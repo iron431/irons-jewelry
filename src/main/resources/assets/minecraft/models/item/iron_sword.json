@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:item/handheld",
+  "loader": "irons_jewelry:dynamic_model",
+  "temp": [
+    "palette_api:base/test_long_sword_template_gold",
+    "palette_api:base/test_hilt_template_gold"
+  ]
+}

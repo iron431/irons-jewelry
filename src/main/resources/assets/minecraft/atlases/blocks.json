@@ -1,0 +1,15 @@
+{
+    "sources": [
+        {
+            "type": "paletted_permutations",
+            "textures": [
+                "irons_jewelry:base/gold_ring"
+            ],
+            "palette_key": "irons_jewelry:palettes/gold",
+            "permutations": {
+                "gold": "irons_jewelry:palettes/gold",
+                "test": "irons_jewelry:palettes/test"
+            }
+        }
+    ]
+}
