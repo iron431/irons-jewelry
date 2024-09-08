@@ -1,0 +1,19 @@
+{
+  "unlocked_by_default": true,
+  "parts": [
+    {
+      "id":"gem_band",
+      "material_cost": 4
+    },
+    {
+      "id":"pointy_gem",
+      "material_cost": 1
+    }
+  ],
+  "bonuses": [
+    {
+      "bonus_source": "pointy_gem",
+      "quality_source": "gem_band"
+    }
+  ]
+}

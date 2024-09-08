@@ -6,11 +6,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.math.Transformation;
 import io.redspace.ironsjewelry.IronsJewelry;
-import io.redspace.ironsjewelry.core.AbstractPattern;
-import io.redspace.ironsjewelry.data.JewelryData;
-import io.redspace.ironsjewelry.data.MaterialData;
-import io.redspace.ironsjewelry.data.PartData;
-import io.redspace.ironsjewelry.data.PartInstance;
+import io.redspace.ironsjewelry.core.Pattern;
+import io.redspace.ironsjewelry.core.data.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.RenderType;
@@ -43,7 +40,6 @@ import org.joml.Vector3f;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -84,13 +80,11 @@ public class DynamicModel implements IUnbakedGeometry<DynamicModel> {
         }
 
         private static JewelryData tempJewelryData() {
-            ResourceLocation patternId = IronsJewelry.id("simple_ring");
-            ResourceLocation bandPartId = IronsJewelry.id("unadorned_band");
-            PartData unadornedBand = new PartData(bandPartId, IronsJewelry.id("base/gold_ring"));
-            MaterialData materialData = new MaterialData(IronsJewelry.id("wip_material"), null, IronsJewelry.id("palettes/test"), null, 1);
+            PartDefinition unadornedBand = new PartDefinition(IronsJewelry.id("base/gold_ring"));
+            MaterialData materialData = new MaterialData(null, IronsJewelry.id("palettes/test"), null, 1);
             return new JewelryData(
-                    new AbstractPattern(patternId, Map.of(bandPartId, unadornedBand)),
-                    Map.of(bandPartId, new PartInstance(unadornedBand, materialData))
+                    new Pattern(List.of(new PartIngredient(unadornedBand, 4)), List.of(), true),
+                    List.of(new PartInstance(unadornedBand, materialData))
             );
         }
 
@@ -132,18 +126,12 @@ public class DynamicModel implements IUnbakedGeometry<DynamicModel> {
 
     public static BakedModel bake(JewelryData jewelryData, IGeometryBakingContext context, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelState, ItemOverrides overrides) {
         IronsJewelry.LOGGER.debug("JewelryModel bake: {}", jewelryData);
-        var partInstance = jewelryData.getFirstPart();
-        if (partInstance.isPresent()) {
-            TextureAtlasSprite particle = spriteGetter.apply(new Material(InventoryMenu.BLOCK_ATLAS, partInstance.get().atlasResourceLocaction()));
+        var parts = jewelryData.parts();
+        if (!parts.isEmpty()) {
+            TextureAtlasSprite particle = spriteGetter.apply(new Material(InventoryMenu.BLOCK_ATLAS, parts.getFirst().atlasResourceLocaction()));
             CompositeModel.Baked.Builder builder = CompositeModel.Baked.builder(context, particle, overrides, context.getTransforms());
             Transformation rootTransform = context.getRootTransform();
 
-
-            var parts = jewelryData.parts().values().stream().toList();
-//            var list2 = new ArrayList<Drawable>();
-//            for (int i = 0; i < parts.size(); i++) {
-//                list2.add(new Drawable(parts.get(i), 1f + i * .001f));
-//            }
             for (int i = 0; i < parts.size(); i++) {
                 PartInstance part = parts.get(i);
                 TextureAtlasSprite sprite = spriteGetter.apply(new Material(InventoryMenu.BLOCK_ATLAS, part.atlasResourceLocaction()));

@@ -1,8 +1,8 @@
-package io.redspace.ironsjewelry.data;
+package io.redspace.ironsjewelry.core.data;
 
 import net.minecraft.resources.ResourceLocation;
 
-public record PartInstance(PartData part, MaterialData material) {
+public record PartInstance(PartDefinition part, MaterialData material) {
 
     public ResourceLocation atlasResourceLocaction(){
         String composite = part.baseTextureLocation().toString();
