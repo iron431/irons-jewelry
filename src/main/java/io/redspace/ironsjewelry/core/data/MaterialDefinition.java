@@ -15,12 +15,12 @@ import java.util.List;
  * @param bonuses list of bonuses using this materialId could provide
  * @param quality effectiveness multiplier to bonuses of jewelry made from this materialId
  */
-public record MaterialData(Ingredient ingredient, ResourceLocation paletteLocation, List<AbstractBonus> bonuses, double quality) {
+public record MaterialDefinition(Ingredient ingredient, ResourceLocation paletteLocation, List<AbstractBonus> bonuses, double quality) {
     //TODO: figure out how to record bonuses
-    public static final Codec<MaterialData> CODEC = RecordCodecBuilder.create(builder -> builder.group(
-            Ingredient.CODEC.fieldOf("ingredient").forGetter(MaterialData::ingredient),
-            ResourceLocation.CODEC.fieldOf("paletteLocation").forGetter(MaterialData::paletteLocation),
+    public static final Codec<MaterialDefinition> CODEC = RecordCodecBuilder.create(builder -> builder.group(
+            Ingredient.CODEC.fieldOf("ingredient").forGetter(MaterialDefinition::ingredient),
+            ResourceLocation.CODEC.fieldOf("paletteLocation").forGetter(MaterialDefinition::paletteLocation),
             //Codecs.li.CODEC.fieldOf("paletteLocation").forGetter(MaterialData::bonuses),
-            Codec.DOUBLE.fieldOf("quality").forGetter(MaterialData::quality)
-    ).apply(builder, (ingredient, paletteLocation, quality) -> new MaterialData(ingredient, paletteLocation, List.of(), quality)));
+            Codec.DOUBLE.fieldOf("quality").forGetter(MaterialDefinition::quality)
+    ).apply(builder, (ingredient, paletteLocation, quality) -> new MaterialDefinition(ingredient, paletteLocation, List.of(), quality)));
 }

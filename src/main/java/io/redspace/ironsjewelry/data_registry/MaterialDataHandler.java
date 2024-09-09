@@ -5,7 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 import io.redspace.ironsjewelry.IronsJewelry;
-import io.redspace.ironsjewelry.core.data.MaterialData;
+import io.redspace.ironsjewelry.core.data.MaterialDefinition;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -15,7 +15,7 @@ import net.minecraft.util.profiling.ProfilerFiller;
 import java.util.Map;
 
 public class MaterialDataHandler extends SimpleJsonResourceReloadListener {
-    public static Map<ResourceLocation, MaterialData> INSTANCE;
+    public static Map<ResourceLocation, MaterialDefinition> INSTANCE;
 
     public MaterialDataHandler() {
         super(new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create(), "irons_jewelry/materials");
@@ -30,7 +30,7 @@ public class MaterialDataHandler extends SimpleJsonResourceReloadListener {
     @Override
     protected void apply(Map<ResourceLocation, JsonElement> pObject, ResourceManager pResourceManager, ProfilerFiller pProfiler) {
         IronsJewelry.LOGGER.debug("MaterialDataHandler.apply");
-        ImmutableMap.Builder<ResourceLocation, MaterialData> builder = ImmutableMap.builder();
+        ImmutableMap.Builder<ResourceLocation, MaterialDefinition> builder = ImmutableMap.builder();
         RegistryOps<JsonElement> registryops = this.makeConditionalOps(); // Neo: add condition context
 
         for (Map.Entry<ResourceLocation, JsonElement> entry : pObject.entrySet()) {
@@ -39,7 +39,7 @@ public class MaterialDataHandler extends SimpleJsonResourceReloadListener {
                 continue; //Forge: filter anything beginning with "_" as it's used for metadata.
 
             try {
-                var decoded = MaterialData.CODEC.parse(registryops, entry.getValue()).getOrThrow(JsonParseException::new);
+                var decoded = MaterialDefinition.CODEC.parse(registryops, entry.getValue()).getOrThrow(JsonParseException::new);
                 builder.put(resourcelocation, decoded);
             } catch (IllegalArgumentException | JsonParseException jsonparseexception) {
                 IronsJewelry.LOGGER.error("Parsing error loading materialId {}", resourcelocation, jsonparseexception);
