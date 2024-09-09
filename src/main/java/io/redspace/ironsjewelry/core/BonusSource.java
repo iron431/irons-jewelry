@@ -2,18 +2,17 @@ package io.redspace.ironsjewelry.core;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import io.redspace.ironsjewelry.core.data.PartDefinition;
-import io.redspace.ironsjewelry.data_registry.PartDataHandler;
+import net.minecraft.resources.ResourceLocation;
 
-public record BonusSource(PartDefinition partSource, PartDefinition qualitySource) {
+public record BonusSource(ResourceLocation partIdForBonus, ResourceLocation partIdForQuality) {
     public static final Codec<BonusSource> CODEC = RecordCodecBuilder.create(builder -> builder.group(
-            PartDataHandler.CODEC.fieldOf("partSource").forGetter(BonusSource::partSource),
-            PartDataHandler.CODEC.fieldOf("qualitySource").forGetter(BonusSource::qualitySource)
+            ResourceLocation.CODEC.fieldOf("bonusSource").forGetter(BonusSource::partIdForBonus),
+            ResourceLocation.CODEC.fieldOf("qualitySource").forGetter(BonusSource::partIdForQuality)
     ).apply(builder, BonusSource::new));
 
     @Override
     public int hashCode() {
-        return partSource.hashCode() * 31 + qualitySource().hashCode();
+        return partIdForBonus.hashCode() * 31 + partIdForQuality().hashCode();
     }
 }
 

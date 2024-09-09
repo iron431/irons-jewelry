@@ -6,8 +6,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.math.Transformation;
 import io.redspace.ironsjewelry.IronsJewelry;
-import io.redspace.ironsjewelry.core.Pattern;
-import io.redspace.ironsjewelry.core.data.*;
+import io.redspace.ironsjewelry.core.data.JewelryData;
+import io.redspace.ironsjewelry.core.data.PartInstance;
+import io.redspace.ironsjewelry.registry.ComponentRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.RenderType;
@@ -70,7 +71,7 @@ public class DynamicModel implements IUnbakedGeometry<DynamicModel> {
                 @Nullable
                 @Override
                 public BakedModel resolve(BakedModel pModel, ItemStack pStack, @Nullable ClientLevel pLevel, @Nullable LivingEntity pEntity, int pSeed) {
-                    JewelryData data = tempJewelryData();//pStack.get(ComponentRegistry.JEWELRY_COMPONENT);
+                    JewelryData data = pStack.get(ComponentRegistry.JEWELRY_COMPONENT);
                     if (data != null) {
                         return ClientModelCache.MODEL_CACHE.computeIfAbsent(data.hashCode(), (i) -> bake(data, context, baker.getModelTextureGetter(), modelState, new ItemOverrides(baker, blockmodel, List.of(), baker.getModelTextureGetter())));
                     }
@@ -79,14 +80,15 @@ public class DynamicModel implements IUnbakedGeometry<DynamicModel> {
             };
         }
 
-        private static JewelryData tempJewelryData() {
-            PartDefinition unadornedBand = new PartDefinition(IronsJewelry.id("base/gold_ring"));
-            MaterialData materialData = new MaterialData(null, IronsJewelry.id("palettes/test"), null, 1);
-            return new JewelryData(
-                    new Pattern(List.of(new PartIngredient(unadornedBand, 4)), List.of(), true),
-                    List.of(new PartInstance(unadornedBand, materialData))
-            );
-        }
+//        private static JewelryData tempJewelryData() {
+//            var partId = IronsJewelry.id("base/gold_ring");
+//            PartDefinition unadornedBand = new PartDefinition(partId);
+//            MaterialData materialData = new MaterialData(null, IronsJewelry.id("palettes/test"), null, 1);
+//            return new JewelryData(
+//                    new Pattern(List.of(new PartIngredient(partId, 4)), List.of(), true),
+//                    List.of(new PartInstance(unadornedBand, materialData))
+//            );
+//        }
 
         @Override
         public List<BakedQuad> getQuads(@Nullable BlockState pState, @Nullable Direction pDirection, RandomSource pRandom) {

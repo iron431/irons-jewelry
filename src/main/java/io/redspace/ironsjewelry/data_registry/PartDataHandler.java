@@ -4,8 +4,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.redspace.ironsjewelry.IronsJewelry;
 import io.redspace.ironsjewelry.core.data.PartDefinition;
 import net.minecraft.resources.RegistryOps;
@@ -17,10 +15,8 @@ import net.minecraft.util.profiling.ProfilerFiller;
 import java.util.Map;
 
 public class PartDataHandler extends SimpleJsonResourceReloadListener {
-    private static Map<ResourceLocation, PartDefinition> INSTANCE;
-    public static final Codec<PartDefinition> CODEC = RecordCodecBuilder.create(builder -> builder.group(
-            ResourceLocation.CODEC.fieldOf("baseTextureLocation").forGetter(PartDefinition::baseTextureLocation)
-    ).apply(builder, PartDefinition::new));
+    public static Map<ResourceLocation, PartDefinition> INSTANCE;
+
 
     public PartDataHandler() {
         super(new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create(), "irons_jewelry/parts");
@@ -37,10 +33,10 @@ public class PartDataHandler extends SimpleJsonResourceReloadListener {
                 continue; //Forge: filter anything beginning with "_" as it's used for metadata.
 
             try {
-                var decoded = CODEC.parse(registryops, entry.getValue()).getOrThrow(JsonParseException::new);
+                var decoded = PartDefinition.CODEC.parse(registryops, entry.getValue()).getOrThrow(JsonParseException::new);
                 builder.put(resourcelocation, decoded);
             } catch (IllegalArgumentException | JsonParseException jsonparseexception) {
-                IronsJewelry.LOGGER.error("Parsing error loading part {}", resourcelocation, jsonparseexception);
+                IronsJewelry.LOGGER.error("Parsing error loading partId {}", resourcelocation, jsonparseexception);
             }
         }
 

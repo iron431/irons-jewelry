@@ -4,12 +4,8 @@ import com.google.common.collect.ImmutableMap;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.redspace.ironsjewelry.IronsJewelry;
-import io.redspace.ironsjewelry.core.BonusSource;
 import io.redspace.ironsjewelry.core.Pattern;
-import io.redspace.ironsjewelry.core.data.PartIngredient;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -20,11 +16,6 @@ import java.util.Map;
 
 public class PatternDataHandler extends SimpleJsonResourceReloadListener {
     private static Map<ResourceLocation, Pattern> INSTANCE;
-    public static final Codec<Pattern> CODEC = RecordCodecBuilder.create(builder -> builder.group(
-            Codec.list(PartIngredient.CODEC).fieldOf("requiredParts").forGetter(Pattern::partTemplate),
-            Codec.list(BonusSource.CODEC).fieldOf("bonuses").forGetter(Pattern::bonuses),
-            Codec.BOOL.fieldOf("unlockedByDefault").forGetter(Pattern::unlockedByDefault)
-    ).apply(builder, Pattern::new));
 
     public PatternDataHandler() {
         super(new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create(), "irons_jewelry/patterns");
@@ -41,7 +32,7 @@ public class PatternDataHandler extends SimpleJsonResourceReloadListener {
                 continue; //Forge: filter anything beginning with "_" as it's used for metadata.
 
             try {
-                var decoded = CODEC.parse(registryops, entry.getValue()).getOrThrow(JsonParseException::new);
+                var decoded = Pattern.CODEC.parse(registryops, entry.getValue()).getOrThrow(JsonParseException::new);
                 builder.put(resourcelocation, decoded);
             } catch (IllegalArgumentException | JsonParseException jsonparseexception) {
                 IronsJewelry.LOGGER.error("Parsing error loading pattern {}", resourcelocation, jsonparseexception);
