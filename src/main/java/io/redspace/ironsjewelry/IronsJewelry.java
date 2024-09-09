@@ -2,6 +2,9 @@ package io.redspace.ironsjewelry;
 
 import com.mojang.logging.LogUtils;
 import io.redspace.ironsjewelry.client.DynamicModel;
+import io.redspace.ironsjewelry.data_registry.MaterialDataHandler;
+import io.redspace.ironsjewelry.data_registry.PartDataHandler;
+import io.redspace.ironsjewelry.data_registry.PatternDataHandler;
 import io.redspace.ironsjewelry.registry.ComponentRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -28,6 +31,7 @@ import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.client.event.ModelEvent;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.AddReloadListenerEvent;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.neoforged.neoforge.registries.DeferredBlock;
@@ -74,6 +78,7 @@ public class IronsJewelry {
         // Register the commonSetup method for modloading
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::registerModelLoader);
+        NeoForge.EVENT_BUS.addListener(this::registerReloadListeners);
 
         // Register the Deferred Register to the mod event bus so blocks get registered
         BLOCKS.register(modEventBus);
@@ -130,6 +135,12 @@ public class IronsJewelry {
             LOGGER.info("HELLO FROM CLIENT SETUP");
             LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().getUser().getName());
         }
+    }
+
+    public void registerReloadListeners(AddReloadListenerEvent event) {
+        event.addListener(new MaterialDataHandler());
+        event.addListener(new PatternDataHandler());
+        event.addListener(new PartDataHandler());
     }
 
     public void registerModelLoader(ModelEvent.RegisterGeometryLoaders event) {
