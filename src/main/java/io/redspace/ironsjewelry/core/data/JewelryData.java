@@ -9,11 +9,8 @@ import java.util.List;
  * @param parts   The part instances this piece of jewelry is made of
  */
 public record JewelryData(Pattern pattern, List<PartInstance> parts) {
-
-    //TODO: hash code implementation
-
     @Override
     public int hashCode() {
-        return 0;
+        return pattern.hashCode() * 31 + parts.hashCode();
     }
 }

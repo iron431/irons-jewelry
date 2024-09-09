@@ -9,4 +9,9 @@ public record PartIngredient(PartDefinition part, int materialCost) {
             PartDataHandler.CODEC.fieldOf("id").forGetter(PartIngredient::part),
             Codec.INT.fieldOf("materialCost").forGetter(PartIngredient::materialCost)
     ).apply(builder, PartIngredient::new));
+
+    @Override
+    public int hashCode() {
+        return part.hashCode();
+    }
 }

@@ -10,6 +10,11 @@ public record BonusSource(PartDefinition partSource, PartDefinition qualitySourc
             PartDataHandler.CODEC.fieldOf("partSource").forGetter(BonusSource::partSource),
             PartDataHandler.CODEC.fieldOf("qualitySource").forGetter(BonusSource::qualitySource)
     ).apply(builder, BonusSource::new));
+
+    @Override
+    public int hashCode() {
+        return partSource.hashCode() * 31 + qualitySource().hashCode();
+    }
 }
 
 

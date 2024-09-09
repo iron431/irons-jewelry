@@ -2,11 +2,11 @@
   "unlockedByDefault": true,
   "parts": [
     {
-      "id":"gem_band",
+      "id": "gem_band",
       "materialCost": 4
     },
     {
-      "id":"pointy_gem",
+      "id": "pointy_gem",
       "materialCost": 1
     }
   ],
