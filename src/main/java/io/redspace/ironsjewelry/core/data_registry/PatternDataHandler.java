@@ -40,5 +40,6 @@ public class PatternDataHandler extends SimpleJsonResourceReloadListener {
         }
 
         INSTANCE = builder.build();
+        IronsJewelry.LOGGER.debug("PatternDataHandler Finished Loading: {}", INSTANCE);
     }
 }

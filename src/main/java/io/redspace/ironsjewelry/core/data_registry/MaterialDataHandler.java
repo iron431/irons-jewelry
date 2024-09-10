@@ -47,5 +47,7 @@ public class MaterialDataHandler extends SimpleJsonResourceReloadListener {
         }
 
         INSTANCE = builder.build();
+        IronsJewelry.LOGGER.debug("MaterialDataHandler Finished Loading: {}", INSTANCE);
+
     }
 }

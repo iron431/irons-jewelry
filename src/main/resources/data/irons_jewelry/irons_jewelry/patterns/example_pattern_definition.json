@@ -6,13 +6,13 @@
       "materialCost": 4
     },
     {
-      "id": "irons_jewelry:gem_pointy",
+      "id": "irons_jewelry:pointy_gem",
       "materialCost": 1
     }
   ],
   "bonuses": [
     {
-      "bonusSource": "irons_jewelry:gem_band",
+      "bonusSource": "irons_jewelry:pointy_gem",
       "qualitySource": "irons_jewelry:gem_band"
     }
   ]

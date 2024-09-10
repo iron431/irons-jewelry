@@ -134,6 +134,7 @@ public class DynamicModel implements IUnbakedGeometry<DynamicModel> {
             CompositeModel.Baked.Builder builder = CompositeModel.Baked.builder(context, particle, overrides, context.getTransforms());
             Transformation rootTransform = context.getRootTransform();
 
+            //TODO: should we validate the pattern?
             for (int i = 0; i < parts.size(); i++) {
                 PartInstance part = parts.get(i);
                 TextureAtlasSprite sprite = spriteGetter.apply(new Material(InventoryMenu.BLOCK_ATLAS, part.atlasResourceLocaction()));

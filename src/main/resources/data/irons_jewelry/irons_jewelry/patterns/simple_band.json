@@ -1,0 +1,15 @@
+{
+  "unlockedByDefault": true,
+  "parts": [
+    {
+      "id": "irons_jewelry:simple_band",
+      "materialCost": 4
+    }
+  ],
+  "bonuses": [
+    {
+      "bonusSource": "irons_jewelry:simple_band",
+      "qualitySource": "irons_jewelry:simple_band"
+    }
+  ]
+}

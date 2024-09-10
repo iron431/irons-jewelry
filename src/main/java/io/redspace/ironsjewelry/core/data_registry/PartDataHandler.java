@@ -41,5 +41,6 @@ public class PartDataHandler extends SimpleJsonResourceReloadListener {
         }
 
         INSTANCE = builder.build();
+        IronsJewelry.LOGGER.debug("PartDataHandler Finished Loading: {}", INSTANCE);
     }
 }
