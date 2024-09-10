@@ -2,6 +2,7 @@ package io.redspace.ironsjewelry.core.data;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import io.redspace.ironsjewelry.core.data_registry.PatternDataHandler;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
@@ -35,6 +36,10 @@ public record JewelryData(ResourceLocation patternId, List<PartInstance> parts) 
         }
         return new JewelryData(patternid, parts);
     });
+
+    public PatternDefinition pattern() {
+        return PatternDataHandler.INSTANCE.get(this.patternId);
+    }
 
     @Override
     public int hashCode() {

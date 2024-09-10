@@ -2,10 +2,11 @@ package io.redspace.ironsjewelry;
 
 import com.mojang.logging.LogUtils;
 import io.redspace.ironsjewelry.client.DynamicModel;
-import io.redspace.ironsjewelry.data_registry.MaterialDataHandler;
-import io.redspace.ironsjewelry.data_registry.PartDataHandler;
-import io.redspace.ironsjewelry.data_registry.PatternDataHandler;
+import io.redspace.ironsjewelry.core.data_registry.MaterialDataHandler;
+import io.redspace.ironsjewelry.core.data_registry.PartDataHandler;
+import io.redspace.ironsjewelry.core.data_registry.PatternDataHandler;
 import io.redspace.ironsjewelry.registry.ComponentRegistry;
+import io.redspace.ironsjewelry.registry.BonusRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -78,6 +79,7 @@ public class IronsJewelry {
         // Register the commonSetup method for modloading
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::registerModelLoader);
+        modEventBus.addListener(BonusRegistry::registerRegistry);
         NeoForge.EVENT_BUS.addListener(this::registerReloadListeners);
 
         // Register the Deferred Register to the mod event bus so blocks get registered
@@ -88,6 +90,7 @@ public class IronsJewelry {
         CREATIVE_MODE_TABS.register(modEventBus);
 
         ComponentRegistry.register(modEventBus);
+        BonusRegistry.register(modEventBus);
 
         // Register ourselves for server and other game events we are interested in.
         // Note that this is necessary if and only if we want *this* class (ExampleMod) to respond directly to events.

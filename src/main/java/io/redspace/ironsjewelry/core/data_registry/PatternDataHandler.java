@@ -1,11 +1,11 @@
-package io.redspace.ironsjewelry.data_registry;
+package io.redspace.ironsjewelry.core.data_registry;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 import io.redspace.ironsjewelry.IronsJewelry;
-import io.redspace.ironsjewelry.core.data.PartDefinition;
+import io.redspace.ironsjewelry.core.data.PatternDefinition;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -14,17 +14,16 @@ import net.minecraft.util.profiling.ProfilerFiller;
 
 import java.util.Map;
 
-public class PartDataHandler extends SimpleJsonResourceReloadListener {
-    public static Map<ResourceLocation, PartDefinition> INSTANCE;
+public class PatternDataHandler extends SimpleJsonResourceReloadListener {
+    public static Map<ResourceLocation, PatternDefinition> INSTANCE;
 
-
-    public PartDataHandler() {
-        super(new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create(), "irons_jewelry/parts");
+    public PatternDataHandler() {
+        super(new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create(), "irons_jewelry/patterns");
     }
 
     @Override
     protected void apply(Map<ResourceLocation, JsonElement> pObject, ResourceManager pResourceManager, ProfilerFiller pProfiler) {
-        ImmutableMap.Builder<ResourceLocation, PartDefinition> builder = ImmutableMap.builder();
+        ImmutableMap.Builder<ResourceLocation, PatternDefinition> builder = ImmutableMap.builder();
         RegistryOps<JsonElement> registryops = this.makeConditionalOps(); // Neo: add condition context
 
         for (Map.Entry<ResourceLocation, JsonElement> entry : pObject.entrySet()) {
@@ -33,10 +32,10 @@ public class PartDataHandler extends SimpleJsonResourceReloadListener {
                 continue; //Forge: filter anything beginning with "_" as it's used for metadata.
 
             try {
-                var decoded = PartDefinition.CODEC.parse(registryops, entry.getValue()).getOrThrow(JsonParseException::new);
+                var decoded = PatternDefinition.CODEC.parse(registryops, entry.getValue()).getOrThrow(JsonParseException::new);
                 builder.put(resourcelocation, decoded);
             } catch (IllegalArgumentException | JsonParseException jsonparseexception) {
-                IronsJewelry.LOGGER.error("Parsing error loading partId {}", resourcelocation, jsonparseexception);
+                IronsJewelry.LOGGER.error("Parsing error loading pattern {}", resourcelocation, jsonparseexception);
             }
         }
 
