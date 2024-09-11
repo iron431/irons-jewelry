@@ -1,6 +1,7 @@
 package io.redspace.ironsjewelry.core.data_registry;
 
-import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.ImmutableBiMap;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
@@ -15,7 +16,7 @@ import net.minecraft.util.profiling.ProfilerFiller;
 import java.util.Map;
 
 public class PartDataHandler extends SimpleJsonResourceReloadListener {
-    public static Map<ResourceLocation, PartDefinition> INSTANCE;
+    private static BiMap<ResourceLocation, PartDefinition> INSTANCE;
 
 
     public PartDataHandler() {
@@ -24,7 +25,7 @@ public class PartDataHandler extends SimpleJsonResourceReloadListener {
 
     @Override
     protected void apply(Map<ResourceLocation, JsonElement> pObject, ResourceManager pResourceManager, ProfilerFiller pProfiler) {
-        ImmutableMap.Builder<ResourceLocation, PartDefinition> builder = ImmutableMap.builder();
+        ImmutableBiMap.Builder<ResourceLocation, PartDefinition> builder = ImmutableBiMap.builder();
         RegistryOps<JsonElement> registryops = this.makeConditionalOps(); // Neo: add condition context
 
         for (Map.Entry<ResourceLocation, JsonElement> entry : pObject.entrySet()) {
@@ -36,11 +37,19 @@ public class PartDataHandler extends SimpleJsonResourceReloadListener {
                 var decoded = PartDefinition.CODEC.parse(registryops, entry.getValue()).getOrThrow(JsonParseException::new);
                 builder.put(resourcelocation, decoded);
             } catch (IllegalArgumentException | JsonParseException jsonparseexception) {
-                IronsJewelry.LOGGER.error("Parsing error loading partId {}", resourcelocation, jsonparseexception);
+                IronsJewelry.LOGGER.error("Parsing error loading part {}", resourcelocation, jsonparseexception);
             }
         }
 
         INSTANCE = builder.build();
         IronsJewelry.LOGGER.debug("PartDataHandler Finished Loading: {}", INSTANCE);
+    }
+
+    public static PartDefinition get(ResourceLocation resourceLocation) {
+        return INSTANCE.get(resourceLocation);
+    }
+
+    public static ResourceLocation getKey(PartDefinition part) {
+        return INSTANCE.inverse().get(part);
     }
 }

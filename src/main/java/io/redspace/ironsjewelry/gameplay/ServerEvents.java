@@ -4,7 +4,6 @@ import io.redspace.ironsjewelry.IronsJewelry;
 import io.redspace.ironsjewelry.core.IBonus;
 import io.redspace.ironsjewelry.core.bonuses.DeathBonus;
 import io.redspace.ironsjewelry.core.data.BonusSource;
-import io.redspace.ironsjewelry.core.data_registry.MaterialDataHandler;
 import io.redspace.ironsjewelry.registry.ComponentRegistry;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -25,7 +24,7 @@ public class ServerEvents {
             var data = tempJewelry.get(ComponentRegistry.JEWELRY_COMPONENT);
             if (data != null) {
                 for (BonusSource source : data.pattern().bonuses()) {
-                    var bonuses = data.parts().stream().filter(part -> part.partId().equals(source.partIdForBonus())).findFirst().map(instance -> MaterialDataHandler.INSTANCE.get(instance.materialId()).bonuses()).orElse(List.of());
+                    var bonuses = data.parts().stream().filter(part -> part.part().equals(source.partIdForBonus())).findFirst().map(instance -> instance.material().bonuses()).orElse(List.of());
                     for (IBonus bonus : bonuses) {
                         if(bonus instanceof DeathBonus){
                             player.die(player.level().damageSources().fellOutOfWorld());

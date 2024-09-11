@@ -1,6 +1,7 @@
 package io.redspace.ironsjewelry.core.data_registry;
 
-import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.ImmutableBiMap;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
@@ -15,7 +16,7 @@ import net.minecraft.util.profiling.ProfilerFiller;
 import java.util.Map;
 
 public class MaterialDataHandler extends SimpleJsonResourceReloadListener {
-    public static Map<ResourceLocation, MaterialDefinition> INSTANCE;
+    private static BiMap<ResourceLocation, MaterialDefinition> INSTANCE;
 
     public MaterialDataHandler() {
         super(new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create(), "irons_jewelry/materials");
@@ -30,7 +31,7 @@ public class MaterialDataHandler extends SimpleJsonResourceReloadListener {
     @Override
     protected void apply(Map<ResourceLocation, JsonElement> pObject, ResourceManager pResourceManager, ProfilerFiller pProfiler) {
         IronsJewelry.LOGGER.debug("MaterialDataHandler.apply");
-        ImmutableMap.Builder<ResourceLocation, MaterialDefinition> builder = ImmutableMap.builder();
+        ImmutableBiMap.Builder<ResourceLocation, MaterialDefinition> builder = ImmutableBiMap.builder();
         RegistryOps<JsonElement> registryops = this.makeConditionalOps(); // Neo: add condition context
 
         for (Map.Entry<ResourceLocation, JsonElement> entry : pObject.entrySet()) {
@@ -42,12 +43,20 @@ public class MaterialDataHandler extends SimpleJsonResourceReloadListener {
                 var decoded = MaterialDefinition.CODEC.parse(registryops, entry.getValue()).getOrThrow(JsonParseException::new);
                 builder.put(resourcelocation, decoded);
             } catch (IllegalArgumentException | JsonParseException jsonparseexception) {
-                IronsJewelry.LOGGER.error("Parsing error loading materialId {}", resourcelocation, jsonparseexception);
+                IronsJewelry.LOGGER.error("Parsing error loading material {}", resourcelocation, jsonparseexception);
             }
         }
 
         INSTANCE = builder.build();
         IronsJewelry.LOGGER.debug("MaterialDataHandler Finished Loading: {}", INSTANCE);
 
+    }
+
+    public static MaterialDefinition get(ResourceLocation resourceLocation) {
+        return INSTANCE.get(resourceLocation);
+    }
+
+    public static ResourceLocation getKey(MaterialDefinition part) {
+        return INSTANCE.inverse().get(part);
     }
 }

@@ -2,7 +2,6 @@ package io.redspace.ironsjewelry.client;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.math.Transformation;
 import io.redspace.ironsjewelry.IronsJewelry;
@@ -39,17 +38,13 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class DynamicModel implements IUnbakedGeometry<DynamicModel> {
-    List<Material> textures;
 
-    public DynamicModel(List<ResourceLocation> textures) {
+    public DynamicModel() {
         ResourceLocation atlasToUse = InventoryMenu.BLOCK_ATLAS;
-        this.textures = textures.stream().map((resourceLocation -> new Material(atlasToUse, resourceLocation))).collect(Collectors.toList());
     }
 
     @Override
@@ -81,11 +76,11 @@ public class DynamicModel implements IUnbakedGeometry<DynamicModel> {
         }
 
 //        private static JewelryData tempJewelryData() {
-//            var partId = IronsJewelry.id("base/gold_ring");
-//            PartDefinition unadornedBand = new PartDefinition(partId);
+//            var part = IronsJewelry.id("base/gold_ring");
+//            PartDefinition unadornedBand = new PartDefinition(part);
 //            MaterialData materialData = new MaterialData(null, IronsJewelry.id("palettes/test"), null, 1);
 //            return new JewelryData(
-//                    new Pattern(List.of(new PartIngredient(partId, 4)), List.of(), true),
+//                    new Pattern(List.of(new PartIngredient(part, 4)), List.of(), true),
 //                    List.of(new PartInstance(unadornedBand, materialData))
 //            );
 //        }
@@ -167,15 +162,7 @@ public class DynamicModel implements IUnbakedGeometry<DynamicModel> {
 
         @Override
         public DynamicModel read(JsonObject jsonObject, JsonDeserializationContext deserializationContext) {
-            JsonArray tempTextureLocations = GsonHelper.getAsJsonArray(jsonObject, "temp");
-            ArrayList<ResourceLocation> textureLocations = new ArrayList<>();
-            for (JsonElement object : tempTextureLocations) {
-                textureLocations.add(ResourceLocation.parse(object.getAsString()));
-            }
-            //TODO: allow people to load nbt-translator here too?
-            IronsJewelry.LOGGER.debug("PalettedModel.Loader.read textureLocations ({}):", textureLocations.size());
-            textureLocations.forEach(r -> IronsJewelry.LOGGER.debug("\t" + r.toString()));
-            return new DynamicModel(textureLocations);
+            return new DynamicModel();
         }
     }
 }

@@ -11,5 +11,6 @@
       "bonusSource": "irons_jewelry:simple_band",
       "qualitySource": "irons_jewelry:simple_band"
     }
-  ]
+  ],
+  "qualityMultiplier": 0.5
 }

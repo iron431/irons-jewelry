@@ -1,0 +1,4 @@
+{
+  "parent": "minecraft:item/handheld",
+  "loader": "irons_jewelry:dynamic_model"
+}

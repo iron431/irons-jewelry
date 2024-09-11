@@ -3,11 +3,13 @@
     "item": "minecraft:gold_ingot"
   },
   "paletteLocation": "irons_jewelry:item/palettes/gold",
-  "quality": 1.0,
+  "quality": 2.5,
   "bonuses": [
     {
-      "type": "irons_jewelry:death",
-      "deathBonus": true
+      "type": "irons_jewelry:attribute_bonus",
+      "attribute": "minecraft:generic.max_health",
+      "amount": 4,
+      "operation": "add_value"
     }
   ]
 }

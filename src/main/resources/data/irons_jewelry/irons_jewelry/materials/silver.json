@@ -3,7 +3,7 @@
     "item": "minecraft:gold_ingot"
   },
   "paletteLocation": "irons_jewelry:item/palettes/silver",
-  "quality": 1.0,
+  "quality": 2.0,
   "bonuses": [
   ]
 }
