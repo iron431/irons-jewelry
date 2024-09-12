@@ -1,13 +1,12 @@
 package io.redspace.ironsjewelry.client;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.mojang.math.Transformation;
 import io.redspace.ironsjewelry.IronsJewelry;
 import io.redspace.ironsjewelry.core.data.JewelryData;
-import io.redspace.ironsjewelry.core.data.PartInstance;
-import io.redspace.ironsjewelry.registry.ComponentRegistry;
+import io.redspace.ironsjewelry.core.data.MaterialDefinition;
+import io.redspace.ironsjewelry.core.data.PartDefinition;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.RenderType;
@@ -19,7 +18,6 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.*;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.GsonHelper;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.inventory.InventoryMenu;
@@ -57,7 +55,6 @@ public class DynamicModel implements IUnbakedGeometry<DynamicModel> {
         ItemOverrides overrides;
 
         public BakedHolder(IGeometryBakingContext context, ModelBaker baker, ModelState modelState) {
-            //fixme: will the missing model have been baked yet?
             this.model = Minecraft.getInstance().getModelManager().getMissingModel();
             var blockmodel = (BlockModel) baker.getModel(ModelBakery.MISSING_MODEL_LOCATION);
             this.overrides = new ItemOverrides(baker, blockmodel,
@@ -66,24 +63,14 @@ public class DynamicModel implements IUnbakedGeometry<DynamicModel> {
                 @Nullable
                 @Override
                 public BakedModel resolve(BakedModel pModel, ItemStack pStack, @Nullable ClientLevel pLevel, @Nullable LivingEntity pEntity, int pSeed) {
-                    JewelryData data = pStack.get(ComponentRegistry.JEWELRY_COMPONENT);
-                    if (data != null) {
+                    JewelryData data = JewelryData.get(pStack);
+                    if (data.isValid()) {
                         return ClientModelCache.MODEL_CACHE.computeIfAbsent(data.hashCode(), (i) -> bake(data, context, baker.getModelTextureGetter(), modelState, new ItemOverrides(baker, blockmodel, List.of(), baker.getModelTextureGetter())));
                     }
                     return EmptyModel.BAKED;
                 }
             };
         }
-
-//        private static JewelryData tempJewelryData() {
-//            var part = IronsJewelry.id("base/gold_ring");
-//            PartDefinition unadornedBand = new PartDefinition(part);
-//            MaterialData materialData = new MaterialData(null, IronsJewelry.id("palettes/test"), null, 1);
-//            return new JewelryData(
-//                    new Pattern(List.of(new PartIngredient(part, 4)), List.of(), true),
-//                    List.of(new PartInstance(unadornedBand, materialData))
-//            );
-//        }
 
         @Override
         public List<BakedQuad> getQuads(@Nullable BlockState pState, @Nullable Direction pDirection, RandomSource pRandom) {
@@ -123,16 +110,14 @@ public class DynamicModel implements IUnbakedGeometry<DynamicModel> {
 
     public static BakedModel bake(JewelryData jewelryData, IGeometryBakingContext context, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelState, ItemOverrides overrides) {
         IronsJewelry.LOGGER.debug("JewelryModel bake: {}", jewelryData);
-        var parts = jewelryData.parts();
+        var parts = jewelryData.parts().entrySet().stream().toList();
         if (!parts.isEmpty()) {
-            TextureAtlasSprite particle = spriteGetter.apply(new Material(InventoryMenu.BLOCK_ATLAS, parts.getFirst().atlasResourceLocaction()));
+            TextureAtlasSprite particle = spriteGetter.apply(new Material(InventoryMenu.BLOCK_ATLAS, atlasResourceLocaction(parts.getFirst().getKey(), parts.getFirst().getValue())));
             CompositeModel.Baked.Builder builder = CompositeModel.Baked.builder(context, particle, overrides, context.getTransforms());
             Transformation rootTransform = context.getRootTransform();
 
-            //TODO: should we validate the pattern?
             for (int i = 0; i < parts.size(); i++) {
-                PartInstance part = parts.get(i);
-                TextureAtlasSprite sprite = spriteGetter.apply(new Material(InventoryMenu.BLOCK_ATLAS, part.atlasResourceLocaction()));
+                TextureAtlasSprite sprite = spriteGetter.apply(new Material(InventoryMenu.BLOCK_ATLAS, atlasResourceLocaction(parts.get(i).getKey(), parts.get(i).getValue())));
 
                 ModelState subState = new SimpleModelState(modelState.getRotation().compose(
                         rootTransform.compose(new Transformation(
@@ -152,6 +137,18 @@ public class DynamicModel implements IUnbakedGeometry<DynamicModel> {
         }
         return EmptyModel.BAKED;
 
+    }
+
+    public static ResourceLocation atlasResourceLocaction(PartDefinition part, MaterialDefinition material) {
+        try {
+            String composite = part.baseTextureLocation().toString();
+            var components = material.paletteLocation().getPath().split("/");
+            composite += "_" + components[components.length - 1];
+            return ResourceLocation.parse(composite);
+        } catch (Exception e) {
+            //TODO: something better
+            return ResourceLocation.parse("unknown");
+        }
     }
 
     public static final class Loader implements IGeometryLoader<DynamicModel> {

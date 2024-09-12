@@ -2,6 +2,8 @@ package io.redspace.ironsjewelry.core.data;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import io.redspace.ironsjewelry.core.data_registry.PatternDataHandler;
+import net.minecraft.resources.ResourceLocation;
 
 import java.util.List;
 
@@ -23,5 +25,9 @@ public record PatternDefinition(List<PartIngredient> partTemplate, List<BonusSou
     @Override
     public int hashCode() {
         return (partTemplate.hashCode() * 31 + bonuses().hashCode()) * 10 + (unlockedByDefault ? 1 : 0);
+    }
+
+    public ResourceLocation id(){
+        return PatternDataHandler.getKey(this);
     }
 }

@@ -14,6 +14,7 @@ import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
 
 import java.util.Map;
+import java.util.Optional;
 
 public class PartDataHandler extends SimpleJsonResourceReloadListener {
     private static BiMap<ResourceLocation, PartDefinition> INSTANCE;
@@ -47,6 +48,10 @@ public class PartDataHandler extends SimpleJsonResourceReloadListener {
 
     public static PartDefinition get(ResourceLocation resourceLocation) {
         return INSTANCE.get(resourceLocation);
+    }
+
+    public static Optional<PartDefinition> getSafe(ResourceLocation resourceLocation) {
+        return INSTANCE.containsKey(resourceLocation) ? Optional.of(INSTANCE.get(resourceLocation)) : Optional.empty();
     }
 
     public static ResourceLocation getKey(PartDefinition part) {

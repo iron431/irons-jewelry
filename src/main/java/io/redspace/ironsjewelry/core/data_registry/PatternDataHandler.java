@@ -1,6 +1,7 @@
 package io.redspace.ironsjewelry.core.data_registry;
 
-import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.ImmutableBiMap;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
@@ -13,9 +14,10 @@ import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
 
 import java.util.Map;
+import java.util.Optional;
 
 public class PatternDataHandler extends SimpleJsonResourceReloadListener {
-    public static Map<ResourceLocation, PatternDefinition> INSTANCE;
+    private static BiMap<ResourceLocation, PatternDefinition> INSTANCE;
 
     public PatternDataHandler() {
         super(new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create(), "irons_jewelry/patterns");
@@ -23,7 +25,7 @@ public class PatternDataHandler extends SimpleJsonResourceReloadListener {
 
     @Override
     protected void apply(Map<ResourceLocation, JsonElement> pObject, ResourceManager pResourceManager, ProfilerFiller pProfiler) {
-        ImmutableMap.Builder<ResourceLocation, PatternDefinition> builder = ImmutableMap.builder();
+        ImmutableBiMap.Builder<ResourceLocation, PatternDefinition> builder = ImmutableBiMap.builder();
         RegistryOps<JsonElement> registryops = this.makeConditionalOps(); // Neo: add condition context
 
         for (Map.Entry<ResourceLocation, JsonElement> entry : pObject.entrySet()) {
@@ -41,5 +43,17 @@ public class PatternDataHandler extends SimpleJsonResourceReloadListener {
 
         INSTANCE = builder.build();
         IronsJewelry.LOGGER.debug("PatternDataHandler Finished Loading: {}", INSTANCE);
+    }
+
+    public static PatternDefinition get(ResourceLocation resourceLocation) {
+        return INSTANCE.get(resourceLocation);
+    }
+
+    public static Optional<PatternDefinition> getSafe(ResourceLocation resourceLocation) {
+        return INSTANCE.containsKey(resourceLocation) ? Optional.of(INSTANCE.get(resourceLocation)) : Optional.empty();
+    }
+
+    public static ResourceLocation getKey(PatternDefinition part) {
+        return INSTANCE.inverse().get(part);
     }
 }

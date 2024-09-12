@@ -95,8 +95,9 @@ public class IronsJewelry {
 
     public void registerReloadListeners(AddReloadListenerEvent event) {
         event.addListener(new MaterialDataHandler());
-        event.addListener(new PatternDataHandler());
         event.addListener(new PartDataHandler());
+        //Pattern Data References Part/Material data and must be run last
+        event.addListener(new PatternDataHandler());
     }
 
     public void registerModelLoader(ModelEvent.RegisterGeometryLoaders event) {

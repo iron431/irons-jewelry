@@ -14,6 +14,7 @@ import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
 
 import java.util.Map;
+import java.util.Optional;
 
 public class MaterialDataHandler extends SimpleJsonResourceReloadListener {
     private static BiMap<ResourceLocation, MaterialDefinition> INSTANCE;
@@ -21,6 +22,7 @@ public class MaterialDataHandler extends SimpleJsonResourceReloadListener {
     public MaterialDataHandler() {
         super(new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create(), "irons_jewelry/materials");
     }
+
 
     @Override
     protected Map<ResourceLocation, JsonElement> prepare(ResourceManager pResourceManager, ProfilerFiller pProfiler) {
@@ -54,6 +56,10 @@ public class MaterialDataHandler extends SimpleJsonResourceReloadListener {
 
     public static MaterialDefinition get(ResourceLocation resourceLocation) {
         return INSTANCE.get(resourceLocation);
+    }
+
+    public static Optional<MaterialDefinition> getSafe(ResourceLocation resourceLocation) {
+        return INSTANCE.containsKey(resourceLocation) ? Optional.of(INSTANCE.get(resourceLocation)) : Optional.empty();
     }
 
     public static ResourceLocation getKey(MaterialDefinition part) {
