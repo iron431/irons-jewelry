@@ -27,6 +27,10 @@ public class MaterialDataHandler extends SimpleJsonResourceReloadListener {
     @Override
     protected Map<ResourceLocation, JsonElement> prepare(ResourceManager pResourceManager, ProfilerFiller pProfiler) {
         IronsJewelry.LOGGER.debug("MaterialDataHandler.prepare");
+        //TODO: soft-override system like TagLoader#52
+        // While TogLoader is a custom implementation, it is still driven by a PreparableReloadListener (TagManager)
+        // Our own custom implementation would be difficuly because its not the SimpleJsonManager#scan that needs to account for our "soft-overrides", but the ResourceManager#list that does
+        // Would the tagloader style of filetoidconverter.listMatchingResourceStacks work instead?
         return super.prepare(pResourceManager, pProfiler);
     }
 
