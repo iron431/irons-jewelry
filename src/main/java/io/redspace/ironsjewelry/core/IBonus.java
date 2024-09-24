@@ -10,4 +10,6 @@ public interface IBonus {
     Codec<IBonus> DIRECT_CODEC = BonusRegistry.BONUS_REGISTRY.byNameCodec()
             .dispatch(IBonus::codec, Function.identity());
     MapCodec<? extends IBonus> codec();
+
+    IBonusParameterType<?> getParameter();
 }

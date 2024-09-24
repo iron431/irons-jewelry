@@ -97,7 +97,8 @@ public class JewelryData {
         if (!valid) {
             return List.of();
         }
-        return pattern.bonuses().stream().flatMap(source -> parts.get(source.partForBonus()).bonuses().stream().map(bonus -> new BonusInstance(bonus, parts.get(source.partForQuality()).quality() * pattern.qualityMultiplier()))).toList();
+        return pattern.bonuses().stream().map(source -> source.getBonusFor(this)).toList();
+        //return pattern.bonuses().stream().flatMap(source -> parts.get(source.partForBonus()).bonuses().stream().map(bonus -> new BonusInstance(bonus, parts.get(source.partForQuality()).qualityOrSource() * pattern.qualityMultiplier()))).toList();
     }
 
     public List<BonusInstance> getBonuses() {

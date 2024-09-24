@@ -5,6 +5,7 @@ import io.redspace.ironsjewelry.client.DynamicModel;
 import io.redspace.ironsjewelry.core.data_registry.MaterialDataHandler;
 import io.redspace.ironsjewelry.core.data_registry.PartDataHandler;
 import io.redspace.ironsjewelry.core.data_registry.PatternDataHandler;
+import io.redspace.ironsjewelry.registry.ParameterTypeRegistry;
 import io.redspace.ironsjewelry.registry.BonusRegistry;
 import io.redspace.ironsjewelry.registry.ComponentRegistry;
 import io.redspace.ironsjewelry.registry.ItemRegistry;
@@ -44,16 +45,18 @@ public class IronsJewelry {
 //            }).build());
 
     // The constructor for the mod class is the first code that is run when your mod is loaded.
-    // FML will recognize some parameter types like IEventBus or ModContainer and pass them in automatically.
+    // FML will recognize some parameterOrSource types like IEventBus or ModContainer and pass them in automatically.
     public IronsJewelry(IEventBus modEventBus, ModContainer modContainer) {
         // Register the commonSetup method for modloading
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::registerModelLoader);
         modEventBus.addListener(BonusRegistry::registerRegistry);
+        modEventBus.addListener(ParameterTypeRegistry::registerRegistry);
         NeoForge.EVENT_BUS.addListener(this::registerReloadListeners);
 
         ComponentRegistry.register(modEventBus);
         BonusRegistry.register(modEventBus);
+        ParameterTypeRegistry.register(modEventBus);
         ItemRegistry.register(modEventBus);
 
         // Register ourselves for server and other game events we are interested in.

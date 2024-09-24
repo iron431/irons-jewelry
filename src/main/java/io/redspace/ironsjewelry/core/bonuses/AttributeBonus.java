@@ -5,6 +5,8 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.redspace.ironsjewelry.IronsJewelry;
 import io.redspace.ironsjewelry.core.IBonus;
+import io.redspace.ironsjewelry.core.IBonusParameterType;
+import io.redspace.ironsjewelry.registry.ParameterTypeRegistry;
 import net.minecraft.core.Holder;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -21,6 +23,11 @@ public record AttributeBonus(Holder<Attribute> attribute, double amount,
     @Override
     public MapCodec<? extends IBonus> codec() {
         return CODEC;
+    }
+
+    @Override
+    public IBonusParameterType<?> getParameter() {
+        return ParameterTypeRegistry.ATTRIBUTE_PARAMETER.get();
     }
 
     public AttributeModifier modifier(SlotContext context, double quality) {

@@ -4,6 +4,8 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.redspace.ironsjewelry.core.IBonus;
+import io.redspace.ironsjewelry.core.IBonusParameterType;
+import io.redspace.ironsjewelry.registry.ParameterTypeRegistry;
 
 public class DeathBonus implements IBonus {
     public static final MapCodec<DeathBonus> CODEC = RecordCodecBuilder.mapCodec(builder ->
@@ -12,5 +14,10 @@ public class DeathBonus implements IBonus {
     @Override
     public MapCodec<DeathBonus> codec() {
         return CODEC;
+    }
+
+    @Override
+    public IBonusParameterType<?> getParameter() {
+        return ParameterTypeRegistry.EMPTY.get();
     }
 }
