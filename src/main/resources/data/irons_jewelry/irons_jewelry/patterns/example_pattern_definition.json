@@ -12,8 +12,9 @@
   ],
   "bonuses": [
     {
-      "bonusSource": "irons_jewelry:pointy_gem",
-      "qualitySource": "irons_jewelry:gem_band"
+      "bonus": "irons_jewelry:attribute_bonus",
+      "parameter": "irons_jewelry:gem_band",
+      "quality": 1.0
     }
   ]
 }

@@ -49,7 +49,7 @@ public class MaterialDataHandler extends SimpleJsonResourceReloadListener {
                 var decoded = MaterialDefinition.CODEC.parse(registryops, entry.getValue()).getOrThrow(JsonParseException::new);
                 builder.put(resourcelocation, decoded);
             } catch (IllegalArgumentException | JsonParseException jsonparseexception) {
-                IronsJewelry.LOGGER.error("Parsing error loading material {}", resourcelocation, jsonparseexception);
+                IronsJewelry.LOGGER.error("Parsing error loading material {}: {}", resourcelocation, jsonparseexception);
             }
         }
 

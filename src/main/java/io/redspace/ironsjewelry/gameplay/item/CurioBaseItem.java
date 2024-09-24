@@ -49,11 +49,12 @@ public class CurioBaseItem extends Item implements ICurioItem {
             ImmutableMultimap.Builder<Holder<Attribute>, AttributeModifier> builder = ImmutableMultimap.builder();
             for (BonusInstance instance : bonuses) {
                 if (instance.bonus() instanceof AttributeBonus attributeBonus) {
-                    builder.put(attributeBonus.attribute(), attributeBonus.modifier(slotContext, instance.quality()));
+                    attributeBonus.getParameter().resolve(instance.parameter()).ifPresent(
+                            param -> builder.put(param.attribute(), attributeBonus.modifier(param, slotContext, instance.quality()))
+                    );
                 }
             }
             return builder.build();
-
         }
         return ICurioItem.super.getAttributeModifiers(slotContext, id, stack);
     }

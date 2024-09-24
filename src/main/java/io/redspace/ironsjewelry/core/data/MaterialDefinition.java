@@ -24,7 +24,7 @@ public record MaterialDefinition(Ingredient ingredient, ResourceLocation palette
             ResourceLocation.CODEC.fieldOf("paletteLocation").forGetter(MaterialDefinition::paletteLocation),
             IBonusParameterType.BONUS_TO_INSTANCE_CODEC.fieldOf("bonusParameters").forGetter(MaterialDefinition::bonusParameters),
 
-            Codec.DOUBLE.fieldOf("qualityOrSource").forGetter(MaterialDefinition::quality)
+            Codec.DOUBLE.fieldOf("quality").forGetter(MaterialDefinition::quality)
     ).apply(builder, MaterialDefinition::new));
 
     public ResourceLocation id() {

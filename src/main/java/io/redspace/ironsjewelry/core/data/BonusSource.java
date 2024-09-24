@@ -8,13 +8,16 @@ import io.redspace.ironsjewelry.core.IBonus;
 import io.redspace.ironsjewelry.core.IBonusParameterType;
 import io.redspace.ironsjewelry.core.Utils;
 import io.redspace.ironsjewelry.core.data_registry.PartDataHandler;
+import io.redspace.ironsjewelry.registry.BonusRegistry;
 
 import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.function.Function;
 
 public record BonusSource(IBonus bonus, Either<Map<IBonusParameterType<?>, Object>, PartDefinition> parameterOrSource,
                           Either<Double, PartDefinition> qualityOrSource) {
     public static final Codec<BonusSource> CODEC = RecordCodecBuilder.create(builder -> builder.group(
-            IBonus.DIRECT_CODEC.fieldOf("bonus").forGetter(BonusSource::bonus),
+            BonusRegistry.BONUS_REGISTRY.byNameCodec().fieldOf("bonus").forGetter(BonusSource::bonus),
             Codec.either(IBonusParameterType.BONUS_TO_INSTANCE_CODEC, Utils.idCodec(PartDataHandler::getSafe, PartDefinition::id)).fieldOf("parameter").forGetter(BonusSource::parameterOrSource),
             Codec.either(Codec.DOUBLE, Utils.idCodec(PartDataHandler::getSafe, PartDefinition::id)).fieldOf("quality").forGetter(BonusSource::qualityOrSource)
     ).apply(builder, BonusSource::new));
@@ -22,9 +25,19 @@ public record BonusSource(IBonus bonus, Either<Map<IBonusParameterType<?>, Objec
     public BonusInstance getBonusFor(JewelryData data) {
         return new BonusInstance(
                 bonus,
-                qualityOrSource.left().orElse(qualityFromPart(qualityOrSource.right().get(), data)),
-                parameterOrSource.left().orElse(parameterFromPart(parameterOrSource.right().get(), data))
+                mapEither(qualityOrSource, Function.identity(), (right) -> qualityFromPart(right, data)),
+                mapEither(parameterOrSource, Function.identity(), (right) -> parameterFromPart(right, data))
         );
+    }
+
+    private <L, R, T> T mapEither(Either<L, R> either, Function<L, T> leftToValue, Function<R, T> rightToValue) {
+        if (either.left().isPresent()) {
+            return leftToValue.apply(either.left().get());
+        } else if (either.right().isPresent()) {
+            return rightToValue.apply(either.right().get());
+        } else {
+            throw new NoSuchElementException("Neither right nor left present in either");
+        }
     }
 
     private double qualityFromPart(PartDefinition part, JewelryData data) {

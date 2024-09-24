@@ -19,7 +19,7 @@ public class ParameterTypeRegistry {
     private static final DeferredRegister<IBonusParameterType<?>> PARAMETER_TYPES = DeferredRegister.create(PARAMETER_TYPE_REGISTRY, IronsJewelry.MODID);
 
     public static final Supplier<IBonusParameterType<?>> EMPTY = PARAMETER_TYPES.register("empty", EmptyParameter::new);
-    public static final Supplier<IBonusParameterType<?>> ATTRIBUTE_PARAMETER = PARAMETER_TYPES.register("attribute_bonus", AttributeParameter::new);
+    public static final Supplier<AttributeParameter> ATTRIBUTE_PARAMETER = PARAMETER_TYPES.register("attribute", AttributeParameter::new);
 
 
     public static void registerRegistry(NewRegistryEvent event) {

@@ -4,12 +4,11 @@
   },
   "paletteLocation": "irons_jewelry:item/palettes/gold",
   "quality": 2.5,
-  "bonuses": [
-    {
-      "type": "irons_jewelry:attribute_bonus",
+  "bonusParameters": {
+    "irons_jewelry:attribute": {
       "attribute": "minecraft:generic.max_health",
-      "amount": 4,
+      "amount": 2,
       "operation": "add_value"
     }
-  ]
+  }
 }
