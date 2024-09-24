@@ -46,7 +46,7 @@ public class MaterialDataHandler extends SimpleJsonResourceReloadListener {
                 continue; //Forge: filter anything beginning with "_" as it's used for metadata.
 
             try {
-                var decoded = MaterialDefinition.CODEC.parse(registryops, entry.getValue()).getOrThrow(JsonParseException::new);
+                 var decoded = MaterialDefinition.CODEC.parse(registryops, entry.getValue()).getOrThrow(JsonParseException::new);
                 builder.put(resourcelocation, decoded);
             } catch (IllegalArgumentException | JsonParseException jsonparseexception) {
                 IronsJewelry.LOGGER.error("Parsing error loading material {}: {}", resourcelocation, jsonparseexception);

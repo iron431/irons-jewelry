@@ -9,6 +9,9 @@
       "attribute": "minecraft:generic.max_health",
       "amount": 2,
       "operation": "add_value"
+    },
+    "irons_jewelry:positive_effect": {
+      "effect": "minecraft:regeneration"
     }
   }
 }

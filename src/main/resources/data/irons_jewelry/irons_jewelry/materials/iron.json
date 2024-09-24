@@ -1,0 +1,14 @@
+{
+  "ingredient": {
+    "item": "minecraft:gold_ingot"
+  },
+  "paletteLocation": "irons_jewelry:item/palettes/iron",
+  "quality": 1.0,
+  "bonusParameters": {
+    "irons_jewelry:attribute": {
+      "attribute": "minecraft:generic.armor",
+      "amount": 2,
+      "operation": "add_value"
+    }
+  }
+}

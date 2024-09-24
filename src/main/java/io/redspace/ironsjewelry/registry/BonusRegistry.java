@@ -3,6 +3,7 @@ package io.redspace.ironsjewelry.registry;
 import io.redspace.ironsjewelry.IronsJewelry;
 import io.redspace.ironsjewelry.core.IBonus;
 import io.redspace.ironsjewelry.core.bonuses.AttributeBonus;
+import io.redspace.ironsjewelry.core.bonuses.EffectOnHitBonus;
 import io.redspace.ironsjewelry.core.bonuses.EmptyBonus;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
@@ -21,6 +22,7 @@ public class BonusRegistry {
     public static final Supplier<IBonus> EMPTY = BONUSES.register("empty", EmptyBonus::new);
     //public static final Supplier<IBonus> DEATH = BONUSES.register("death", () -> DeathBonus.CODEC);
     public static final Supplier<IBonus> ATTRIBUTE_BONUS = BONUSES.register("attribute_bonus", AttributeBonus::new);
+    public static final Supplier<IBonus> EFFECT_ON_HIT_BONUS = BONUSES.register("effect_on_hit", EffectOnHitBonus::new);
 
 
     public static void registerRegistry(NewRegistryEvent event) {

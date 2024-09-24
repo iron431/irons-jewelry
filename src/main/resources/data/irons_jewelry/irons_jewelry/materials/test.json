@@ -1,0 +1,14 @@
+{
+  "ingredient": {
+    "item": "minecraft:gold_ingot"
+  },
+  "paletteLocation": "irons_jewelry:item/palettes/test",
+  "quality": 1.0,
+  "bonusParameters": {
+    "irons_jewelry:attribute": {
+      "attribute": "minecraft:generic.attack_damage",
+      "amount": 2,
+      "operation": "add_value"
+    }
+  }
+}

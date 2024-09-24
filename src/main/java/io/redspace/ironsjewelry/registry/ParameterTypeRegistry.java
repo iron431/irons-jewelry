@@ -4,6 +4,7 @@ import io.redspace.ironsjewelry.IronsJewelry;
 import io.redspace.ironsjewelry.core.IBonusParameterType;
 import io.redspace.ironsjewelry.core.parameters.AttributeParameter;
 import io.redspace.ironsjewelry.core.parameters.EmptyParameter;
+import io.redspace.ironsjewelry.core.parameters.PositiveEffectParameter;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.neoforged.bus.api.IEventBus;
@@ -20,6 +21,7 @@ public class ParameterTypeRegistry {
 
     public static final Supplier<IBonusParameterType<?>> EMPTY = PARAMETER_TYPES.register("empty", EmptyParameter::new);
     public static final Supplier<AttributeParameter> ATTRIBUTE_PARAMETER = PARAMETER_TYPES.register("attribute", AttributeParameter::new);
+    public static final Supplier<PositiveEffectParameter> POSITIVE_EFFECT_PARAMETER = PARAMETER_TYPES.register("positive_effect", PositiveEffectParameter::new);
 
 
     public static void registerRegistry(NewRegistryEvent event) {

@@ -1,0 +1,17 @@
+{
+  "ingredient": {
+    "item": "minecraft:gold_ingot"
+  },
+  "paletteLocation": "irons_jewelry:item/palettes/silver",
+  "quality": 2.0,
+  "bonusParameters": {
+    "irons_jewelry:attribute": {
+      "attribute": "minecraft:generic.movement_speed",
+      "amount": 0.02,
+      "operation": "add_multiplied_total"
+    },
+    "irons_jewelry:positive_effect": {
+      "effect": "minecraft:speed"
+    }
+  }
+}

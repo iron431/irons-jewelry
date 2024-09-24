@@ -1,0 +1,21 @@
+{
+  "unlockedByDefault": true,
+  "parts": [
+    {
+      "id": "irons_jewelry:gem_band_thin",
+      "materialCost": 4
+    },
+    {
+      "id": "irons_jewelry:pointy_gem",
+      "materialCost": 1
+    }
+  ],
+  "bonuses": [
+    {
+      "bonus": "irons_jewelry:effect_on_hit",
+      "parameter": "irons_jewelry:gem_band_thin",
+      "quality": 1.0
+    }
+  ]
+}
+///give @p iron_sword[irons_jewelry:jewelry_data={pattern:"irons_jewelry:example_pattern_definition",parts:[{"part":"irons_jewelry:gem_band","material":"irons_jewelry:gold"},{"part":"irons_jewelry:pointy_gem","material":"irons_jewelry:gold"}]}]
