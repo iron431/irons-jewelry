@@ -26,6 +26,11 @@
         }
       },
       "quality": 1.0
+    },
+    {
+      "bonus": "irons_jewelry:effect_on_hit",
+      "parameter": "irons_jewelry:gem_pointy",
+      "quality": "irons_jewelry:band_gem"
     }
   ]
 }

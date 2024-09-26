@@ -4,7 +4,7 @@ import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.redspace.ironsjewelry.IronsJewelry;
-import io.redspace.ironsjewelry.core.IBonus;
+import io.redspace.ironsjewelry.core.Bonus;
 import io.redspace.ironsjewelry.core.IBonusParameterType;
 import io.redspace.ironsjewelry.core.Utils;
 import io.redspace.ironsjewelry.core.data_registry.PartDataHandler;
@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.function.Function;
 
-public record BonusSource(IBonus bonus, Either<Map<IBonusParameterType<?>, Object>, PartDefinition> parameterOrSource,
+public record BonusSource(Bonus bonus, Either<Map<IBonusParameterType<?>, Object>, PartDefinition> parameterOrSource,
                           Either<Double, PartDefinition> qualityOrSource) {
     public static final Codec<BonusSource> CODEC = RecordCodecBuilder.create(builder -> builder.group(
             BonusRegistry.BONUS_REGISTRY.byNameCodec().fieldOf("bonus").forGetter(BonusSource::bonus),
@@ -25,7 +25,7 @@ public record BonusSource(IBonus bonus, Either<Map<IBonusParameterType<?>, Objec
     public BonusInstance getBonusFor(JewelryData data) {
         return new BonusInstance(
                 bonus,
-                mapEither(qualityOrSource, Function.identity(), (right) -> qualityFromPart(right, data)),
+                mapEither(qualityOrSource, Function.identity(), (right) -> qualityFromPart(right, data)) * data.pattern().qualityMultiplier(),
                 mapEither(parameterOrSource, Function.identity(), (right) -> parameterFromPart(right, data))
         );
     }
@@ -45,7 +45,7 @@ public record BonusSource(IBonus bonus, Either<Map<IBonusParameterType<?>, Objec
     }
 
     private Map<IBonusParameterType<?>, Object> parameterFromPart(PartDefinition part, JewelryData data) {
-        var targetParameter = bonus.getParameter();
+        var targetParameter = bonus.getParameterType();
         if (targetParameter.isEmpty()) {
             return Map.of();
         }

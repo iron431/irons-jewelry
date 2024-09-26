@@ -1,10 +1,10 @@
 package io.redspace.ironsjewelry.core.bonuses;
 
-import io.redspace.ironsjewelry.core.IBonus;
+import io.redspace.ironsjewelry.core.Bonus;
 import io.redspace.ironsjewelry.core.IBonusParameterType;
 import io.redspace.ironsjewelry.registry.ParameterTypeRegistry;
 
-public class EmptyBonus implements IBonus {
+public class EmptyBonus extends Bonus {
 //    public static final MapCodec<EmptyBonus> CODEC = MapCodec.unit(new EmptyBonus());
 //
 //    @Override
@@ -13,7 +13,7 @@ public class EmptyBonus implements IBonus {
 //    }
 
     @Override
-    public IBonusParameterType<?> getParameter() {
+    public IBonusParameterType<?> getParameterType() {
         return ParameterTypeRegistry.EMPTY.get();
     }
 }

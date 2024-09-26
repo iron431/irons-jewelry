@@ -11,10 +11,12 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 public class JewelryData {
     public static final Codec<JewelryData> CODEC = RecordCodecBuilder.create(builder -> builder.group(
@@ -55,8 +57,16 @@ public class JewelryData {
 
     public static JewelryData NONE = new JewelryData();
 
+    @NotNull
     public static JewelryData get(ItemStack itemStack) {
         return itemStack.getOrDefault(ComponentRegistry.JEWELRY_COMPONENT, NONE);
+    }
+
+    public static void ifPresent(ItemStack itemStack, Consumer<JewelryData> consumer) {
+        var data = itemStack.get(ComponentRegistry.JEWELRY_COMPONENT);
+        if (data != null) {
+            consumer.accept(data);
+        }
     }
 
     private final PatternDefinition pattern;
@@ -93,7 +103,7 @@ public class JewelryData {
         return valid;
     }
 
-    public List<BonusInstance> cacheBonuses() {
+    private List<BonusInstance> cacheBonuses() {
         if (!valid) {
             return List.of();
         }

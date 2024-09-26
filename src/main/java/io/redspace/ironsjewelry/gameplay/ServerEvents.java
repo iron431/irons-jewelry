@@ -26,7 +26,7 @@ public class ServerEvents {
                     if (instance.bonus() instanceof DeathBonus) {
                         player.die(player.level().damageSources().fellOutOfWorld());
                     } else if (instance.bonus() instanceof EffectOnHitBonus effectOnHitBonus) {
-                        effectOnHitBonus.getParameter().resolve(instance.parameter()).ifPresent(effect ->
+                        effectOnHitBonus.getParameterType().resolve(instance.parameter()).ifPresent(effect ->
                                 player.addEffect(new MobEffectInstance(effect, 100))
                         );
                     }
