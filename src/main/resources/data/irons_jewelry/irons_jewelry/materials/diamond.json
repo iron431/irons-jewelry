@@ -1,13 +1,12 @@
 {
   "ingredient": {
-    "item": "minecraft:gold_ingot"
+    "item": "minecraft:diamond"
   },
   "materialType": [
-    "metal",
-    "gold"
+    "diamond"
   ],
-  "paletteLocation": "irons_jewelry:item/palettes/gold",
-  "quality": 2.5,
+  "paletteLocation": "irons_jewelry:item/palettes/test",
+  "quality": 3,
   "bonusParameters": {
     "irons_jewelry:attribute": {
       "attribute": "minecraft:generic.max_health",

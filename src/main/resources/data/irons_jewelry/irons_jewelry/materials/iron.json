@@ -2,6 +2,9 @@
   "ingredient": {
     "item": "minecraft:gold_ingot"
   },
+  "materialType": [
+    "metal"
+  ],
   "paletteLocation": "irons_jewelry:item/palettes/iron",
   "quality": 1.0,
   "bonusParameters": {

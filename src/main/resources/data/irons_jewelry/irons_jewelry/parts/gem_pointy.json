@@ -1,3 +1,6 @@
 {
+  "allowedMaterialTypes": [
+    "gem"
+  ],
   "baseTextureLocation": "irons_jewelry:base/pointy_gem"
 }

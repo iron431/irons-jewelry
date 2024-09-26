@@ -2,20 +2,31 @@
   "unlockedByDefault": true,
   "parts": [
     {
-      "id": "irons_jewelry:gem_band",
+      "id": "irons_jewelry:band_gem",
       "materialCost": 4
     },
     {
-      "id": "irons_jewelry:pointy_gem",
+      "id": "irons_jewelry:gem_pointy",
       "materialCost": 1
     }
   ],
   "bonuses": [
     {
       "bonus": "irons_jewelry:attribute_bonus",
-      "parameter": "irons_jewelry:gem_band",
+      "parameter": "irons_jewelry:gem_pointy",
+      "quality": "irons_jewelry:band_gem"
+    },
+    {
+      "bonus": "irons_jewelry:attribute_bonus",
+      "parameter": {
+        "irons_jewelry:attribute": {
+          "attribute": "minecraft:generic.attack_damage",
+          "amount": 2,
+          "operation": "add_value"
+        }
+      },
       "quality": 1.0
     }
   ]
 }
-///give @p iron_sword[irons_jewelry:jewelry_data={pattern:"irons_jewelry:example_pattern_definition",parts:[{"part":"irons_jewelry:gem_band","material":"irons_jewelry:gold"},{"part":"irons_jewelry:pointy_gem","material":"irons_jewelry:gold"}]}]
+///give @p irons_jewelry:ring[irons_jewelry:jewelry_data={pattern:"irons_jewelry:example_pattern_definition",parts:{"irons_jewelry:band_gem":"irons_jewelry:silver","irons_jewelry:gem_pointy":"irons_jewelry:diamond"}}]
