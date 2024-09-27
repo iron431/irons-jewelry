@@ -8,6 +8,7 @@ import io.redspace.ironsjewelry.core.data_registry.PartDataHandler;
 import io.redspace.ironsjewelry.core.data_registry.PatternDataHandler;
 import io.redspace.ironsjewelry.registry.ComponentRegistry;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -18,6 +19,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
+/**
+ * Primary Data Object for the Jewelry Data Component
+ * Consists of:
+ * - Pattern Definition, the template for what this piece of jewelry is
+ * - Map of Parts to Materials, the instantiated parts and what material they're made of
+ * - Validity Boolean (whether all parts are in place, etc)
+ * - List of Bonus Instances, which are the buffs this piece of jewelry gives when worn
+ */
 public class JewelryData {
     public static final Codec<JewelryData> CODEC = RecordCodecBuilder.create(builder -> builder.group(
             Utils.idCodec(PatternDataHandler::getSafe, PatternDefinition::id).fieldOf("pattern").forGetter(JewelryData::pattern),
@@ -48,6 +57,18 @@ public class JewelryData {
         return new JewelryData(PatternDataHandler.get(patternid), parts);
     });
 
+    private final PatternDefinition pattern;
+    private final Map<PartDefinition, MaterialDefinition> parts;
+    private final boolean valid;
+    private final List<BonusInstance> bonuses;
+
+    public JewelryData(PatternDefinition pattern, Map<PartDefinition, MaterialDefinition> parts) {
+        this.pattern = pattern;
+        this.parts = parts;
+        this.valid = validate();
+        this.bonuses = cacheBonuses();
+    }
+
     private JewelryData() {
         this.pattern = null;
         this.valid = false;
@@ -69,17 +90,6 @@ public class JewelryData {
         }
     }
 
-    private final PatternDefinition pattern;
-    private final Map<PartDefinition, MaterialDefinition> parts;
-    private final boolean valid;
-    private final List<BonusInstance> bonuses;
-
-    public JewelryData(PatternDefinition pattern, Map<PartDefinition, MaterialDefinition> parts) {
-        this.pattern = pattern;
-        this.parts = parts;
-        this.valid = validate();
-        this.bonuses = cacheBonuses();
-    }
 
     private boolean validate() {
         if (this.pattern == null) {
@@ -109,6 +119,20 @@ public class JewelryData {
         }
         return pattern.bonuses().stream().map(source -> source.getBonusFor(this)).toList();
         //return pattern.bonuses().stream().flatMap(source -> parts.get(source.partForBonus()).bonuses().stream().map(bonus -> new BonusInstance(bonus, parts.get(source.partForQuality()).qualityOrSource() * pattern.qualityMultiplier()))).toList();
+    }
+
+    public Component getItemName() {
+        if (this == NONE) {
+            return Component.translatable("item.irons_jewelry.invalid_jewelry");
+        }
+        //technically, this isn't ordered. but like, it kinda is. essentially uses material arguments in reverse-draw-order, meaning the pinnacle component (ie gem) will be the first argument
+        var values = parts.values();
+        Component[] ids = new Component[values.size()];
+        var itr = values.iterator();
+        for (int i = parts.size() - 1; i >= 0; i--) {
+            ids[i] = Component.translatable(itr.next().getDescriptionId());
+        }
+        return Component.translatable(this.pattern.getDescriptionId() + ".item", ids);
     }
 
     public List<BonusInstance> getBonuses() {

@@ -15,5 +15,5 @@ public class ItemRegistry {
         ITEMS.register(eventBus);
     }
 
-    public static final DeferredHolder<Item, CurioBaseItem> JEWELRY_COMPONENT = ITEMS.register("ring", () -> new CurioBaseItem(new Item.Properties().stacksTo(1), "ring"));
+    public static final DeferredHolder<Item, CurioBaseItem> RING = ITEMS.register("ring", () -> new CurioBaseItem(new Item.Properties().stacksTo(1), "ring"));
 }

@@ -1,3 +1,16 @@
 {
+  "item.irons_jewelry.ring": "Ring",
+  "item.irons_jewelry.necklace": "Necklace",
+  "item.irons_jewelry.invalid_jewelry": "Invalid Jewelry",
+
+  "pattern.irons_jewelry.simple_band.item": "Simple %s Ring",
+  "pattern.irons_jewelry.effect_on_hit_ring.item": "%s Ring of Response",
+  "pattern.irons_jewelry.example_pattern_definition.item": "%s-%s Ring",
+
+  "material.irons_jewelry.iron": "Iron",
+  "material.irons_jewelry.gold": "Gold",
+  "material.irons_jewelry.diamond": "Diamond",
+  "material.irons_jewelry.silver": "Silver",
+
   "bonus.irons_jewelry.effect_on_hit.description": "When hit, gain %s for %s seconds"
 }

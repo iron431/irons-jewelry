@@ -59,6 +59,12 @@ public class CurioBaseItem extends Item implements ICurioItem {
     }
 
     @Override
+    public Component getName(ItemStack itemStack) {
+        //TODO: cache or use actual item name component entry
+        return JewelryData.get(itemStack).getItemName();
+    }
+
+    @Override
     public Multimap<Holder<Attribute>, AttributeModifier> getAttributeModifiers(SlotContext slotContext, ResourceLocation id, ItemStack stack) {
 
         JewelryData data = stack.get(ComponentRegistry.JEWELRY_COMPONENT);

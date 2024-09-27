@@ -4,6 +4,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.redspace.ironsjewelry.core.IBonusParameterType;
 import io.redspace.ironsjewelry.core.data_registry.MaterialDataHandler;
+import net.minecraft.Util;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.Ingredient;
 
@@ -32,5 +33,14 @@ public record MaterialDefinition(Ingredient ingredient, List<String> materialTyp
 
     public ResourceLocation id() {
         return MaterialDataHandler.getKey(this);
+    }
+
+    public String getDescriptionId() {
+        var id = id();
+        if (id == null) {
+            return "unregistered_material";
+        } else {
+            return Util.makeDescriptionId("material", id);
+        }
     }
 }

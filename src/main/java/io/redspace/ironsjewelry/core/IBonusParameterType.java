@@ -8,7 +8,10 @@ import java.util.Map;
 import java.util.Optional;
 
 public interface IBonusParameterType<T> {
-    public static final Codec<Map<IBonusParameterType<?>, Object>> BONUS_TO_INSTANCE_CODEC = Codec.dispatchedMap(
+    /**
+     * Codec which relates the Parameter Type to the Data Object associated with that parameter, in a map, via a dispatch map codec
+     */
+    Codec<Map<IBonusParameterType<?>, Object>> BONUS_TO_INSTANCE_CODEC = Codec.dispatchedMap(
             ParameterTypeRegistry.PARAMETER_TYPE_REGISTRY.byNameCodec(),
             IBonusParameterType::codec
     );
