@@ -3,21 +3,33 @@ package io.redspace.ironsjewelry.gameplay.block.jewelcrafting_station;
 import io.redspace.ironsjewelry.IronsJewelry;
 import io.redspace.ironsjewelry.core.data.PatternDefinition;
 import io.redspace.ironsjewelry.core.data_registry.PatternDataHandler;
+import io.redspace.ironsjewelry.network.packets.SetJewelcraftingStationPattern;
+import io.redspace.ironsjewelry.network.packets.SyncJewelcraftingSlotStates;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.Slot;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class JewelcraftingStationScreen extends AbstractContainerScreen<JewelcraftingStationMenu> {
-    static class PatternButton extends Button/*ImageButton*/ {
-        public PatternButton(int pX, int pY, int pWidth, int pHeight, OnPress pOnPress) {
+    public void handleSlotSync(SyncJewelcraftingSlotStates packet) {
+        this.menu.handleClientSideSlotSync(packet.slotStates());
+    }
+
+    static class PatternButton extends Button {
+        PatternDefinition patternDefinition;
+
+        public PatternButton(PatternDefinition patternDefinition, int pX, int pY, int pWidth, int pHeight, OnPress pOnPress) {
             super(pX, pY, pWidth, pHeight, Component.empty(), pOnPress, DEFAULT_NARRATION);
+            this.patternDefinition = patternDefinition;
         }
 
         public void renderWidget(GuiGraphics pGuiGraphics, boolean isHovering, boolean selected) {
@@ -37,12 +49,16 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
     int selectedPattern;
     List<PatternDefinition> availablePatterns;
     List<PatternButton> patternButtons;
+    SimpleContainer workspaceContainer;
+    List<Slot> inputSlots;
 
     public JewelcraftingStationScreen(JewelcraftingStationMenu pMenu, Inventory pPlayerInventory, Component pTitle) {
         super(pMenu, pPlayerInventory, pTitle);
         this.imageWidth = 206;
-
+        this.workspaceContainer = new SimpleContainer();
+        this.inputSlots = new ArrayList<>();
     }
+
 
     private void positionPatternButtons() {
         int maxPatterns = 7;
@@ -64,13 +80,16 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
         patternButtons = new ArrayList<>();
         for (int i = 0; i < availablePatterns.size(); i++) {
             int index = i;
-            patternButtons.add(this.addRenderableWidget(new PatternButton(0, 0, 18, 18, (button) -> {
+            patternButtons.add(this.addRenderableWidget(new PatternButton(availablePatterns.get(i), 0, 0, 18, 18, (button) -> {
                 IronsJewelry.LOGGER.debug("pattern button pressed: {}", index);
                 selectedPattern = index;
+                PacketDistributor.sendToServer(new SetJewelcraftingStationPattern(this.menu.containerId, availablePatterns.get(selectedPattern)));
+                //refreshWorkspace();
             })));
         }
         positionPatternButtons();
     }
+
 
     @Override
     protected void renderBg(GuiGraphics pGuiGraphics, float pPartialTick, int pMouseX, int pMouseY) {
