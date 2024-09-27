@@ -12,6 +12,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.Map;
 import java.util.Optional;
@@ -46,7 +47,7 @@ public class MaterialDataHandler extends SimpleJsonResourceReloadListener {
                 continue; //Forge: filter anything beginning with "_" as it's used for metadata.
 
             try {
-                 var decoded = MaterialDefinition.CODEC.parse(registryops, entry.getValue()).getOrThrow(JsonParseException::new);
+                var decoded = MaterialDefinition.CODEC.parse(registryops, entry.getValue()).getOrThrow(JsonParseException::new);
                 builder.put(resourcelocation, decoded);
             } catch (IllegalArgumentException | JsonParseException jsonparseexception) {
                 IronsJewelry.LOGGER.error("Parsing error loading material {}: {}", resourcelocation, jsonparseexception);
@@ -56,6 +57,10 @@ public class MaterialDataHandler extends SimpleJsonResourceReloadListener {
         INSTANCE = builder.build();
         IronsJewelry.LOGGER.debug("MaterialDataHandler Finished Loading: {}", INSTANCE);
 
+    }
+
+    public static Optional<MaterialDefinition> getMaterialForIngredient(ItemStack ingredient) {
+        return INSTANCE.values().stream().filter(material -> material.ingredient().test(ingredient)).findFirst();
     }
 
     public static MaterialDefinition get(ResourceLocation resourceLocation) {

@@ -3,7 +3,7 @@
     "item": "minecraft:diamond"
   },
   "materialType": [
-    "diamond"
+    "gem"
   ],
   "paletteLocation": "irons_jewelry:item/palettes/test",
   "quality": 3,

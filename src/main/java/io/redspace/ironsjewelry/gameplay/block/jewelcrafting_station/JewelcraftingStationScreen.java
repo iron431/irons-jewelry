@@ -10,7 +10,6 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -44,19 +43,22 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
     private static final ResourceLocation RECIPE_SPRITE_SELECTED = IronsJewelry.id("jewelcrafting_station/recipe_selected");
     private static final ResourceLocation RECIPE_SPRITE_HOVERING = IronsJewelry.id("jewelcrafting_station/recipe_highlighted");
     private static final ResourceLocation RECIPE_SPRITE = IronsJewelry.id("jewelcrafting_station/recipe");
+    private static final ResourceLocation INPUT_SLOT = IronsJewelry.id("jewelcrafting_station/input_slot");
 
     int scrollOff;
     int selectedPattern;
     List<PatternDefinition> availablePatterns;
     List<PatternButton> patternButtons;
-    SimpleContainer workspaceContainer;
-    List<Slot> inputSlots;
 
     public JewelcraftingStationScreen(JewelcraftingStationMenu pMenu, Inventory pPlayerInventory, Component pTitle) {
         super(pMenu, pPlayerInventory, pTitle);
         this.imageWidth = 206;
-        this.workspaceContainer = new SimpleContainer();
-        this.inputSlots = new ArrayList<>();
+
+        this.selectedPattern = -1;
+        this.scrollOff = 0;
+
+        this.availablePatterns = PatternDataHandler.patterns().stream().filter(PatternDefinition::unlockedByDefault).toList();
+
     }
 
 
@@ -73,10 +75,6 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
     @Override
     protected void init() {
         super.init();
-        this.selectedPattern = -1;
-        this.scrollOff = 0;
-
-        this.availablePatterns = PatternDataHandler.patterns().stream().filter(PatternDefinition::unlockedByDefault).toList();
         patternButtons = new ArrayList<>();
         for (int i = 0; i < availablePatterns.size(); i++) {
             int index = i;
@@ -84,7 +82,6 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
                 IronsJewelry.LOGGER.debug("pattern button pressed: {}", index);
                 selectedPattern = index;
                 PacketDistributor.sendToServer(new SetJewelcraftingStationPattern(this.menu.containerId, availablePatterns.get(selectedPattern)));
-                //refreshWorkspace();
             })));
         }
         positionPatternButtons();
@@ -96,6 +93,12 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
         int i = this.leftPos;
         int j = this.topPos;
         pGuiGraphics.blit(BACKGROUND_TEXTURE, i, j, 0, 0, this.imageWidth, this.imageHeight);
+        for (Slot slot : menu.workspaceSlots) {
+            if (!slot.isActive()) {
+                break;
+            }
+            pGuiGraphics.blitSprite(INPUT_SLOT, leftPos + slot.x - 2, topPos + slot.y - 2, 20, 20);
+        }
     }
 
     @Override

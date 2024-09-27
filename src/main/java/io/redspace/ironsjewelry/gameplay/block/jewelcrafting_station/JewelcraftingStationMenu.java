@@ -1,8 +1,14 @@
 package io.redspace.ironsjewelry.gameplay.block.jewelcrafting_station;
 
+import io.redspace.ironsjewelry.core.data.JewelryData;
+import io.redspace.ironsjewelry.core.data.MaterialDefinition;
+import io.redspace.ironsjewelry.core.data.PartDefinition;
 import io.redspace.ironsjewelry.core.data.PatternDefinition;
+import io.redspace.ironsjewelry.core.data_registry.MaterialDataHandler;
 import io.redspace.ironsjewelry.network.packets.SyncJewelcraftingSlotStates;
 import io.redspace.ironsjewelry.registry.BlockRegistry;
+import io.redspace.ironsjewelry.registry.ComponentRegistry;
+import io.redspace.ironsjewelry.registry.ItemRegistry;
 import io.redspace.ironsjewelry.registry.MenuRegistry;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
@@ -12,20 +18,20 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerLevelAccess;
-import net.minecraft.world.inventory.ResultContainer;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class JewelcraftingStationMenu extends AbstractContainerMenu {
-    static class ShadowSlot extends Slot {
+    public static class JewelcraftingInputSlot extends Slot {
         public boolean active;
 
-        public ShadowSlot(Container pContainer, int pSlot, int pX, int pY) {
+        public JewelcraftingInputSlot(Container pContainer, int pSlot, int pX, int pY) {
             super(pContainer, pSlot, pX, pY);
         }
 
@@ -43,9 +49,16 @@ public class JewelcraftingStationMenu extends AbstractContainerMenu {
 
     }
 
-    private final SimpleContainer workspaceContainer = new SimpleContainer(10);
-    private final ResultContainer resultSlots = new ResultContainer();
-    private final List<ShadowSlot> workspaceSlots = new ArrayList<>();
+    private final SimpleContainer workspaceContainer = new SimpleContainer(10) {
+        @Override
+        public void setChanged() {
+            super.setChanged();
+            JewelcraftingStationMenu.this.setupResult();
+        }
+    };
+    public final List<JewelcraftingInputSlot> workspaceSlots = new ArrayList<>();
+    private final SimpleContainer resultContainer = new SimpleContainer(1);
+    public final Slot resultSlot;
 
     public JewelcraftingStationMenu(int pContainerId, Inventory pPlayerInventory) {
         this(pContainerId, pPlayerInventory, ContainerLevelAccess.NULL);
@@ -62,11 +75,15 @@ public class JewelcraftingStationMenu extends AbstractContainerMenu {
         super(MenuRegistry.JEWELCRAFTING_MENU.get(), pContainerId);
         this.access = pAccess;
         this.player = pPlayerInventory.player;
-        int centerX = 64 + 89 / 2;
-        int centerY = 10 + 66 / 2;
+        this.resultSlot = this.addSlot(new Slot(resultContainer, 0, 173, 33) {
+            @Override
+            public boolean mayPlace(ItemStack pStack) {
+                return false;
+            }
+        });
         //Workspace slots. We allocate 10 as max, although most will be inaccessible at any given time. If a modder wants to add a piece of jewelry with over ten ingredients, good luck.
         for (int i = 0; i < 10; i++) {
-            this.workspaceSlots.add((ShadowSlot) this.addSlot(new ShadowSlot(workspaceContainer, i, -20, -20)));
+            this.workspaceSlots.add((JewelcraftingInputSlot) this.addSlot(new JewelcraftingInputSlot(workspaceContainer, i, -20, -20)));
         }
 
         //Player Inventory
@@ -79,6 +96,28 @@ public class JewelcraftingStationMenu extends AbstractContainerMenu {
         for (int l = 0; l < 9; l++) {
             this.addSlot(new Slot(pPlayerInventory, l, SCROLL_AREA_OFFSET + 8 + l * 18, 142));
         }
+    }
+
+    private void setupResult() {
+        ItemStack result = ItemStack.EMPTY;
+        if (this.currentPattern != null) {
+            var parts = new HashMap<PartDefinition, MaterialDefinition>();
+            var requiredIngredients = currentPattern.partTemplate();
+            for (int i = 0; i < requiredIngredients.size(); i++) {
+                var ingredient = requiredIngredients.get(i);
+                var input = workspaceSlots.get(i).getItem();
+                var material = MaterialDataHandler.getMaterialForIngredient(input);
+                if (material.isPresent() && input.getCount() >= ingredient.materialCost() && ingredient.part().canUseMaterial(material.get().materialType())) {
+                    parts.put(ingredient.part(), material.get());
+                }
+            }
+            var jewelryData = new JewelryData(currentPattern, parts);
+            if (jewelryData.isValid()) {
+                result = new ItemStack(ItemRegistry.RING.get());
+                result.set(ComponentRegistry.JEWELRY_COMPONENT, jewelryData);
+            }
+        }
+        resultSlot.set(result);
     }
 
 //    private void refreshWorkspace() {
@@ -129,8 +168,8 @@ public class JewelcraftingStationMenu extends AbstractContainerMenu {
                 int radius = (int) Mth.lerp(ingredientCount / 10f, 16, 36 + 1);
                 int anglePerSlot = 360 / ingredientCount;
                 for (int i = 0; i < ingredientCount; i++) {
-                    int x = (int) (radius * -Mth.cos(i * anglePerSlot * Mth.DEG_TO_RAD) + centerX - 8);
-                    int y = (int) (radius * 0.5 * -Mth.sin(i * anglePerSlot * Mth.DEG_TO_RAD) + centerY - 8);
+                    int x = (int) (radius * -Mth.cos(i * anglePerSlot * Mth.DEG_TO_RAD)) + centerX - 8;
+                    int y = (int) (radius * 0.5 * -Mth.sin(i * anglePerSlot * Mth.DEG_TO_RAD)) + centerY - 8;
                     this.workspaceSlots.get(i).setup(x, y, true);
                 }
             }
