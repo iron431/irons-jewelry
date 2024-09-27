@@ -4,15 +4,28 @@ import io.redspace.ironsjewelry.IronsJewelry;
 import io.redspace.ironsjewelry.core.data.PatternDefinition;
 import io.redspace.ironsjewelry.core.data_registry.PatternDataHandler;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class JewelcraftingStationScreen extends AbstractContainerScreen<JewelcraftingStationMenu> {
+    static class PatternButton extends Button/*ImageButton*/ {
+        public PatternButton(int pX, int pY, int pWidth, int pHeight, OnPress pOnPress) {
+            super(pX, pY, pWidth, pHeight, Component.empty(), pOnPress, DEFAULT_NARRATION);
+        }
+
+        public void renderWidget(GuiGraphics pGuiGraphics, boolean isHovering, boolean selected) {
+            var sprite = isHovering ? RECIPE_SPRITE_HOVERING : selected ? RECIPE_SPRITE_SELECTED : RECIPE_SPRITE;
+            pGuiGraphics.blitSprite(sprite, this.getX(), this.getY(), this.width, this.height);
+        }
+    }
+
     public static final ResourceLocation BACKGROUND_TEXTURE = IronsJewelry.id("textures/gui/jewelcrafting_station.png");
     private static final ResourceLocation SCROLLER_SPRITE = IronsJewelry.id("jewelcrafting_station/scroller");
     private static final ResourceLocation SCROLLER_DISABLED_SPRITE = IronsJewelry.id("jewelcrafting_station/scroller_disabled");
@@ -21,12 +34,42 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
     private static final ResourceLocation RECIPE_SPRITE = IronsJewelry.id("jewelcrafting_station/recipe");
 
     int scrollOff;
+    int selectedPattern;
     List<PatternDefinition> availablePatterns;
+    List<PatternButton> patternButtons;
 
     public JewelcraftingStationScreen(JewelcraftingStationMenu pMenu, Inventory pPlayerInventory, Component pTitle) {
         super(pMenu, pPlayerInventory, pTitle);
         this.imageWidth = 206;
+
+    }
+
+    private void positionPatternButtons() {
+        int maxPatterns = 7;
+        int x = leftPos + 5;
+        int y = topPos + 18;
+        for (int i = 0; i < patternButtons.size(); i++) {
+            patternButtons.get(i).setPosition(x, y + (scrollOff + i) * 18);
+            patternButtons.get(i).active = (i - scrollOff) >= 0 && (i - scrollOff) < maxPatterns;
+        }
+    }
+
+    @Override
+    protected void init() {
+        super.init();
+        this.selectedPattern = -1;
+        this.scrollOff = 0;
+
         this.availablePatterns = PatternDataHandler.patterns().stream().filter(PatternDefinition::unlockedByDefault).toList();
+        patternButtons = new ArrayList<>();
+        for (int i = 0; i < availablePatterns.size(); i++) {
+            int index = i;
+            patternButtons.add(this.addRenderableWidget(new PatternButton(0, 0, 18, 18, (button) -> {
+                IronsJewelry.LOGGER.debug("pattern button pressed: {}", index);
+                selectedPattern = index;
+            })));
+        }
+        positionPatternButtons();
     }
 
     @Override
@@ -54,10 +97,9 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
         int iconX = leftPos + 5;
         int y = topPos + 18;
         int maxPatterns = 7;
-        for (int i = scrollOff; i < availablePatterns.size() && i < maxPatterns; i++) {
-            int iy = y + i * 18;
-            var sprite = isHovering(mouseX, mouseY, iconX, iy, 18, 18) ? RECIPE_SPRITE_HOVERING : RECIPE_SPRITE;
-            guiGraphics.blitSprite(sprite, iconX, iy, 0, 18, 18);
+        for (int i = scrollOff; i < patternButtons.size() && i < maxPatterns; i++) {
+            var button = patternButtons.get(i);
+            button.renderWidget(guiGraphics, isHovering(mouseX, mouseY, button.getX(), button.getY(), button.getWidth(), button.getHeight()), i == selectedPattern);
         }
 
         int i = availablePatterns.size() + 1 - maxPatterns;
