@@ -13,6 +13,7 @@ import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 
@@ -51,6 +52,10 @@ public class PatternDataHandler extends SimpleJsonResourceReloadListener {
 
     public static Optional<PatternDefinition> getSafe(ResourceLocation resourceLocation) {
         return INSTANCE.containsKey(resourceLocation) ? Optional.of(INSTANCE.get(resourceLocation)) : Optional.empty();
+    }
+
+    public static Collection<PatternDefinition> patterns() {
+        return INSTANCE.values();
     }
 
     public static ResourceLocation getKey(PatternDefinition part) {

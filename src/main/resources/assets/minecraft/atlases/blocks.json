@@ -3,17 +3,17 @@
         {
             "type": "paletted_permutations",
             "textures": [
-                "irons_jewelry:base/gem_band",
-                "irons_jewelry:base/gem_band_thin",
-                "irons_jewelry:base/pointy_gem",
-                "irons_jewelry:base/gold_ring"
+                "irons_jewelry:item/base/gem_band",
+                "irons_jewelry:item/base/gem_band_thin",
+                "irons_jewelry:item/base/pointy_gem",
+                "irons_jewelry:item/base/gold_ring"
             ],
-            "palette_key": "irons_jewelry:palettes/gold",
+            "palette_key": "irons_jewelry:item/palettes/gold",
             "permutations": {
-                "gold": "irons_jewelry:palettes/gold",
-                "test": "irons_jewelry:palettes/test",
-                "silver": "irons_jewelry:palettes/silver",
-                "iron": "irons_jewelry:palettes/iron"
+                "gold": "irons_jewelry:item/palettes/gold",
+                "test": "irons_jewelry:item/palettes/test",
+                "silver": "irons_jewelry:item/palettes/silver",
+                "iron": "irons_jewelry:item/palettes/iron"
             }
         }
     ]

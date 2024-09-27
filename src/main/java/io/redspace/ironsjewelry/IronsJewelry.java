@@ -5,11 +5,8 @@ import io.redspace.ironsjewelry.client.DynamicModel;
 import io.redspace.ironsjewelry.core.data_registry.MaterialDataHandler;
 import io.redspace.ironsjewelry.core.data_registry.PartDataHandler;
 import io.redspace.ironsjewelry.core.data_registry.PatternDataHandler;
-import io.redspace.ironsjewelry.registry.ParameterTypeRegistry;
-import io.redspace.ironsjewelry.registry.BonusRegistry;
-import io.redspace.ironsjewelry.registry.ComponentRegistry;
-import io.redspace.ironsjewelry.registry.ItemRegistry;
-import net.minecraft.client.Minecraft;
+import io.redspace.ironsjewelry.gameplay.block.jewelcrafting_station.JewelcraftingStationScreen;
+import io.redspace.ironsjewelry.registry.*;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Blocks;
@@ -23,6 +20,7 @@ import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.client.event.ModelEvent;
+import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.AddReloadListenerEvent;
 import org.slf4j.Logger;
@@ -58,6 +56,8 @@ public class IronsJewelry {
         BonusRegistry.register(modEventBus);
         ParameterTypeRegistry.register(modEventBus);
         ItemRegistry.register(modEventBus);
+        BlockRegistry.register(modEventBus);
+        MenuRegistry.register(modEventBus);
 
         // Register ourselves for server and other game events we are interested in.
         // Note that this is necessary if and only if we want *this* class (ExampleMod) to respond directly to events.
@@ -90,9 +90,12 @@ public class IronsJewelry {
     public static class ClientModEvents {
         @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event) {
-            // Some client setup code
-            LOGGER.info("HELLO FROM CLIENT SETUP");
-            LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().getUser().getName());
+
+        }
+
+        @SubscribeEvent
+        public static void registerMenuScreens(RegisterMenuScreensEvent event) {
+            event.register(MenuRegistry.JEWELCRAFTING_MENU.get(), JewelcraftingStationScreen::new);
         }
     }
 
