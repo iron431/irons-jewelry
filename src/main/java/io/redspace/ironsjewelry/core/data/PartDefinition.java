@@ -3,6 +3,7 @@ package io.redspace.ironsjewelry.core.data;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.redspace.ironsjewelry.core.data_registry.PartDataHandler;
+import net.minecraft.Util;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.List;
@@ -19,6 +20,15 @@ public record PartDefinition(List<String> allowedMaterials, ResourceLocation bas
 
     public boolean canUseMaterial(List<String> materialTypes) {
         return allowedMaterials.isEmpty() || materialTypes.stream().anyMatch(allowedMaterials::contains);
+    }
+
+    public String getDescriptionId() {
+        var id = id();
+        if (id == null) {
+            return "unregistered_part";
+        } else {
+            return Util.makeDescriptionId("part", id);
+        }
     }
 
     @Override

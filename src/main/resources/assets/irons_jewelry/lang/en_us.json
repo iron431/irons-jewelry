@@ -3,14 +3,30 @@
   "item.irons_jewelry.necklace": "Necklace",
   "item.irons_jewelry.invalid_jewelry": "Invalid Jewelry",
 
+  "pattern.irons_jewelry.simple_band": "Simple Ring",
   "pattern.irons_jewelry.simple_band.item": "Simple %s Ring",
+  "pattern.irons_jewelry.effect_on_hit_ring": "Ring of Response (WIP)",
   "pattern.irons_jewelry.effect_on_hit_ring.item": "%s Ring of Response",
-  "pattern.irons_jewelry.example_pattern_definition.item": "%s-%s Ring",
+  "pattern.irons_jewelry.example_pattern_definition": "Gemset Ring",
+  "pattern.irons_jewelry.example_pattern_definition.item": "%s Ring",
 
   "material.irons_jewelry.iron": "Iron",
   "material.irons_jewelry.gold": "Gold",
   "material.irons_jewelry.diamond": "Diamond",
+  "material.irons_jewelry.amethyst": "Amethyst",
   "material.irons_jewelry.silver": "Silver",
 
-  "bonus.irons_jewelry.effect_on_hit.description": "When hit, gain %s for %s seconds"
+  "part.irons_jewelry.band_simple": "Band",
+  "part.irons_jewelry.band_gem": "Band",
+  "part.irons_jewelry.band_gem_thin": "Band",
+  "part.irons_jewelry.gem_pointy": "Gemstone",
+
+  "bonus.irons_jewelry.attribute_bonus": "Attribute",
+  "bonus.irons_jewelry.effect_on_hit": "Effect on Hit",
+  "bonus.irons_jewelry.effect_on_hit.description": "When hit, gain %s for %s seconds",
+
+  "tooltip.irons_jewelry.bonus_header" : "Bonus:",
+  "tooltip.irons_jewelry.bonus_header_plural" : "Bonuses:",
+  "tooltip.irons_jewelry.bonus_with_source": "%s (From %s)",
+  "tooltip.irons_jewelry.bonus_with_direct_source": "%s (%s)"
 }

@@ -7,6 +7,8 @@ import io.redspace.ironsjewelry.core.data.AttributeInstance;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 
+import java.util.Optional;
+
 public class AttributeParameter implements IBonusParameterType<AttributeInstance> {
     public static final Codec<AttributeInstance> CODEC = RecordCodecBuilder.create(
             p_349989_ -> p_349989_.group(
@@ -20,5 +22,10 @@ public class AttributeParameter implements IBonusParameterType<AttributeInstance
     @Override
     public Codec<AttributeInstance> codec() {
         return CODEC;
+    }
+
+    @Override
+    public Optional<String> getValueDescriptionId(AttributeInstance value) {
+        return Optional.of(((AttributeInstance) value).attribute().value().getDescriptionId());
     }
 }

@@ -7,6 +7,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.effect.MobEffect;
 
+import java.util.Optional;
 import java.util.function.Function;
 
 public class PositiveEffectParameter implements IBonusParameterType<Holder<MobEffect>> {
@@ -18,5 +19,10 @@ public class PositiveEffectParameter implements IBonusParameterType<Holder<MobEf
     @Override
     public Codec<Holder<MobEffect>> codec() {
         return CODEC;
+    }
+
+    @Override
+    public Optional<String> getValueDescriptionId(Holder<MobEffect> value) {
+        return Optional.of(value.value().getDescriptionId());
     }
 }

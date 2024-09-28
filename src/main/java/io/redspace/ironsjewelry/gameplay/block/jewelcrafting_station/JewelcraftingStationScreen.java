@@ -15,6 +15,7 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -100,6 +101,18 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
         positionPatternButtons();
     }
 
+    @Override
+    protected void renderTooltip(GuiGraphics pGuiGraphics, int mouseX, int mouseY) {
+        super.renderTooltip(pGuiGraphics, mouseX, mouseY);
+        if (this.menu.getCarried().isEmpty() && this.hoveredSlot == null) {
+            for (PatternButton button : this.patternButtons) {
+                if (isHovering(mouseX, mouseY, button.getX(), button.getY(), button.getWidth(), button.getHeight())) {
+                    pGuiGraphics.renderTooltip(this.font, button.patternDefinition.getFullPatternTooltip().stream().map(component -> FormattedCharSequence.forward(component.getString(), component.getStyle())).toList(), mouseX, mouseY);
+                    break;
+                }
+            }
+        }
+    }
 
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float pPartialTick, int pMouseX, int pMouseY) {
@@ -109,7 +122,7 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
             if (!slot.isActive()) {
                 break;
             }
-            guiGraphics.blitSprite(INPUT_SLOT, leftPos + slot.x - 2, topPos + slot.y - 2, 20, 20);
+            guiGraphics.blitSprite(INPUT_SLOT, leftPos + slot.x - 3, topPos + slot.y - 3, 22, 22);
             if (!slot.hasItem()) {
                 if (selectedPattern >= 0) {
                     var pattern = availablePatterns.get(selectedPattern);
@@ -119,7 +132,6 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
                     }
                 }
             }
-
         }
     }
 

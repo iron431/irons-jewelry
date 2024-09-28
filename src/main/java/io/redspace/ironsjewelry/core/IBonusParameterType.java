@@ -19,6 +19,8 @@ public interface IBonusParameterType<T> {
 
     Codec<T> codec();
 
+    Optional<String> getValueDescriptionId(T value);
+
     default boolean isEmpty() {
         return this == ParameterTypeRegistry.EMPTY.get();
     }
