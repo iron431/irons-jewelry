@@ -30,6 +30,7 @@ import java.util.List;
 public class JewelcraftingStationMenu extends AbstractContainerMenu {
     public static class JewelcraftingInputSlot extends Slot {
         public boolean active;
+        public int currentCost;
 
         public JewelcraftingInputSlot(Container pContainer, int pSlot, int pX, int pY) {
             super(pContainer, pSlot, pX, pY);
@@ -46,7 +47,10 @@ public class JewelcraftingStationMenu extends AbstractContainerMenu {
             return active;
         }
 
-
+        @Override
+        public boolean mayPlace(ItemStack pStack) {
+            return this.isActive();
+        }
     }
 
     private final SimpleContainer workspaceContainer = new SimpleContainer(10) {
@@ -75,16 +79,29 @@ public class JewelcraftingStationMenu extends AbstractContainerMenu {
         super(MenuRegistry.JEWELCRAFTING_MENU.get(), pContainerId);
         this.access = pAccess;
         this.player = pPlayerInventory.player;
+        //Workspace slots. We allocate 10 as max, although most will be inaccessible at any given time. If a modder wants to add a piece of jewelry with over ten ingredients, good luck.
+        for (int i = 0; i < 10; i++) {
+            this.workspaceSlots.add((JewelcraftingInputSlot) this.addSlot(new JewelcraftingInputSlot(workspaceContainer, i, -20, -20)));
+        }
         this.resultSlot = this.addSlot(new Slot(resultContainer, 0, 173, 33) {
             @Override
             public boolean mayPlace(ItemStack pStack) {
                 return false;
             }
+
+            @Override
+            public void onTake(Player pPlayer, ItemStack pStack) {
+                super.onTake(pPlayer, pStack);
+                for (JewelcraftingInputSlot slot : workspaceSlots) {
+                    if (!slot.isActive()) {
+                        break;
+                    }
+                    slot.remove(slot.currentCost);
+                }
+                JewelcraftingStationMenu.this.setupResult();
+            }
         });
-        //Workspace slots. We allocate 10 as max, although most will be inaccessible at any given time. If a modder wants to add a piece of jewelry with over ten ingredients, good luck.
-        for (int i = 0; i < 10; i++) {
-            this.workspaceSlots.add((JewelcraftingInputSlot) this.addSlot(new JewelcraftingInputSlot(workspaceContainer, i, -20, -20)));
-        }
+
 
         //Player Inventory
         for (int k = 0; k < 3; k++) {
@@ -109,6 +126,7 @@ public class JewelcraftingStationMenu extends AbstractContainerMenu {
                 var material = MaterialDataHandler.getMaterialForIngredient(input);
                 if (material.isPresent() && input.getCount() >= ingredient.materialCost() && ingredient.part().canUseMaterial(material.get().materialType())) {
                     parts.put(ingredient.part(), material.get());
+                    workspaceSlots.get(i).currentCost = ingredient.materialCost();
                 }
             }
             var jewelryData = new JewelryData(currentPattern, parts);
@@ -120,26 +138,58 @@ public class JewelcraftingStationMenu extends AbstractContainerMenu {
         resultSlot.set(result);
     }
 
-//    private void refreshWorkspace() {
-//        PatternDefinition pattern = availablePatterns.get(selectedPattern);
-//        //clear previous
-//        //TODO: implemenmt me
-//
-//        //setup new
-//        int ingredientCount = pattern.partTemplate().size();
-//        workspaceContainer = new SimpleContainer(ingredientCount);
-//        List<Vec2> locations;
-//        int centerX = leftPos + 64 + 89 / 2;
-//        int centerY = topPos + 10 + 66 / 2;
-//        for (int i = 0; i < ingredientCount; i++) {
-//            workspaceSlots.add(new Slot(workspaceContainer, i, centerX, centerY));
-//        }
-//    }
-
-    //TODO: implement me!
     @Override
-    public ItemStack quickMoveStack(Player pPlayer, int pIndex) {
-        return null;
+    public ItemStack quickMoveStack(Player pPlayer, int index) {
+        ItemStack tryingToMoveCopy = ItemStack.EMPTY;
+        Slot slot = this.slots.get(index);
+        if (slot.hasItem()) {
+            ItemStack baseItemTryingToMove = slot.getItem();
+            tryingToMoveCopy = baseItemTryingToMove.copy();
+            int result = 10;
+            int invBegin = result + 1;
+            int hotbarBegin = invBegin + 27;
+            int playerEnd = hotbarBegin + 9;
+            if (index > result) {
+                //trying to move item that originates in player inventory
+                //First, attempt to place in input slots
+                boolean flag = this.moveItemStackTo(baseItemTryingToMove, 0, result, false);
+                if (!flag) {
+                    //We failed. Move hotbar -> invBegin, or invBegin -> hotbar
+                    if (index >= hotbarBegin) {
+                        if (!this.moveItemStackTo(baseItemTryingToMove, invBegin, hotbarBegin, false)) {
+                            return ItemStack.EMPTY;
+                        }
+                    } else {
+                        if (!this.moveItemStackTo(baseItemTryingToMove, hotbarBegin, playerEnd, false)) {
+                            return ItemStack.EMPTY;
+                        }
+                    }
+                }
+            } else {
+                //trying to put workspace item back into inventory
+                if (!this.moveItemStackTo(baseItemTryingToMove, invBegin, playerEnd, false)) {
+                    return ItemStack.EMPTY;
+                }
+            }
+
+            //copied from crafting table... looks like state tracking
+            if (baseItemTryingToMove.isEmpty()) {
+                slot.setByPlayer(ItemStack.EMPTY);
+            } else {
+                slot.setChanged();
+            }
+
+            if (baseItemTryingToMove.getCount() == tryingToMoveCopy.getCount()) {
+                return ItemStack.EMPTY;
+            }
+
+            slot.onTake(pPlayer, baseItemTryingToMove);
+            if (index == 0) {
+                pPlayer.drop(baseItemTryingToMove, false);
+            }
+        }
+
+        return tryingToMoveCopy;
     }
 
     @Override
@@ -189,4 +239,11 @@ public class JewelcraftingStationMenu extends AbstractContainerMenu {
             }
         }
     }
+
+    @Override
+    public void removed(Player pPlayer) {
+        super.removed(pPlayer);
+        this.access.execute((p_39371_, p_39372_) -> this.clearContainer(pPlayer, this.workspaceContainer));
+    }
+
 }
