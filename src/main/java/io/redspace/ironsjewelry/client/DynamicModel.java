@@ -151,6 +151,17 @@ public class DynamicModel implements IUnbakedGeometry<DynamicModel> {
         }
     }
 
+    public static ResourceLocation atlasResourceLocaction(PartDefinition part, String paletteName) {
+        try {
+            String composite = part.baseTextureLocation().toString();
+            composite += "_" + paletteName;
+            return ResourceLocation.parse(composite);
+        } catch (Exception e) {
+            //TODO: something better
+            return ResourceLocation.parse("unknown");
+        }
+    }
+
     public static final class Loader implements IGeometryLoader<DynamicModel> {
         public static final Loader INSTANCE = new Loader();
 

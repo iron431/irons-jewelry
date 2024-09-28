@@ -13,7 +13,8 @@
                 "gold": "irons_jewelry:item/palettes/gold",
                 "test": "irons_jewelry:item/palettes/test",
                 "silver": "irons_jewelry:item/palettes/silver",
-                "iron": "irons_jewelry:item/palettes/iron"
+                "iron": "irons_jewelry:item/palettes/iron",
+                "menu": "irons_jewelry:item/palettes/menu"
             }
         }
     ]

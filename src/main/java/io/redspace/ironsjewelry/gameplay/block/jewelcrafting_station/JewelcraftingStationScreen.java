@@ -1,17 +1,22 @@
 package io.redspace.ironsjewelry.gameplay.block.jewelcrafting_station;
 
 import io.redspace.ironsjewelry.IronsJewelry;
+import io.redspace.ironsjewelry.client.DynamicModel;
+import io.redspace.ironsjewelry.core.data.PartDefinition;
+import io.redspace.ironsjewelry.core.data.PartIngredient;
 import io.redspace.ironsjewelry.core.data.PatternDefinition;
 import io.redspace.ironsjewelry.core.data_registry.PatternDataHandler;
 import io.redspace.ironsjewelry.network.packets.SetJewelcraftingStationPattern;
 import io.redspace.ironsjewelry.network.packets.SyncJewelcraftingSlotStates;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.inventory.InventoryMenu;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 
@@ -31,10 +36,18 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
             this.patternDefinition = patternDefinition;
         }
 
-        public void renderWidget(GuiGraphics pGuiGraphics, boolean isHovering, boolean selected) {
+        public void renderWidget(GuiGraphics guiGraphics, boolean isHovering, boolean selected) {
             var sprite = isHovering ? RECIPE_SPRITE_HOVERING : selected ? RECIPE_SPRITE_SELECTED : RECIPE_SPRITE;
-            pGuiGraphics.blitSprite(sprite, this.getX(), this.getY(), this.width, this.height);
+            guiGraphics.blitSprite(sprite, this.getX(), this.getY(), this.width, this.height);
+            var parts = patternDefinition.partTemplate();
+            for (PartIngredient part : parts) {
+                guiGraphics.blit(this.getX() + 1, this.getY() + 1, 0, 16, 16, getMenuSprite(part.part()));
+            }
         }
+    }
+
+    private static TextureAtlasSprite getMenuSprite(PartDefinition partDefinition) {
+        return Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(DynamicModel.atlasResourceLocaction(partDefinition, "menu"));
     }
 
     public static final ResourceLocation BACKGROUND_TEXTURE = IronsJewelry.id("textures/gui/jewelcrafting_station.png");
@@ -89,15 +102,24 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
 
 
     @Override
-    protected void renderBg(GuiGraphics pGuiGraphics, float pPartialTick, int pMouseX, int pMouseY) {
-        int i = this.leftPos;
-        int j = this.topPos;
-        pGuiGraphics.blit(BACKGROUND_TEXTURE, i, j, 0, 0, this.imageWidth, this.imageHeight);
-        for (Slot slot : menu.workspaceSlots) {
+    protected void renderBg(GuiGraphics guiGraphics, float pPartialTick, int pMouseX, int pMouseY) {
+        guiGraphics.blit(BACKGROUND_TEXTURE, leftPos, topPos, 0, 0, this.imageWidth, this.imageHeight);
+        for (int i = 0; i < menu.workspaceSlots.size(); i++) {
+            var slot = menu.workspaceSlots.get(i);
             if (!slot.isActive()) {
                 break;
             }
-            pGuiGraphics.blitSprite(INPUT_SLOT, leftPos + slot.x - 2, topPos + slot.y - 2, 20, 20);
+            guiGraphics.blitSprite(INPUT_SLOT, leftPos + slot.x - 2, topPos + slot.y - 2, 20, 20);
+            if (!slot.hasItem()) {
+                if (selectedPattern >= 0) {
+                    var pattern = availablePatterns.get(selectedPattern);
+                    var parts = pattern.partTemplate();
+                    if (i < parts.size()) {
+                        guiGraphics.blit(leftPos + slot.x, topPos + slot.y, 0, 16, 16, getMenuSprite(parts.get(i).part()));
+                    }
+                }
+            }
+
         }
     }
 
