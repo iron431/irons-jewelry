@@ -1,6 +1,6 @@
 {
   "ingredient": {
-    "item": "minecraft:iron_ingot"
+    "tag": "c:ingots/iron"
   },
   "materialType": [
     "metal"

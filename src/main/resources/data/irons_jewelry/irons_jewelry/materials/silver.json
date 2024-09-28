@@ -1,6 +1,6 @@
 {
   "ingredient": {
-    "item": "minecraft:brick"
+    "tag": "c:ingots/silver"
   },
   "materialType": [
     "metal"

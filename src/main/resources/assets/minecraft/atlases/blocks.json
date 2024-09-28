@@ -5,7 +5,6 @@
             "textures": [
                 "irons_jewelry:item/base/gem_band",
                 "irons_jewelry:item/base/gem_band_thin",
-                "irons_jewelry:item/base/pointy_gem",
                 "irons_jewelry:item/base/gold_ring"
             ],
             "palette_key": "irons_jewelry:item/palettes/gold",
@@ -14,6 +13,18 @@
                 "test": "irons_jewelry:item/palettes/test",
                 "silver": "irons_jewelry:item/palettes/silver",
                 "iron": "irons_jewelry:item/palettes/iron",
+                "menu": "irons_jewelry:item/palettes/menu"
+            }
+        },
+        {
+            "type": "paletted_permutations",
+            "textures": [
+                "irons_jewelry:item/base/pointy_gem"
+            ],
+            "palette_key": "irons_jewelry:item/palettes/diamond",
+            "permutations": {
+                "diamond": "irons_jewelry:item/palettes/diamond",
+                "amethyst": "irons_jewelry:item/palettes/amethyst",
                 "menu": "irons_jewelry:item/palettes/menu"
             }
         }

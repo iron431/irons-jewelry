@@ -1,15 +1,15 @@
 {
   "ingredient": {
-    "tag": "c:gems/diamond"
+    "tag": "c:gems/amethyst"
   },
   "materialType": [
     "gem"
   ],
-  "paletteLocation": "irons_jewelry:item/palettes/diamond",
+  "paletteLocation": "irons_jewelry:item/palettes/amethyst",
   "quality": 3,
   "bonusParameters": {
     "irons_jewelry:attribute": {
-      "attribute": "minecraft:generic.armor_toughness",
+      "attribute": "minecraft:generic.max_health",
       "amount": 2,
       "operation": "add_value"
     },

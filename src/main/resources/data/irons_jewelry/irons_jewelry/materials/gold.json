@@ -1,6 +1,6 @@
 {
   "ingredient": {
-    "item": "minecraft:gold_ingot"
+    "tag": "c:ingots/gold"
   },
   "materialType": [
     "metal",
