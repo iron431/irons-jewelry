@@ -2,8 +2,14 @@ package io.redspace.ironsjewelry.core;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
+import io.redspace.ironsjewelry.core.data.BonusInstance;
+import io.redspace.ironsjewelry.core.data.JewelryData;
+import io.redspace.ironsjewelry.registry.ComponentRegistry;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Player;
+import top.theillusivec4.curios.api.CuriosApi;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -17,6 +23,10 @@ public class Utils {
                                 .orElseGet(() -> DataResult.error(() -> "Unknown registry key: " + resourceLocation)),
                         objToId
                 );
+    }
+
+    public static List<BonusInstance> getEquippedBonuses(Player player) {
+        return CuriosApi.getCuriosInventory(player).map(inv -> inv.findCurios(stack -> stack.has(ComponentRegistry.JEWELRY_COMPONENT)).stream().flatMap(slot -> JewelryData.get(slot.stack()).getBonuses().stream()).toList()).orElse(List.of());
     }
 
     public static String timeFromTicks(float ticks, int decimalPlaces) {
