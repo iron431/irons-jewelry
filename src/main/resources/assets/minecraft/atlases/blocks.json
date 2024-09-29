@@ -7,13 +7,16 @@
                 "irons_jewelry:item/base/gem_band_thin",
                 "irons_jewelry:item/base/gold_ring"
             ],
-            "palette_key": "irons_jewelry:item/palettes/gold",
+            "palette_key": "irons_jewelry:palettes/gold",
             "permutations": {
-                "gold": "irons_jewelry:item/palettes/gold",
-                "test": "irons_jewelry:item/palettes/test",
-                "silver": "irons_jewelry:item/palettes/silver",
-                "iron": "irons_jewelry:item/palettes/iron",
-                "menu": "irons_jewelry:item/palettes/menu"
+                "gold": "irons_jewelry:palettes/gold",
+                "test": "irons_jewelry:palettes/test",
+                "silver": "irons_jewelry:palettes/silver",
+                "iron": "irons_jewelry:palettes/iron",
+                "copper": "irons_jewelry:palettes/copper",
+                "netherite": "irons_jewelry:palettes/netherite",
+                "menu": "irons_jewelry:palettes/menu",
+                "menu_bright": "irons_jewelry:palettes/menu_bright"
             }
         },
         {
@@ -21,11 +24,13 @@
             "textures": [
                 "irons_jewelry:item/base/pointy_gem"
             ],
-            "palette_key": "irons_jewelry:item/palettes/diamond",
+            "palette_key": "irons_jewelry:palettes/diamond",
             "permutations": {
-                "diamond": "irons_jewelry:item/palettes/diamond",
-                "amethyst": "irons_jewelry:item/palettes/amethyst",
-                "menu": "irons_jewelry:item/palettes/menu"
+                "diamond": "irons_jewelry:palettes/diamond",
+                "amethyst": "irons_jewelry:palettes/amethyst",
+                "emerald": "irons_jewelry:palettes/emerald",
+                "menu": "irons_jewelry:palettes/menu",
+                "menu_bright": "irons_jewelry:palettes/menu_bright"
             }
         }
     ]

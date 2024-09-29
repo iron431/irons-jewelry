@@ -15,6 +15,9 @@
   "material.irons_jewelry.diamond": "Diamond",
   "material.irons_jewelry.amethyst": "Amethyst",
   "material.irons_jewelry.silver": "Silver",
+  "material.irons_jewelry.copper": "Copper",
+  "material.irons_jewelry.netherite": "Netherite",
+  "material.irons_jewelry.emerald": "Emerald",
 
   "part.irons_jewelry.band_simple": "Band",
   "part.irons_jewelry.band_gem": "Band",
@@ -25,6 +28,7 @@
   "bonus.irons_jewelry.effect_on_hit": "Effect on Hit",
   "bonus.irons_jewelry.effect_on_hit.description": "When hit, gain %s for %s seconds",
 
+  "tooltip.irons_jewelry.parts_header" : "Parts:",
   "tooltip.irons_jewelry.bonus_header" : "Bonus:",
   "tooltip.irons_jewelry.bonus_header_plural" : "Bonuses:",
   "tooltip.irons_jewelry.bonus_with_source": "%s (From %s)",

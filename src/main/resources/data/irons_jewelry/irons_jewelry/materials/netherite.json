@@ -1,0 +1,12 @@
+{
+  "ingredient": {
+    "tag": "c:ingots/netherite"
+  },
+  "materialType": [
+    "metal"
+  ],
+  "paletteLocation": "irons_jewelry:item/palettes/netherite",
+  "quality": 4,
+  "bonusParameters": {
+  }
+}

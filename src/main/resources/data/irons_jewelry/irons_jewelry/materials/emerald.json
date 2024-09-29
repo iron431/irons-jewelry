@@ -1,0 +1,20 @@
+{
+  "ingredient": {
+    "tag": "c:gems/emerald"
+  },
+  "materialType": [
+    "gem"
+  ],
+  "paletteLocation": "irons_jewelry:item/palettes/emerald",
+  "quality": 2.2,
+  "bonusParameters": {
+    "irons_jewelry:attribute": {
+      "attribute": "minecraft:generic.attack_speed",
+      "amount": 0.05,
+      "operation": "add_multiplied_total"
+    },
+    "irons_jewelry:positive_effect": {
+      "effect": "minecraft:jump_boost"
+    }
+  }
+}

@@ -15,22 +15,6 @@
       "bonus": "irons_jewelry:attribute_bonus",
       "parameter": "irons_jewelry:gem_pointy",
       "quality": "irons_jewelry:band_gem"
-    },
-    {
-      "bonus": "irons_jewelry:attribute_bonus",
-      "parameter": {
-        "irons_jewelry:attribute": {
-          "attribute": "minecraft:generic.attack_damage",
-          "amount": 2,
-          "operation": "add_value"
-        }
-      },
-      "quality": 1.0
-    },
-    {
-      "bonus": "irons_jewelry:effect_on_hit",
-      "parameter": "irons_jewelry:gem_pointy",
-      "quality": "irons_jewelry:band_gem"
     }
   ]
 }

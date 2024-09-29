@@ -47,9 +47,11 @@ public record PatternDefinition(List<PartIngredient> partTemplate, List<BonusSou
     }
 
     public List<Component> getFullPatternTooltip() {
+        var titleStyle = Style.EMPTY.applyFormats(ChatFormatting.GOLD, ChatFormatting.UNDERLINE);
         var headerStyle = Style.EMPTY.applyFormats(ChatFormatting.YELLOW, ChatFormatting.UNDERLINE);
         var infoStyle = ChatFormatting.GRAY;
-        Component title = Component.translatable(this.getDescriptionId()).withStyle(headerStyle);
+        Component title = Component.translatable(this.getDescriptionId()).withStyle(titleStyle);
+        Component partHeader = Component.translatable("tooltip.irons_jewelry.parts_header").withStyle(headerStyle);
         var parts = this.partTemplate.stream().map(part -> Component.translatable(part.part().getDescriptionId()).withStyle(infoStyle)).toList();
         Component bonusHeader = Component.translatable(this.bonuses.size() > 1 ? "tooltip.irons_jewelry.bonus_header_plural" : "tooltip.irons_jewelry.bonus_header").withStyle(headerStyle);
         var bonuses = this.bonuses.stream().map(source -> {
@@ -74,6 +76,7 @@ public record PatternDefinition(List<PartIngredient> partTemplate, List<BonusSou
         }).toList();
         var tooltip = new ArrayList<Component>();
         tooltip.add(title);
+        tooltip.add(partHeader);
         tooltip.addAll(parts);
         if (!bonuses.isEmpty()) {
             tooltip.add(Component.empty());

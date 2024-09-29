@@ -42,13 +42,13 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
             guiGraphics.blitSprite(sprite, this.getX(), this.getY(), this.width, this.height);
             var parts = patternDefinition.partTemplate();
             for (PartIngredient part : parts) {
-                guiGraphics.blit(this.getX() + 1, this.getY() + 1, 0, 16, 16, getMenuSprite(part.part()));
+                guiGraphics.blit(this.getX() + 1, this.getY() + 1, 0, 16, 16, getMenuSprite(part.part(), selected || isHovering));
             }
         }
     }
 
-    private static TextureAtlasSprite getMenuSprite(PartDefinition partDefinition) {
-        return Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(DynamicModel.atlasResourceLocaction(partDefinition, "menu"));
+    private static TextureAtlasSprite getMenuSprite(PartDefinition partDefinition, boolean bright) {
+        return Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(DynamicModel.atlasResourceLocaction(partDefinition, bright ? "menu_bright" : "menu"));
     }
 
     public static final ResourceLocation BACKGROUND_TEXTURE = IronsJewelry.id("textures/gui/jewelcrafting_station.png");
@@ -128,7 +128,7 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
                     var pattern = availablePatterns.get(selectedPattern);
                     var parts = pattern.partTemplate();
                     if (i < parts.size()) {
-                        guiGraphics.blit(leftPos + slot.x, topPos + slot.y, 0, 16, 16, getMenuSprite(parts.get(i).part()));
+                        guiGraphics.blit(leftPos + slot.x, topPos + slot.y, 0, 16, 16, getMenuSprite(parts.get(i).part(), false));
                     }
                 }
             }
