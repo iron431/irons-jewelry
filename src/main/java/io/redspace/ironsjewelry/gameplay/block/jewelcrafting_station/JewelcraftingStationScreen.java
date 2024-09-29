@@ -16,6 +16,7 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -58,6 +59,7 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
     private static final ResourceLocation RECIPE_SPRITE_HOVERING = IronsJewelry.id("jewelcrafting_station/recipe_highlighted");
     private static final ResourceLocation RECIPE_SPRITE = IronsJewelry.id("jewelcrafting_station/recipe");
     private static final ResourceLocation INPUT_SLOT = IronsJewelry.id("jewelcrafting_station/input_slot");
+    private static final int MAX_PATTERNS = 8;
 
     int scrollOff;
     int selectedPattern;
@@ -67,7 +69,9 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
     public JewelcraftingStationScreen(JewelcraftingStationMenu pMenu, Inventory pPlayerInventory, Component pTitle) {
         super(pMenu, pPlayerInventory, pTitle);
         this.imageWidth = 206;
-
+        this.inventoryLabelX += menu.SCROLL_AREA_OFFSET;
+        this.inventoryLabelY += 2;
+        this.titleLabelY -= 2;
         this.selectedPattern = -1;
         this.scrollOff = 0;
 
@@ -77,12 +81,11 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
 
 
     private void positionPatternButtons() {
-        int maxPatterns = 7;
         int x = leftPos + 5;
-        int y = topPos + 18;
+        int y = topPos + SCROLL_BAR_Y_OFFSET;
         for (int i = 0; i < patternButtons.size(); i++) {
-            patternButtons.get(i).setPosition(x, y + (scrollOff + i) * 18);
-            patternButtons.get(i).active = (i - scrollOff) >= 0 && (i - scrollOff) < maxPatterns;
+            patternButtons.get(i).setPosition(x, y + (-scrollOff + i) * 18);
+            patternButtons.get(i).active = (i - scrollOff) >= 0 && (i - scrollOff) < MAX_PATTERNS;
         }
     }
 
@@ -92,7 +95,7 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
         patternButtons = new ArrayList<>();
         for (int i = 0; i < availablePatterns.size(); i++) {
             int index = i;
-            patternButtons.add(this.addRenderableWidget(new PatternButton(availablePatterns.get(i), 0, 0, 18, 18, (button) -> {
+            patternButtons.add(this.addWidget(new PatternButton(availablePatterns.get(i), 0, 0, 18, 18, (button) -> {
                 IronsJewelry.LOGGER.debug("pattern button pressed: {}", index);
                 selectedPattern = index;
                 PacketDistributor.sendToServer(new SetJewelcraftingStationPattern(this.menu.containerId, availablePatterns.get(selectedPattern)));
@@ -106,7 +109,7 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
         super.renderTooltip(pGuiGraphics, mouseX, mouseY);
         if (this.menu.getCarried().isEmpty() && this.hoveredSlot == null) {
             for (PatternButton button : this.patternButtons) {
-                if (isHovering(mouseX, mouseY, button.getX(), button.getY(), button.getWidth(), button.getHeight())) {
+                if (button.active && isHovering(mouseX, mouseY, button.getX(), button.getY(), button.getWidth(), button.getHeight())) {
                     pGuiGraphics.renderTooltip(this.font, button.patternDefinition.getFullPatternTooltip().stream().map(component -> FormattedCharSequence.forward(component.getString(), component.getStyle())).toList(), mouseX, mouseY);
                     break;
                 }
@@ -148,29 +151,105 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
         return mouseX > xmin && mouseX < xmin + width && mouseY > ymin && mouseY < ymin + height;
     }
 
+    private static final int SCROLL_BAR_X_OFFSET = 24;
+    private static final int SCROLL_BAR_Y_OFFSET = 14;
+    private static final int SCROLL_BAR_WIDTH = 6;
+    private static final int SCROLL_BAR_HEIGHT = 27;
+    private static final int SCROLL_BAR_CHANNEL_LENGTH = 144;
+
     private void renderSidebar(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        int barX = leftPos + 24;
-        int iconX = leftPos + 5;
-        int y = topPos + 18;
-        int maxPatterns = 7;
-        for (int i = scrollOff; i < patternButtons.size() && i < maxPatterns; i++) {
+        int barX = leftPos + SCROLL_BAR_X_OFFSET;
+        int y = topPos + SCROLL_BAR_Y_OFFSET;
+        for (int i = scrollOff; i < patternButtons.size() && i < MAX_PATTERNS + scrollOff; i++) {
             var button = patternButtons.get(i);
             button.renderWidget(guiGraphics, isHovering(mouseX, mouseY, button.getX(), button.getY(), button.getWidth(), button.getHeight()), i == selectedPattern);
         }
 
-        int i = availablePatterns.size() + 1 - maxPatterns;
+        int i = availablePatterns.size() + 1 - MAX_PATTERNS;
         if (i > 1) {
-            int j = 139 - (27 + (i - 1) * 139 / i);
-            int k = 1 + j / i + 139 / i;
-            int l = 113;
-            int i1 = Math.min(113, this.scrollOff * k);
-            if (this.scrollOff == i - 1) {
-                i1 = 113;
-            }
-
+            var i1 = getCurrentScrollBarYOffset(i);
             guiGraphics.blitSprite(SCROLLER_SPRITE, barX, y + i1, 0, 6, 27);
         } else {
             guiGraphics.blitSprite(SCROLLER_DISABLED_SPRITE, barX, y, 0, 6, 27);
         }
+    }
+
+    private int getCurrentScrollBarYOffset(int patternsPastMaxPatterns) {
+        int j = SCROLL_BAR_CHANNEL_LENGTH - (SCROLL_BAR_HEIGHT + (patternsPastMaxPatterns - 1) * 139 / patternsPastMaxPatterns);
+        int k = 1 + j / patternsPastMaxPatterns + SCROLL_BAR_CHANNEL_LENGTH / patternsPastMaxPatterns;
+        int l = SCROLL_BAR_CHANNEL_LENGTH - SCROLL_BAR_HEIGHT;
+        int i1 = Math.min(l, this.scrollOff * k);
+        if (this.scrollOff == patternsPastMaxPatterns - 1) {
+            i1 = l;
+        }
+        return i1;
+    }
+
+    private boolean canScroll(int count) {
+        return count > MAX_PATTERNS;
+    }
+
+    private boolean isDragging;
+
+    @Override
+    public boolean mouseScrolled(double pMouseX, double pMouseY, double pScrollX, double pScrollY) {
+        int i = this.availablePatterns.size();
+        if (this.canScroll(i)) {
+            int j = i - MAX_PATTERNS;
+            this.scrollOff = Mth.clamp((int) ((double) this.scrollOff - pScrollY), 0, j);
+            positionPatternButtons();
+        }
+
+        return true;
+    }
+
+    /**
+     * Called when the mouse is dragged within the GUI element.
+     * <p>
+     *
+     * @param pMouseX the X coordinate of the mouse.
+     * @param pMouseY the Y coordinate of the mouse.
+     * @param pButton the button that is being dragged.
+     * @param pDragX  the X distance of the drag.
+     * @param pDragY  the Y distance of the drag.
+     * @return {@code true} if the event is consumed, {@code false} otherwise.
+     */
+    @Override
+    public boolean mouseDragged(double pMouseX, double pMouseY, int pButton, double pDragX, double pDragY) {
+        int i = this.availablePatterns.size();
+        if (this.isDragging) {
+            int j = this.topPos + 18;
+            int k = j + 139;
+            int l = i - MAX_PATTERNS;
+            float f = ((float) pMouseY - (float) j - 13.5F) / ((float) (k - j) - 27.0F);
+            f = f * (float) l + 0.5F;
+            this.scrollOff = Mth.clamp((int) f, 0, l);
+            positionPatternButtons();
+            return true;
+        } else {
+            return super.mouseDragged(pMouseX, pMouseY, pButton, pDragX, pDragY);
+        }
+    }
+
+    /**
+     * Called when a mouse button is clicked within the GUI element.
+     * <p>
+     *
+     * @param pMouseX the X coordinate of the mouse.
+     * @param pMouseY the Y coordinate of the mouse.
+     * @param pButton the button that was clicked.
+     * @return {@code true} if the event is consumed, {@code false} otherwise.
+     */
+    @Override
+    public boolean mouseClicked(double pMouseX, double pMouseY, int pButton) {
+        this.isDragging = this.canScroll(this.availablePatterns.size())
+                && isHovering((int) pMouseX, (int) pMouseY,
+                leftPos + SCROLL_BAR_X_OFFSET,
+                topPos + SCROLL_BAR_Y_OFFSET + getCurrentScrollBarYOffset(availablePatterns.size() + 1 - MAX_PATTERNS),
+                SCROLL_BAR_WIDTH,
+                SCROLL_BAR_HEIGHT
+        );
+
+        return super.mouseClicked(pMouseX, pMouseY, pButton);
     }
 }

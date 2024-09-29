@@ -14,7 +14,7 @@ import net.minecraft.world.phys.BlockHitResult;
 
 public class JewelcraftingStationBlock extends Block {
     //todo:title
-    private static final Component CONTAINER_TITLE = Component.translatable("container.crafting");
+    private static final Component CONTAINER_TITLE = Component.translatable("block.irons_jewelry.jewelcrafting_station");
 
     public JewelcraftingStationBlock(Properties p_49795_) {
         super(p_49795_);

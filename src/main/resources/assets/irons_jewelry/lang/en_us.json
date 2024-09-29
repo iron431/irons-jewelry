@@ -3,6 +3,8 @@
   "item.irons_jewelry.necklace": "Necklace",
   "item.irons_jewelry.invalid_jewelry": "Invalid Jewelry",
 
+  "block.irons_jewelry.jewelcrafting_station": "Jewelcrafting Station",
+
   "pattern.irons_jewelry.simple_band": "Simple Ring",
   "pattern.irons_jewelry.simple_band.item": "Simple %s Ring",
   "pattern.irons_jewelry.effect_on_hit_ring": "Ring of Response (WIP)",
