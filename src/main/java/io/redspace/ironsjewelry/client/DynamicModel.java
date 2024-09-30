@@ -7,6 +7,7 @@ import io.redspace.ironsjewelry.IronsJewelry;
 import io.redspace.ironsjewelry.core.data.JewelryData;
 import io.redspace.ironsjewelry.core.data.MaterialDefinition;
 import io.redspace.ironsjewelry.core.data.PartDefinition;
+import io.redspace.ironsjewelry.core.data.PartIngredient;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.RenderType;
@@ -36,6 +37,7 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import javax.annotation.Nullable;
+import java.util.Comparator;
 import java.util.List;
 import java.util.function.Function;
 
@@ -110,7 +112,7 @@ public class DynamicModel implements IUnbakedGeometry<DynamicModel> {
 
     public static BakedModel bake(JewelryData jewelryData, IGeometryBakingContext context, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelState, ItemOverrides overrides) {
         IronsJewelry.LOGGER.debug("JewelryModel bake: {}", jewelryData);
-        var parts = jewelryData.parts().entrySet().stream().toList();
+        var parts = jewelryData.parts().entrySet().stream().sorted(Comparator.comparingInt(entry -> get(entry.getKey(), jewelryData.pattern().partTemplate()).drawOrder())).toList();
         if (!parts.isEmpty()) {
             TextureAtlasSprite particle = spriteGetter.apply(new Material(InventoryMenu.BLOCK_ATLAS, atlasResourceLocaction(parts.getFirst().getKey(), parts.getFirst().getValue())));
             CompositeModel.Baked.Builder builder = CompositeModel.Baked.builder(context, particle, overrides, context.getTransforms());
@@ -137,6 +139,15 @@ public class DynamicModel implements IUnbakedGeometry<DynamicModel> {
         }
         return EmptyModel.BAKED;
 
+    }
+
+    private static PartIngredient get(PartDefinition definition, List<PartIngredient> list) {
+        for (PartIngredient i : list) {
+            if (i.part().equals(definition)) {
+                return i;
+            }
+        }
+        return null;
     }
 
     public static ResourceLocation atlasResourceLocaction(PartDefinition part, MaterialDefinition material) {

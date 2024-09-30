@@ -92,13 +92,12 @@ public class JewelryData {
 
 
     private boolean validate() {
-        if (this.pattern == null) {
+        if (this.pattern == null || this.parts.size() != this.pattern.partTemplate().size()) {
             return false;
         }
         for (PartIngredient part : this.pattern.partTemplate()) {
             if (!this.parts.containsKey(part.part())) {
                 //Ensure our parts contain everything specified by the pattern
-                //TODO: ensure parts dont contain extra things not specifiied by pattern?
                 return false;
             }
         }
@@ -122,15 +121,14 @@ public class JewelryData {
     }
 
     public Component getItemName() {
-        if (this == NONE) {
+        if (!this.isValid()) {
             return Component.translatable("item.irons_jewelry.invalid_jewelry");
         }
-        //technically, this isn't ordered. but like, it kinda is. essentially uses material arguments in reverse-draw-order, meaning the pinnacle component (ie gem) will be the first argument
-        var values = parts.values();
-        Component[] ids = new Component[values.size()];
-        var itr = values.iterator();
-        for (int i = parts.size() - 1; i >= 0; i--) {
-            ids[i] = Component.translatable(itr.next().getDescriptionId());
+        var parts = pattern.partTemplate();
+        Component[] ids = new Component[parts.size()];
+        for (int i = 0; i < parts.size(); i++) {
+            //Fill arguments in reverse (pinnacle piece, ie gem, will be first translation argument)
+            ids[parts.size() - 1 - i] = Component.translatable(this.parts.get(parts.get(i).part()).getDescriptionId());
         }
         return Component.translatable(this.pattern.getDescriptionId() + ".item", ids);
     }

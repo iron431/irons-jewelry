@@ -5,7 +5,11 @@
             "textures": [
                 "irons_jewelry:item/base/gem_band",
                 "irons_jewelry:item/base/gem_band_thin",
-                "irons_jewelry:item/base/gold_ring"
+                "irons_jewelry:item/base/gold_ring",
+                "irons_jewelry:item/base/band_flat_top",
+                "irons_jewelry:item/base/band_gem_superior",
+                "irons_jewelry:item/base/twisted_ring_primary",
+                "irons_jewelry:item/base/twisted_ring_secondary"
             ],
             "palette_key": "irons_jewelry:palettes/gold",
             "permutations": {
@@ -22,7 +26,9 @@
         {
             "type": "paletted_permutations",
             "textures": [
-                "irons_jewelry:item/base/pointy_gem"
+                "irons_jewelry:item/base/pointy_gem",
+                "irons_jewelry:item/base/gem_round",
+                "irons_jewelry:item/base/gems_side"
             ],
             "palette_key": "irons_jewelry:palettes/diamond",
             "permutations": {

@@ -7,17 +7,12 @@
       "drawOrder": 0
     },
     {
-      "id": "irons_jewelry:gem_pointy",
+      "id": "irons_jewelry:gem_round",
       "materialCost": 1,
       "drawOrder": 1
     }
   ],
   "bonuses": [
-    {
-      "bonus": "irons_jewelry:effect_on_hit",
-      "parameter": "irons_jewelry:gem_pointy",
-      "quality": "irons_jewelry:band_gem_thin"
-    }
   ]
 }
 ///give @p irons_jewelry:ring[irons_jewelry:jewelry_data={pattern:"irons_jewelry:effect_on_hit_ring",parts:{"irons_jewelry:band_gem_thin":"irons_jewelry:gold","irons_jewelry:gem_pointy":"irons_jewelry:diamond"}}]

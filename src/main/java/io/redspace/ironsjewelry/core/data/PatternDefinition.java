@@ -12,6 +12,7 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,6 +32,14 @@ public record PatternDefinition(List<PartIngredient> partTemplate, List<BonusSou
             Codec.BOOL.optionalFieldOf("unlockedByDefault", true).forGetter(PatternDefinition::unlockedByDefault),
             Codec.DOUBLE.optionalFieldOf("qualityMultiplier", 1d).forGetter(PatternDefinition::qualityMultiplier)
     ).apply(builder, PatternDefinition::new));
+
+    public PatternDefinition(List<PartIngredient> partTemplate, List<BonusSource> bonuses, boolean unlockedByDefault,
+                             double qualityMultiplier) {
+        this.partTemplate = partTemplate.stream().sorted(Comparator.comparingInt(PartIngredient::drawOrder)).toList();
+        this.bonuses = bonuses;
+        this.unlockedByDefault = unlockedByDefault;
+        this.qualityMultiplier = qualityMultiplier;
+    }
 
     @Override
     public int hashCode() {

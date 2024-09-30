@@ -3,7 +3,9 @@
   "parts": [
     {
       "id": "irons_jewelry:band_simple",
-      "materialCost": 4
+      "materialCost": 4,
+      "drawOrder": 0
+
     }
   ],
   "bonuses": [

@@ -1,0 +1,6 @@
+{
+  "allowedMaterialTypes": [
+    "metal"
+  ],
+  "baseTextureLocation": "irons_jewelry:item/base/twisted_ring_secondary"
+}

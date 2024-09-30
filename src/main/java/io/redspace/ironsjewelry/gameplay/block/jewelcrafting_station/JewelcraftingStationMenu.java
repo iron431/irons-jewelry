@@ -137,7 +137,6 @@ public class JewelcraftingStationMenu extends AbstractContainerMenu {
         resultSlot.set(result);
     }
 
-
     @Override
     public ItemStack quickMoveStack(Player pPlayer, int index) {
         ItemStack tryingToMoveCopy = ItemStack.EMPTY;
@@ -150,11 +149,11 @@ public class JewelcraftingStationMenu extends AbstractContainerMenu {
             int hotbarBegin = invBegin + 27;
             int playerEnd = hotbarBegin + 9;
             if (index > result) {
-                //trying to move item that originates in player inventory
-                //First, attempt to place in input slots
+                // Trying to move item that originates in player inventory
+                // First, attempt to place in input slots
                 boolean flag = this.moveItemStackTo(baseItemTryingToMove, 0, result, false);
                 if (!flag) {
-                    //We failed. Move hotbar -> invBegin, or invBegin -> hotbar
+                    // We failed. Move hotbar -> inv, or inv -> hotbar
                     if (index >= hotbarBegin) {
                         if (!this.moveItemStackTo(baseItemTryingToMove, invBegin, hotbarBegin, false)) {
                             return ItemStack.EMPTY;
@@ -166,13 +165,14 @@ public class JewelcraftingStationMenu extends AbstractContainerMenu {
                     }
                 }
             } else {
-                //trying to put workspace item back into inventory
+                // Trying to put workspace item back into inventory
                 if (!this.moveItemStackTo(baseItemTryingToMove, invBegin, playerEnd, false)) {
                     return ItemStack.EMPTY;
                 }
             }
 
-            //copied from crafting table... looks like state tracking
+            // Below copied from crafting table... looks like state tracking
+
             if (baseItemTryingToMove.isEmpty()) {
                 slot.setByPlayer(ItemStack.EMPTY);
             } else {
@@ -202,19 +202,6 @@ public class JewelcraftingStationMenu extends AbstractContainerMenu {
         return true;
     }
 
-    private static final int[][] SLOT_ROW_TO_MAX_COLUM = {
-            {1, 1},
-            {1, 2},
-            {2, 2},
-            {2, 2},
-            {2, 3},
-            {2, 3},
-            {3, 3},
-            {3, 3},
-            {3, 3},
-            {3, 4}
-    };
-
     public boolean handleSetPattern(PatternDefinition patternDefinition) {
         //Reset Workspace
         this.clearContainer(player, workspaceContainer);
@@ -227,33 +214,21 @@ public class JewelcraftingStationMenu extends AbstractContainerMenu {
             if (ingredientCount == 1) {
                 this.workspaceSlots.get(0).setup(centerX - 8, centerY - 8, true);
             } else {
-                //int rows = SLOT_ROW_TO_MAX_COLUM[ingredientCount - 1][0];
-                //int maxColumns = SLOT_ROW_TO_MAX_COLUM[ingredientCount - 1][1];
-
                 int maxPerRow = ingredientCount == 10 ? 4 : 3;
                 int rows = (ingredientCount-1) / maxPerRow + 1;
-                int spacing = 8;
+                int verticalSpacing = 8;
+                int horizontalSpacing = 14;
                 int spriteWidth = 16;
-                int totalHeight = rows * spriteWidth + (rows - 1) * spacing;
+                int totalHeight = rows * spriteWidth + (rows - 1) * verticalSpacing;
                 for (int i = 0; i < rows; i++) {
                     int boxesInThisRow = Math.min(maxPerRow, ingredientCount - i * maxPerRow);
-                    int rowWidth = boxesInThisRow * spriteWidth + spacing * (boxesInThisRow - 1);
+                    int rowWidth = boxesInThisRow * spriteWidth + horizontalSpacing * (boxesInThisRow - 1);
                     for (int j = 0; j < boxesInThisRow; j++) {
-                        int x = centerX - rowWidth / 2 + (spriteWidth + spacing) * j;
-                        int y = centerY - totalHeight / 2 + (spriteWidth + spacing) * i;
+                        int x = centerX - rowWidth / 2 + (spriteWidth + horizontalSpacing) * j;
+                        int y = centerY - totalHeight / 2 + (spriteWidth + verticalSpacing) * i;
                         this.workspaceSlots.get(i * maxPerRow + j).setup(x, y, true);
                     }
                 }
-
-
-//                int radius = (int) Mth.lerp(ingredientCount / 10f, 16, 44 + 1);
-//                int anglePerSlot = 360 / ingredientCount;
-//                for (int i = 0; i < ingredientCount; i++) {
-//                    int angle = i * anglePerSlot + (ingredientCount % 2 == 0 ? 0 : 270 - anglePerSlot * 2);
-//                    int x = (int) (radius * -Mth.cos(angle * Mth.DEG_TO_RAD)) + centerX - 8;
-//                    int y = (int) (radius * 0.75 * -Mth.sin(angle * Mth.DEG_TO_RAD)) + centerY - 8;
-//                    this.workspaceSlots.get(i).setup(x, y, true);
-//                }
             }
         }
         //Update client of new slot availability/positions

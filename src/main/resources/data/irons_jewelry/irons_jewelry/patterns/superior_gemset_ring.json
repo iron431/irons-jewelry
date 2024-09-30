@@ -2,21 +2,31 @@
   "unlockedByDefault": true,
   "parts": [
     {
-      "id": "irons_jewelry:band_gem",
+      "id": "irons_jewelry:band_gem_superior",
       "materialCost": 4,
       "drawOrder": 0
     },
     {
-      "id": "irons_jewelry:gem_round",
+      "id": "irons_jewelry:gems_side",
       "materialCost": 1,
       "drawOrder": 1
+    },
+    {
+      "id": "irons_jewelry:gem_pointy",
+      "materialCost": 2,
+      "drawOrder": 2
     }
   ],
   "bonuses": [
     {
       "bonus": "irons_jewelry:attribute_bonus",
-      "parameter": "irons_jewelry:gem_round",
-      "quality": "irons_jewelry:band_gem"
+      "parameter": "irons_jewelry:gem_pointy",
+      "quality": "irons_jewelry:band_gem_superior"
+    },
+    {
+      "bonus": "irons_jewelry:attribute_bonus",
+      "parameter": "irons_jewelry:gems_side",
+      "quality": "irons_jewelry:band_gem_superior"
     }
   ]
 }
