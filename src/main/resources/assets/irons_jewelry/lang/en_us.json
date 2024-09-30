@@ -34,5 +34,9 @@
   "tooltip.irons_jewelry.bonus_header" : "Bonus:",
   "tooltip.irons_jewelry.bonus_header_plural" : "Bonuses:",
   "tooltip.irons_jewelry.bonus_with_source": "%s (From %s)",
-  "tooltip.irons_jewelry.bonus_with_direct_source": "%s (%s)"
+  "tooltip.irons_jewelry.bonus_with_direct_source": "%s (%s)",
+  "tooltip.irons_jewelry.bonus_to_source": "%s: %s",
+  "tooltip.irons_jewelry.quality_to_source": "Quality: %s",
+  "tooltip.irons_jewelry.part_header_with_counter": "%s (%s/%s):",
+  "tooltip.irons_jewelry.empty": "Empty"
 }

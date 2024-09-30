@@ -2,12 +2,16 @@ package io.redspace.ironsjewelry.gameplay.block.jewelcrafting_station;
 
 import io.redspace.ironsjewelry.IronsJewelry;
 import io.redspace.ironsjewelry.client.DynamicModel;
+import io.redspace.ironsjewelry.core.IBonusParameterType;
+import io.redspace.ironsjewelry.core.data.BonusSource;
 import io.redspace.ironsjewelry.core.data.PartDefinition;
 import io.redspace.ironsjewelry.core.data.PartIngredient;
 import io.redspace.ironsjewelry.core.data.PatternDefinition;
+import io.redspace.ironsjewelry.core.data_registry.MaterialDataHandler;
 import io.redspace.ironsjewelry.core.data_registry.PatternDataHandler;
 import io.redspace.ironsjewelry.network.packets.SetJewelcraftingStationPattern;
 import io.redspace.ironsjewelry.network.packets.SyncJewelcraftingSlotStates;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
@@ -24,6 +28,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class JewelcraftingStationScreen extends AbstractContainerScreen<JewelcraftingStationMenu> {
     public void handleSlotSync(SyncJewelcraftingSlotStates packet) {
@@ -59,6 +65,7 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
     private static final ResourceLocation RECIPE_SPRITE_HOVERING = IronsJewelry.id("jewelcrafting_station/recipe_highlighted");
     private static final ResourceLocation RECIPE_SPRITE = IronsJewelry.id("jewelcrafting_station/recipe");
     private static final ResourceLocation INPUT_SLOT = IronsJewelry.id("jewelcrafting_station/input_slot");
+    private static final ResourceLocation LORE_PAGE = IronsJewelry.id("jewelcrafting_station/lore_page");
     private static final int MAX_PATTERNS = 8;
 
     int scrollOff;
@@ -136,19 +143,107 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
                 }
             }
         }
+        guiGraphics.blitSprite(LORE_PAGE, leftPos + imageWidth, topPos, 80, 165);
     }
+
 
     @Override
     public void render(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
         renderSidebar(guiGraphics, mouseX, mouseY);
 
-
+        renderLorePage(guiGraphics, mouseX, mouseY);
         this.renderTooltip(guiGraphics, mouseX, mouseY);
     }
 
     private boolean isHovering(int mouseX, int mouseY, int xmin, int ymin, int width, int height) {
         return mouseX > xmin && mouseX < xmin + width && mouseY > ymin && mouseY < ymin + height;
+    }
+
+    private void renderLorePage(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+        if (selectedPattern < 0) {
+            return;
+        }
+        /*
+        Example page:
+
+        Gemset Ring
+        Band (0/4)
+        - Empty
+        Gem (1/1)
+         - Diamond: Max Health
+
+         Bonus:
+         +2 Max Health
+         */
+        var pattern = availablePatterns.get(selectedPattern);
+        int lorePageWidth = 80;
+        int lineHeight = font.lineHeight;
+        AtomicInteger lineY = new AtomicInteger(3);
+        int maxWidth = lorePageWidth - 15;
+        int leftMargin = leftPos + imageWidth + 2;
+        var title = Component.translatable(pattern.getDescriptionId()).withStyle(ChatFormatting.UNDERLINE);
+        font.split(title, maxWidth).forEach(text -> guiGraphics.drawCenteredString(font, text, leftPos + imageWidth + lorePageWidth / 2, topPos + lineY.getAndAdd(lineHeight), 0xFFFFFF));
+        lineY.addAndGet(lineHeight / 2);
+
+        for (int i = 0; i < pattern.partTemplate().size(); i++) {
+            List<Component> bonusEntries = new ArrayList<>();
+            Optional<Component> qualityEntry = Optional.empty();
+            var part = pattern.partTemplate().get(i);
+            int matCount = 0;
+            String materialOrEmptyKey = "tooltip.irons_jewelry.empty";
+            if (i < menu.workspaceSlots.size()) {
+                var slot = menu.workspaceSlots.get(i);
+                if (slot.isActive()) {
+                    var stack = slot.getItem();
+                    var material = MaterialDataHandler.getMaterialForIngredient(stack);
+                    if (material.isPresent() && part.part().canUseMaterial(material.get().materialType())) {
+                        materialOrEmptyKey = material.get().getDescriptionId();
+                        //is for bonus?
+                        var bonusForPart = pattern.bonuses().stream().filter(source -> source.parameterOrSource().right().isPresent() && source.parameterOrSource().right().get().equals(part.part())).toList();
+                        for (BonusSource source : bonusForPart) {
+                            IBonusParameterType type = source.bonus().getParameterType();
+                            var value = type.resolve(material.get().bonusParameters());
+                            if (value.isPresent()) {
+                                Optional<String> string = type.getValueDescriptionId(value.get());
+                                if (string.isPresent()) {
+                                    bonusEntries.add(Component.literal(" ").append(Component.translatable("tooltip.irons_jewelry.bonus_to_source", Component.translatable(source.bonus().getDescriptionId()), Component.translatable(string.get()))));
+                                }
+                            }
+                        }
+                        //is for quality?
+                        var qualityForPart = pattern.bonuses().stream().filter(source -> source.qualityOrSource().right().isPresent() && source.qualityOrSource().right().get().equals(part.part())).findFirst();
+                        if (qualityForPart.isPresent()) {
+                            qualityEntry = Optional.of(Component.literal(" ").append(Component.translatable("tooltip.irons_jewelry.quality_to_source", material.get().quality())));
+                        }
+                    }
+                }
+            }
+            int current = getMaterialCount(i, part.part());
+            int cost = part.materialCost();
+            String counter = String.format("(%s/%s)", current, cost);
+            var partHeader = Component.translatable(part.part().getDescriptionId()).append(": ").append(Component.translatable(materialOrEmptyKey)).append(" ").append(Component.literal(counter).withStyle(current >= cost ? ChatFormatting.GREEN : ChatFormatting.RED));
+            //var partEntry = Component.literal("- ").append(Component.translatable(materialOrEmptyKey));
+            guiGraphics.drawString(font, partHeader, leftMargin, topPos + lineY.getAndAdd(lineHeight), 0xFFFFFF);
+            //guiGraphics.drawString(font, partEntry, leftMargin, topPos + lineY.getAndAdd(lineHeight), 0xFFFFFF);
+            bonusEntries.forEach(component -> guiGraphics.drawString(font, component, leftMargin, topPos + lineY.getAndAdd(lineHeight), 0xFFFFFF));
+            qualityEntry.ifPresent(component -> guiGraphics.drawString(font, component, leftMargin, topPos + lineY.getAndAdd(lineHeight), 0xFFFFFF));
+        }
+
+    }
+
+    private int getMaterialCount(int index, PartDefinition forPart) {
+        if (index >= 0 && index < menu.workspaceSlots.size()) {
+            var slot = menu.workspaceSlots.get(index);
+            if (slot.isActive()) {
+                var stack = slot.getItem();
+                var material = MaterialDataHandler.getMaterialForIngredient(stack);
+                if (material.isPresent() && forPart.canUseMaterial(material.get().materialType())) {
+                    return stack.getCount();
+                }
+            }
+        }
+        return 0;
     }
 
     private static final int SCROLL_BAR_X_OFFSET = 24;
