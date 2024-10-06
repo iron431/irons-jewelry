@@ -30,6 +30,6 @@ public class AttributeBonus extends Bonus {
         var amount = value.amount();
         var operation = value.operation();
         var attr = attribute.getKey().location();
-        return new AttributeModifier(IronsJewelry.id(String.format("%s_%s_%s_%s", attr.getNamespace(), attr.getPath(), context.identifier(), context.index())), amount * quality, operation);
+        return new AttributeModifier(IronsJewelry.id(String.format("%s_%s_%s_%s_%s", attr.getNamespace(), attr.getPath(), operation.id(), context.identifier(), context.index())), amount * quality, operation);
     }
 }

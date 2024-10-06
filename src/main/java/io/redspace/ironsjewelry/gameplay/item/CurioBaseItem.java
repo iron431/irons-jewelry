@@ -23,7 +23,9 @@ import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.api.type.capability.ICurioItem;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class CurioBaseItem extends Item implements ICurioItem {
     String slotIdentifier = "";
@@ -68,17 +70,32 @@ public class CurioBaseItem extends Item implements ICurioItem {
     public Multimap<Holder<Attribute>, AttributeModifier> getAttributeModifiers(SlotContext slotContext, ResourceLocation id, ItemStack stack) {
 
         JewelryData data = stack.get(ComponentRegistry.JEWELRY_COMPONENT);
-
+        //TODO: cache these in the stack's attribute component for as long as index hasn't changed?
         if (data != null && slotContext.identifier().equals(this.slotIdentifier)) {
-            var pattern = data.pattern();
             var bonuses = data.getBonuses();
-            ImmutableMultimap.Builder<Holder<Attribute>, AttributeModifier> builder = ImmutableMultimap.builder();
+            Map<Holder<Attribute>, Map<AttributeModifier.Operation, AttributeModifier>> collapsedModifiers = new HashMap<>();
             for (BonusInstance instance : bonuses) {
                 if (instance.bonus() instanceof AttributeBonus attributeBonus) {
                     attributeBonus.getParameterType().resolve(instance.parameter()).ifPresent(
-                            param -> builder.put(param.attribute(), attributeBonus.modifier(param, slotContext, instance.quality()))
-                    );
+                            attributeInstance -> {
+                                //builder.put(attributeInstance.attribute(), attributeBonus.modifier(attributeInstance, slotContext, instance.quality())
+                                var byOperation = collapsedModifiers.computeIfAbsent(attributeInstance.attribute(), (x) -> new HashMap<>());
+                                var modifier = attributeBonus.modifier(attributeInstance, slotContext, instance.quality());
+                                var operation = modifier.operation();
+                                if (byOperation.containsKey(operation)) {
+                                    var oldModifier = byOperation.get(operation);
+                                    var jointModifier = new AttributeModifier(oldModifier.id(), oldModifier.amount() + modifier.amount(), operation);
+                                    byOperation.put(operation, jointModifier);
+                                } else {
+                                    byOperation.put(operation, modifier);
+                                }
+                            });
+
                 }
+            }
+            ImmutableMultimap.Builder<Holder<Attribute>, AttributeModifier> builder = ImmutableMultimap.builder();
+            for (Map.Entry<Holder<Attribute>, Map<AttributeModifier.Operation, AttributeModifier>> entry : collapsedModifiers.entrySet()) {
+                builder.putAll(entry.getKey(), entry.getValue().values());
             }
             return builder.build();
         }
