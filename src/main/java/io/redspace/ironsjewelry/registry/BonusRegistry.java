@@ -2,10 +2,7 @@ package io.redspace.ironsjewelry.registry;
 
 import io.redspace.ironsjewelry.IronsJewelry;
 import io.redspace.ironsjewelry.core.Bonus;
-import io.redspace.ironsjewelry.core.bonuses.AttributeBonus;
-import io.redspace.ironsjewelry.core.bonuses.EffectImmunityBonus;
-import io.redspace.ironsjewelry.core.bonuses.EffectOnHitBonus;
-import io.redspace.ironsjewelry.core.bonuses.EmptyBonus;
+import io.redspace.ironsjewelry.core.bonuses.*;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.neoforged.bus.api.IEventBus;
@@ -22,6 +19,7 @@ public class BonusRegistry {
 
     public static final Supplier<Bonus> EMPTY = BONUSES.register("empty", EmptyBonus::new);
     //public static final Supplier<IBonus> DEATH = BONUSES.register("death", () -> DeathBonus.CODEC);
+    public static final Supplier<Bonus> PIGLIN_NEUTRAL_BONUS = BONUSES.register("piglin_neutral_bonus", PiglinNeutralBonus::new);
     public static final Supplier<Bonus> ATTRIBUTE_BONUS = BONUSES.register("attribute_bonus", AttributeBonus::new);
     public static final Supplier<Bonus> EFFECT_ON_HIT_BONUS = BONUSES.register("effect_on_hit_bonus", EffectOnHitBonus::new);
     public static final Supplier<Bonus> EFFECT_IMMUNITY_BONUS = BONUSES.register("effect_immunity_bonus", EffectImmunityBonus::new);

@@ -19,6 +19,8 @@
   "pattern.irons_jewelry.tearstone_ring.item": "%s Tearstone Ring",
   "pattern.irons_jewelry.stoneplate_ring": "Stoneplate Ring",
   "pattern.irons_jewelry.stoneplate_ring.item": "%s Stoneplate Ring",
+  "pattern.irons_jewelry.piglin_signet_ring": "Piglin Signet Ring",
+  "pattern.irons_jewelry.piglin_signet_ring.item": "Piglin Signet Ring",
 
   "material.irons_jewelry.iron": "Iron",
   "material.irons_jewelry.gold": "Gold",
@@ -41,12 +43,16 @@
   "part.irons_jewelry.band_tearstone": "Band",
   "part.irons_jewelry.gem_stoneplate": "Gemstone",
   "part.irons_jewelry.band_stoneplate": "Band",
+  "part.irons_jewelry.piglin_signet": "Piglin Signet",
+  "part.irons_jewelry.piglin_signet_band": "Band",
 
   "bonus.irons_jewelry.attribute_bonus": "Attribute",
   "bonus.irons_jewelry.effect_on_hit_bonus": "Effect on Hit",
   "bonus.irons_jewelry.effect_on_hit_bonus.description": "When hit, gain %s for %s seconds",
   "bonus.irons_jewelry.effect_immunity_bonus": "Effect Immunity",
   "bonus.irons_jewelry.effect_immunity_bonus.description": "Grants immunity to %s",
+  "bonus.irons_jewelry.piglin_neutral_bonus": "Piglin Neutrality",
+  "bonus.irons_jewelry.piglin_neutral_bonus.description": "Makes Piglins Neutral",
 
   "tooltip.irons_jewelry.parts_header" : "Parts:",
   "tooltip.irons_jewelry.bonus_header" : "Bonus:",

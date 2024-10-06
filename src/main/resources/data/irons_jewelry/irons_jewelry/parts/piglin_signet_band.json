@@ -1,0 +1,6 @@
+{
+  "allowedMaterialTypes": [
+    "metal"
+  ],
+  "baseTextureLocation": "irons_jewelry:item/base/piglin_signet_band"
+}

@@ -2,7 +2,9 @@ package io.redspace.ironsjewelry.gameplay.item;
 
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
+import io.redspace.ironsjewelry.core.Utils;
 import io.redspace.ironsjewelry.core.bonuses.AttributeBonus;
+import io.redspace.ironsjewelry.core.bonuses.PiglinNeutralBonus;
 import io.redspace.ironsjewelry.core.data.BonusInstance;
 import io.redspace.ironsjewelry.core.data.JewelryData;
 import io.redspace.ironsjewelry.registry.BonusRegistry;
@@ -15,6 +17,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -65,6 +68,12 @@ public class CurioBaseItem extends Item implements ICurioItem {
     public Component getName(ItemStack itemStack) {
         //TODO: cache or use actual item name component entry
         return JewelryData.get(itemStack).getItemName();
+    }
+
+    @Override
+    public boolean makesPiglinsNeutral(ItemStack stack, LivingEntity wearer) {
+        //TODO: cache
+        return wearer instanceof Player player && Utils.getEquippedBonuses(player).stream().map(BonusInstance::bonus).anyMatch(bonus -> bonus instanceof PiglinNeutralBonus);
     }
 
     @Override
