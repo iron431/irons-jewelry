@@ -143,7 +143,8 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
                 }
             }
         }
-        guiGraphics.blitSprite(LORE_PAGE, leftPos + imageWidth, topPos, 80, 165);
+        //todo: lore page
+        //guiGraphics.blitSprite(LORE_PAGE, leftPos + imageWidth, topPos, 80, 165);
     }
 
 
@@ -161,6 +162,9 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
     }
 
     private void renderLorePage(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+        if (true) {
+            return;
+        }
         if (selectedPattern < 0) {
             return;
         }
@@ -185,12 +189,10 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
         var title = Component.translatable(pattern.getDescriptionId()).withStyle(ChatFormatting.UNDERLINE);
         font.split(title, maxWidth).forEach(text -> guiGraphics.drawCenteredString(font, text, leftPos + imageWidth + lorePageWidth / 2, topPos + lineY.getAndAdd(lineHeight), 0xFFFFFF));
         lineY.addAndGet(lineHeight / 2);
-
         for (int i = 0; i < pattern.partTemplate().size(); i++) {
             List<Component> bonusEntries = new ArrayList<>();
             Optional<Component> qualityEntry = Optional.empty();
             var part = pattern.partTemplate().get(i);
-            int matCount = 0;
             String materialOrEmptyKey = "tooltip.irons_jewelry.empty";
             if (i < menu.workspaceSlots.size()) {
                 var slot = menu.workspaceSlots.get(i);
@@ -224,12 +226,12 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
             String counter = String.format("(%s/%s)", current, cost);
             var partHeader = Component.translatable(part.part().getDescriptionId()).append(": ").append(Component.translatable(materialOrEmptyKey)).append(" ").append(Component.literal(counter).withStyle(current >= cost ? ChatFormatting.GREEN : ChatFormatting.RED));
             //var partEntry = Component.literal("- ").append(Component.translatable(materialOrEmptyKey));
+
             guiGraphics.drawString(font, partHeader, leftMargin, topPos + lineY.getAndAdd(lineHeight), 0xFFFFFF);
             //guiGraphics.drawString(font, partEntry, leftMargin, topPos + lineY.getAndAdd(lineHeight), 0xFFFFFF);
             bonusEntries.forEach(component -> guiGraphics.drawString(font, component, leftMargin, topPos + lineY.getAndAdd(lineHeight), 0xFFFFFF));
             qualityEntry.ifPresent(component -> guiGraphics.drawString(font, component, leftMargin, topPos + lineY.getAndAdd(lineHeight), 0xFFFFFF));
         }
-
     }
 
     private int getMaterialCount(int index, PartDefinition forPart) {
