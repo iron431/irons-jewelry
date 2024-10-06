@@ -3,7 +3,7 @@ package io.redspace.ironsjewelry.core.bonuses;
 import io.redspace.ironsjewelry.core.Bonus;
 import io.redspace.ironsjewelry.core.Utils;
 import io.redspace.ironsjewelry.core.data.BonusInstance;
-import io.redspace.ironsjewelry.core.parameters.PositiveEffectParameter;
+import io.redspace.ironsjewelry.core.parameters.EffectParameter;
 import io.redspace.ironsjewelry.registry.ParameterTypeRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
@@ -14,7 +14,7 @@ import java.util.List;
 
 public class EffectOnHitBonus extends Bonus {
     @Override
-    public PositiveEffectParameter getParameterType() {
+    public EffectParameter getParameterType() {
         return ParameterTypeRegistry.POSITIVE_EFFECT_PARAMETER.get();
     }
 

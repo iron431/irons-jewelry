@@ -10,7 +10,7 @@ import net.minecraft.world.effect.MobEffect;
 import java.util.Optional;
 import java.util.function.Function;
 
-public class PositiveEffectParameter implements IBonusParameterType<Holder<MobEffect>> {
+public class EffectParameter implements IBonusParameterType<Holder<MobEffect>> {
 
     public static final Codec<Holder<MobEffect>> CODEC = RecordCodecBuilder.create(builder -> builder.group(
             BuiltInRegistries.MOB_EFFECT.holderByNameCodec().fieldOf("effect").forGetter(Function.identity())

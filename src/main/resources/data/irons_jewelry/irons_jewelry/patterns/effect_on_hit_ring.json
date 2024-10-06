@@ -14,7 +14,7 @@
   ],
   "bonuses": [
     {
-      "bonus": "irons_jewelry:effect_on_hit",
+      "bonus": "irons_jewelry:effect_on_hit_bonus",
       "parameter": "irons_jewelry:gem_pointy",
       "quality": "irons_jewelry:band_gem_thin"
     }

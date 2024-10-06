@@ -1,0 +1,23 @@
+{
+  "ingredient": {
+    "tag": "c:gems/lapis"
+  },
+  "materialType": [
+    "gem"
+  ],
+  "paletteLocation": "irons_jewelry:item/palettes/lapis",
+  "quality": 3,
+  "bonusParameters": {
+    "irons_jewelry:attribute": {
+      "attribute": "minecraft:generic.max_health",
+      "amount": 2,
+      "operation": "add_value"
+    },
+    "irons_jewelry:positive_effect": {
+      "effect": "minecraft:regeneration"
+    },
+    "irons_jewelry:negative_effect": {
+      "effect": "minecraft:slowness"
+    }
+  }
+}

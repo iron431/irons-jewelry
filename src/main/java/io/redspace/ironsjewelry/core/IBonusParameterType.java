@@ -2,6 +2,7 @@ package io.redspace.ironsjewelry.core;
 
 import com.mojang.serialization.Codec;
 import io.redspace.ironsjewelry.IronsJewelry;
+import io.redspace.ironsjewelry.core.data.BonusInstance;
 import io.redspace.ironsjewelry.registry.ParameterTypeRegistry;
 
 import java.util.Map;
@@ -34,5 +35,9 @@ public interface IBonusParameterType<T> {
             IronsJewelry.LOGGER.error("Invalid parameter data association found: {} to {}", this, param);
             return Optional.empty();
         }
+    }
+
+    default Optional<T> resolve(BonusInstance bonusInstance) {
+        return resolve(bonusInstance.parameter());
     }
 }

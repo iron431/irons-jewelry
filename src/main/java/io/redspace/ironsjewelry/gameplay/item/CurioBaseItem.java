@@ -5,6 +5,7 @@ import com.google.common.collect.Multimap;
 import io.redspace.ironsjewelry.core.bonuses.AttributeBonus;
 import io.redspace.ironsjewelry.core.data.BonusInstance;
 import io.redspace.ironsjewelry.core.data.JewelryData;
+import io.redspace.ironsjewelry.registry.BonusRegistry;
 import io.redspace.ironsjewelry.registry.ComponentRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
@@ -64,6 +65,19 @@ public class CurioBaseItem extends Item implements ICurioItem {
     public Component getName(ItemStack itemStack) {
         //TODO: cache or use actual item name component entry
         return JewelryData.get(itemStack).getItemName();
+    }
+
+    @Override
+    public void onEquip(SlotContext slotContext, ItemStack prevStack, ItemStack stack) {
+        ICurioItem.super.onEquip(slotContext, prevStack, stack);
+        JewelryData.ifPresent(stack, data -> {
+            data.forBonuses(BonusRegistry.EFFECT_IMMUNITY_BONUS.get(), Holder.class, (bonus, param) -> slotContext.entity().removeEffect(param));
+//            for (BonusInstance instance : data.getBonuses()) {
+//                if (instance.bonus() instanceof EffectImmunityBonus immunityBonus) {
+//                    immunityBonus.getParameterType().resolve(instance).ifPresent(mobEffectHolder -> slotContext.entity().removeEffect(mobEffectHolder));
+//                }
+//            }
+        });
     }
 
     @Override

@@ -2,17 +2,22 @@
   "unlockedByDefault": true,
   "parts": [
     {
-      "id": "irons_jewelry:band_gem_thin",
-      "materialCost": 4,
+      "id": "irons_jewelry:band_tearstone",
+      "materialCost": 6,
       "drawOrder": 0
     },
     {
-      "id": "irons_jewelry:gem_round",
-      "materialCost": 1,
+      "id": "irons_jewelry:gem_tearstone",
+      "materialCost": 2,
       "drawOrder": 1
     }
   ],
   "bonuses": [
+    {
+      "bonus": "irons_jewelry:effect_immunity_bonus",
+      "parameter": "irons_jewelry:gem_tearstone",
+      "quality": 1.0
+    }
   ]
 }
 ///give @p irons_jewelry:ring[irons_jewelry:jewelry_data={pattern:"irons_jewelry:effect_on_hit_ring",parts:{"irons_jewelry:band_gem_thin":"irons_jewelry:gold","irons_jewelry:gem_pointy":"irons_jewelry:diamond"}}]

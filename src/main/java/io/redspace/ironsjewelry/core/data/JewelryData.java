@@ -2,6 +2,7 @@ package io.redspace.ironsjewelry.core.data;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import io.redspace.ironsjewelry.core.Bonus;
 import io.redspace.ironsjewelry.core.Utils;
 import io.redspace.ironsjewelry.core.data_registry.MaterialDataHandler;
 import io.redspace.ironsjewelry.core.data_registry.PartDataHandler;
@@ -17,6 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 /**
@@ -90,6 +92,20 @@ public class JewelryData {
         }
     }
 
+    public <T> void forBonuses(Bonus bonus, Class<T> clazz, BiConsumer<Bonus, T> consumer) {
+        var bonuses = this.getBonuses();
+        for (BonusInstance instance : bonuses) {
+            if (instance.bonus().equals(bonus)) {
+                instance.bonus().getParameterType().resolve(instance).ifPresent(param ->
+                        {
+                            if (clazz.isInstance(param)) {
+                                consumer.accept(instance.bonus(), (T) param);
+                            }
+                        }
+                );
+            }
+        }
+    }
 
     private boolean validate() {
         if (this.pattern == null || this.parts.size() != this.pattern.partTemplate().size()) {

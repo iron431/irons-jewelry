@@ -1,0 +1,6 @@
+{
+  "allowedMaterialTypes": [
+    "gem"
+  ],
+  "baseTextureLocation": "irons_jewelry:item/base/gem_tearstone"
+}

@@ -7,6 +7,8 @@
                 "irons_jewelry:item/base/gem_band_thin",
                 "irons_jewelry:item/base/gold_ring",
                 "irons_jewelry:item/base/band_flat_top",
+                "irons_jewelry:item/base/band_tearstone",
+                "irons_jewelry:item/base/band_stoneplate",
                 "irons_jewelry:item/base/band_gem_superior",
                 "irons_jewelry:item/base/twisted_ring_primary",
                 "irons_jewelry:item/base/twisted_ring_secondary"
@@ -28,13 +30,16 @@
             "textures": [
                 "irons_jewelry:item/base/pointy_gem",
                 "irons_jewelry:item/base/gem_round",
-                "irons_jewelry:item/base/gems_side"
+                "irons_jewelry:item/base/gems_side",
+                "irons_jewelry:item/base/gem_tearstone",
+                "irons_jewelry:item/base/gem_stoneplate"
             ],
             "palette_key": "irons_jewelry:palettes/diamond",
             "permutations": {
                 "diamond": "irons_jewelry:palettes/diamond",
                 "amethyst": "irons_jewelry:palettes/amethyst",
                 "emerald": "irons_jewelry:palettes/emerald",
+                "lapis": "irons_jewelry:palettes/lapis",
                 "menu": "irons_jewelry:palettes/menu",
                 "menu_bright": "irons_jewelry:palettes/menu_bright"
             }

@@ -7,7 +7,9 @@ import io.redspace.ironsjewelry.core.data.JewelryData;
 import io.redspace.ironsjewelry.registry.ComponentRegistry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import top.theillusivec4.curios.api.CuriosApi;
+import top.theillusivec4.curios.api.SlotResult;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,6 +30,11 @@ public class Utils {
     public static List<BonusInstance> getEquippedBonuses(Player player) {
         return CuriosApi.getCuriosInventory(player).map(inv -> inv.findCurios(stack -> stack.has(ComponentRegistry.JEWELRY_COMPONENT)).stream().flatMap(slot -> JewelryData.get(slot.stack()).getBonuses().stream()).toList()).orElse(List.of());
     }
+
+    public static List<ItemStack> getEquippedJewelry(Player player) {
+        return CuriosApi.getCuriosInventory(player).map(inv -> inv.findCurios(stack -> stack.has(ComponentRegistry.JEWELRY_COMPONENT)).stream().map(SlotResult::stack).toList()).orElse(List.of());
+    }
+
 
     public static String timeFromTicks(float ticks, int decimalPlaces) {
         float ticks_to_seconds = 20;
