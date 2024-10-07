@@ -55,7 +55,7 @@ public class CurioBaseItem extends Item implements ICurioItem {
         boolean needHeader = tooltip.isEmpty();
         JewelryData.ifPresent(stack, (jewelryData) -> {
             var bonuses = jewelryData.getBonuses();
-            if (needHeader) {
+            if (needHeader && !bonuses.isEmpty()) {
                 tooltips.add(Component.empty());
                 tooltips.add(Component.translatable("curios.modifiers." + slotIdentifier).withStyle(ChatFormatting.GOLD));
             }
