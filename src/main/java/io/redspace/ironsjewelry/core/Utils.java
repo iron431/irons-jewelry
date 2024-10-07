@@ -5,7 +5,9 @@ import com.mojang.serialization.DataResult;
 import io.redspace.ironsjewelry.core.data.BonusInstance;
 import io.redspace.ironsjewelry.core.data.JewelryData;
 import io.redspace.ironsjewelry.registry.ComponentRegistry;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import top.theillusivec4.curios.api.CuriosApi;
@@ -33,6 +35,10 @@ public class Utils {
 
     public static List<ItemStack> getEquippedJewelry(Player player) {
         return CuriosApi.getCuriosInventory(player).map(inv -> inv.findCurios(stack -> stack.has(ComponentRegistry.JEWELRY_COMPONENT)).stream().map(SlotResult::stack).toList()).orElse(List.of());
+    }
+
+    public static List<? extends FormattedCharSequence> rasterizeComponentList(List<Component> components){
+        return components.stream().map(component -> FormattedCharSequence.forward(component.getString(), component.getStyle())).toList();
     }
 
 

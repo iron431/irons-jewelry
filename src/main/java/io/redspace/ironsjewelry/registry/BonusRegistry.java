@@ -22,8 +22,8 @@ public class BonusRegistry {
     public static final Supplier<Bonus> PIGLIN_NEUTRAL_BONUS = BONUSES.register("piglin_neutral_bonus", PiglinNeutralBonus::new);
     public static final Supplier<Bonus> ATTRIBUTE_BONUS = BONUSES.register("attribute_bonus", AttributeBonus::new);
     public static final Supplier<Bonus> EFFECT_ON_HIT_BONUS = BONUSES.register("effect_on_hit_bonus", EffectOnHitBonus::new);
+    public static final Supplier<EffectOnProjectileHitBonus> EFFECT_ON_PROJECTILE_HIT_BONUS = BONUSES.register("effect_on_projectile_hit_bonus", EffectOnProjectileHitBonus::new);
     public static final Supplier<Bonus> EFFECT_IMMUNITY_BONUS = BONUSES.register("effect_immunity_bonus", EffectImmunityBonus::new);
-
 
     public static void registerRegistry(NewRegistryEvent event) {
         event.register(BONUS_REGISTRY);

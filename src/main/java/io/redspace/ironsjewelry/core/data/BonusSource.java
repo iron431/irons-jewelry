@@ -15,17 +15,18 @@ import java.util.NoSuchElementException;
 import java.util.function.Function;
 
 public record BonusSource(Bonus bonus, Either<Map<IBonusParameterType<?>, Object>, PartDefinition> parameterOrSource,
-                          Either<Double, PartDefinition> qualityOrSource) {
+                          Either<Double, PartDefinition> qualityOrSource, double qualityMultiplier) {
     public static final Codec<BonusSource> CODEC = RecordCodecBuilder.create(builder -> builder.group(
             BonusRegistry.BONUS_REGISTRY.byNameCodec().fieldOf("bonus").forGetter(BonusSource::bonus),
             Codec.either(IBonusParameterType.BONUS_TO_INSTANCE_CODEC, Utils.idCodec(PartDataHandler::getSafe, PartDefinition::id)).fieldOf("parameter").forGetter(BonusSource::parameterOrSource),
-            Codec.either(Codec.DOUBLE, Utils.idCodec(PartDataHandler::getSafe, PartDefinition::id)).fieldOf("quality").forGetter(BonusSource::qualityOrSource)
+            Codec.either(Codec.DOUBLE, Utils.idCodec(PartDataHandler::getSafe, PartDefinition::id)).fieldOf("quality").forGetter(BonusSource::qualityOrSource),
+            Codec.DOUBLE.optionalFieldOf("qualityMultiplier", 1d).forGetter(BonusSource::qualityMultiplier)
     ).apply(builder, BonusSource::new));
 
     public BonusInstance getBonusFor(JewelryData data) {
         return new BonusInstance(
                 bonus,
-                mapEither(qualityOrSource, Function.identity(), (right) -> qualityFromPart(right, data)) * data.pattern().qualityMultiplier(),
+                mapEither(qualityOrSource, Function.identity(), (right) -> qualityFromPart(right, data)) * data.pattern().qualityMultiplier()  * qualityMultiplier,
                 mapEither(parameterOrSource, Function.identity(), (right) -> parameterFromPart(right, data))
         );
     }

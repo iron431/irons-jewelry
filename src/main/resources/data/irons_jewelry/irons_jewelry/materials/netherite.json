@@ -6,7 +6,15 @@
     "metal"
   ],
   "paletteLocation": "irons_jewelry:item/palettes/netherite",
-  "quality": 4,
+  "quality": 2.5,
   "bonusParameters": {
+    "irons_jewelry:attribute": {
+      "attribute": "minecraft:generic.attack_damage",
+      "amount": 0.10,
+      "operation": "add_multiplied_total"
+    },
+    "irons_jewelry:positive_effect": {
+      "effect": "minecraft:fire_resistance"
+    }
   }
 }

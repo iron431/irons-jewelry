@@ -6,7 +6,18 @@
     "metal"
   ],
   "paletteLocation": "irons_jewelry:item/palettes/copper",
-  "quality": 0.75,
+  "quality": 0.5,
   "bonusParameters": {
+    "irons_jewelry:attribute": {
+      "attribute": "minecraft:generic.attack_speed",
+      "amount": 0.10,
+      "operation": "add_multiplied_total"
+    },
+    "irons_jewelry:positive_effect": {
+      "effect": "minecraft:haste"
+    },
+    "irons_jewelry:negative_effect": {
+      "effect": "minecraft:poison"
+    }
   }
 }

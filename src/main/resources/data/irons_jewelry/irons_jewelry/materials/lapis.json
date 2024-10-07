@@ -6,7 +6,7 @@
     "gem"
   ],
   "paletteLocation": "irons_jewelry:item/palettes/lapis",
-  "quality": 3,
+  "quality": 1,
   "bonusParameters": {
     "irons_jewelry:attribute": {
       "attribute": "minecraft:generic.max_health",

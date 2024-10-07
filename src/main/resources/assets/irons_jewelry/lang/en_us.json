@@ -21,6 +21,8 @@
   "pattern.irons_jewelry.stoneplate_ring.item": "%s Stoneplate Ring",
   "pattern.irons_jewelry.piglin_signet_ring": "Piglin Signet Ring",
   "pattern.irons_jewelry.piglin_signet_ring.item": "Piglin Signet Ring",
+  "pattern.irons_jewelry.ranger_ring": "Ranger Ring",
+  "pattern.irons_jewelry.ranger_ring.item": "%s Ranger Ring",
 
   "material.irons_jewelry.iron": "Iron",
   "material.irons_jewelry.gold": "Gold",
@@ -53,6 +55,8 @@
   "bonus.irons_jewelry.effect_immunity_bonus.description": "Grants immunity to %s",
   "bonus.irons_jewelry.piglin_neutral_bonus": "Piglin Neutrality",
   "bonus.irons_jewelry.piglin_neutral_bonus.description": "Makes Piglins Neutral",
+  "bonus.irons_jewelry.effect_on_projectile_hit_bonus": "Tipped Projectiles",
+  "bonus.irons_jewelry.effect_on_projectile_hit_bonus.description": "On projectile hit, inflict %s for %s seconds",
 
   "tooltip.irons_jewelry.parts_header" : "Parts:",
   "tooltip.irons_jewelry.bonus_header" : "Bonus:",
@@ -62,5 +66,6 @@
   "tooltip.irons_jewelry.bonus_to_source": "%s: %s",
   "tooltip.irons_jewelry.quality_to_source": "Quality: %s",
   "tooltip.irons_jewelry.part_header_with_counter": "%s (%s/%s):",
-  "tooltip.irons_jewelry.empty": "Empty"
+  "tooltip.irons_jewelry.empty": "Empty",
+  "tooltip.irons_jewelry.applicable_materials": "Applicable Materials:"
 }

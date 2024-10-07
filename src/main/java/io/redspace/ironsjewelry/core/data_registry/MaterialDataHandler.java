@@ -14,6 +14,7 @@ import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.item.ItemStack;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 
@@ -73,5 +74,9 @@ public class MaterialDataHandler extends SimpleJsonResourceReloadListener {
 
     public static ResourceLocation getKey(MaterialDefinition part) {
         return INSTANCE.inverse().get(part);
+    }
+
+    public static Collection<MaterialDefinition> values() {
+        return INSTANCE.values();
     }
 }

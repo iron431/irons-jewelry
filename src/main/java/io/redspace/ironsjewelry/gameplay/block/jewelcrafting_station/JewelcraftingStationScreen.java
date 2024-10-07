@@ -3,6 +3,7 @@ package io.redspace.ironsjewelry.gameplay.block.jewelcrafting_station;
 import io.redspace.ironsjewelry.IronsJewelry;
 import io.redspace.ironsjewelry.client.DynamicModel;
 import io.redspace.ironsjewelry.core.IBonusParameterType;
+import io.redspace.ironsjewelry.core.Utils;
 import io.redspace.ironsjewelry.core.data.BonusSource;
 import io.redspace.ironsjewelry.core.data.PartDefinition;
 import io.redspace.ironsjewelry.core.data.PartIngredient;
@@ -19,7 +20,6 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.InventoryMenu;
@@ -114,11 +114,30 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
     @Override
     protected void renderTooltip(GuiGraphics pGuiGraphics, int mouseX, int mouseY) {
         super.renderTooltip(pGuiGraphics, mouseX, mouseY);
-        if (this.menu.getCarried().isEmpty() && this.hoveredSlot == null) {
-            for (PatternButton button : this.patternButtons) {
-                if (button.active && isHovering(mouseX, mouseY, button.getX(), button.getY(), button.getWidth(), button.getHeight())) {
-                    pGuiGraphics.renderTooltip(this.font, button.patternDefinition.getFullPatternTooltip().stream().map(component -> FormattedCharSequence.forward(component.getString(), component.getStyle())).toList(), mouseX, mouseY);
-                    break;
+        if (this.menu.getCarried().isEmpty()) {
+            if (this.hoveredSlot == null) {
+                for (PatternButton button : this.patternButtons) {
+                    if (button.active && isHovering(mouseX, mouseY, button.getX(), button.getY(), button.getWidth(), button.getHeight())) {
+                        pGuiGraphics.renderTooltip(this.font, Utils.rasterizeComponentList(button.patternDefinition.getFullPatternTooltip()), mouseX, mouseY);
+                        break;
+                    }
+                }
+            } else {
+                if (!hoveredSlot.hasItem() && menu.isWorkspaceSlot(this.hoveredSlot)) {
+                    int i = this.hoveredSlot.getSlotIndex();
+                    if (selectedPattern >= 0) {
+                        var pattern = availablePatterns.get(selectedPattern);
+                        if (i < pattern.partTemplate().size()) {
+                            var part = pattern.partTemplate().get(i);
+                            List<Component> tooltip = new ArrayList<>();
+                            tooltip.add(Component.translatable(part.part().getDescriptionId()).withStyle(ChatFormatting.YELLOW, ChatFormatting.UNDERLINE));
+                            tooltip.add(Component.literal(String.format(" (0/%s)", part.materialCost())).withStyle(ChatFormatting.RED));
+                            tooltip.add(Component.translatable("tooltip.irons_jewelry.applicable_materials").withStyle(ChatFormatting.YELLOW, ChatFormatting.UNDERLINE));
+                            MaterialDataHandler.values().stream().filter(materialDefinition -> !materialDefinition.ingredient().hasNoItems() && part.part().canUseMaterial(materialDefinition.materialType()))
+                                    .forEach(material -> tooltip.add(Component.literal(" ").append(Component.translatable(material.getDescriptionId()).withStyle(ChatFormatting.GRAY))));
+                            pGuiGraphics.renderTooltip(this.font, Utils.rasterizeComponentList(tooltip), mouseX, mouseY);
+                        }
+                    }
                 }
             }
         }

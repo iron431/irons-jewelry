@@ -6,7 +6,7 @@
     "metal"
   ],
   "paletteLocation": "irons_jewelry:item/palettes/silver",
-  "quality": 2.0,
+  "quality": 1,
   "bonusParameters": {
     "irons_jewelry:attribute": {
       "attribute": "minecraft:generic.movement_speed",

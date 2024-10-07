@@ -6,7 +6,7 @@
     "gem"
   ],
   "paletteLocation": "irons_jewelry:item/palettes/diamond",
-  "quality": 3,
+  "quality": 2,
   "bonusParameters": {
     "irons_jewelry:attribute": {
       "attribute": "minecraft:generic.armor_toughness",
@@ -15,6 +15,9 @@
     },
     "irons_jewelry:positive_effect": {
       "effect": "minecraft:resistance"
+    },
+    "irons_jewelry:negative_effect": {
+      "effect": "minecraft:weakness"
     }
   }
 }

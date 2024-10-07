@@ -7,7 +7,7 @@
     "gold"
   ],
   "paletteLocation": "irons_jewelry:item/palettes/gold",
-  "quality": 2.5,
+  "quality": 1.5,
   "bonusParameters": {
     "irons_jewelry:attribute": {
       "attribute": "minecraft:generic.max_health",

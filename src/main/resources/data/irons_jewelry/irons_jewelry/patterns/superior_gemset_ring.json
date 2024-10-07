@@ -21,13 +21,16 @@
     {
       "bonus": "irons_jewelry:attribute_bonus",
       "parameter": "irons_jewelry:gem_pointy",
-      "quality": "irons_jewelry:band_gem_superior"
+      "quality": "irons_jewelry:band_gem_superior",
+      "qualityMultiplier": 0.8
     },
     {
       "bonus": "irons_jewelry:attribute_bonus",
       "parameter": "irons_jewelry:gems_side",
-      "quality": "irons_jewelry:band_gem_superior"
+      "quality": "irons_jewelry:band_gem_superior",
+      "qualityMultiplier": 0.5
     }
-  ]
+  ],
+  "qualityMultiplier": 1.5
 }
 ///give @p irons_jewelry:ring[irons_jewelry:jewelry_data={pattern:"irons_jewelry:example_pattern_definition",parts:{"irons_jewelry:band_gem":"irons_jewelry:silver","irons_jewelry:gem_pointy":"irons_jewelry:diamond"}}]

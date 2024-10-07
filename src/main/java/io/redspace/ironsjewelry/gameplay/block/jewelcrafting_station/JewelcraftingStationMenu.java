@@ -114,6 +114,10 @@ public class JewelcraftingStationMenu extends AbstractContainerMenu {
         }
     }
 
+    public boolean isWorkspaceSlot(Slot slot) {
+        return slot.index < 10 && slot.container.equals(workspaceContainer);
+    }
+
     private void setupResult() {
         ItemStack result = ItemStack.EMPTY;
         if (this.currentPattern != null) {
@@ -215,7 +219,7 @@ public class JewelcraftingStationMenu extends AbstractContainerMenu {
                 this.workspaceSlots.get(0).setup(centerX - 8, centerY - 8, true);
             } else {
                 int maxPerRow = ingredientCount == 10 ? 4 : 3;
-                int rows = (ingredientCount-1) / maxPerRow + 1;
+                int rows = (ingredientCount - 1) / maxPerRow + 1;
                 int verticalSpacing = 8;
                 int horizontalSpacing = 14;
                 int spriteWidth = 16;

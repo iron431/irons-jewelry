@@ -9,6 +9,7 @@ import io.redspace.ironsjewelry.registry.BonusRegistry;
 import net.minecraft.core.Holder;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.Projectile;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
@@ -18,8 +19,32 @@ import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
 public class ServerEvents {
 
     @SubscribeEvent
-    public static void onPlayerDamaged(LivingIncomingDamageEvent event) {
-        if (event.getEntity() instanceof Player player) {
+    public static void onLivingDamaged(LivingIncomingDamageEvent event) {
+        var damageSource = event.getSource();
+        var attacker = event.getSource().getEntity();
+        var victim = event.getEntity();
+        /*
+        Attacker Effects
+         */
+        if (attacker instanceof Player player) {
+            var bonuses = Utils.getEquippedBonuses(player);
+            for (BonusInstance instance : bonuses) {
+                /*
+                Effect on projectile hit
+                 */
+                if (instance.bonus().equals(BonusRegistry.EFFECT_ON_PROJECTILE_HIT_BONUS.get())) {
+                    if (damageSource.getDirectEntity() instanceof Projectile) {
+                        BonusRegistry.EFFECT_ON_PROJECTILE_HIT_BONUS.get().getParameterType().resolve(instance).ifPresent(
+                                effect -> victim.addEffect(new MobEffectInstance(effect, BonusRegistry.EFFECT_ON_PROJECTILE_HIT_BONUS.get().durationInTicks(effect, instance.quality())))
+                        );
+                    }
+                }
+            }
+        }
+        /*
+        Victim Effects
+         */
+        if (victim instanceof Player player) {
             for (BonusInstance instance : Utils.getEquippedBonuses(player)) {
                 if (instance.bonus() instanceof DeathBonus) {
                     player.die(player.level().damageSources().fellOutOfWorld());
