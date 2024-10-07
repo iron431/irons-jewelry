@@ -18,6 +18,7 @@
       "parameter": "irons_jewelry:piglin_signet",
       "quality": 1.0
     }
-  ]
+  ],
+  "qualityMultiplier": 2.0
 }
 ///give @p irons_jewelry:ring[irons_jewelry:jewelry_data={pattern:"irons_jewelry:effect_on_hit_ring",parts:{"irons_jewelry:band_gem_thin":"irons_jewelry:gold","irons_jewelry:gem_pointy":"irons_jewelry:diamond"}}]

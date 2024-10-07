@@ -22,7 +22,7 @@
       "bonus": "irons_jewelry:attribute_bonus",
       "parameter": "irons_jewelry:gem_pointy",
       "quality": "irons_jewelry:band_gem_superior",
-      "qualityMultiplier": 0.8
+      "qualityMultiplier": 1.0
     },
     {
       "bonus": "irons_jewelry:attribute_bonus",

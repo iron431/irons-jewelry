@@ -27,6 +27,7 @@ import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -82,7 +83,7 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
         this.selectedPattern = -1;
         this.scrollOff = 0;
 
-        this.availablePatterns = PatternDataHandler.patterns().stream().filter(PatternDefinition::unlockedByDefault).toList();
+        this.availablePatterns = PatternDataHandler.patterns().stream().filter(PatternDefinition::unlockedByDefault).sorted(Comparator.comparingDouble(PatternDefinition::qualityMultiplier)).toList();
 
     }
 
@@ -103,7 +104,6 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
         for (int i = 0; i < availablePatterns.size(); i++) {
             int index = i;
             patternButtons.add(this.addWidget(new PatternButton(availablePatterns.get(i), 0, 0, 18, 18, (button) -> {
-                IronsJewelry.LOGGER.debug("pattern button pressed: {}", index);
                 selectedPattern = index;
                 PacketDistributor.sendToServer(new SetJewelcraftingStationPattern(this.menu.containerId, availablePatterns.get(selectedPattern)));
             })));
@@ -134,7 +134,7 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
                             tooltip.add(Component.literal(String.format(" (0/%s)", part.materialCost())).withStyle(ChatFormatting.RED));
                             tooltip.add(Component.translatable("tooltip.irons_jewelry.applicable_materials").withStyle(ChatFormatting.YELLOW, ChatFormatting.UNDERLINE));
                             MaterialDataHandler.values().stream().filter(materialDefinition -> !materialDefinition.ingredient().hasNoItems() && part.part().canUseMaterial(materialDefinition.materialType()))
-                                    .forEach(material -> tooltip.add(Component.literal(" ").append(Component.translatable(material.getDescriptionId()).withStyle(ChatFormatting.GRAY))));
+                                    .forEach(material -> tooltip.add(Component.literal(" ").append(Component.translatable(material.getDescriptionId())).withStyle(ChatFormatting.GRAY)));
                             pGuiGraphics.renderTooltip(this.font, Utils.rasterizeComponentList(tooltip), mouseX, mouseY);
                         }
                     }
