@@ -2,7 +2,7 @@
   "unlockedByDefault": true,
   "parts": [
     {
-      "id": "irons_jewelry:piglin_signet_band",
+      "id": "irons_jewelry:band_gem",
       "materialCost": 4,
       "drawOrder": 0
     },
