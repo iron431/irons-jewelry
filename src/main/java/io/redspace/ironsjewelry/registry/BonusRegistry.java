@@ -24,6 +24,7 @@ public class BonusRegistry {
     public static final Supplier<Bonus> EFFECT_ON_HIT_BONUS = BONUSES.register("effect_on_hit_bonus", EffectOnHitBonus::new);
     public static final Supplier<EffectOnProjectileHitBonus> EFFECT_ON_PROJECTILE_HIT_BONUS = BONUSES.register("effect_on_projectile_hit_bonus", EffectOnProjectileHitBonus::new);
     public static final Supplier<Bonus> EFFECT_IMMUNITY_BONUS = BONUSES.register("effect_immunity_bonus", EffectImmunityBonus::new);
+    public static final Supplier<OnShieldBlockBonus> ON_SHIELD_BLOCK_BONUS = BONUSES.register("on_shield_block_bonus", OnShieldBlockBonus::new);
 
     public static void registerRegistry(NewRegistryEvent event) {
         event.register(BONUS_REGISTRY);

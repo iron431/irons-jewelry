@@ -5,18 +5,44 @@ import io.redspace.ironsjewelry.core.bonuses.DeathBonus;
 import io.redspace.ironsjewelry.core.bonuses.EffectOnHitBonus;
 import io.redspace.ironsjewelry.core.data.BonusInstance;
 import io.redspace.ironsjewelry.core.data.JewelryData;
+import io.redspace.ironsjewelry.core.parameters.EnchantmentRunnableParameter;
 import io.redspace.ironsjewelry.registry.BonusRegistry;
 import net.minecraft.core.Holder;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.EnchantedItemInUse;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
+import net.neoforged.neoforge.event.entity.living.LivingShieldBlockEvent;
 import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
 
 @EventBusSubscriber
 public class ServerEvents {
+
+    @SubscribeEvent
+    public static void onShieldBlock(LivingShieldBlockEvent event) {
+        if (event.getBlocked() && event.getEntity() instanceof ServerPlayer player && event.getDamageSource().getEntity() instanceof LivingEntity livingAttacker) {
+            var items = Utils.getEquippedJewelry(player);
+            for (ItemStack stack : items) {
+                JewelryData.ifPresent(stack, jewelryData -> {
+                    jewelryData.forBonuses(BonusRegistry.ON_SHIELD_BLOCK_BONUS.get(), EnchantmentRunnableParameter.EnchantmentRunnable.class, (bonus, enchant) -> {
+                        if (enchant.targetSelf()) {
+                            enchant.enchantment().apply(player.serverLevel(), enchant.effectiveLevel(), new EnchantedItemInUse(stack, null, player, (item) -> {
+                            }), player, player.position());
+                        } else {
+                            enchant.enchantment().apply(player.serverLevel(), enchant.effectiveLevel(), new EnchantedItemInUse(stack, null, player, (item) -> {
+                            }), livingAttacker, livingAttacker.position());
+                        }
+                    });
+                });
+            }
+        }
+    }
 
     @SubscribeEvent
     public static void onLivingDamaged(LivingIncomingDamageEvent event) {

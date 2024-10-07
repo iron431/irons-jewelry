@@ -16,6 +16,15 @@
     },
     "irons_jewelry:positive_effect": {
       "effect": "minecraft:regeneration"
+    },
+    "irons_jewelry:enchantment_runnable": {
+      "verbTranslation": "bonus.irons_jewelry.enchantment.ignite",
+      "targetSelf": false,
+      "effectiveLevel": 3,
+      "effect": {
+        "type": "minecraft:ignite",
+        "duration": 100.0
+      }
     }
   }
 }
