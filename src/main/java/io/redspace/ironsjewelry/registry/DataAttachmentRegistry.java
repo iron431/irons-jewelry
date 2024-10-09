@@ -16,5 +16,5 @@ public class DataAttachmentRegistry {
     }
 
     public static final DeferredHolder<AttachmentType<?>, AttachmentType<PlayerData>> PLAYER_DATA = ATTACHMENT_TYPES.register("jewelcrafting_data",
-            () -> AttachmentType.builder((holder) ->new PlayerData()).serialize(new PlayerData.Serializer()).build());
+            () -> AttachmentType.builder((holder) ->new PlayerData()).serialize(new PlayerData.Serializer()).copyOnDeath().build());
 }

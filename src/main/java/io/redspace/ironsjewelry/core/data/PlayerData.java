@@ -53,7 +53,9 @@ public class PlayerData {
 
         public static void networkWrite(FriendlyByteBuf buf, PlayerData playerData) {
             buf.writeInt(playerData.learnedPatterns.size());
-            playerData.learnedPatterns.forEach(def -> buf.writeResourceLocation(def.id()));
+            for (PatternDefinition pattern : playerData.learnedPatterns) {
+                buf.writeResourceLocation(pattern.id());
+            }
         }
 
         public static PlayerData networkRead(FriendlyByteBuf buf) {
