@@ -9,9 +9,9 @@
   "quality": 1,
   "bonusParameters": {
     "irons_jewelry:attribute": {
-      "attribute": "minecraft:generic.max_health",
-      "amount": 2,
-      "operation": "add_value"
+      "attribute": "apothic_attributes:experience_gained",
+      "amount": 0.10,
+      "operation": "add_multiplied_total"
     },
     "irons_jewelry:positive_effect": {
       "effect": "minecraft:regeneration"

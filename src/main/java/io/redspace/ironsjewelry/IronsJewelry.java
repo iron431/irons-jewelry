@@ -58,6 +58,8 @@ public class IronsJewelry {
         ItemRegistry.register(modEventBus);
         BlockRegistry.register(modEventBus);
         MenuRegistry.register(modEventBus);
+        CommandArgumentRegistry.register(modEventBus);
+        DataAttachmentRegistry.register(modEventBus);
 
         // Register ourselves for server and other game events we are interested in.
         // Note that this is necessary if and only if we want *this* class (ExampleMod) to respond directly to events.

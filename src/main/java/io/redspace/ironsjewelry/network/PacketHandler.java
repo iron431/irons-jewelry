@@ -3,6 +3,7 @@ package io.redspace.ironsjewelry.network;
 import io.redspace.ironsjewelry.IronsJewelry;
 import io.redspace.ironsjewelry.network.packets.SetJewelcraftingStationPattern;
 import io.redspace.ironsjewelry.network.packets.SyncJewelcraftingSlotStates;
+import io.redspace.ironsjewelry.network.packets.SyncPlayerDataPacket;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
@@ -16,6 +17,7 @@ public class PacketHandler {
 
         payloadRegistrar.playToServer(SetJewelcraftingStationPattern.TYPE, SetJewelcraftingStationPattern.STREAM_CODEC, SetJewelcraftingStationPattern::handle);
         payloadRegistrar.playToClient(SyncJewelcraftingSlotStates.TYPE, SyncJewelcraftingSlotStates.STREAM_CODEC, SyncJewelcraftingSlotStates::handle);
+        payloadRegistrar.playToClient(SyncPlayerDataPacket.TYPE, SyncPlayerDataPacket.STREAM_CODEC, SyncPlayerDataPacket::handle);
 
     }
 }

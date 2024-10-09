@@ -1,12 +1,15 @@
 package io.redspace.ironsjewelry.gameplay;
 
+import io.redspace.ironsjewelry.IronsJewelry;
 import io.redspace.ironsjewelry.core.Utils;
 import io.redspace.ironsjewelry.core.bonuses.DeathBonus;
 import io.redspace.ironsjewelry.core.bonuses.EffectOnHitBonus;
 import io.redspace.ironsjewelry.core.data.BonusInstance;
 import io.redspace.ironsjewelry.core.data.JewelryData;
 import io.redspace.ironsjewelry.core.parameters.EnchantmentRunnableParameter;
+import io.redspace.ironsjewelry.network.packets.SyncPlayerDataPacket;
 import io.redspace.ironsjewelry.registry.BonusRegistry;
+import io.redspace.ironsjewelry.registry.DataAttachmentRegistry;
 import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -20,9 +23,18 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.LivingShieldBlockEvent;
 import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 @EventBusSubscriber
 public class ServerEvents {
+
+    @SubscribeEvent
+    public static void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
+        if (event.getEntity() instanceof ServerPlayer serverPlayer) {
+            PacketDistributor.sendToPlayer(serverPlayer, new SyncPlayerDataPacket(serverPlayer.getData(DataAttachmentRegistry.PLAYER_DATA)));
+        }
+    }
 
     @SubscribeEvent
     public static void onShieldBlock(LivingShieldBlockEvent event) {

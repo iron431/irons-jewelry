@@ -67,7 +67,7 @@ public class DynamicModel implements IUnbakedGeometry<DynamicModel> {
                 public BakedModel resolve(BakedModel pModel, ItemStack pStack, @Nullable ClientLevel pLevel, @Nullable LivingEntity pEntity, int pSeed) {
                     JewelryData data = JewelryData.get(pStack);
                     if (data.isValid()) {
-                        return ClientModelCache.MODEL_CACHE.computeIfAbsent(data.hashCode(), (i) -> bake(data, context, baker.getModelTextureGetter(), modelState, new ItemOverrides(baker, blockmodel, List.of(), baker.getModelTextureGetter())));
+                        return ClientData.MODEL_CACHE.computeIfAbsent(data.hashCode(), (i) -> bake(data, context, baker.getModelTextureGetter(), modelState, new ItemOverrides(baker, blockmodel, List.of(), baker.getModelTextureGetter())));
                     }
                     return EmptyModel.BAKED;
                 }

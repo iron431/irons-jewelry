@@ -23,6 +23,13 @@ repositories {
     maven {
         url "https://cursemaven.com"
     }
+    maven {
+        // Shadows (Attribute Lib)
+        url "https://maven.shadowsoffire.dev/releases"
+        content {
+            includeGroup "dev.shadowsoffire"
+        }
+    }
 }
 
 base {
@@ -109,6 +116,9 @@ dependencies {
     implementation "curse.maven:adorned-1036809:5684431"
     implementation "curse.maven:ato-405593:5500624"
 
+    implementation "dev.shadowsoffire:ApothicAttributes:${minecraft_version}-${attribute_lib_version}"
+    localRuntime "dev.shadowsoffire:Placebo:${minecraft_version}-${placebo_version}"
+
     // Example optional mod dependency with JEI
     // The JEI API is declared for compile time use, while the full JEI artifact is used at runtime
     // compileOnly "mezz.jei:jei-${mc_version}-common-api:${jei_version}"
@@ -148,7 +158,9 @@ tasks.withType(ProcessResources).configureEach {
             mod_license            : mod_license,
             mod_version            : mod_version,
             mod_authors            : mod_authors,
-            mod_description        : mod_description
+            mod_description        : mod_description,
+            attribute_lib_version  : attribute_lib_version,
+            placebo_version        : placebo_version
     ]
     inputs.properties replaceProperties
 

@@ -1,9 +1,6 @@
 package io.redspace.ironsjewelry.gameplay.block.jewelcrafting_station;
 
-import io.redspace.ironsjewelry.core.data.JewelryData;
-import io.redspace.ironsjewelry.core.data.MaterialDefinition;
-import io.redspace.ironsjewelry.core.data.PartDefinition;
-import io.redspace.ironsjewelry.core.data.PatternDefinition;
+import io.redspace.ironsjewelry.core.data.*;
 import io.redspace.ironsjewelry.core.data_registry.MaterialDataHandler;
 import io.redspace.ironsjewelry.network.packets.SyncJewelcraftingSlotStates;
 import io.redspace.ironsjewelry.registry.BlockRegistry;
@@ -201,9 +198,12 @@ public class JewelcraftingStationMenu extends AbstractContainerMenu {
         return stillValid(this.access, pPlayer, BlockRegistry.JEWELCRAFTING_STATION_BLOCK.value());
     }
 
-    //TODO: return true if this pattern is able to be crafted here
+    /**
+     * @param patternDefinition
+     * @return returns true if this pattern is valid and can be crafted, ie the player has learned it
+     */
     private boolean validateAvailablePattern(PatternDefinition patternDefinition) {
-        return true;
+        return patternDefinition.unlockedByDefault() || this.player instanceof ServerPlayer serverPlayer && PlayerData.get(serverPlayer).isLearned(patternDefinition);
     }
 
     public boolean handleSetPattern(PatternDefinition patternDefinition) {

@@ -1,6 +1,7 @@
 package io.redspace.ironsjewelry.gameplay.block.jewelcrafting_station;
 
 import io.redspace.ironsjewelry.IronsJewelry;
+import io.redspace.ironsjewelry.client.ClientData;
 import io.redspace.ironsjewelry.client.DynamicModel;
 import io.redspace.ironsjewelry.core.IBonusParameterType;
 import io.redspace.ironsjewelry.core.Utils;
@@ -31,6 +32,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
 
 public class JewelcraftingStationScreen extends AbstractContainerScreen<JewelcraftingStationMenu> {
     public void handleSlotSync(SyncJewelcraftingSlotStates packet) {
@@ -83,8 +85,8 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
         this.selectedPattern = -1;
         this.scrollOff = 0;
 
-        this.availablePatterns = PatternDataHandler.patterns().stream().filter(PatternDefinition::unlockedByDefault).sorted(Comparator.comparingDouble(PatternDefinition::qualityMultiplier)).toList();
-
+        this.availablePatterns = Stream.concat(PatternDataHandler.patterns().stream().filter(PatternDefinition::unlockedByDefault),
+                ClientData.localPlayerData.getLearnedPatterns().stream()).distinct().sorted(Comparator.comparingDouble(PatternDefinition::qualityMultiplier)).toList();
     }
 
 
