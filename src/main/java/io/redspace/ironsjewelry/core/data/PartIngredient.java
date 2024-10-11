@@ -12,8 +12,4 @@ public record PartIngredient(PartDefinition part, int materialCost, int drawOrde
             Codec.INT.fieldOf("drawOrder").forGetter(PartIngredient::drawOrder)
     ).apply(builder, PartIngredient::new));
 
-    @Override
-    public int hashCode() {
-        return part.hashCode();
-    }
 }

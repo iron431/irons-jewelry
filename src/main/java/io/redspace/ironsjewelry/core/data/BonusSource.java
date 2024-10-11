@@ -61,7 +61,6 @@ public record BonusSource(Bonus bonus, Either<Map<IBonusParameterType<?>, Object
         IronsJewelry.LOGGER.warn("Part {} unable to find bonus parameter {} in jewelry: {}", part, targetParameter, data);
         return Map.of();
     }
-//TODO:
 //    @Override
 //    public int hashCode() {
 //        return partForBonus.hashCode() * 31 + partForQuality().hashCode();

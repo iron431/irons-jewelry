@@ -31,11 +31,6 @@ public record PartDefinition(List<String> allowedMaterials, ResourceLocation bas
         }
     }
 
-    @Override
-    public int hashCode() {
-        return baseTextureLocation.hashCode();
-    }
-
     public ResourceLocation id() {
         return PartDataHandler.getKey(this);
     }

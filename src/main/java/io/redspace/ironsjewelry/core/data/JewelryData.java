@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
  * Primary Data Object for the Jewelry Data Component
@@ -63,12 +64,14 @@ public class JewelryData {
     private final Map<PartDefinition, MaterialDefinition> parts;
     private final boolean valid;
     private final List<BonusInstance> bonuses;
+    private final int hashCode;
 
     public JewelryData(PatternDefinition pattern, Map<PartDefinition, MaterialDefinition> parts) {
         this.pattern = pattern;
         this.parts = parts;
         this.valid = validate();
         this.bonuses = cacheBonuses();
+        this.hashCode = pattern.id().hashCode() * 31 + parts.entrySet().stream().collect(Collectors.toMap(entry -> entry.getKey().id(), entry -> entry.getValue().id())).hashCode();
     }
 
     private JewelryData() {
@@ -76,6 +79,7 @@ public class JewelryData {
         this.valid = false;
         this.parts = Map.of();
         this.bonuses = List.of();
+        this.hashCode = 0;
     }
 
     public static JewelryData NONE = new JewelryData();
@@ -159,7 +163,7 @@ public class JewelryData {
 
     @Override
     public int hashCode() {
-        return pattern.id().hashCode() * 31 + parts.hashCode();
+        return hashCode;
     }
 
     @Override

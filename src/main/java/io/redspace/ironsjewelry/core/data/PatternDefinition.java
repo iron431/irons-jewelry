@@ -41,11 +41,6 @@ public record PatternDefinition(List<PartIngredient> partTemplate, List<BonusSou
         this.qualityMultiplier = qualityMultiplier;
     }
 
-    @Override
-    public int hashCode() {
-        return (partTemplate.hashCode() * 31 + bonuses().hashCode()) * 10 + (unlockedByDefault ? 1 : 0);
-    }
-
     public String getDescriptionId() {
         var id = id();
         if (id == null) {
