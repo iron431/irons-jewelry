@@ -12,7 +12,9 @@
                 "irons_jewelry:item/base/band_gem_superior",
                 "irons_jewelry:item/base/piglin_signet",
                 "irons_jewelry:item/base/twisted_ring_primary",
-                "irons_jewelry:item/base/twisted_ring_secondary"
+                "irons_jewelry:item/base/twisted_ring_secondary",
+                "irons_jewelry:item/base/chain_simple",
+                "irons_jewelry:item/base/chain_simple_amulet"
             ],
             "palette_key": "irons_jewelry:palettes/gold",
             "permutations": {
@@ -33,7 +35,8 @@
                 "irons_jewelry:item/base/gem_round",
                 "irons_jewelry:item/base/gems_side",
                 "irons_jewelry:item/base/gem_tearstone",
-                "irons_jewelry:item/base/gem_stoneplate"
+                "irons_jewelry:item/base/gem_stoneplate",
+                "irons_jewelry:item/base/gem_simple_amulet"
             ],
             "palette_key": "irons_jewelry:palettes/diamond",
             "permutations": {

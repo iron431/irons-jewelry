@@ -79,29 +79,23 @@ public class CurioBaseItem extends Item implements ICurioItem {
     @Override
     public void onEquip(SlotContext slotContext, ItemStack prevStack, ItemStack stack) {
         ICurioItem.super.onEquip(slotContext, prevStack, stack);
-        JewelryData.ifPresent(stack, data -> {
-            data.forBonuses(BonusRegistry.EFFECT_IMMUNITY_BONUS.get(), Holder.class, (bonus, param) -> slotContext.entity().removeEffect(param));
-//            for (BonusInstance instance : data.getBonuses()) {
-//                if (instance.bonus() instanceof EffectImmunityBonus immunityBonus) {
-//                    immunityBonus.getParameterType().resolve(instance).ifPresent(mobEffectHolder -> slotContext.entity().removeEffect(mobEffectHolder));
-//                }
-//            }
-        });
+        JewelryData.ifPresent(stack, data -> data.forBonuses(BonusRegistry.EFFECT_IMMUNITY_BONUS.get(), Holder.class, (bonus, param) -> slotContext.entity().removeEffect(param)));
     }
 
     @Override
     public Multimap<Holder<Attribute>, AttributeModifier> getAttributeModifiers(SlotContext slotContext, ResourceLocation id, ItemStack stack) {
-
         JewelryData data = stack.get(ComponentRegistry.JEWELRY_COMPONENT);
         //TODO: cache these in the stack's attribute component for as long as index hasn't changed?
         if (data != null && slotContext.identifier().equals(this.slotIdentifier)) {
             var bonuses = data.getBonuses();
+            // We want to combine like modifiers by operation, so instead of two "+2 health"'s, we get one "+4 health"
             Map<Holder<Attribute>, Map<AttributeModifier.Operation, AttributeModifier>> collapsedModifiers = new HashMap<>();
             for (BonusInstance instance : bonuses) {
                 if (instance.bonus() instanceof AttributeBonus attributeBonus) {
                     attributeBonus.getParameterType().resolve(instance.parameter()).ifPresent(
                             attributeInstance -> {
-                                //builder.put(attributeInstance.attribute(), attributeBonus.modifier(attributeInstance, slotContext, instance.quality())
+                                // If this is the first modifier of this attribute and operation, store it.
+                                // If it is not, get the previous modifier, and create a new modifier of previous value + additional value
                                 var byOperation = collapsedModifiers.computeIfAbsent(attributeInstance.attribute(), (x) -> new HashMap<>());
                                 var modifier = attributeBonus.modifier(attributeInstance, slotContext, instance.quality());
                                 var operation = modifier.operation();
@@ -113,7 +107,6 @@ public class CurioBaseItem extends Item implements ICurioItem {
                                     byOperation.put(operation, modifier);
                                 }
                             });
-
                 }
             }
             ImmutableMultimap.Builder<Holder<Attribute>, AttributeModifier> builder = ImmutableMultimap.builder();

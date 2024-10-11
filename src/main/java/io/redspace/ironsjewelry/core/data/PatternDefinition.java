@@ -4,6 +4,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.redspace.ironsjewelry.core.IBonusParameterType;
 import io.redspace.ironsjewelry.core.data_registry.PatternDataHandler;
+import io.redspace.ironsjewelry.registry.JewelryTypeRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.network.chat.Component;
@@ -19,22 +20,26 @@ import java.util.Optional;
 /**
  * A pattern represents a piece of jewelry that can be crafted, and contains data for what components are required to craft it and what the resulting item can do
  *
+ * @param jewelryType
  * @param partTemplate
  * @param bonuses
  * @param unlockedByDefault
  * @param qualityMultiplier
  */
-public record PatternDefinition(List<PartIngredient> partTemplate, List<BonusSource> bonuses, boolean unlockedByDefault,
+public record PatternDefinition(JewelryType jewelryType, List<PartIngredient> partTemplate, List<BonusSource> bonuses,
+                                boolean unlockedByDefault,
                                 double qualityMultiplier) {
     public static final Codec<PatternDefinition> CODEC = RecordCodecBuilder.create(builder -> builder.group(
+            JewelryTypeRegistry.JEWELRY_TYPE_REGISTRY.byNameCodec().fieldOf("type").forGetter(PatternDefinition::jewelryType),
             Codec.list(PartIngredient.CODEC).fieldOf("parts").forGetter(PatternDefinition::partTemplate),
             Codec.list(BonusSource.CODEC).fieldOf("bonuses").forGetter(PatternDefinition::bonuses),
             Codec.BOOL.optionalFieldOf("unlockedByDefault", true).forGetter(PatternDefinition::unlockedByDefault),
             Codec.DOUBLE.optionalFieldOf("qualityMultiplier", 1d).forGetter(PatternDefinition::qualityMultiplier)
     ).apply(builder, PatternDefinition::new));
 
-    public PatternDefinition(List<PartIngredient> partTemplate, List<BonusSource> bonuses, boolean unlockedByDefault,
+    public PatternDefinition(JewelryType jewelryType, List<PartIngredient> partTemplate, List<BonusSource> bonuses, boolean unlockedByDefault,
                              double qualityMultiplier) {
+        this.jewelryType = jewelryType;
         this.partTemplate = partTemplate.stream().sorted(Comparator.comparingInt(PartIngredient::drawOrder)).toList();
         this.bonuses = bonuses;
         this.unlockedByDefault = unlockedByDefault;

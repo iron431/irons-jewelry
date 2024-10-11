@@ -1,14 +1,14 @@
 {
   "unlockedByDefault": true,
-  "type": "irons_jewelry:ring",
+  "type": "irons_jewelry:necklace",
   "parts": [
     {
-      "id": "irons_jewelry:band_gem",
+      "id": "irons_jewelry:chain_simple_amulet",
       "materialCost": 4,
       "drawOrder": 0
     },
     {
-      "id": "irons_jewelry:gem_round",
+      "id": "irons_jewelry:gem_simple_amulet",
       "materialCost": 1,
       "drawOrder": 1
     }
@@ -16,8 +16,8 @@
   "bonuses": [
     {
       "bonus": "irons_jewelry:attribute_bonus",
-      "parameter": "irons_jewelry:gem_round",
-      "quality": "irons_jewelry:band_gem"
+      "parameter": "irons_jewelry:gem_simple_amulet",
+      "quality": "irons_jewelry:chain_simple_amulet"
     }
   ]
 }

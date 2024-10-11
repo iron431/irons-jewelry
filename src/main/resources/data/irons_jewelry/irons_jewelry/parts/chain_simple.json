@@ -1,0 +1,7 @@
+{
+  "allowedMaterialTypes": [
+    "metal",
+    "strap"
+  ],
+  "baseTextureLocation": "irons_jewelry:item/base/chain_simple"
+}

@@ -1,0 +1,4 @@
+{
+  "parent": "minecraft:item/generated",
+  "loader": "irons_jewelry:dynamic_model"
+}

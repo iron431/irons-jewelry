@@ -5,7 +5,6 @@ import io.redspace.ironsjewelry.core.data_registry.MaterialDataHandler;
 import io.redspace.ironsjewelry.network.packets.SyncJewelcraftingSlotStates;
 import io.redspace.ironsjewelry.registry.BlockRegistry;
 import io.redspace.ironsjewelry.registry.ComponentRegistry;
-import io.redspace.ironsjewelry.registry.ItemRegistry;
 import io.redspace.ironsjewelry.registry.MenuRegistry;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
@@ -131,7 +130,7 @@ public class JewelcraftingStationMenu extends AbstractContainerMenu {
             }
             var jewelryData = new JewelryData(currentPattern, parts);
             if (jewelryData.isValid()) {
-                result = new ItemStack(ItemRegistry.RING.get());
+                result = new ItemStack(this.currentPattern.jewelryType().item());
                 result.set(ComponentRegistry.JEWELRY_COMPONENT, jewelryData);
             }
         }

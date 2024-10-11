@@ -1,5 +1,6 @@
 {
   "unlockedByDefault": false,
+  "type": "irons_jewelry:ring",
   "parts": [
     {
       "id": "irons_jewelry:band_gem_superior",
