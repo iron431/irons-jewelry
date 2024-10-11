@@ -1,14 +1,10 @@
 package io.redspace.ironsjewelry.gameplay.block.jewelcrafting_station;
 
 import io.redspace.ironsjewelry.IronsJewelry;
-import io.redspace.ironsjewelry.client.ClientData;
 import io.redspace.ironsjewelry.client.DynamicModel;
 import io.redspace.ironsjewelry.core.IBonusParameterType;
 import io.redspace.ironsjewelry.core.Utils;
-import io.redspace.ironsjewelry.core.data.BonusSource;
-import io.redspace.ironsjewelry.core.data.PartDefinition;
-import io.redspace.ironsjewelry.core.data.PartIngredient;
-import io.redspace.ironsjewelry.core.data.PatternDefinition;
+import io.redspace.ironsjewelry.core.data.*;
 import io.redspace.ironsjewelry.core.data_registry.MaterialDataHandler;
 import io.redspace.ironsjewelry.core.data_registry.PatternDataHandler;
 import io.redspace.ironsjewelry.network.packets.SetJewelcraftingStationPattern;
@@ -85,8 +81,10 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
         this.selectedPattern = -1;
         this.scrollOff = 0;
 
-        this.availablePatterns = Stream.concat(PatternDataHandler.patterns().stream().filter(PatternDefinition::unlockedByDefault),
-                ClientData.localPlayerData.getLearnedPatterns().stream()).distinct().sorted(Comparator.comparingDouble(PatternDefinition::qualityMultiplier)).toList();
+        if (Minecraft.getInstance().player != null) {
+            this.availablePatterns = Stream.concat(PatternDataHandler.patterns().stream().filter(PatternDefinition::unlockedByDefault),
+                    PlayerData.get(Minecraft.getInstance().player).getLearnedPatterns().stream()).distinct().sorted(Comparator.comparingDouble(PatternDefinition::qualityMultiplier)).toList();
+        }
     }
 
 

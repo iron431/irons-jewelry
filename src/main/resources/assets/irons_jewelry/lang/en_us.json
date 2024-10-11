@@ -77,5 +77,8 @@
   "tooltip.irons_jewelry.empty": "Empty",
   "tooltip.irons_jewelry.applicable_materials": "Applicable Materials:",
   "tooltip.irons_jewelry.self": "Self",
-  "tooltip.irons_jewelry.attacker": "Attacker"
+  "tooltip.irons_jewelry.attacker": "Attacker",
+  "tooltip.irons_jewelry.stored_pattern": "Pattern: %s",
+  "tooltip.irons_jewelry.use_to_learn": "[%s] to Learn",
+  "tooltip.irons_jewelry.already_learned": "Already Learned"
 }

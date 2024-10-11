@@ -31,7 +31,9 @@ public class IronsDebugCommand {
             return p_138819_.hasPermission(2);
         }).then(Commands.literal("learnPattern").then(Commands.argument("pattern", PatternCommandArgument.patternArgument()).suggests(PATTERN_SUGGESTIONS).executes((commandContext) -> {
             return learnPattern(commandContext.getSource(), commandContext.getArgument("pattern", String.class));
-        })).then(Commands.literal("all").executes(context -> learnAllPatterns(context.getSource())))).then(Commands.literal("clearClientCache").executes((commandContext -> {
+        })).then(Commands.literal("all").executes(context -> learnAllPatterns(context.getSource()))
+        ).then(Commands.literal("unlearnAll").executes(context -> unlearnAllPatterns(context.getSource()))
+        )).then(Commands.literal("clearClientCache").executes((commandContext -> {
             ClientData.MODEL_CACHE.clear();
             return 1;
         }))));
@@ -59,6 +61,18 @@ public class IronsDebugCommand {
             for (PatternDefinition patternDefinition : PatternDataHandler.patterns()) {
                 data.learn(serverPlayer, patternDefinition);
             }
+            return 1;
+        }
+
+        throw ERROR_FAILED.create();
+    }
+
+    private static int unlearnAllPatterns(CommandSourceStack source) throws CommandSyntaxException {
+        var serverPlayer = source.getPlayer();
+        if (serverPlayer != null) {
+            var data = serverPlayer.getData(DataAttachmentRegistry.PLAYER_DATA);
+            data.getLearnedPatterns().clear();
+            data.sync(serverPlayer);
             return 1;
         }
 

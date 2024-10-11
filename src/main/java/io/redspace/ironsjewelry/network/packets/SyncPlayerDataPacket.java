@@ -1,8 +1,9 @@
 package io.redspace.ironsjewelry.network.packets;
 
 import io.redspace.ironsjewelry.IronsJewelry;
-import io.redspace.ironsjewelry.client.ClientData;
 import io.redspace.ironsjewelry.core.data.PlayerData;
+import io.redspace.ironsjewelry.registry.DataAttachmentRegistry;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -28,8 +29,11 @@ public record SyncPlayerDataPacket(PlayerData playerData) implements CustomPacke
     }
 
     public static void handle(SyncPlayerDataPacket packet, IPayloadContext context) {
-        context.enqueueWork(() -> {
-            ClientData.localPlayerData = packet.playerData();
+        context.enqueueWork(() ->
+        {
+            if (Minecraft.getInstance().player != null) {
+                Minecraft.getInstance().player.setData(DataAttachmentRegistry.PLAYER_DATA, packet.playerData);
+            }
         });
     }
 }

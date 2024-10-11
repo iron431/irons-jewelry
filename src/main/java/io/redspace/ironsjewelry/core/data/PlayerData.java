@@ -80,10 +80,14 @@ public class PlayerData {
 
     public boolean learn(ServerPlayer serverPlayer, PatternDefinition patternDefinition) {
         if (learnedPatterns.add(patternDefinition)) {
-            PacketDistributor.sendToPlayer(serverPlayer, new SyncPlayerDataPacket(this));
+            sync(serverPlayer);
             return true;
         }
         return false;
+    }
+
+    public void sync(ServerPlayer serverPlayer) {
+        PacketDistributor.sendToPlayer(serverPlayer, new SyncPlayerDataPacket(this));
     }
 
     public boolean isLearned(PatternDefinition definition) {
