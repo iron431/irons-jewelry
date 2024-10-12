@@ -80,7 +80,7 @@
   "action.irons_jewelry.apply_effect.entity": "Inflict %s (%s)",
   "action.irons_jewelry.knockback.push": "Knock %s Back",
   "action.irons_jewelry.knockback.pull": "Pull %s In",
-  "action.irons_jewelry.ignite": "Ignite %s",
+  "action.irons_jewelry.ignite": "Ignite %s for %ss",
 
   "tooltip.irons_jewelry.parts_header" : "Parts:",
   "tooltip.irons_jewelry.bonus_header" : "Bonus:",
