@@ -2,7 +2,8 @@ package io.redspace.ironsjewelry.core;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
-import io.redspace.ironsjewelry.core.data.JewelryData;
+import io.redspace.ironsjewelry.core.data.BonusInstance;
+import io.redspace.ironsjewelry.core.data.PlayerData;
 import io.redspace.ironsjewelry.registry.ActionRegistry;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -16,6 +17,18 @@ public interface IAction {
             .dispatch(IAction::codec, Function.identity());
 
     void apply(ServerLevel serverLevel, double quality, boolean applyToSelf, ServerPlayer wearer, Entity entity);
+
+    default void handleAction(ServerLevel serverLevel, BonusInstance bonusInstance, boolean applyToSelf, int cooldownTicks, ServerPlayer wearer, Entity entity) {
+        var playerData = PlayerData.get(wearer);
+        if (!playerData.isOnCooldown(bonusInstance.bonus())) {
+            apply(serverLevel, bonusInstance.quality(), applyToSelf, wearer, entity);
+            if (cooldownTicks > 0) {
+                playerData.addCooldown(bonusInstance.bonus(), cooldownTicks);
+            }
+        }
+
+    }
+
 
     MapCodec<? extends IAction> codec();
 }

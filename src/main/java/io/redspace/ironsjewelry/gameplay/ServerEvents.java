@@ -22,6 +22,7 @@ import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.LivingShieldBlockEvent;
 import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 @EventBusSubscriber
@@ -41,10 +42,17 @@ public class ServerEvents {
             for (ItemStack stack : items) {
                 JewelryData.ifPresent(stack, jewelryData -> {
                     jewelryData.forBonuses(BonusRegistry.ON_SHIELD_BLOCK_BONUS.get(), ActionParameter.ActionRunnable.class, (bonus, action) -> {
-                        action.action().apply(player.serverLevel(), bonus.quality(), action.targetSelf(), player, livingAttacker);
+                        action.action().handleAction(player.serverLevel(), bonus, action.targetSelf(), action.cooldownTicks(), player, livingAttacker);
                     });
                 });
             }
+        }
+    }
+
+    @SubscribeEvent
+    public static void onPlayerTick(PlayerTickEvent.Post event) {
+        if (event.getEntity() instanceof ServerPlayer serverPlayer) {
+            serverPlayer.getData(DataAttachmentRegistry.PLAYER_DATA).tickCooldowns(1);
         }
     }
 
