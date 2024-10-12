@@ -20,7 +20,7 @@ public interface IAction {
 
     default void handleAction(ServerLevel serverLevel, BonusInstance bonusInstance, boolean applyToSelf, int cooldownTicks, ServerPlayer wearer, Entity entity) {
         var playerData = PlayerData.get(wearer);
-        if (!playerData.isOnCooldown(bonusInstance.bonus())) {
+        if (cooldownTicks <= 0 || !playerData.isOnCooldown(bonusInstance.bonus())) {
             apply(serverLevel, bonusInstance.quality(), applyToSelf, wearer, entity);
             if (cooldownTicks > 0) {
                 playerData.addCooldown(bonusInstance.bonus(), cooldownTicks);
@@ -28,7 +28,6 @@ public interface IAction {
         }
 
     }
-
 
     MapCodec<? extends IAction> codec();
 }

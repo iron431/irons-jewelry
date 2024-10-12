@@ -52,7 +52,12 @@ public class PlayerData {
     }
 
     public void addCooldown(Bonus bonus, int ticks) {
-        cooldowns.put(BonusRegistry.BONUS_REGISTRY.getKey(bonus), new CooldownInstance(ticks));
+        var k = BonusRegistry.BONUS_REGISTRY.getKey(bonus);
+        var cooldown = cooldowns.get(k);
+        if (cooldown != null && cooldown.remainingTicks >= ticks) {
+            return;
+        }
+        cooldowns.put(k, new CooldownInstance(ticks));
     }
 
     public boolean learn(ServerPlayer serverPlayer, PatternDefinition patternDefinition) {

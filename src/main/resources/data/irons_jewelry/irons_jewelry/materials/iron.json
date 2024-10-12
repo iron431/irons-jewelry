@@ -33,7 +33,7 @@
     "irons_jewelry:defensive_action": {
       "verbTranslation": "knockback",
       "targetSelf": false,
-      "cooldownTicks": 100,
+      "cooldownTicks": 200,
       "action": {
         "type": "irons_jewelry:knockback",
         "strength": 2.0
