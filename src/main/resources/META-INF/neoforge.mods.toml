@@ -85,8 +85,16 @@ file="META-INF/accesstransformer.cfg"
     ordering="NONE"
     side="BOTH"
 
-# Features are specific properties of the game environment, that you may want to declare you require. This example declares
-# that your mod requires GL version 3.2 or higher. Other features will be added. They are side aware so declaring this won't
-# stop your mod loading on the server for example.
-#[features.${mod_id}]
-#openGLVersion="[3.2,)"
+[[dependencies.${mod_id}]]
+    modId="apothic_attributes"
+    type="required"
+    versionRange="[${attribute_lib_version},)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.${mod_id}]]
+    modId="curios"
+    type="required"
+    versionRange="[9.0.5+1.21.0,)"
+    ordering="NONE"
+    side="BOTH"
