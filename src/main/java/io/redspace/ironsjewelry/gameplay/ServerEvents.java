@@ -25,6 +25,7 @@ import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
+import org.jetbrains.annotations.Nullable;
 
 @EventBusSubscriber
 public class ServerEvents {
@@ -60,7 +61,7 @@ public class ServerEvents {
     @SubscribeEvent
     public static void onLivingDamaged(LivingIncomingDamageEvent event) {
         var damageSource = event.getSource();
-        var attacker = event.getSource().getEntity();
+        @Nullable var attacker = event.getSource().getEntity();
         var victim = event.getEntity();
         /*
         Attacker Effects
@@ -91,7 +92,7 @@ public class ServerEvents {
                     effectOnHitBonus.getParameterType().resolve(instance.parameter()).ifPresent(effect ->
                             player.addEffect(new MobEffectInstance(effect, effectOnHitBonus.durationInTicks(effect, instance.quality())))
                     );
-                } else if (instance.bonus().equals(BonusRegistry.ON_TAKE_DAMAGE_BONUS.get())) {
+                } else if (instance.bonus().equals(BonusRegistry.ON_TAKE_DAMAGE_BONUS.get()) && attacker != null) {
                     //TODO: create map of bonus to consumer or something?
                     BonusRegistry.ON_TAKE_DAMAGE_BONUS.get().getParameterType().resolve(instance).ifPresent(
                             effect -> effect.action().handleAction(player.serverLevel(), instance, effect.targetSelf(), effect.cooldownTicks(), player, attacker));
