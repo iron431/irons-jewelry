@@ -25,6 +25,10 @@
   "pattern.irons_jewelry.ranger_ring.item": "%s Ranger Ring",
   "pattern.irons_jewelry.stalwart_ring": "(TEST) Stalwart Ring",
   "pattern.irons_jewelry.stalwart_ring.item": "Stalwart %s Ring",
+  "pattern.irons_jewelry.simple_chain": "Simple Chain",
+  "pattern.irons_jewelry.simple_chain.item": "%s Chain",
+  "pattern.irons_jewelry.simple_amulet": "Simple Amulet",
+  "pattern.irons_jewelry.simple_amulet.item": "%s Amulet",
 
   "material.irons_jewelry.iron": "Iron",
   "material.irons_jewelry.gold": "Gold",
@@ -50,6 +54,9 @@
   "part.irons_jewelry.piglin_signet": "Piglin Signet",
   "part.irons_jewelry.piglin_signet_band": "Band",
   "part.irons_jewelry.band_flat_top": "Stalwart Band",
+  "part.irons_jewelry.chain_simple": "Chain",
+  "part.irons_jewelry.chain_simple_amulet": "Chain",
+  "part.irons_jewelry.gem_simple_amulet": "Gem",
 
   "bonus.irons_jewelry.attribute_bonus": "Attribute",
   "bonus.irons_jewelry.effect_on_hit_bonus": "Effect on Hit",
