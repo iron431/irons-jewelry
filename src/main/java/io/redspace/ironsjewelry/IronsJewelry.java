@@ -26,6 +26,7 @@ public class IronsJewelry {
         modEventBus.addListener(BonusRegistry::registerRegistry);
         modEventBus.addListener(ParameterTypeRegistry::registerRegistry);
         modEventBus.addListener(JewelryTypeRegistry::registerRegistry);
+        modEventBus.addListener(ActionRegistry::registerRegistry);
         modEventBus.addListener(CreativeTabRegistry::addCreative);
         NeoForge.EVENT_BUS.addListener(this::registerReloadListeners);
 
@@ -39,6 +40,7 @@ public class IronsJewelry {
         DataAttachmentRegistry.register(modEventBus);
         CreativeTabRegistry.register(modEventBus);
         JewelryTypeRegistry.register(modEventBus);
+        ActionRegistry.register(modEventBus);
 
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
     }

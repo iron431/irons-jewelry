@@ -96,14 +96,14 @@ public class JewelryData {
         }
     }
 
-    public <T> void forBonuses(Bonus bonus, Class<T> clazz, BiConsumer<Bonus, T> consumer) {
+    public <T> void forBonuses(Bonus bonus, Class<T> clazz, BiConsumer<BonusInstance, T> consumer) {
         var bonuses = this.getBonuses();
         for (BonusInstance instance : bonuses) {
             if (instance.bonus().equals(bonus)) {
                 instance.bonus().getParameterType().resolve(instance).ifPresent(param ->
                         {
                             if (clazz.isInstance(param)) {
-                                consumer.accept(instance.bonus(), (T) param);
+                                consumer.accept(instance, (T) param);
                             }
                         }
                 );

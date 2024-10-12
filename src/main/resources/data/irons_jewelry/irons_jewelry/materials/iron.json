@@ -29,6 +29,14 @@
         "min_duration": 1.5,
         "to_apply": "minecraft:regeneration"
       }
+    },
+    "irons_jewelry:defensive_action": {
+      "verbTranslation": "knockback",
+      "targetSelf": false,
+      "action": {
+        "type": "irons_jewelry:knockback",
+        "strength": 2.0
+      }
     }
   }
 }

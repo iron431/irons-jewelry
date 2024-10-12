@@ -2,7 +2,7 @@ package io.redspace.ironsjewelry.core.bonuses;
 
 import io.redspace.ironsjewelry.core.Bonus;
 import io.redspace.ironsjewelry.core.data.BonusInstance;
-import io.redspace.ironsjewelry.core.parameters.EnchantmentRunnableParameter;
+import io.redspace.ironsjewelry.core.parameters.ActionParameter;
 import io.redspace.ironsjewelry.registry.ParameterTypeRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -11,8 +11,8 @@ import java.util.List;
 
 public class OnShieldBlockBonus extends Bonus {
     @Override
-    public EnchantmentRunnableParameter getParameterType() {
-        return ParameterTypeRegistry.ENCHANTMENT_PARAMETER.get();
+    public ActionParameter getParameterType() {
+        return ParameterTypeRegistry.DEFENSIVE_ACTION_PARAMETER.get();
     }
 
     @Override

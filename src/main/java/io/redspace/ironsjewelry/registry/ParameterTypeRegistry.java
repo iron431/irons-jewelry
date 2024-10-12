@@ -2,10 +2,7 @@ package io.redspace.ironsjewelry.registry;
 
 import io.redspace.ironsjewelry.IronsJewelry;
 import io.redspace.ironsjewelry.core.IBonusParameterType;
-import io.redspace.ironsjewelry.core.parameters.AttributeParameter;
-import io.redspace.ironsjewelry.core.parameters.EffectParameter;
-import io.redspace.ironsjewelry.core.parameters.EmptyParameter;
-import io.redspace.ironsjewelry.core.parameters.EnchantmentRunnableParameter;
+import io.redspace.ironsjewelry.core.parameters.*;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.neoforged.bus.api.IEventBus;
@@ -25,6 +22,7 @@ public class ParameterTypeRegistry {
     public static final Supplier<EffectParameter> POSITIVE_EFFECT_PARAMETER = PARAMETER_TYPES.register("positive_effect", EffectParameter::new);
     public static final Supplier<EffectParameter> NEGATIVE_EFFECT_PARAMETER = PARAMETER_TYPES.register("negative_effect", EffectParameter::new);
     public static final Supplier<EnchantmentRunnableParameter> ENCHANTMENT_PARAMETER = PARAMETER_TYPES.register("enchantment_runnable", EnchantmentRunnableParameter::new);
+    public static final Supplier<ActionParameter> DEFENSIVE_ACTION_PARAMETER = PARAMETER_TYPES.register("defensive_action", ActionParameter::new);
 
 
     public static void registerRegistry(NewRegistryEvent event) {
