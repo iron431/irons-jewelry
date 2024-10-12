@@ -24,4 +24,8 @@ public abstract class Bonus {
         }
         return descriptionId;
     }
+
+    public final String getTooltipDescriptionId() {
+        return String.format("%s.description", getDescriptionId());
+    }
 }

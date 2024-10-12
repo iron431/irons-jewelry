@@ -27,7 +27,6 @@
       }
     },
     "irons_jewelry:defensive_action": {
-      "verbTranslation": "fioire",
       "targetSelf": false,
       "action": {
         "type": "irons_jewelry:ignite",

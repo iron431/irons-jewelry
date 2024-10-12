@@ -71,9 +71,9 @@ public class ServerEvents {
                 /*
                 Effect on projectile hit
                  */
-                if (instance.bonus().equals(BonusRegistry.EFFECT_ON_PROJECTILE_HIT_BONUS.get())) {
+                if (instance.bonus().equals(BonusRegistry.ON_PROJECTILE_HIT_BONUS.get())) {
                     if (damageSource.getDirectEntity() instanceof Projectile) {
-                        BonusRegistry.EFFECT_ON_PROJECTILE_HIT_BONUS.get().getParameterType().resolve(instance).ifPresent(
+                        BonusRegistry.ON_PROJECTILE_HIT_BONUS.get().getParameterType().resolve(instance).ifPresent(
                                 effect -> effect.action().handleAction(player.serverLevel(), instance, effect.targetSelf(), effect.cooldownTicks(), player, victim));
                     }
                 }
@@ -82,14 +82,19 @@ public class ServerEvents {
         /*
         Victim Effects
          */
-        if (victim instanceof Player player) {
-            for (BonusInstance instance : Utils.getEquippedBonuses(player)) {
+        if (victim instanceof ServerPlayer player) {
+            var bonuses = Utils.getEquippedBonuses(player);
+            for (BonusInstance instance : bonuses) {
                 if (instance.bonus() instanceof DeathBonus) {
                     player.die(player.level().damageSources().fellOutOfWorld());
                 } else if (instance.bonus() instanceof EffectOnHitBonus effectOnHitBonus) {
                     effectOnHitBonus.getParameterType().resolve(instance.parameter()).ifPresent(effect ->
                             player.addEffect(new MobEffectInstance(effect, effectOnHitBonus.durationInTicks(effect, instance.quality())))
                     );
+                } else if (instance.bonus().equals(BonusRegistry.ON_TAKE_DAMAGE_BONUS.get())) {
+                    //TODO: create map of bonus to consumer or something?
+                    BonusRegistry.ON_TAKE_DAMAGE_BONUS.get().getParameterType().resolve(instance).ifPresent(
+                            effect -> effect.action().handleAction(player.serverLevel(), instance, effect.targetSelf(), effect.cooldownTicks(), player, attacker));
                 }
             }
         }

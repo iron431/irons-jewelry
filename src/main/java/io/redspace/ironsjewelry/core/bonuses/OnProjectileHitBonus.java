@@ -10,7 +10,7 @@ import net.minecraft.world.effect.MobEffect;
 
 import java.util.List;
 
-public class EffectOnProjectileHitBonus extends Bonus {
+public class OnProjectileHitBonus extends Bonus {
     @Override
     public ActionParameter getParameterType() {
         return ParameterTypeRegistry.DEFENSIVE_ACTION_PARAMETER.get();
@@ -21,7 +21,7 @@ public class EffectOnProjectileHitBonus extends Bonus {
         var param = getParameterType().resolve(bonus);
         if (param.isPresent()) {
             var enchant = param.get();
-            return ParameterTypeRegistry.DEFENSIVE_ACTION_PARAMETER.get().getActionTooltip("bonus.irons_jewelry.on_projectile_hit.description",enchant, bonus);
+            return ParameterTypeRegistry.DEFENSIVE_ACTION_PARAMETER.get().getActionTooltip(getTooltipDescriptionId(), enchant, bonus);
         }
         return super.getTooltipDescription(bonus);
     }

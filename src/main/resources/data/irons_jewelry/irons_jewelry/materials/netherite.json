@@ -17,7 +17,6 @@
       "effect": "minecraft:fire_resistance"
     },
     "irons_jewelry:defensive_action": {
-      "verbTranslation": "effecto",
       "targetSelf": true,
       "action": {
         "type": "irons_jewelry:apply_effect",

@@ -8,7 +8,7 @@ import net.minecraft.network.chat.Component;
 
 import java.util.List;
 
-public class OnShieldBlockBonus extends Bonus {
+public class OnTakeDamageBonus extends Bonus {
     @Override
     public ActionParameter getParameterType() {
         return ParameterTypeRegistry.DEFENSIVE_ACTION_PARAMETER.get();

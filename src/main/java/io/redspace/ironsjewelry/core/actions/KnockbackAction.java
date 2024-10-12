@@ -26,7 +26,7 @@ public record KnockbackAction(FloatProvider strength) implements IAction {
             wearer.setDeltaMovement(wearer.getDeltaMovement().add(direction.scale(-1)));
             wearer.hurtMarked = true;
         } else {
-            entity.setDeltaMovement(wearer.getDeltaMovement().add(direction));
+            entity.setDeltaMovement(entity.getDeltaMovement().add(direction));
             entity.hurtMarked = true;
         }
     }

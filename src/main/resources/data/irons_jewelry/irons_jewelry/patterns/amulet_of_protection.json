@@ -1,0 +1,24 @@
+{
+  "unlockedByDefault": false,
+  "type": "irons_jewelry:necklace",
+  "parts": [
+    {
+      "id": "irons_jewelry:chain_amulet_of_protection",
+      "materialCost": 6,
+      "drawOrder": 0
+    },
+    {
+      "id": "irons_jewelry:gem_amulet_of_protection",
+      "materialCost": 2,
+      "drawOrder": 1
+    }
+  ],
+  "bonuses": [
+    {
+      "bonus": "irons_jewelry:on_take_damage_bonus",
+      "parameter": "irons_jewelry:gem_amulet_of_protection",
+      "quality": "irons_jewelry:chain_amulet_of_protection"
+    }
+  ],
+  "qualityMultiplier": 1.5
+}
