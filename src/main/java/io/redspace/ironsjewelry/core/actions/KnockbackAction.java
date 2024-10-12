@@ -21,19 +21,15 @@ public record KnockbackAction(QualityScalar strength) implements IAction {
     public void apply(ServerLevel serverLevel, double quality, boolean applyToSelf, ServerPlayer wearer, Entity entity) {
         double strength = this.strength.sample(quality);
         Vec3 direction = entity.getBoundingBox().getCenter().subtract(wearer.getBoundingBox().getCenter());
-        direction = direction.normalize().scale(strength);
-        if (applyToSelf) {
-            wearer.setDeltaMovement(wearer.getDeltaMovement().add(direction.scale(-1)));
-            wearer.hurtMarked = true;
-        } else {
-            entity.setDeltaMovement(entity.getDeltaMovement().add(direction));
-            entity.hurtMarked = true;
-        }
+        direction = direction.normalize().scale(strength).scale(applyToSelf ? -1 : 1);
+        var target = applyToSelf ? wearer : entity;
+        target.setDeltaMovement(target.getDeltaMovement().add(direction.add(0, 0.3, 0)));
+        target.hurtMarked = true;
     }
 
     @Override
     public Component formatTooltip(BonusInstance bonusInstance, boolean applyToSelf) {
-        Component target = applyToSelf ? Component.translatable("tooltip.irons_jewelry.self").withStyle(ChatFormatting.GREEN) :  Component.translatable("tooltip.irons_jewelry.attacker").withStyle(ChatFormatting.RED);
+        Component target = applyToSelf ? Component.translatable("tooltip.irons_jewelry.self").withStyle(ChatFormatting.GREEN) : Component.translatable("tooltip.irons_jewelry.attacker").withStyle(ChatFormatting.RED);
         //fixme: i dont think this works. with the current translation wording, i dont think it can work
         boolean push = (applyToSelf && strength.baseAmount() > 0) || (!applyToSelf && strength.baseAmount() > 0);
         return Component.translatable((push ? "action.irons_jewelry.knockback.push" : "action.irons_jewelry.knockback.pull"), target);

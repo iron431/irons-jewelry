@@ -23,6 +23,7 @@ public class ParameterTypeRegistry {
     public static final Supplier<EffectParameter> NEGATIVE_EFFECT_PARAMETER = PARAMETER_TYPES.register("negative_effect", EffectParameter::new);
     public static final Supplier<EnchantmentRunnableParameter> ENCHANTMENT_PARAMETER = PARAMETER_TYPES.register("enchantment_runnable", EnchantmentRunnableParameter::new);
     public static final Supplier<ActionParameter> DEFENSIVE_ACTION_PARAMETER = PARAMETER_TYPES.register("defensive_action", ActionParameter::new);
+    public static final Supplier<ActionParameter> OFFENSIVE_ACTION_PARAMETER = PARAMETER_TYPES.register("offensive_action", ActionParameter::new);
 
 
     public static void registerRegistry(NewRegistryEvent event) {

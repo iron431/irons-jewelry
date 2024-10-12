@@ -26,7 +26,7 @@ public record IgniteAction(QualityScalar tickDuration) implements IAction {
     @Override
     public Component formatTooltip(BonusInstance bonusInstance, boolean applyToSelf) {
         Component target = applyToSelf ? Component.translatable("tooltip.irons_jewelry.self").withStyle(ChatFormatting.RED) : Component.translatable("tooltip.irons_jewelry.attacker").withStyle(ChatFormatting.RED);
-        return Component.translatable("action.irons_jewelry.ignite", target, Component.literal(Utils.digitalTimeFromTicks((int) tickDuration.sample(bonusInstance.quality()))));
+        return Component.translatable("action.irons_jewelry.ignite", target, Component.literal(Utils.timeFromTicks((int) tickDuration.sample(bonusInstance.quality()), 1)));
     }
 
     @Override

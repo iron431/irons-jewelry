@@ -23,7 +23,7 @@
   "pattern.irons_jewelry.piglin_signet_ring.item": "Piglin Signet Ring",
   "pattern.irons_jewelry.ranger_ring": "Ranger Ring",
   "pattern.irons_jewelry.ranger_ring.item": "%s Ranger Ring",
-  "pattern.irons_jewelry.stalwart_ring": "(TEST) Stalwart Ring",
+  "pattern.irons_jewelry.stalwart_ring": "Stalwart Ring",
   "pattern.irons_jewelry.stalwart_ring.item": "Stalwart %s Ring",
   "pattern.irons_jewelry.simple_chain": "Simple Chain",
   "pattern.irons_jewelry.simple_chain.item": "%s Chain",
@@ -80,7 +80,7 @@
   "action.irons_jewelry.apply_effect.entity": "Inflict %s (%s)",
   "action.irons_jewelry.knockback.push": "Knock %s Back",
   "action.irons_jewelry.knockback.pull": "Pull %s In",
-  "action.irons_jewelry.ignite": "Ignite %s for %ss",
+  "action.irons_jewelry.ignite": "Ignite %s for %s",
 
   "tooltip.irons_jewelry.parts_header" : "Parts:",
   "tooltip.irons_jewelry.bonus_header" : "Bonus:",
