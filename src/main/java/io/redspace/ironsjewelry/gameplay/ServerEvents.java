@@ -1,5 +1,6 @@
 package io.redspace.ironsjewelry.gameplay;
 
+import io.redspace.ironsjewelry.core.ICooldownHandler;
 import io.redspace.ironsjewelry.core.Utils;
 import io.redspace.ironsjewelry.core.bonuses.DeathBonus;
 import io.redspace.ironsjewelry.core.bonuses.EffectOnHitBonus;
@@ -42,7 +43,7 @@ public class ServerEvents {
             for (ItemStack stack : items) {
                 JewelryData.ifPresent(stack, jewelryData -> {
                     jewelryData.forBonuses(BonusRegistry.ON_SHIELD_BLOCK_BONUS.get(), ActionParameter.ActionRunnable.class, (bonus, action) -> {
-                        action.action().handleAction(player.serverLevel(), bonus, action.targetSelf(), action.cooldownTicks(), player, livingAttacker);
+                        action.action().handleAction(player.serverLevel(), bonus, action.targetSelf(), ICooldownHandler.INSTANCE.getCooldown(action.cooldownTicks(), bonus.quality()), player, livingAttacker);
                     });
                 });
             }
@@ -64,7 +65,7 @@ public class ServerEvents {
         /*
         Attacker Effects
          */
-        if (attacker instanceof Player player) {
+        if (attacker instanceof ServerPlayer player) {
             var bonuses = Utils.getEquippedBonuses(player);
             for (BonusInstance instance : bonuses) {
                 /*
@@ -73,8 +74,7 @@ public class ServerEvents {
                 if (instance.bonus().equals(BonusRegistry.EFFECT_ON_PROJECTILE_HIT_BONUS.get())) {
                     if (damageSource.getDirectEntity() instanceof Projectile) {
                         BonusRegistry.EFFECT_ON_PROJECTILE_HIT_BONUS.get().getParameterType().resolve(instance).ifPresent(
-                                effect -> victim.addEffect(new MobEffectInstance(effect, BonusRegistry.EFFECT_ON_PROJECTILE_HIT_BONUS.get().durationInTicks(effect, instance.quality())))
-                        );
+                                effect -> effect.action().handleAction(player.serverLevel(), instance, effect.targetSelf(), effect.cooldownTicks(), player, victim));
                     }
                 }
             }

@@ -1,11 +1,9 @@
 package io.redspace.ironsjewelry.core.bonuses;
 
 import io.redspace.ironsjewelry.core.Bonus;
-import io.redspace.ironsjewelry.core.Utils;
 import io.redspace.ironsjewelry.core.data.BonusInstance;
-import io.redspace.ironsjewelry.core.parameters.EffectParameter;
+import io.redspace.ironsjewelry.core.parameters.ActionParameter;
 import io.redspace.ironsjewelry.registry.ParameterTypeRegistry;
-import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.effect.MobEffect;
@@ -14,18 +12,16 @@ import java.util.List;
 
 public class EffectOnProjectileHitBonus extends Bonus {
     @Override
-    public EffectParameter getParameterType() {
-        return ParameterTypeRegistry.NEGATIVE_EFFECT_PARAMETER.get();
+    public ActionParameter getParameterType() {
+        return ParameterTypeRegistry.DEFENSIVE_ACTION_PARAMETER.get();
     }
 
     @Override
     public List<Component> getTooltipDescription(BonusInstance bonus) {
-        var param = getParameterType().resolve(bonus.parameter());
+        var param = getParameterType().resolve(bonus);
         if (param.isPresent()) {
-            var effect = param.get();
-            return List.of(
-                    Component.literal(" ").append(Component.translatable(getDescriptionId() + ".description", Component.translatable(effect.value().getDescriptionId()).withStyle(ChatFormatting.RED), Component.literal(Utils.digitalTimeFromTicks(durationInTicks(effect, bonus.quality()))).withStyle(ChatFormatting.GREEN)).withStyle(ChatFormatting.YELLOW))
-            );
+            var enchant = param.get();
+            return ParameterTypeRegistry.DEFENSIVE_ACTION_PARAMETER.get().getActionTooltip("bonus.irons_jewelry.on_projectile_hit.description",enchant, bonus);
         }
         return super.getTooltipDescription(bonus);
     }

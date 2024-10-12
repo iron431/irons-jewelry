@@ -32,7 +32,7 @@ public class Utils {
     }
 
     public static <T> StreamCodec<ByteBuf, T> idStreamCodec(Function<ResourceLocation, T> idToObj, Function<T, ResourceLocation> objToId) {
-        return ResourceLocation.STREAM_CODEC.map(idToObj,objToId);
+        return ResourceLocation.STREAM_CODEC.map(idToObj, objToId);
     }
 
     public static List<BonusInstance> getEquippedBonuses(Player player) {
@@ -43,7 +43,7 @@ public class Utils {
         return CuriosApi.getCuriosInventory(player).map(inv -> inv.findCurios(stack -> stack.has(ComponentRegistry.JEWELRY_COMPONENT)).stream().map(SlotResult::stack).toList()).orElse(List.of());
     }
 
-    public static List<? extends FormattedCharSequence> rasterizeComponentList(List<Component> components){
+    public static List<? extends FormattedCharSequence> rasterizeComponentList(List<Component> components) {
         return components.stream().map(component -> FormattedCharSequence.forward(component.getString(), component.getStyle())).toList();
     }
 
@@ -81,6 +81,10 @@ public class Utils {
     }
 
     public static String digitalTimeFromTicks(int ticks) {
+        return digitalTimeFromTicks(ticks, false);
+    }
+
+    public static String digitalTimeFromTicks(int ticks, boolean showZeroMinutes) {
         String time = "";
         int seconds = ticks / 20;
         int minutes = seconds / 60;
@@ -88,11 +92,13 @@ public class Utils {
         if (minutes >= 60) {
             time += String.format("%s:", hours);
         }
-        if (seconds >= 60) {
+        if (seconds >= 60 || showZeroMinutes) {
             time += String.format("%s:", minutes % 60);
         }
         if (seconds >= 10) {
             time += (seconds % 60) / 10;
+        } else if (minutes > 0 || showZeroMinutes) {
+            time += "0";
         }
         time += seconds % 10;
         return time;

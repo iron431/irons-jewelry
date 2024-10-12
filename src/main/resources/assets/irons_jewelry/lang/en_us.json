@@ -68,10 +68,14 @@
   "bonus.irons_jewelry.effect_on_projectile_hit_bonus": "Tipped Projectiles",
   "bonus.irons_jewelry.effect_on_projectile_hit_bonus.description": "On projectile hit, inflict %s for %s seconds",
   "bonus.irons_jewelry.on_shield_block_bonus": "Action on Shield Block",
-  "bonus.irons_jewelry.on_shield_block_bonus.description": "On shield block, %s %s",
-  "bonus.irons_jewelry.enchantment.ignite": "Ignite",
-  "bonus.irons_jewelry.enchantment.wind_burst": "Wind Burst",
-  "bonus.irons_jewelry.enchantment.apply_regen": "apply Regeneration to",
+  "bonus.irons_jewelry.on_shield_block_bonus.description": "On shield block, %s",
+  "bonus.irons_jewelry.on_projectile_hit.description": "On projectile hit, %s",
+
+  "action.irons_jewelry.apply_effect.self": "Gain %s (%s)",
+  "action.irons_jewelry.apply_effect.entity": "Inflict %s (%s)",
+  "action.irons_jewelry.knockback.push": "Knock %s Back",
+  "action.irons_jewelry.knockback.pull": "Pull %s In",
+  "action.irons_jewelry.ignite": "Ignite %s",
 
   "tooltip.irons_jewelry.parts_header" : "Parts:",
   "tooltip.irons_jewelry.bonus_header" : "Bonus:",
@@ -87,5 +91,6 @@
   "tooltip.irons_jewelry.attacker": "Attacker",
   "tooltip.irons_jewelry.stored_pattern": "Pattern: %s",
   "tooltip.irons_jewelry.use_to_learn": "[%s] to Learn",
-  "tooltip.irons_jewelry.already_learned": "Already Learned"
+  "tooltip.irons_jewelry.already_learned": "Already Learned",
+  "tooltip.irons_jewelry.cooldown": "Cooldown: %s"
 }

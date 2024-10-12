@@ -5,6 +5,7 @@ import com.mojang.serialization.MapCodec;
 import io.redspace.ironsjewelry.core.data.BonusInstance;
 import io.redspace.ironsjewelry.core.data.PlayerData;
 import io.redspace.ironsjewelry.registry.ActionRegistry;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -28,6 +29,7 @@ public interface IAction {
         }
 
     }
+    Component formatTooltip(BonusInstance bonusInstance, boolean applyToSelf);
 
     MapCodec<? extends IAction> codec();
 }
