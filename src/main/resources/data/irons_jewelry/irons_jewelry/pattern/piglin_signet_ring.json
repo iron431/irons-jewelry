@@ -1,5 +1,5 @@
 {
-  "unlockedByDefault": true,
+  "unlockedByDefault": false,
   "type": "irons_jewelry:ring",
   "descriptionId": "pattern.irons_jewelry.piglin_signet_ring",
   "parts": [

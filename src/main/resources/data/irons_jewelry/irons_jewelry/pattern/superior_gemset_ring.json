@@ -1,5 +1,5 @@
 {
-  "unlockedByDefault": true,
+  "unlockedByDefault": false,
   "type": "irons_jewelry:ring",
   "descriptionId": "pattern.irons_jewelry.superior_gemset_ring",
   "parts": [

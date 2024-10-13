@@ -1,5 +1,5 @@
 {
-  "unlockedByDefault": true,
+  "unlockedByDefault": false,
   "type": "irons_jewelry:necklace",
   "descriptionId": "pattern.irons_jewelry.amulet_of_protection",
   "parts": [
