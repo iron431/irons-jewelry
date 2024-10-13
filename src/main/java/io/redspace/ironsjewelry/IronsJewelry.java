@@ -9,8 +9,6 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.neoforge.client.event.ModelEvent;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.AddReloadListenerEvent;
 import org.slf4j.Logger;
 
 @Mod(IronsJewelry.MODID)
@@ -26,7 +24,6 @@ public class IronsJewelry {
         modEventBus.addListener(ActionRegistry::registerRegistry);
         modEventBus.addListener(CreativeTabRegistry::addCreative);
         modEventBus.addListener(JewelryDataRegistries::registerDatapackRegistries);
-        NeoForge.EVENT_BUS.addListener(this::registerReloadListeners);
 
         ComponentRegistry.register(modEventBus);
         BonusRegistry.register(modEventBus);
@@ -42,13 +39,6 @@ public class IronsJewelry {
         LootRegistry.register(modEventBus);
 
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
-    }
-
-    public void registerReloadListeners(AddReloadListenerEvent event) {
-//        event.addListener(new MaterialDataHandler());
-//        event.addListener(new PartDataHandler());
-        //Pattern Data References Part/Material data and must be run last
-        //event.addListener(new PatternDataHandler());
     }
 
     public void registerModelLoader(ModelEvent.RegisterGeometryLoaders event) {
