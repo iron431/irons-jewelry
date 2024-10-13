@@ -25,7 +25,7 @@ import java.util.function.Function;
 
 public class Utils {
 
-    public static <T> Codec<T> idCodec(Function<ResourceLocation, Optional<T>> idToObj, Function<T, ResourceLocation> objToId) {
+    public static <T> Codec<T> byIdCodec(Function<ResourceLocation, Optional<T>> idToObj, Function<T, ResourceLocation> objToId) {
         return ResourceLocation.CODEC
                 .comapFlatMap(
                         resourceLocation -> idToObj.apply(resourceLocation)
