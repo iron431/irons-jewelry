@@ -112,7 +112,7 @@ public class DynamicModel implements IUnbakedGeometry<DynamicModel> {
 
     public static BakedModel bake(JewelryData jewelryData, IGeometryBakingContext context, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelState, ItemOverrides overrides) {
         IronsJewelry.LOGGER.debug("JewelryModel bake: {}", jewelryData);
-        var parts = jewelryData.parts().entrySet().stream().sorted(Comparator.comparingInt(entry -> get(entry.getKey(), jewelryData.pattern().partTemplate()).drawOrder())).toList();
+        var parts = jewelryData.parts().entrySet().stream().sorted(Comparator.comparingInt(entry -> get(entry.getKey(), jewelryData.pattern().value().partTemplate()).drawOrder())).toList();
         if (!parts.isEmpty()) {
             TextureAtlasSprite particle = spriteGetter.apply(new Material(InventoryMenu.BLOCK_ATLAS, atlasResourceLocaction(parts.getFirst().getKey(), parts.getFirst().getValue())));
             CompositeModel.Baked.Builder builder = CompositeModel.Baked.builder(context, particle, overrides, context.getTransforms());

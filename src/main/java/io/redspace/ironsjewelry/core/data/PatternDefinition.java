@@ -3,14 +3,11 @@ package io.redspace.ironsjewelry.core.data;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.redspace.ironsjewelry.core.IBonusParameterType;
-import io.redspace.ironsjewelry.core.data_registry.PatternDataHandler;
 import io.redspace.ironsjewelry.registry.JewelryTypeRegistry;
 import net.minecraft.ChatFormatting;
-import net.minecraft.Util;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
-import net.minecraft.resources.ResourceLocation;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -26,10 +23,11 @@ import java.util.Optional;
  * @param unlockedByDefault
  * @param qualityMultiplier
  */
-public record PatternDefinition(JewelryType jewelryType, List<PartIngredient> partTemplate, List<BonusSource> bonuses,
+public record PatternDefinition(String descriptionId, JewelryType jewelryType, List<PartIngredient> partTemplate, List<BonusSource> bonuses,
                                 boolean unlockedByDefault,
                                 double qualityMultiplier) {
     public static final Codec<PatternDefinition> CODEC = RecordCodecBuilder.create(builder -> builder.group(
+            Codec.STRING.fieldOf("descriptionId").forGetter(PatternDefinition::descriptionId),
             JewelryTypeRegistry.JEWELRY_TYPE_REGISTRY.byNameCodec().fieldOf("type").forGetter(PatternDefinition::jewelryType),
             Codec.list(PartIngredient.CODEC).fieldOf("parts").forGetter(PatternDefinition::partTemplate),
             Codec.list(BonusSource.CODEC).fieldOf("bonuses").forGetter(PatternDefinition::bonuses),
@@ -37,8 +35,9 @@ public record PatternDefinition(JewelryType jewelryType, List<PartIngredient> pa
             Codec.DOUBLE.optionalFieldOf("qualityMultiplier", 1d).forGetter(PatternDefinition::qualityMultiplier)
     ).apply(builder, PatternDefinition::new));
 
-    public PatternDefinition(JewelryType jewelryType, List<PartIngredient> partTemplate, List<BonusSource> bonuses, boolean unlockedByDefault,
+    public PatternDefinition(String descriptionId, JewelryType jewelryType, List<PartIngredient> partTemplate, List<BonusSource> bonuses, boolean unlockedByDefault,
                              double qualityMultiplier) {
+        this.descriptionId = descriptionId;
         this.jewelryType = jewelryType;
         this.partTemplate = partTemplate.stream().sorted(Comparator.comparingInt(PartIngredient::drawOrder)).toList();
         this.bonuses = bonuses;
@@ -47,12 +46,7 @@ public record PatternDefinition(JewelryType jewelryType, List<PartIngredient> pa
     }
 
     public String getDescriptionId() {
-        var id = id();
-        if (id == null) {
-            return "unregistered_pattern";
-        } else {
-            return Util.makeDescriptionId("pattern", id);
-        }
+        return this.descriptionId;
     }
 
     public List<Component> getFullPatternTooltip() {
@@ -93,9 +87,5 @@ public record PatternDefinition(JewelryType jewelryType, List<PartIngredient> pa
             tooltip.addAll(bonuses);
         }
         return tooltip;
-    }
-
-    public ResourceLocation id() {
-        return PatternDataHandler.getKey(this);
     }
 }

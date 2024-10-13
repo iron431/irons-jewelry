@@ -1,13 +1,16 @@
 package io.redspace.ironsjewelry.core.data;
 
+import io.redspace.ironsjewelry.IronsJewelry;
 import io.redspace.ironsjewelry.core.Bonus;
-import io.redspace.ironsjewelry.core.data_registry.PatternDataHandler;
 import io.redspace.ironsjewelry.network.packets.SyncPlayerDataPacket;
 import io.redspace.ironsjewelry.registry.BonusRegistry;
 import io.redspace.ironsjewelry.registry.DataAttachmentRegistry;
+import io.redspace.ironsjewelry.registry.JewelryDataRegistries;
+import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.*;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -16,18 +19,15 @@ import net.neoforged.neoforge.attachment.IAttachmentSerializer;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class PlayerData {
 
 
-    private final Set<PatternDefinition> learnedPatterns = new HashSet<>();
+    private final Set<Holder<PatternDefinition>> learnedPatterns = new HashSet<>();
     private final Map<ResourceLocation, CooldownInstance> cooldowns = new HashMap<>();
 
-    public Set<PatternDefinition> getLearnedPatterns() {
+    public Set<Holder<PatternDefinition>> getLearnedPatterns() {
         return learnedPatterns;
     }
 
@@ -60,7 +60,7 @@ public class PlayerData {
         cooldowns.put(k, new CooldownInstance(ticks));
     }
 
-    public boolean learn(ServerPlayer serverPlayer, PatternDefinition patternDefinition) {
+    public boolean learn(ServerPlayer serverPlayer, Holder<PatternDefinition> patternDefinition) {
         if (learnedPatterns.add(patternDefinition)) {
             sync(serverPlayer);
             return true;
@@ -72,7 +72,7 @@ public class PlayerData {
         PacketDistributor.sendToPlayer(serverPlayer, new SyncPlayerDataPacket(this));
     }
 
-    public boolean isLearned(PatternDefinition definition) {
+    public boolean isLearned(Holder<PatternDefinition> definition) {
         return learnedPatterns.contains(definition);
     }
 
@@ -95,11 +95,12 @@ public class PlayerData {
         public PlayerData read(IAttachmentHolder holder, CompoundTag compoundTag, HolderLookup.Provider provider) {
             var data = new PlayerData();
             var learnedPatterns = compoundTag.getList(LEARNED_PATTERNS, StringTag.TAG_STRING);
+            var holderGetter = provider.asGetterLookup().lookupOrThrow(JewelryDataRegistries.PATTERN_REGISTRY_KEY);
             for (Tag stringTag : learnedPatterns) {
                 try {
                     var string = stringTag.getAsString();
-                    var pattern = PatternDataHandler.get(ResourceLocation.parse(string));
-                    data.learnedPatterns.add(pattern);
+                    var pattern = holderGetter.get(ResourceKey.create(JewelryDataRegistries.PATTERN_REGISTRY_KEY, ResourceLocation.parse(string)));
+                    pattern.ifPresent(data.learnedPatterns::add);
                 } catch (Exception e) {
                     continue;
                 }
@@ -124,7 +125,7 @@ public class PlayerData {
             CompoundTag tag = new CompoundTag();
 
             var patterns = new ListTag();
-            attachment.learnedPatterns.forEach(patternDefinition -> patterns.add(StringTag.valueOf(patternDefinition.id().toString())));
+            attachment.learnedPatterns.forEach(patternDefinition -> patterns.add(StringTag.valueOf(patternDefinition.getKey().location().toString())));
             tag.put(LEARNED_PATTERNS, patterns);
 
             var cooldowns = new ListTag();
@@ -140,19 +141,24 @@ public class PlayerData {
             return tag;
         }
 
-        public static void networkWrite(FriendlyByteBuf buf, PlayerData playerData) {
+        public static void networkWrite(RegistryFriendlyByteBuf buf, PlayerData playerData) {
             buf.writeInt(playerData.learnedPatterns.size());
-            for (PatternDefinition pattern : playerData.learnedPatterns) {
-                buf.writeResourceLocation(pattern.id());
+            for (Holder<PatternDefinition> pattern : playerData.learnedPatterns) {
+                try {
+                    buf.writeResourceLocation(Objects.requireNonNull(pattern.getKey()).location());
+                } catch (Exception e) {
+                    buf.writeResourceLocation(IronsJewelry.id("empty"));
+                }
             }
         }
 
-        public static PlayerData networkRead(FriendlyByteBuf buf) {
+        public static PlayerData networkRead(RegistryFriendlyByteBuf buf) {
             var playerData = new PlayerData();
             int i = buf.readInt();
+            var registry = JewelryDataRegistries.patternRegistry(buf.registryAccess());
             for (int j = 0; j < i; j++) {
                 try {
-                    playerData.learnedPatterns.add(PatternDataHandler.get(buf.readResourceLocation()));
+                    playerData.learnedPatterns.add(registry.wrapAsHolder(Objects.requireNonNull(registry.get(buf.readResourceLocation()))));
                 } catch (Exception e) {
                     continue;
                 }

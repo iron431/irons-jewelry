@@ -6,15 +6,16 @@ import io.redspace.ironsjewelry.core.IBonusParameterType;
 import io.redspace.ironsjewelry.core.Utils;
 import io.redspace.ironsjewelry.core.data.*;
 import io.redspace.ironsjewelry.core.data_registry.MaterialDataHandler;
-import io.redspace.ironsjewelry.core.data_registry.PatternDataHandler;
 import io.redspace.ironsjewelry.network.packets.SetJewelcraftingStationPattern;
 import io.redspace.ironsjewelry.network.packets.SyncJewelcraftingSlotStates;
+import io.redspace.ironsjewelry.registry.JewelryDataRegistries;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
@@ -36,9 +37,9 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
     }
 
     static class PatternButton extends Button {
-        PatternDefinition patternDefinition;
+        Holder<PatternDefinition> patternDefinition;
 
-        public PatternButton(PatternDefinition patternDefinition, int pX, int pY, int pWidth, int pHeight, OnPress pOnPress) {
+        public PatternButton(Holder<PatternDefinition> patternDefinition, int pX, int pY, int pWidth, int pHeight, OnPress pOnPress) {
             super(pX, pY, pWidth, pHeight, Component.empty(), pOnPress, DEFAULT_NARRATION);
             this.patternDefinition = patternDefinition;
         }
@@ -46,7 +47,7 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
         public void renderWidget(GuiGraphics guiGraphics, boolean isHovering, boolean selected) {
             var sprite = isHovering ? RECIPE_SPRITE_HOVERING : selected ? RECIPE_SPRITE_SELECTED : RECIPE_SPRITE;
             guiGraphics.blitSprite(sprite, this.getX(), this.getY(), this.width, this.height);
-            var parts = patternDefinition.partTemplate();
+            var parts = patternDefinition.value().partTemplate();
             for (PartIngredient part : parts) {
                 guiGraphics.blit(this.getX() + 1, this.getY() + 1, 0, 16, 16, getMenuSprite(part.part(), selected || isHovering));
             }
@@ -69,7 +70,7 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
 
     int scrollOff;
     int selectedPattern;
-    List<PatternDefinition> availablePatterns;
+    List<Holder<PatternDefinition>> availablePatterns;
     List<PatternButton> patternButtons;
 
     public JewelcraftingStationScreen(JewelcraftingStationMenu pMenu, Inventory pPlayerInventory, Component pTitle) {
@@ -82,8 +83,9 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
         this.scrollOff = 0;
 
         if (Minecraft.getInstance().player != null) {
-            this.availablePatterns = Stream.concat(PatternDataHandler.patterns().stream().filter(PatternDefinition::unlockedByDefault),
-                    PlayerData.get(Minecraft.getInstance().player).getLearnedPatterns().stream()).distinct().sorted(Comparator.comparingDouble(PatternDefinition::qualityMultiplier)).toList();
+            var registry = JewelryDataRegistries.patternRegistry(pPlayerInventory.player.registryAccess());
+            this.availablePatterns = Stream.concat(registry.stream().filter(PatternDefinition::unlockedByDefault).map(registry::wrapAsHolder),
+                    PlayerData.get(pPlayerInventory.player).getLearnedPatterns().stream()).distinct().sorted(Comparator.comparingDouble(patternholder -> patternholder.value().qualityMultiplier())).toList();
         }
     }
 
@@ -118,7 +120,7 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
             if (this.hoveredSlot == null) {
                 for (PatternButton button : this.patternButtons) {
                     if (button.active && isHovering(mouseX, mouseY, button.getX(), button.getY(), button.getWidth(), button.getHeight())) {
-                        pGuiGraphics.renderTooltip(this.font, Utils.rasterizeComponentList(button.patternDefinition.getFullPatternTooltip()), mouseX, mouseY);
+                        pGuiGraphics.renderTooltip(this.font, Utils.rasterizeComponentList(button.patternDefinition.value().getFullPatternTooltip()), mouseX, mouseY);
                         break;
                     }
                 }
@@ -126,7 +128,7 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
                 if (!hoveredSlot.hasItem() && menu.isWorkspaceSlot(this.hoveredSlot)) {
                     int i = this.hoveredSlot.getSlotIndex();
                     if (selectedPattern >= 0) {
-                        var pattern = availablePatterns.get(selectedPattern);
+                        var pattern = availablePatterns.get(selectedPattern).value();
                         if (i < pattern.partTemplate().size()) {
                             var part = pattern.partTemplate().get(i);
                             List<Component> tooltip = new ArrayList<>();
@@ -154,7 +156,7 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
             guiGraphics.blitSprite(INPUT_SLOT, leftPos + slot.x - 3, topPos + slot.y - 3, 22, 22);
             if (!slot.hasItem()) {
                 if (selectedPattern >= 0) {
-                    var pattern = availablePatterns.get(selectedPattern);
+                    var pattern = availablePatterns.get(selectedPattern).value();
                     var parts = pattern.partTemplate();
                     if (i < parts.size()) {
                         guiGraphics.blit(leftPos + slot.x, topPos + slot.y, 0, 16, 16, getMenuSprite(parts.get(i).part(), false));
@@ -199,7 +201,7 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
          Bonus:
          +2 Max Health
          */
-        var pattern = availablePatterns.get(selectedPattern);
+        var pattern = availablePatterns.get(selectedPattern).value();
         int lorePageWidth = 80;
         int lineHeight = font.lineHeight;
         AtomicInteger lineY = new AtomicInteger(3);

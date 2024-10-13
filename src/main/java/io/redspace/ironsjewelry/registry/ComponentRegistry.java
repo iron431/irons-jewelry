@@ -1,12 +1,12 @@
 package io.redspace.ironsjewelry.registry;
 
 import io.redspace.ironsjewelry.IronsJewelry;
-import io.redspace.ironsjewelry.core.Utils;
 import io.redspace.ironsjewelry.core.data.JewelryData;
 import io.redspace.ironsjewelry.core.data.PatternDefinition;
-import io.redspace.ironsjewelry.core.data_registry.PatternDataHandler;
+import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -25,5 +25,5 @@ public class ComponentRegistry {
     }
 
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<JewelryData>> JEWELRY_COMPONENT = register("jewelry_data", (builder) -> builder.persistent(JewelryData.CODEC).networkSynchronized(JewelryData.STREAM_CODEC).cacheEncoding());
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<PatternDefinition>> STORED_PATTERN = register("stored_pattern", (builder) -> builder.persistent(Utils.idCodec(PatternDataHandler::getSafe, PatternDefinition::id)).networkSynchronized(Utils.idStreamCodec(PatternDataHandler::get, PatternDefinition::id)).cacheEncoding());
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Holder<PatternDefinition>>> STORED_PATTERN = register("stored_pattern", (builder) -> builder.persistent(JewelryDataRegistries.PATTERN_REGISTRY_CODEC).networkSynchronized(ByteBufCodecs.holderRegistry(JewelryDataRegistries.PATTERN_REGISTRY_KEY)).cacheEncoding());
 }

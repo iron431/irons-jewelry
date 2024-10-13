@@ -26,7 +26,7 @@ public record BonusSource(Bonus bonus, Either<Map<IBonusParameterType<?>, Object
     public BonusInstance getBonusFor(JewelryData data) {
         return new BonusInstance(
                 bonus,
-                mapEither(qualityOrSource, Function.identity(), (right) -> qualityFromPart(right, data)) * data.pattern().qualityMultiplier()  * qualityMultiplier,
+                mapEither(qualityOrSource, Function.identity(), (right) -> qualityFromPart(right, data)) * data.pattern().value().qualityMultiplier()  * qualityMultiplier,
                 mapEither(parameterOrSource, Function.identity(), (right) -> parameterFromPart(right, data))
         );
     }

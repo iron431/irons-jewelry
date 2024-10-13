@@ -1,6 +1,7 @@
 {
   "unlockedByDefault": true,
   "type": "irons_jewelry:necklace",
+  "descriptionId": "pattern.irons_jewelry.amulet_of_protection",
   "parts": [
     {
       "id": "irons_jewelry:chain_amulet_of_protection",

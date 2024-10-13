@@ -1,6 +1,7 @@
 {
   "unlockedByDefault": true,
   "type": "irons_jewelry:necklace",
+  "descriptionId": "pattern.irons_jewelry.simple_chain",
   "parts": [
     {
       "id": "irons_jewelry:chain_simple",

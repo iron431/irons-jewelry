@@ -4,7 +4,6 @@ import com.mojang.logging.LogUtils;
 import io.redspace.ironsjewelry.client.DynamicModel;
 import io.redspace.ironsjewelry.core.data_registry.MaterialDataHandler;
 import io.redspace.ironsjewelry.core.data_registry.PartDataHandler;
-import io.redspace.ironsjewelry.core.data_registry.PatternDataHandler;
 import io.redspace.ironsjewelry.registry.*;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
@@ -28,6 +27,7 @@ public class IronsJewelry {
         modEventBus.addListener(JewelryTypeRegistry::registerRegistry);
         modEventBus.addListener(ActionRegistry::registerRegistry);
         modEventBus.addListener(CreativeTabRegistry::addCreative);
+        modEventBus.addListener(JewelryDataRegistries::registerDatapackRegistries);
         NeoForge.EVENT_BUS.addListener(this::registerReloadListeners);
 
         ComponentRegistry.register(modEventBus);
@@ -49,7 +49,7 @@ public class IronsJewelry {
         event.addListener(new MaterialDataHandler());
         event.addListener(new PartDataHandler());
         //Pattern Data References Part/Material data and must be run last
-        event.addListener(new PatternDataHandler());
+        //event.addListener(new PatternDataHandler());
     }
 
     public void registerModelLoader(ModelEvent.RegisterGeometryLoaders event) {

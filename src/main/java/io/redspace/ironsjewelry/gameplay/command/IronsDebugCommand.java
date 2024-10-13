@@ -7,26 +7,30 @@ import com.mojang.brigadier.suggestion.SuggestionProvider;
 import io.redspace.ironsjewelry.IronsJewelry;
 import io.redspace.ironsjewelry.client.ClientData;
 import io.redspace.ironsjewelry.core.data.PatternDefinition;
-import io.redspace.ironsjewelry.core.data_registry.PatternDataHandler;
 import io.redspace.ironsjewelry.registry.DataAttachmentRegistry;
+import io.redspace.ironsjewelry.registry.JewelryDataRegistries;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class IronsDebugCommand {
     private static final SimpleCommandExceptionType ERROR_FAILED = new SimpleCommandExceptionType(Component.translatable("commands.irons_spellbooks.create_imbued_sword.failed"));
     private static final SuggestionProvider<CommandSourceStack> PATTERN_SUGGESTIONS = (context, builder) -> {
-        var resources = PatternDataHandler.patterns().stream()
-                .map(PatternDefinition::id)
+        var registry = JewelryDataRegistries.patternRegistry(context.getSource().registryAccess());
+        var resources = registry.stream()
+                .map(registry::getKey)
                 .collect(Collectors.toSet());
         return SharedSuggestionProvider.suggestResource(resources, builder);
     };
 
     public static void register(CommandDispatcher<CommandSourceStack> pDispatcher) {
+
         pDispatcher.register(Commands.literal("ironsJewelry").requires((p_138819_) -> {
             return p_138819_.hasPermission(2);
         }).then(Commands.literal("learnPattern").then(Commands.argument("pattern", PatternCommandArgument.patternArgument()).suggests(PATTERN_SUGGESTIONS).executes((commandContext) -> {
@@ -44,11 +48,14 @@ public class IronsDebugCommand {
             patternId = IronsJewelry.MODID + ":" + patternId;
         }
 
-        var pattern = PatternDataHandler.get(ResourceLocation.parse(patternId));
+        var registry = JewelryDataRegistries.patternRegistry(source.registryAccess());
+        var pattern = registry.get(ResourceLocation.parse(patternId));
+        if (pattern != null) {
+            var serverPlayer = source.getPlayer();
+            if (serverPlayer != null) {
+                return serverPlayer.getData(DataAttachmentRegistry.PLAYER_DATA).learn(serverPlayer, registry.wrapAsHolder(pattern)) ? 1 : 0;
+            }
 
-        var serverPlayer = source.getPlayer();
-        if (serverPlayer != null) {
-            return serverPlayer.getData(DataAttachmentRegistry.PLAYER_DATA).learn(serverPlayer, pattern) ? 1 : 0;
         }
 
         throw ERROR_FAILED.create();
@@ -58,8 +65,9 @@ public class IronsDebugCommand {
         var serverPlayer = source.getPlayer();
         if (serverPlayer != null) {
             var data = serverPlayer.getData(DataAttachmentRegistry.PLAYER_DATA);
-            for (PatternDefinition patternDefinition : PatternDataHandler.patterns()) {
-                data.learn(serverPlayer, patternDefinition);
+            var registry = JewelryDataRegistries.patternRegistry(source.registryAccess());
+            for (Map.Entry<ResourceKey<PatternDefinition>, PatternDefinition> entry : registry.entrySet()) {
+                data.learn(serverPlayer, registry.wrapAsHolder(entry.getValue()));
             }
             return 1;
         }

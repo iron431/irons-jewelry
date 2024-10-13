@@ -6,6 +6,7 @@ import io.redspace.ironsjewelry.network.packets.SyncJewelcraftingSlotStates;
 import io.redspace.ironsjewelry.registry.BlockRegistry;
 import io.redspace.ironsjewelry.registry.ComponentRegistry;
 import io.redspace.ironsjewelry.registry.MenuRegistry;
+import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
@@ -68,7 +69,7 @@ public class JewelcraftingStationMenu extends AbstractContainerMenu {
     private final ContainerLevelAccess access;
     private final Player player;
     @Nullable
-    private PatternDefinition currentPattern;
+    private Holder<PatternDefinition> currentPattern;
 
     public JewelcraftingStationMenu(int pContainerId, Inventory pPlayerInventory, ContainerLevelAccess pAccess) {
         super(MenuRegistry.JEWELCRAFTING_MENU.get(), pContainerId);
@@ -117,6 +118,7 @@ public class JewelcraftingStationMenu extends AbstractContainerMenu {
     private void setupResult() {
         ItemStack result = ItemStack.EMPTY;
         if (this.currentPattern != null) {
+            var currentPattern = this.currentPattern.value();
             var parts = new HashMap<PartDefinition, MaterialDefinition>();
             var requiredIngredients = currentPattern.partTemplate();
             for (int i = 0; i < requiredIngredients.size(); i++) {
@@ -128,9 +130,9 @@ public class JewelcraftingStationMenu extends AbstractContainerMenu {
                     workspaceSlots.get(i).currentCost = ingredient.materialCost();
                 }
             }
-            var jewelryData = new JewelryData(currentPattern, parts);
+            var jewelryData = new JewelryData(this.currentPattern, parts);
             if (jewelryData.isValid()) {
-                result = new ItemStack(this.currentPattern.jewelryType().item());
+                result = new ItemStack(currentPattern.jewelryType().item());
                 result.set(ComponentRegistry.JEWELRY_COMPONENT, jewelryData);
             }
         }
@@ -201,17 +203,17 @@ public class JewelcraftingStationMenu extends AbstractContainerMenu {
      * @param patternDefinition
      * @return returns true if this pattern is valid and can be crafted, ie the player has learned it
      */
-    private boolean validateAvailablePattern(PatternDefinition patternDefinition) {
-        return patternDefinition.unlockedByDefault() || this.player instanceof ServerPlayer serverPlayer && PlayerData.get(serverPlayer).isLearned(patternDefinition);
+    private boolean validateAvailablePattern(Holder<PatternDefinition> patternDefinition) {
+        return patternDefinition.value().unlockedByDefault() || this.player instanceof ServerPlayer serverPlayer && PlayerData.get(serverPlayer).isLearned(patternDefinition);
     }
 
-    public boolean handleSetPattern(PatternDefinition patternDefinition) {
+    public boolean handleSetPattern(Holder<PatternDefinition> patternDefinition) {
         //Reset Workspace
         this.clearContainer(player, workspaceContainer);
         this.workspaceSlots.forEach(slot -> slot.setup(-20, -20, false));
         if (validateAvailablePattern(patternDefinition)) {
             this.currentPattern = patternDefinition;
-            int ingredientCount = Math.min(10, currentPattern.partTemplate().size());
+            int ingredientCount = Math.min(10, currentPattern.value().partTemplate().size());
             int centerX = 64 + 89 / 2;
             int centerY = 10 + 66 / 2;
             if (ingredientCount == 1) {

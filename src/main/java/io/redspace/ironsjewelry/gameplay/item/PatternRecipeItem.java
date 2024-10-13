@@ -45,7 +45,7 @@ public class PatternRecipeItem extends Item {
                 return InteractionResultHolder.consume(stack);
             } else {
                 if (pPlayer instanceof ServerPlayer player) {
-                    player.connection.send(new ClientboundSetActionBarTextPacket(Component.translatable("tooltip.irons_jewelry.pattern_already_learned", Component.translatable(pattern.getDescriptionId())).withStyle(ChatFormatting.RED)));
+                    player.connection.send(new ClientboundSetActionBarTextPacket(Component.translatable("tooltip.irons_jewelry.pattern_already_learned", Component.translatable(pattern.value().getDescriptionId())).withStyle(ChatFormatting.RED)));
                 } else {
                     pPlayer.playSound(SoundEvents.BOOK_PAGE_TURN, 1f, 1f);
                 }
@@ -60,7 +60,7 @@ public class PatternRecipeItem extends Item {
         super.appendHoverText(stack, pContext, pTooltipComponents, pTooltipFlag);
         if (stack.has(ComponentRegistry.STORED_PATTERN)) {
             var pattern = stack.get(ComponentRegistry.STORED_PATTERN);
-            pTooltipComponents.add(Component.translatable("tooltip.irons_jewelry.stored_pattern", Component.translatable(pattern.getDescriptionId()).withStyle(ChatFormatting.GOLD)).withStyle(ChatFormatting.GRAY));
+            pTooltipComponents.add(Component.translatable("tooltip.irons_jewelry.stored_pattern", Component.translatable(pattern.value().getDescriptionId()).withStyle(ChatFormatting.GOLD)).withStyle(ChatFormatting.GRAY));
             var player = Minecraft.getInstance().player;
             if (player != null) {
                 var playerData = PlayerData.get(player);

@@ -1,6 +1,7 @@
 {
   "unlockedByDefault": true,
   "type": "irons_jewelry:ring",
+  "descriptionId": "pattern.irons_jewelry.simple_band",
   "parts": [
     {
       "id": "irons_jewelry:band_simple",
