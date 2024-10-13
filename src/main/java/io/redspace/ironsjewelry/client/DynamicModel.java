@@ -18,6 +18,7 @@ import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.*;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
@@ -141,7 +142,7 @@ public class DynamicModel implements IUnbakedGeometry<DynamicModel> {
 
     }
 
-    private static PartIngredient get(PartDefinition definition, List<PartIngredient> list) {
+    private static PartIngredient get(Holder<PartDefinition> definition, List<PartIngredient> list) {
         for (PartIngredient i : list) {
             if (i.part().equals(definition)) {
                 return i;
@@ -150,10 +151,10 @@ public class DynamicModel implements IUnbakedGeometry<DynamicModel> {
         return null;
     }
 
-    public static ResourceLocation atlasResourceLocaction(PartDefinition part, MaterialDefinition material) {
+    public static ResourceLocation atlasResourceLocaction(Holder<PartDefinition> part, Holder<MaterialDefinition> material) {
         try {
-            String composite = part.baseTextureLocation().toString();
-            var components = material.paletteLocation().getPath().split("/");
+            String composite = part.value().baseTextureLocation().toString();
+            var components = material.value().paletteLocation().getPath().split("/");
             composite += "_" + components[components.length - 1];
             return ResourceLocation.parse(composite);
         } catch (Exception e) {
@@ -162,9 +163,9 @@ public class DynamicModel implements IUnbakedGeometry<DynamicModel> {
         }
     }
 
-    public static ResourceLocation atlasResourceLocaction(PartDefinition part, String paletteName) {
+    public static ResourceLocation atlasResourceLocaction(Holder<PartDefinition> part, String paletteName) {
         try {
-            String composite = part.baseTextureLocation().toString();
+            String composite = part.value().baseTextureLocation().toString();
             composite += "_" + paletteName;
             return ResourceLocation.parse(composite);
         } catch (Exception e) {

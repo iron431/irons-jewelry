@@ -6,20 +6,20 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.redspace.ironsjewelry.IronsJewelry;
 import io.redspace.ironsjewelry.core.Bonus;
 import io.redspace.ironsjewelry.core.IBonusParameterType;
-import io.redspace.ironsjewelry.core.Utils;
-import io.redspace.ironsjewelry.core.data_registry.PartDataHandler;
 import io.redspace.ironsjewelry.registry.BonusRegistry;
+import io.redspace.ironsjewelry.registry.JewelryDataRegistries;
+import net.minecraft.core.Holder;
 
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.function.Function;
 
-public record BonusSource(Bonus bonus, Either<Map<IBonusParameterType<?>, Object>, PartDefinition> parameterOrSource,
-                          Either<Double, PartDefinition> qualityOrSource, double qualityMultiplier) {
+public record BonusSource(Bonus bonus, Either<Map<IBonusParameterType<?>, Object>, Holder<PartDefinition>> parameterOrSource,
+                          Either<Double, Holder<PartDefinition>> qualityOrSource, double qualityMultiplier) {
     public static final Codec<BonusSource> CODEC = RecordCodecBuilder.create(builder -> builder.group(
             BonusRegistry.BONUS_REGISTRY.byNameCodec().fieldOf("bonus").forGetter(BonusSource::bonus),
-            Codec.either(IBonusParameterType.BONUS_TO_INSTANCE_CODEC, Utils.idCodec(PartDataHandler::getSafe, PartDefinition::id)).fieldOf("parameter").forGetter(BonusSource::parameterOrSource),
-            Codec.either(Codec.DOUBLE, Utils.idCodec(PartDataHandler::getSafe, PartDefinition::id)).fieldOf("quality").forGetter(BonusSource::qualityOrSource),
+            Codec.either(IBonusParameterType.BONUS_TO_INSTANCE_CODEC, JewelryDataRegistries.PART_REGISTRY_CODEC).fieldOf("parameter").forGetter(BonusSource::parameterOrSource),
+            Codec.either(Codec.DOUBLE, JewelryDataRegistries.PART_REGISTRY_CODEC).fieldOf("quality").forGetter(BonusSource::qualityOrSource),
             Codec.DOUBLE.optionalFieldOf("qualityMultiplier", 1d).forGetter(BonusSource::qualityMultiplier)
     ).apply(builder, BonusSource::new));
 
@@ -41,18 +41,18 @@ public record BonusSource(Bonus bonus, Either<Map<IBonusParameterType<?>, Object
         }
     }
 
-    private double qualityFromPart(PartDefinition part, JewelryData data) {
-        return data.parts().containsKey(part) ? data.parts().get(part).quality() : 1d;
+    private double qualityFromPart(Holder<PartDefinition> part, JewelryData data) {
+        return data.parts().containsKey(part) ? data.parts().get(part).value().quality() : 1d;
     }
 
-    private Map<IBonusParameterType<?>, Object> parameterFromPart(PartDefinition part, JewelryData data) {
+    private Map<IBonusParameterType<?>, Object> parameterFromPart(Holder<PartDefinition> part, JewelryData data) {
         var targetParameter = bonus.getParameterType();
         if (targetParameter.isEmpty()) {
             return Map.of();
         }
         var material = data.parts().get(part);
         if (material != null) {
-            var params = material.bonusParameters();
+            var params = material.value().bonusParameters();
             var param = params.get(targetParameter);
             if (param != null) {
                 return Map.of(targetParameter, param);
@@ -61,12 +61,6 @@ public record BonusSource(Bonus bonus, Either<Map<IBonusParameterType<?>, Object
         IronsJewelry.LOGGER.warn("Part {} unable to find bonus parameter {} in jewelry: {}", part, targetParameter, data);
         return Map.of();
     }
-//    @Override
-//    public int hashCode() {
-//        return partForBonus.hashCode() * 31 + partForQuality().hashCode();
-//    }
-
-
 }
 
 

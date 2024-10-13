@@ -5,7 +5,6 @@ import io.redspace.ironsjewelry.client.DynamicModel;
 import io.redspace.ironsjewelry.core.IBonusParameterType;
 import io.redspace.ironsjewelry.core.Utils;
 import io.redspace.ironsjewelry.core.data.*;
-import io.redspace.ironsjewelry.core.data_registry.MaterialDataHandler;
 import io.redspace.ironsjewelry.network.packets.SetJewelcraftingStationPattern;
 import io.redspace.ironsjewelry.network.packets.SyncJewelcraftingSlotStates;
 import io.redspace.ironsjewelry.registry.JewelryDataRegistries;
@@ -54,7 +53,7 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
         }
     }
 
-    private static TextureAtlasSprite getMenuSprite(PartDefinition partDefinition, boolean bright) {
+    private static TextureAtlasSprite getMenuSprite(Holder<PartDefinition> partDefinition, boolean bright) {
         return Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(DynamicModel.atlasResourceLocaction(partDefinition, bright ? "menu_bright" : "menu"));
     }
 
@@ -124,7 +123,7 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
                         break;
                     }
                 }
-            } else {
+            } else if (Minecraft.getInstance().level != null) {
                 if (!hoveredSlot.hasItem() && menu.isWorkspaceSlot(this.hoveredSlot)) {
                     int i = this.hoveredSlot.getSlotIndex();
                     if (selectedPattern >= 0) {
@@ -132,11 +131,11 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
                         if (i < pattern.partTemplate().size()) {
                             var part = pattern.partTemplate().get(i);
                             List<Component> tooltip = new ArrayList<>();
-                            tooltip.add(Component.translatable(part.part().getDescriptionId()).withStyle(ChatFormatting.YELLOW, ChatFormatting.UNDERLINE));
+                            tooltip.add(Component.translatable(part.part().value().descriptionId()).withStyle(ChatFormatting.YELLOW, ChatFormatting.UNDERLINE));
                             tooltip.add(Component.literal(String.format(" (0/%s)", part.materialCost())).withStyle(ChatFormatting.RED));
                             tooltip.add(Component.translatable("tooltip.irons_jewelry.applicable_materials").withStyle(ChatFormatting.YELLOW, ChatFormatting.UNDERLINE));
-                            MaterialDataHandler.values().stream().filter(materialDefinition -> !materialDefinition.ingredient().hasNoItems() && part.part().canUseMaterial(materialDefinition.materialType()))
-                                    .forEach(material -> tooltip.add(Component.literal(" ").append(Component.translatable(material.getDescriptionId())).withStyle(ChatFormatting.GRAY)));
+                            JewelryDataRegistries.materialRegistry(Minecraft.getInstance().level.registryAccess()).stream().filter(materialDefinition -> !materialDefinition.ingredient().hasNoItems() && part.part().value().canUseMaterial(materialDefinition.materialType()))
+                                    .forEach(material -> tooltip.add(Component.literal(" ").append(Component.translatable(material.descriptionId())).withStyle(ChatFormatting.GRAY)));
                             pGuiGraphics.renderTooltip(this.font, Utils.rasterizeComponentList(tooltip), mouseX, mouseY);
                         }
                     }
@@ -186,7 +185,7 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
         if (true) {
             return;
         }
-        if (selectedPattern < 0) {
+        if (selectedPattern < 0 || Minecraft.getInstance().level == null) {
             return;
         }
         /*
@@ -207,7 +206,7 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
         AtomicInteger lineY = new AtomicInteger(3);
         int maxWidth = lorePageWidth - 15;
         int leftMargin = leftPos + imageWidth + 2;
-        var title = Component.translatable(pattern.getDescriptionId()).withStyle(ChatFormatting.UNDERLINE);
+        var title = Component.translatable(pattern.descriptionId()).withStyle(ChatFormatting.UNDERLINE);
         font.split(title, maxWidth).forEach(text -> guiGraphics.drawCenteredString(font, text, leftPos + imageWidth + lorePageWidth / 2, topPos + lineY.getAndAdd(lineHeight), 0xFFFFFF));
         lineY.addAndGet(lineHeight / 2);
         for (int i = 0; i < pattern.partTemplate().size(); i++) {
@@ -219,14 +218,14 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
                 var slot = menu.workspaceSlots.get(i);
                 if (slot.isActive()) {
                     var stack = slot.getItem();
-                    var material = MaterialDataHandler.getMaterialForIngredient(stack);
-                    if (material.isPresent() && part.part().canUseMaterial(material.get().materialType())) {
-                        materialOrEmptyKey = material.get().getDescriptionId();
+                    var material = Utils.getMaterialForIngredient(Minecraft.getInstance().level.registryAccess(), stack);
+                    if (material.isPresent() && part.part().value().canUseMaterial(material.get().value().materialType())) {
+                        materialOrEmptyKey = material.get().value().descriptionId();
                         //is for bonus?
                         var bonusForPart = pattern.bonuses().stream().filter(source -> source.parameterOrSource().right().isPresent() && source.parameterOrSource().right().get().equals(part.part())).toList();
                         for (BonusSource source : bonusForPart) {
                             IBonusParameterType type = source.bonus().getParameterType();
-                            var value = type.resolve(material.get().bonusParameters());
+                            var value = type.resolve(material.get().value().bonusParameters());
                             if (value.isPresent()) {
                                 Optional<String> string = type.getValueDescriptionId(value.get());
                                 if (string.isPresent()) {
@@ -237,7 +236,7 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
                         //is for quality?
                         var qualityForPart = pattern.bonuses().stream().filter(source -> source.qualityOrSource().right().isPresent() && source.qualityOrSource().right().get().equals(part.part())).findFirst();
                         if (qualityForPart.isPresent()) {
-                            qualityEntry = Optional.of(Component.literal(" ").append(Component.translatable("tooltip.irons_jewelry.quality_to_source", material.get().quality())));
+                            qualityEntry = Optional.of(Component.literal(" ").append(Component.translatable("tooltip.irons_jewelry.quality_to_source", material.get().value().quality())));
                         }
                     }
                 }
@@ -245,7 +244,7 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
             int current = getMaterialCount(i, part.part());
             int cost = part.materialCost();
             String counter = String.format("(%s/%s)", current, cost);
-            var partHeader = Component.translatable(part.part().getDescriptionId()).append(": ").append(Component.translatable(materialOrEmptyKey)).append(" ").append(Component.literal(counter).withStyle(current >= cost ? ChatFormatting.GREEN : ChatFormatting.RED));
+            var partHeader = Component.translatable(part.part().value().descriptionId()).append(": ").append(Component.translatable(materialOrEmptyKey)).append(" ").append(Component.literal(counter).withStyle(current >= cost ? ChatFormatting.GREEN : ChatFormatting.RED));
             //var partEntry = Component.literal("- ").append(Component.translatable(materialOrEmptyKey));
 
             guiGraphics.drawString(font, partHeader, leftMargin, topPos + lineY.getAndAdd(lineHeight), 0xFFFFFF);
@@ -255,13 +254,13 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
         }
     }
 
-    private int getMaterialCount(int index, PartDefinition forPart) {
+    private int getMaterialCount(int index, Holder<PartDefinition> forPart) {
         if (index >= 0 && index < menu.workspaceSlots.size()) {
             var slot = menu.workspaceSlots.get(index);
             if (slot.isActive()) {
                 var stack = slot.getItem();
-                var material = MaterialDataHandler.getMaterialForIngredient(stack);
-                if (material.isPresent() && forPart.canUseMaterial(material.get().materialType())) {
+                var material = Utils.getMaterialForIngredient(Minecraft.getInstance().level.registryAccess(),stack);
+                if (material.isPresent() && forPart.value().canUseMaterial(material.get().value().materialType())) {
                     return stack.getCount();
                 }
             }

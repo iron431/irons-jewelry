@@ -2,6 +2,8 @@ package io.redspace.ironsjewelry.registry;
 
 import com.mojang.serialization.Codec;
 import io.redspace.ironsjewelry.IronsJewelry;
+import io.redspace.ironsjewelry.core.data.MaterialDefinition;
+import io.redspace.ironsjewelry.core.data.PartDefinition;
 import io.redspace.ironsjewelry.core.data.PatternDefinition;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
@@ -12,7 +14,7 @@ import net.neoforged.neoforge.registries.DataPackRegistryEvent;
 
 public class JewelryDataRegistries {
 
-    private static <T> Registry<T> get(RegistryAccess registryAccess, ResourceKey<Registry<T>> key) {
+    public static <T> Registry<T> get(RegistryAccess registryAccess, ResourceKey<Registry<T>> key) {
         return registryAccess.registryOrThrow(key);
     }
 
@@ -20,13 +22,21 @@ public class JewelryDataRegistries {
         return get(registryAccess, PATTERN_REGISTRY_KEY);
     }
 
+    public static Registry<MaterialDefinition> materialRegistry(RegistryAccess registryAccess) {
+        return get(registryAccess, MATERIAL_REGISTRY_KEY);
+    }
+
+    public static Registry<PartDefinition> partRegistry(RegistryAccess registryAccess) {
+        return get(registryAccess, PART_REGISTRY_KEY);
+    }
+
     public static final ResourceKey<Registry<PatternDefinition>> PATTERN_REGISTRY_KEY = ResourceKey.createRegistryKey(IronsJewelry.id("patterns"));
-//    public static final ResourceKey<Registry<MaterialDefinition>> MATERIAL_REGISTRY_KEY = ResourceKey.createRegistryKey(IronsJewelry.id("irons_jewelry/material"));
-//    public static final ResourceKey<Registry<PartDefinition>> PART_REGISTRY_KEY = ResourceKey.createRegistryKey(IronsJewelry.id("irons_jewelry/part"));
+    public static final ResourceKey<Registry<MaterialDefinition>> MATERIAL_REGISTRY_KEY = ResourceKey.createRegistryKey(IronsJewelry.id("materials"));
+    public static final ResourceKey<Registry<PartDefinition>> PART_REGISTRY_KEY = ResourceKey.createRegistryKey(IronsJewelry.id("parts"));
 
     public static final Codec<Holder<PatternDefinition>> PATTERN_REGISTRY_CODEC = RegistryFixedCodec.create(PATTERN_REGISTRY_KEY)/*.xmap(Holder::value, Holder::direct)*/;
-//    public static final Codec<Holder<MaterialDefinition>> MATERIAL_REGISTRY_CODEC = RegistryFixedCodec.create(MATERIAL_REGISTRY_KEY);
-//    public static final Codec<Holder<PartDefinition>> PART_REGISTRY_CODEC = RegistryFixedCodec.create(PART_REGISTRY_KEY);
+    public static final Codec<Holder<MaterialDefinition>> MATERIAL_REGISTRY_CODEC = RegistryFixedCodec.create(MATERIAL_REGISTRY_KEY);
+    public static final Codec<Holder<PartDefinition>> PART_REGISTRY_CODEC = RegistryFixedCodec.create(PART_REGISTRY_KEY);
 
     public static void registerDatapackRegistries(DataPackRegistryEvent.NewRegistry event) {
         event.dataPackRegistry(
@@ -34,15 +44,15 @@ public class JewelryDataRegistries {
                 PatternDefinition.CODEC,
                 PatternDefinition.CODEC
         );
-//        event.dataPackRegistry(
-//                MATERIAL_REGISTRY_KEY,
-//                MaterialDefinition.CODEC,
-//                MaterialDefinition.CODEC
-//        );
-//        event.dataPackRegistry(
-//                PART_REGISTRY_KEY,
-//                PartDefinition.CODEC,
-//                PartDefinition.CODEC
-//        );
+        event.dataPackRegistry(
+                MATERIAL_REGISTRY_KEY,
+                MaterialDefinition.CODEC,
+                MaterialDefinition.CODEC
+        );
+        event.dataPackRegistry(
+                PART_REGISTRY_KEY,
+                PartDefinition.CODEC,
+                PartDefinition.CODEC
+        );
     }
 }

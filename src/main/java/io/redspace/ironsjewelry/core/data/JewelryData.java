@@ -3,23 +3,19 @@ package io.redspace.ironsjewelry.core.data;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.redspace.ironsjewelry.core.Bonus;
-import io.redspace.ironsjewelry.core.Utils;
-import io.redspace.ironsjewelry.core.data_registry.MaterialDataHandler;
-import io.redspace.ironsjewelry.core.data_registry.PartDataHandler;
 import io.redspace.ironsjewelry.registry.ComponentRegistry;
 import io.redspace.ironsjewelry.registry.JewelryDataRegistries;
 import net.minecraft.core.Holder;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -36,32 +32,38 @@ public class JewelryData {
     public static final Codec<JewelryData> CODEC = RecordCodecBuilder.create(builder -> builder.group(
             JewelryDataRegistries.PATTERN_REGISTRY_CODEC.fieldOf("pattern").forGetter(JewelryData::pattern),
             Codec.unboundedMap(
-                    Utils.idCodec(PartDataHandler::getSafe, PartDefinition::id),
-                    Utils.idCodec(MaterialDataHandler::getSafe, MaterialDefinition::id)).fieldOf("parts").forGetter(JewelryData::parts)
+                    JewelryDataRegistries.PART_REGISTRY_CODEC,
+                    JewelryDataRegistries.MATERIAL_REGISTRY_CODEC).fieldOf("parts").forGetter(JewelryData::parts)
     ).apply(builder, JewelryData::new));
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, JewelryData> STREAM_CODEC = StreamCodec.of((buf, data) -> {
-        buf.writeResourceLocation(data.pattern.getKey().location());
-        var parts = data.parts.entrySet();
-        buf.writeInt(parts.size());
-        for (Map.Entry<PartDefinition, MaterialDefinition> entry : parts) {
-            buf.writeResourceLocation(entry.getKey().id());
-            buf.writeResourceLocation(entry.getValue().id());
-        }
-    }, (buf) -> {
-        Map<PartDefinition, MaterialDefinition> parts = new HashMap<>();
-        ResourceLocation patternid = buf.readResourceLocation();
-        int i = buf.readInt();
-        for (int j = 0; j < i; j++) {
-            var opt1 = PartDataHandler.getSafe(buf.readResourceLocation());
-            var opt2 = MaterialDataHandler.getSafe(buf.readResourceLocation());
-            if (opt1.isPresent() && opt2.isPresent()) {
-                parts.put(opt1.get(), opt2.get());
-            }
-        }
-        return new JewelryData(Objects.requireNonNull(buf.registryAccess().registryOrThrow(JewelryDataRegistries.PATTERN_REGISTRY_KEY).getHolder(patternid).orElseThrow(() -> new IllegalStateException("Missing pattern: " + patternid))), parts);
-    });
-
+    //    public static final StreamCodec<RegistryFriendlyByteBuf, JewelryData> STREAM_CODEC = StreamCodec.of((buf, data) -> {
+//        buf.writeResourceLocation(data.pattern.getKey().location());
+//        var parts = data.parts.entrySet();
+//        buf.writeInt(parts.size());
+//        for (Map.Entry<Holder<PartDefinition>, MaterialDefinition> entry : parts) {
+//            buf.writeResourceLocation(entry.getKey().id());
+//            buf.writeResourceLocation(entry.getValue().id());
+//        }
+//    }, (buf) -> {
+//        Map<Holder<PartDefinition>, MaterialDefinition> parts = new HashMap<>();
+//        ResourceLocation patternid = buf.readResourceLocation();
+//        int i = buf.readInt();
+//        for (int j = 0; j < i; j++) {
+//            var opt1 = PartDataHandler.getSafe(buf.readResourceLocation());
+//            var opt2 = MaterialDataHandler.getSafe(buf.readResourceLocation());
+//            if (opt1.isPresent() && opt2.isPresent()) {
+//                parts.put(opt1.get(), opt2.get());
+//            }
+//        }
+//        return new JewelryData(Objects.requireNonNull(buf.registryAccess().registryOrThrow(JewelryDataRegistries.PATTERN_REGISTRY_KEY).getHolder(patternid).orElseThrow(() -> new IllegalStateException("Missing pattern: " + patternid))), parts);
+//    });
+    public static final StreamCodec<RegistryFriendlyByteBuf, JewelryData> STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.holderRegistry(JewelryDataRegistries.PATTERN_REGISTRY_KEY),
+            jewelryData -> jewelryData.pattern,
+            ByteBufCodecs.map(HashMap::new, ByteBufCodecs.holderRegistry(JewelryDataRegistries.PART_REGISTRY_KEY), ByteBufCodecs.holderRegistry(JewelryDataRegistries.MATERIAL_REGISTRY_KEY)),
+            jewelryData -> jewelryData.parts,
+            JewelryData::new
+    );
     //TODO: mc have cool stream codec utilities
 //    public static final StreamCodec<RegistryFriendlyByteBuf, JewelryData> STREAM_CODEC = StreamCodec.composite(
 //            ByteBufCodecs.map(HashMap::new, PartDefinition.STREAM_CODEC, ByteBufCodecs.VAR_INT),
@@ -72,17 +74,21 @@ public class JewelryData {
 //    );
 
     private final Holder<PatternDefinition> pattern;
-    private final Map<PartDefinition, MaterialDefinition> parts;
+    private final Map<Holder<PartDefinition>, Holder<MaterialDefinition>> parts;
     private final boolean valid;
     private final List<BonusInstance> bonuses;
     private final int hashCode;
 
-    public JewelryData(Holder<PatternDefinition> pattern, Map<PartDefinition, MaterialDefinition> parts) {
+    public JewelryData(Holder<PatternDefinition> pattern, Map<Holder<PartDefinition>, Holder<MaterialDefinition>> parts) {
         this.pattern = pattern;
         this.parts = parts;
         this.valid = validate();
         this.bonuses = cacheBonuses();
-        this.hashCode = pattern.getKey().location().hashCode() * 31 + parts.entrySet().stream().collect(Collectors.toMap(entry -> entry.getKey().id(), entry -> entry.getValue().id())).hashCode();
+        this.hashCode =
+                pattern.getKey().location().hashCode() * 31 +
+                        parts.entrySet().stream().collect(
+                                Collectors.toMap(entry -> entry.getKey().getKey().location(), entry -> entry.getValue().getKey().location())
+                        ).hashCode();
     }
 
     private JewelryData() {
@@ -135,7 +141,7 @@ public class JewelryData {
         return true;
     }
 
-    public Map<PartDefinition, MaterialDefinition> parts() {
+    public Map<Holder<PartDefinition>, Holder<MaterialDefinition>> parts() {
         return this.parts;
     }
 
@@ -159,9 +165,9 @@ public class JewelryData {
         Component[] ids = new Component[parts.size()];
         for (int i = 0; i < parts.size(); i++) {
             //Fill arguments in reverse (pinnacle piece, ie gem, will be first translation argument)
-            ids[parts.size() - 1 - i] = Component.translatable(this.parts.get(parts.get(i).part()).getDescriptionId());
+            ids[parts.size() - 1 - i] = Component.translatable(this.parts.get(parts.get(i).part()).value().descriptionId());
         }
-        return Component.translatable(this.pattern.value().getDescriptionId() + ".item", ids);
+        return Component.translatable(this.pattern.value().descriptionId() + ".item", ids);
     }
 
     public List<BonusInstance> getBonuses() {

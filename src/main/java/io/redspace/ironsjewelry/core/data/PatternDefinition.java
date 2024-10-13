@@ -45,22 +45,18 @@ public record PatternDefinition(String descriptionId, JewelryType jewelryType, L
         this.qualityMultiplier = qualityMultiplier;
     }
 
-    public String getDescriptionId() {
-        return this.descriptionId;
-    }
-
     public List<Component> getFullPatternTooltip() {
         var titleStyle = Style.EMPTY.applyFormats(ChatFormatting.GOLD, ChatFormatting.UNDERLINE);
         var headerStyle = Style.EMPTY.applyFormats(ChatFormatting.YELLOW, ChatFormatting.UNDERLINE);
         var infoStyle = ChatFormatting.GRAY;
-        Component title = Component.translatable(this.getDescriptionId()).withStyle(titleStyle);
+        Component title = Component.translatable(this.descriptionId()).withStyle(titleStyle);
         Component partHeader = Component.translatable("tooltip.irons_jewelry.parts_header").withStyle(headerStyle);
-        var parts = this.partTemplate.stream().map(part -> Component.translatable(part.part().getDescriptionId()).withStyle(infoStyle)).toList();
+        var parts = this.partTemplate.stream().map(part -> Component.translatable(part.part().value().descriptionId()).withStyle(infoStyle)).toList();
         Component bonusHeader = Component.translatable(this.bonuses.size() > 1 ? "tooltip.irons_jewelry.bonus_header_plural" : "tooltip.irons_jewelry.bonus_header").withStyle(headerStyle);
         var bonuses = this.bonuses.stream().map(source -> {
             MutableComponent component = null;
             if (source.parameterOrSource().right().isPresent()) {
-                component = Component.translatable("tooltip.irons_jewelry.bonus_with_source", Component.translatable(source.bonus().getDescriptionId()), Component.translatable(source.parameterOrSource().right().get().getDescriptionId()));
+                component = Component.translatable("tooltip.irons_jewelry.bonus_with_source", Component.translatable(source.bonus().getDescriptionId()), Component.translatable(source.parameterOrSource().right().get().value().descriptionId()));
             } else if (source.parameterOrSource().left().isPresent()) {
                 var entries = source.parameterOrSource().left().get();
                 IBonusParameterType type = source.bonus().getParameterType();

@@ -1,7 +1,7 @@
 package io.redspace.ironsjewelry.gameplay.block.jewelcrafting_station;
 
+import io.redspace.ironsjewelry.core.Utils;
 import io.redspace.ironsjewelry.core.data.*;
-import io.redspace.ironsjewelry.core.data_registry.MaterialDataHandler;
 import io.redspace.ironsjewelry.network.packets.SyncJewelcraftingSlotStates;
 import io.redspace.ironsjewelry.registry.BlockRegistry;
 import io.redspace.ironsjewelry.registry.ComponentRegistry;
@@ -119,13 +119,13 @@ public class JewelcraftingStationMenu extends AbstractContainerMenu {
         ItemStack result = ItemStack.EMPTY;
         if (this.currentPattern != null) {
             var currentPattern = this.currentPattern.value();
-            var parts = new HashMap<PartDefinition, MaterialDefinition>();
+            var parts = new HashMap<Holder<PartDefinition>, Holder<MaterialDefinition>>();
             var requiredIngredients = currentPattern.partTemplate();
             for (int i = 0; i < requiredIngredients.size(); i++) {
                 var ingredient = requiredIngredients.get(i);
                 var input = workspaceSlots.get(i).getItem();
-                var material = MaterialDataHandler.getMaterialForIngredient(input);
-                if (material.isPresent() && input.getCount() >= ingredient.materialCost() && ingredient.part().canUseMaterial(material.get().materialType())) {
+                var material = Utils.getMaterialForIngredient(this.player.registryAccess(), input);
+                if (material.isPresent() && input.getCount() >= ingredient.materialCost() && ingredient.part().value().canUseMaterial(material.get().value().materialType())) {
                     parts.put(ingredient.part(), material.get());
                     workspaceSlots.get(i).currentCost = ingredient.materialCost();
                 }

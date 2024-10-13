@@ -24,4 +24,3 @@
   ],
   "qualityMultiplier": 1.5
 }
-///give @p irons_jewelry:ring[irons_jewelry:jewelry_data={pattern:"irons_jewelry:example_pattern_definition",parts:{"irons_jewelry:band_gem":"irons_jewelry:silver","irons_jewelry:gem_pointy":"irons_jewelry:diamond"}}]

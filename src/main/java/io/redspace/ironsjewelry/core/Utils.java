@@ -5,7 +5,11 @@ import com.mojang.serialization.DataResult;
 import io.netty.buffer.ByteBuf;
 import io.redspace.ironsjewelry.core.data.BonusInstance;
 import io.redspace.ironsjewelry.core.data.JewelryData;
+import io.redspace.ironsjewelry.core.data.MaterialDefinition;
 import io.redspace.ironsjewelry.registry.ComponentRegistry;
+import io.redspace.ironsjewelry.registry.JewelryDataRegistries;
+import net.minecraft.core.Holder;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
@@ -33,6 +37,11 @@ public class Utils {
 
     public static <T> StreamCodec<ByteBuf, T> idStreamCodec(Function<ResourceLocation, T> idToObj, Function<T, ResourceLocation> objToId) {
         return ResourceLocation.STREAM_CODEC.map(idToObj, objToId);
+    }
+
+    public static Optional<Holder<MaterialDefinition>> getMaterialForIngredient(RegistryAccess access, ItemStack ingredient) {
+        var r = JewelryDataRegistries.materialRegistry(access);
+        return r.stream().filter(material -> material.ingredient().test(ingredient)).map(r::wrapAsHolder).findFirst();
     }
 
     public static List<BonusInstance> getEquippedBonuses(Player player) {

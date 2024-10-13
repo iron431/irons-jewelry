@@ -2,8 +2,6 @@ package io.redspace.ironsjewelry;
 
 import com.mojang.logging.LogUtils;
 import io.redspace.ironsjewelry.client.DynamicModel;
-import io.redspace.ironsjewelry.core.data_registry.MaterialDataHandler;
-import io.redspace.ironsjewelry.core.data_registry.PartDataHandler;
 import io.redspace.ironsjewelry.registry.*;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
@@ -46,8 +44,8 @@ public class IronsJewelry {
     }
 
     public void registerReloadListeners(AddReloadListenerEvent event) {
-        event.addListener(new MaterialDataHandler());
-        event.addListener(new PartDataHandler());
+//        event.addListener(new MaterialDataHandler());
+//        event.addListener(new PartDataHandler());
         //Pattern Data References Part/Material data and must be run last
         //event.addListener(new PatternDataHandler());
     }
