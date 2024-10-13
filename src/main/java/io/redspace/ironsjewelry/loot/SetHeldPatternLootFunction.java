@@ -26,17 +26,6 @@ public record SetHeldPatternLootFunction(
 
     @Override
     public ItemStack apply(ItemStack stack, LootContext lootContext) {
-        //if (this.patternSource.left().isPresent()) {
-        //    List<Holder<PatternDefinition>> patterns = this.patternSource.left().get();
-        //    if (!patterns.isEmpty()) {
-        //        var pattern = patterns.get(lootContext.getRandom().nextInt(patterns.size()));
-        //        stack.set(ComponentRegistry.STORED_PATTERN, pattern);
-        //    }
-        //} else if (this.patternSource.right().isPresent()) {
-        //    var tagKey = this.patternSource.right().get();
-        //    var registry = IronsJewelryRegistries.patternRegistry(lootContext.getLevel().registryAccess());
-        //    registry.getRandomElementOf(tagKey, lootContext.getRandom()).ifPresent(pattern -> stack.set(ComponentRegistry.STORED_PATTERN, pattern));
-        //}
         this.patternSource.getRandomElement(lootContext.getRandom()).ifPresent(pattern -> stack.set(ComponentRegistry.STORED_PATTERN, pattern));
         return stack;
     }

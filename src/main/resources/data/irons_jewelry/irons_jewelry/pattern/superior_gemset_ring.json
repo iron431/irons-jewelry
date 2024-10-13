@@ -1,7 +1,7 @@
 {
   "unlockedByDefault": true,
   "type": "irons_jewelry:ring",
-  "descriptionId": "pattern.irons_jewelry.superior_gemset_rng",
+  "descriptionId": "pattern.irons_jewelry.superior_gemset_ring",
   "parts": [
     {
       "id": "irons_jewelry:band_gem_superior",
