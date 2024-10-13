@@ -1,0 +1,24 @@
+{
+  "ingredient": {
+    "item": "minecraft:redstone"
+  },
+  "materialType": [
+    "gem"
+  ],
+  "paletteLocation": "irons_jewelry:item/palettes/ruby",
+  "quality": 2,
+  "bonusParameters": {
+    "irons_jewelry:attribute": {
+      "attribute": "minecraft:generic.max_health",
+      "amount": 2,
+      "operation": "add_value"
+    },
+    "irons_jewelry:defensive_action": {
+      "targetSelf": false,
+      "action": {
+        "type": "irons_jewelry:ignite",
+        "tickDuration": 40.0
+      }
+    }
+  }
+}

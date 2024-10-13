@@ -2,6 +2,7 @@
   "item.irons_jewelry.ring": "Ring",
   "item.irons_jewelry.necklace": "Necklace",
   "item.irons_jewelry.invalid_jewelry": "Invalid Jewelry",
+  "item.irons_jewelry.recipe": "Jewelcrafting Treatise",
 
   "block.irons_jewelry.jewelcrafting_station": "Jewelcrafting Station",
 
@@ -41,6 +42,12 @@
   "material.irons_jewelry.copper": "Copper",
   "material.irons_jewelry.netherite": "Netherite",
   "material.irons_jewelry.emerald": "Emerald",
+  "material.irons_jewelry.ruby": "Ruby",
+  "material.irons_jewelry.sapphire": "Sapphire",
+  "material.irons_jewelry.onyx": "Onyx",
+  "material.irons_jewelry.topaz": "Topaz",
+  "material.irons_jewelry.moonstone": "Moonstone",
+  "material.irons_jewelry.peridot": "Peridot",
 
   "part.irons_jewelry.band_simple": "Band",
   "part.irons_jewelry.band_gem": "Band",
@@ -97,5 +104,6 @@
   "tooltip.irons_jewelry.stored_pattern": "Pattern: %s",
   "tooltip.irons_jewelry.use_to_learn": "[%s] to Learn",
   "tooltip.irons_jewelry.already_learned": "Already Learned",
+  "tooltip.irons_jewelry.pattern_already_learned": "%s is Already Learned",
   "tooltip.irons_jewelry.cooldown": "Cooldown: %s"
 }
