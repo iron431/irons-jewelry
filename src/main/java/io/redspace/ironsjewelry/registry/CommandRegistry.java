@@ -1,7 +1,7 @@
 package io.redspace.ironsjewelry.registry;
 
 
-import io.redspace.ironsjewelry.gameplay.command.IronsDebugCommand;
+import io.redspace.ironsjewelry.command.IronsDebugCommand;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;

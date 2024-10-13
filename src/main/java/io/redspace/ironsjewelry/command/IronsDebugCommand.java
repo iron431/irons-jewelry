@@ -1,4 +1,4 @@
-package io.redspace.ironsjewelry.gameplay.command;
+package io.redspace.ironsjewelry.command;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -8,7 +8,7 @@ import io.redspace.ironsjewelry.IronsJewelry;
 import io.redspace.ironsjewelry.client.ClientData;
 import io.redspace.ironsjewelry.core.data.PatternDefinition;
 import io.redspace.ironsjewelry.registry.DataAttachmentRegistry;
-import io.redspace.ironsjewelry.registry.JewelryDataRegistries;
+import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 public class IronsDebugCommand {
     private static final SimpleCommandExceptionType ERROR_FAILED = new SimpleCommandExceptionType(Component.translatable("commands.irons_spellbooks.create_imbued_sword.failed"));
     private static final SuggestionProvider<CommandSourceStack> PATTERN_SUGGESTIONS = (context, builder) -> {
-        var registry = JewelryDataRegistries.patternRegistry(context.getSource().registryAccess());
+        var registry = IronsJewelryRegistries.patternRegistry(context.getSource().registryAccess());
         var resources = registry.stream()
                 .map(registry::getKey)
                 .collect(Collectors.toSet());
@@ -48,7 +48,7 @@ public class IronsDebugCommand {
             patternId = IronsJewelry.MODID + ":" + patternId;
         }
 
-        var registry = JewelryDataRegistries.patternRegistry(source.registryAccess());
+        var registry = IronsJewelryRegistries.patternRegistry(source.registryAccess());
         var pattern = registry.get(ResourceLocation.parse(patternId));
         if (pattern != null) {
             var serverPlayer = source.getPlayer();
@@ -65,7 +65,7 @@ public class IronsDebugCommand {
         var serverPlayer = source.getPlayer();
         if (serverPlayer != null) {
             var data = serverPlayer.getData(DataAttachmentRegistry.PLAYER_DATA);
-            var registry = JewelryDataRegistries.patternRegistry(source.registryAccess());
+            var registry = IronsJewelryRegistries.patternRegistry(source.registryAccess());
             for (Map.Entry<ResourceKey<PatternDefinition>, PatternDefinition> entry : registry.entrySet()) {
                 data.learn(serverPlayer, registry.wrapAsHolder(entry.getValue()));
             }

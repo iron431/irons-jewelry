@@ -3,9 +3,8 @@ package io.redspace.ironsjewelry.core.data;
 import io.redspace.ironsjewelry.IronsJewelry;
 import io.redspace.ironsjewelry.core.Bonus;
 import io.redspace.ironsjewelry.network.packets.SyncPlayerDataPacket;
-import io.redspace.ironsjewelry.registry.BonusRegistry;
 import io.redspace.ironsjewelry.registry.DataAttachmentRegistry;
-import io.redspace.ironsjewelry.registry.JewelryDataRegistries;
+import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.*;
@@ -44,7 +43,7 @@ public class PlayerData {
     }
 
     public boolean isOnCooldown(Bonus bonus) {
-        return isOnCooldown(BonusRegistry.BONUS_REGISTRY.getKey(bonus));
+        return isOnCooldown(IronsJewelryRegistries.BONUS_REGISTRY.getKey(bonus));
     }
 
     public boolean isOnCooldown(ResourceLocation resourceLocation) {
@@ -52,7 +51,7 @@ public class PlayerData {
     }
 
     public void addCooldown(Bonus bonus, int ticks) {
-        var k = BonusRegistry.BONUS_REGISTRY.getKey(bonus);
+        var k = IronsJewelryRegistries.BONUS_REGISTRY.getKey(bonus);
         var cooldown = cooldowns.get(k);
         if (cooldown != null && cooldown.remainingTicks >= ticks) {
             return;
@@ -95,11 +94,11 @@ public class PlayerData {
         public PlayerData read(IAttachmentHolder holder, CompoundTag compoundTag, HolderLookup.Provider provider) {
             var data = new PlayerData();
             var learnedPatterns = compoundTag.getList(LEARNED_PATTERNS, StringTag.TAG_STRING);
-            var holderGetter = provider.asGetterLookup().lookupOrThrow(JewelryDataRegistries.PATTERN_REGISTRY_KEY);
+            var holderGetter = provider.asGetterLookup().lookupOrThrow(IronsJewelryRegistries.Keys.PATTERN_REGISTRY_KEY);
             for (Tag stringTag : learnedPatterns) {
                 try {
                     var string = stringTag.getAsString();
-                    var pattern = holderGetter.get(ResourceKey.create(JewelryDataRegistries.PATTERN_REGISTRY_KEY, ResourceLocation.parse(string)));
+                    var pattern = holderGetter.get(ResourceKey.create(IronsJewelryRegistries.Keys.PATTERN_REGISTRY_KEY, ResourceLocation.parse(string)));
                     pattern.ifPresent(data.learnedPatterns::add);
                 } catch (Exception e) {
                     continue;
@@ -155,7 +154,7 @@ public class PlayerData {
         public static PlayerData networkRead(RegistryFriendlyByteBuf buf) {
             var playerData = new PlayerData();
             int i = buf.readInt();
-            var registry = JewelryDataRegistries.patternRegistry(buf.registryAccess());
+            var registry = IronsJewelryRegistries.patternRegistry(buf.registryAccess());
             for (int j = 0; j < i; j++) {
                 try {
                     playerData.learnedPatterns.add(registry.wrapAsHolder(Objects.requireNonNull(registry.get(buf.readResourceLocation()))));

@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:chest",
+  "pools": [
+    {
+      "bonus_rolls": 0.0,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "irons_jewelry:set_held_pattern",
+              "patterns": "#irons_jewelry:nether_findable"
+            }
+          ],
+          "name": "irons_jewelry:recipe"
+        }
+      ],
+      "rolls": {
+        "type": "minecraft:uniform",
+        "max": 6.0,
+        "min": 2.0
+      }
+    }
+  ]
+}

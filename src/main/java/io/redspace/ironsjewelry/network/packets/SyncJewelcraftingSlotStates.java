@@ -1,7 +1,7 @@
 package io.redspace.ironsjewelry.network.packets;
 
 import io.redspace.ironsjewelry.IronsJewelry;
-import io.redspace.ironsjewelry.gameplay.block.jewelcrafting_station.JewelcraftingStationScreen;
+import io.redspace.ironsjewelry.block.jewelcrafting_station.JewelcraftingStationScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;

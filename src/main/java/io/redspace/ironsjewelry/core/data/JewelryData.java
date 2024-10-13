@@ -4,7 +4,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.redspace.ironsjewelry.core.Bonus;
 import io.redspace.ironsjewelry.registry.ComponentRegistry;
-import io.redspace.ironsjewelry.registry.JewelryDataRegistries;
+import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
 import net.minecraft.core.Holder;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -30,10 +30,10 @@ import java.util.stream.Collectors;
  */
 public class JewelryData {
     public static final Codec<JewelryData> CODEC = RecordCodecBuilder.create(builder -> builder.group(
-            JewelryDataRegistries.PATTERN_REGISTRY_CODEC.fieldOf("pattern").forGetter(JewelryData::pattern),
+            IronsJewelryRegistries.Codecs.PATTERN_REGISTRY_CODEC.fieldOf("pattern").forGetter(JewelryData::pattern),
             Codec.unboundedMap(
-                    JewelryDataRegistries.PART_REGISTRY_CODEC,
-                    JewelryDataRegistries.MATERIAL_REGISTRY_CODEC).fieldOf("parts").forGetter(JewelryData::parts)
+                    IronsJewelryRegistries.Codecs.PART_REGISTRY_CODEC,
+                    IronsJewelryRegistries.Codecs.MATERIAL_REGISTRY_CODEC).fieldOf("parts").forGetter(JewelryData::parts)
     ).apply(builder, JewelryData::new));
 
     //    public static final StreamCodec<RegistryFriendlyByteBuf, JewelryData> STREAM_CODEC = StreamCodec.of((buf, data) -> {
@@ -58,9 +58,9 @@ public class JewelryData {
 //        return new JewelryData(Objects.requireNonNull(buf.registryAccess().registryOrThrow(JewelryDataRegistries.PATTERN_REGISTRY_KEY).getHolder(patternid).orElseThrow(() -> new IllegalStateException("Missing pattern: " + patternid))), parts);
 //    });
     public static final StreamCodec<RegistryFriendlyByteBuf, JewelryData> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.holderRegistry(JewelryDataRegistries.PATTERN_REGISTRY_KEY),
+            ByteBufCodecs.holderRegistry(IronsJewelryRegistries.Keys.PATTERN_REGISTRY_KEY),
             jewelryData -> jewelryData.pattern,
-            ByteBufCodecs.map(HashMap::new, ByteBufCodecs.holderRegistry(JewelryDataRegistries.PART_REGISTRY_KEY), ByteBufCodecs.holderRegistry(JewelryDataRegistries.MATERIAL_REGISTRY_KEY)),
+            ByteBufCodecs.map(HashMap::new, ByteBufCodecs.holderRegistry(IronsJewelryRegistries.Keys.PART_REGISTRY_KEY), ByteBufCodecs.holderRegistry(IronsJewelryRegistries.Keys.MATERIAL_REGISTRY_KEY)),
             jewelryData -> jewelryData.parts,
             JewelryData::new
     );

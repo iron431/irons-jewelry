@@ -3,6 +3,7 @@ package io.redspace.ironsjewelry.core;
 import com.mojang.serialization.Codec;
 import io.redspace.ironsjewelry.IronsJewelry;
 import io.redspace.ironsjewelry.core.data.BonusInstance;
+import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
 import io.redspace.ironsjewelry.registry.ParameterTypeRegistry;
 
 import java.util.Map;
@@ -13,10 +14,10 @@ public interface IBonusParameterType<T> {
      * Codec which relates the Parameter Type to the Data Object associated with that parameter, in a map, via a dispatch map codec
      */
     Codec<Map<IBonusParameterType<?>, Object>> BONUS_TO_INSTANCE_CODEC = Codec.dispatchedMap(
-            ParameterTypeRegistry.PARAMETER_TYPE_REGISTRY.byNameCodec(),
+            IronsJewelryRegistries.PARAMETER_TYPE_REGISTRY.byNameCodec(),
             IBonusParameterType::codec
     );
-    Codec<IBonusParameterType<?>> REGISTRY_CODEC = ParameterTypeRegistry.PARAMETER_TYPE_REGISTRY.byNameCodec();
+    Codec<IBonusParameterType<?>> REGISTRY_CODEC = IronsJewelryRegistries.PARAMETER_TYPE_REGISTRY.byNameCodec();
 
     Codec<T> codec();
 

@@ -1,7 +1,7 @@
 package io.redspace.ironsjewelry.registry;
 
 import io.redspace.ironsjewelry.IronsJewelry;
-import io.redspace.ironsjewelry.gameplay.loot.SetHeldPatternLootFunction;
+import io.redspace.ironsjewelry.loot.SetHeldPatternLootFunction;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
 import net.neoforged.bus.api.IEventBus;

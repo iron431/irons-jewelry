@@ -1,4 +1,4 @@
-package io.redspace.ironsjewelry.gameplay.item;
+package io.redspace.ironsjewelry.item;
 
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;

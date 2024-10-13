@@ -1,4 +1,4 @@
-package io.redspace.ironsjewelry.gameplay.block.jewelcrafting_station;
+package io.redspace.ironsjewelry.block.jewelcrafting_station;
 
 import io.redspace.ironsjewelry.core.Utils;
 import io.redspace.ironsjewelry.core.data.*;

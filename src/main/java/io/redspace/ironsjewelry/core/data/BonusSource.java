@@ -6,8 +6,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.redspace.ironsjewelry.IronsJewelry;
 import io.redspace.ironsjewelry.core.Bonus;
 import io.redspace.ironsjewelry.core.IBonusParameterType;
-import io.redspace.ironsjewelry.registry.BonusRegistry;
-import io.redspace.ironsjewelry.registry.JewelryDataRegistries;
+import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
 import net.minecraft.core.Holder;
 
 import java.util.Map;
@@ -17,9 +16,9 @@ import java.util.function.Function;
 public record BonusSource(Bonus bonus, Either<Map<IBonusParameterType<?>, Object>, Holder<PartDefinition>> parameterOrSource,
                           Either<Double, Holder<PartDefinition>> qualityOrSource, double qualityMultiplier) {
     public static final Codec<BonusSource> CODEC = RecordCodecBuilder.create(builder -> builder.group(
-            BonusRegistry.BONUS_REGISTRY.byNameCodec().fieldOf("bonus").forGetter(BonusSource::bonus),
-            Codec.either(IBonusParameterType.BONUS_TO_INSTANCE_CODEC, JewelryDataRegistries.PART_REGISTRY_CODEC).fieldOf("parameter").forGetter(BonusSource::parameterOrSource),
-            Codec.either(Codec.DOUBLE, JewelryDataRegistries.PART_REGISTRY_CODEC).fieldOf("quality").forGetter(BonusSource::qualityOrSource),
+            IronsJewelryRegistries.BONUS_REGISTRY.byNameCodec().fieldOf("bonus").forGetter(BonusSource::bonus),
+            Codec.either(IBonusParameterType.BONUS_TO_INSTANCE_CODEC, IronsJewelryRegistries.Codecs.PART_REGISTRY_CODEC).fieldOf("parameter").forGetter(BonusSource::parameterOrSource),
+            Codec.either(Codec.DOUBLE, IronsJewelryRegistries.Codecs.PART_REGISTRY_CODEC).fieldOf("quality").forGetter(BonusSource::qualityOrSource),
             Codec.DOUBLE.optionalFieldOf("qualityMultiplier", 1d).forGetter(BonusSource::qualityMultiplier)
     ).apply(builder, BonusSource::new));
 

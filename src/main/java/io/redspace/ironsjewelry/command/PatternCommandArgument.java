@@ -1,4 +1,4 @@
-package io.redspace.ironsjewelry.gameplay.command;
+package io.redspace.ironsjewelry.command;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.ArgumentType;

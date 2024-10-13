@@ -1,7 +1,7 @@
 package io.redspace.ironsjewelry.client;
 
 import io.redspace.ironsjewelry.IronsJewelry;
-import io.redspace.ironsjewelry.gameplay.block.jewelcrafting_station.JewelcraftingStationScreen;
+import io.redspace.ironsjewelry.block.jewelcrafting_station.JewelcraftingStationScreen;
 import io.redspace.ironsjewelry.registry.MenuRegistry;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;

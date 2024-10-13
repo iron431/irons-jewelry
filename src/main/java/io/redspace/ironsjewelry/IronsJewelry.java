@@ -18,12 +18,9 @@ public class IronsJewelry {
 
     public IronsJewelry(IEventBus modEventBus, ModContainer modContainer) {
         modEventBus.addListener(this::registerModelLoader);
-        modEventBus.addListener(BonusRegistry::registerRegistry);
-        modEventBus.addListener(ParameterTypeRegistry::registerRegistry);
-        modEventBus.addListener(JewelryTypeRegistry::registerRegistry);
-        modEventBus.addListener(ActionRegistry::registerRegistry);
         modEventBus.addListener(CreativeTabRegistry::addCreative);
-        modEventBus.addListener(JewelryDataRegistries::registerDatapackRegistries);
+        modEventBus.addListener(IronsJewelryRegistries::registerRegistries);
+        modEventBus.addListener(IronsJewelryRegistries::registerDatapackRegistries);
 
         ComponentRegistry.register(modEventBus);
         BonusRegistry.register(modEventBus);

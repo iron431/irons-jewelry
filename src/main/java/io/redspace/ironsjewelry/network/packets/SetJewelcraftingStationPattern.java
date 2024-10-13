@@ -2,8 +2,8 @@ package io.redspace.ironsjewelry.network.packets;
 
 import io.redspace.ironsjewelry.IronsJewelry;
 import io.redspace.ironsjewelry.core.data.PatternDefinition;
-import io.redspace.ironsjewelry.gameplay.block.jewelcrafting_station.JewelcraftingStationMenu;
-import io.redspace.ironsjewelry.registry.JewelryDataRegistries;
+import io.redspace.ironsjewelry.block.jewelcrafting_station.JewelcraftingStationMenu;
+import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
 import net.minecraft.core.Holder;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
@@ -21,7 +21,7 @@ public record SetJewelcraftingStationPattern(int containerId,
                 buf.writeResourceKey(Objects.requireNonNull(data.patternDefinition.getKey()));
             },
             (buf) -> new SetJewelcraftingStationPattern(buf.readInt(),
-                    JewelryDataRegistries.patternRegistry(buf.registryAccess()).getHolderOrThrow(buf.readResourceKey(JewelryDataRegistries.PATTERN_REGISTRY_KEY))));
+                    IronsJewelryRegistries.patternRegistry(buf.registryAccess()).getHolderOrThrow(buf.readResourceKey(IronsJewelryRegistries.Keys.PATTERN_REGISTRY_KEY))));
 
     @Override
     public Type<? extends CustomPacketPayload> type() {

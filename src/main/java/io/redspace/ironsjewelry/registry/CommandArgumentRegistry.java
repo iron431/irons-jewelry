@@ -1,7 +1,7 @@
 package io.redspace.ironsjewelry.registry;
 
 import io.redspace.ironsjewelry.IronsJewelry;
-import io.redspace.ironsjewelry.gameplay.command.PatternCommandArgument;
+import io.redspace.ironsjewelry.command.PatternCommandArgument;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.commands.synchronization.ArgumentTypeInfos;
 import net.minecraft.commands.synchronization.SingletonArgumentInfo;

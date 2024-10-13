@@ -1,7 +1,7 @@
 package io.redspace.ironsjewelry.registry;
 
 import io.redspace.ironsjewelry.IronsJewelry;
-import io.redspace.ironsjewelry.gameplay.block.jewelcrafting_station.JewelcraftingStationBlock;
+import io.redspace.ironsjewelry.block.jewelcrafting_station.JewelcraftingStationBlock;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;

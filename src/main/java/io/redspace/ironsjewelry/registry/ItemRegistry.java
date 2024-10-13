@@ -1,8 +1,8 @@
 package io.redspace.ironsjewelry.registry;
 
 import io.redspace.ironsjewelry.IronsJewelry;
-import io.redspace.ironsjewelry.gameplay.item.CurioBaseItem;
-import io.redspace.ironsjewelry.gameplay.item.PatternRecipeItem;
+import io.redspace.ironsjewelry.item.CurioBaseItem;
+import io.redspace.ironsjewelry.item.PatternRecipeItem;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;

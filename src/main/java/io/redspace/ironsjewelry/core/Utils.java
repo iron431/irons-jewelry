@@ -7,7 +7,7 @@ import io.redspace.ironsjewelry.core.data.BonusInstance;
 import io.redspace.ironsjewelry.core.data.JewelryData;
 import io.redspace.ironsjewelry.core.data.MaterialDefinition;
 import io.redspace.ironsjewelry.registry.ComponentRegistry;
-import io.redspace.ironsjewelry.registry.JewelryDataRegistries;
+import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
 import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.chat.Component;
@@ -40,7 +40,7 @@ public class Utils {
     }
 
     public static Optional<Holder<MaterialDefinition>> getMaterialForIngredient(RegistryAccess access, ItemStack ingredient) {
-        var r = JewelryDataRegistries.materialRegistry(access);
+        var r = IronsJewelryRegistries.materialRegistry(access);
         return r.stream().filter(material -> material.ingredient().test(ingredient)).map(r::wrapAsHolder).findFirst();
     }
 

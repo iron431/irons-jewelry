@@ -1,4 +1,4 @@
-package io.redspace.ironsjewelry.gameplay;
+package io.redspace.ironsjewelry.event;
 
 import io.redspace.ironsjewelry.core.ICooldownHandler;
 import io.redspace.ironsjewelry.core.Utils;

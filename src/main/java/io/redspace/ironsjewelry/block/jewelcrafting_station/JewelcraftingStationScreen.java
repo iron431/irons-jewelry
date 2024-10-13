@@ -1,4 +1,4 @@
-package io.redspace.ironsjewelry.gameplay.block.jewelcrafting_station;
+package io.redspace.ironsjewelry.block.jewelcrafting_station;
 
 import io.redspace.ironsjewelry.IronsJewelry;
 import io.redspace.ironsjewelry.client.DynamicModel;
@@ -7,7 +7,7 @@ import io.redspace.ironsjewelry.core.Utils;
 import io.redspace.ironsjewelry.core.data.*;
 import io.redspace.ironsjewelry.network.packets.SetJewelcraftingStationPattern;
 import io.redspace.ironsjewelry.network.packets.SyncJewelcraftingSlotStates;
-import io.redspace.ironsjewelry.registry.JewelryDataRegistries;
+import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -82,7 +82,7 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
         this.scrollOff = 0;
 
         if (Minecraft.getInstance().player != null) {
-            var registry = JewelryDataRegistries.patternRegistry(pPlayerInventory.player.registryAccess());
+            var registry = IronsJewelryRegistries.patternRegistry(pPlayerInventory.player.registryAccess());
             this.availablePatterns = Stream.concat(registry.stream().filter(PatternDefinition::unlockedByDefault).map(registry::wrapAsHolder),
                     PlayerData.get(pPlayerInventory.player).getLearnedPatterns().stream()).distinct().sorted(Comparator.comparingDouble(patternholder -> patternholder.value().qualityMultiplier())).toList();
         }
@@ -134,7 +134,7 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
                             tooltip.add(Component.translatable(part.part().value().descriptionId()).withStyle(ChatFormatting.YELLOW, ChatFormatting.UNDERLINE));
                             tooltip.add(Component.literal(String.format(" (0/%s)", part.materialCost())).withStyle(ChatFormatting.RED));
                             tooltip.add(Component.translatable("tooltip.irons_jewelry.applicable_materials").withStyle(ChatFormatting.YELLOW, ChatFormatting.UNDERLINE));
-                            JewelryDataRegistries.materialRegistry(Minecraft.getInstance().level.registryAccess()).stream().filter(materialDefinition -> !materialDefinition.ingredient().hasNoItems() && part.part().value().canUseMaterial(materialDefinition.materialType()))
+                            IronsJewelryRegistries.materialRegistry(Minecraft.getInstance().level.registryAccess()).stream().filter(materialDefinition -> !materialDefinition.ingredient().hasNoItems() && part.part().value().canUseMaterial(materialDefinition.materialType()))
                                     .forEach(material -> tooltip.add(Component.literal(" ").append(Component.translatable(material.descriptionId())).withStyle(ChatFormatting.GRAY)));
                             pGuiGraphics.renderTooltip(this.font, Utils.rasterizeComponentList(tooltip), mouseX, mouseY);
                         }

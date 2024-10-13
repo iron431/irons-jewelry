@@ -1,4 +1,4 @@
-package io.redspace.ironsjewelry.gameplay.item;
+package io.redspace.ironsjewelry.item;
 
 import io.redspace.ironsjewelry.core.data.PlayerData;
 import io.redspace.ironsjewelry.registry.ComponentRegistry;

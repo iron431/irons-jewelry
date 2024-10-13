@@ -3,7 +3,7 @@ package io.redspace.ironsjewelry.core.data;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.redspace.ironsjewelry.core.IBonusParameterType;
-import io.redspace.ironsjewelry.registry.JewelryTypeRegistry;
+import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -28,7 +28,7 @@ public record PatternDefinition(String descriptionId, JewelryType jewelryType, L
                                 double qualityMultiplier) {
     public static final Codec<PatternDefinition> CODEC = RecordCodecBuilder.create(builder -> builder.group(
             Codec.STRING.fieldOf("descriptionId").forGetter(PatternDefinition::descriptionId),
-            JewelryTypeRegistry.JEWELRY_TYPE_REGISTRY.byNameCodec().fieldOf("type").forGetter(PatternDefinition::jewelryType),
+            IronsJewelryRegistries.JEWELRY_TYPE_REGISTRY.byNameCodec().fieldOf("type").forGetter(PatternDefinition::jewelryType),
             Codec.list(PartIngredient.CODEC).fieldOf("parts").forGetter(PatternDefinition::partTemplate),
             Codec.list(BonusSource.CODEC).fieldOf("bonuses").forGetter(PatternDefinition::bonuses),
             Codec.BOOL.optionalFieldOf("unlockedByDefault", true).forGetter(PatternDefinition::unlockedByDefault),

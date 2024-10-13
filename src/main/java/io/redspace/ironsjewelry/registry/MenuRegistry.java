@@ -1,7 +1,7 @@
 package io.redspace.ironsjewelry.registry;
 
 import io.redspace.ironsjewelry.IronsJewelry;
-import io.redspace.ironsjewelry.gameplay.block.jewelcrafting_station.JewelcraftingStationMenu;
+import io.redspace.ironsjewelry.block.jewelcrafting_station.JewelcraftingStationMenu;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.inventory.MenuType;
