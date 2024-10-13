@@ -1,0 +1,49 @@
+{
+  "type": "minecraft:chest",
+  "pools": [
+    {
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "irons_jewelry:set_held_pattern",
+              "patterns": "#irons_jewelry:generic_lootable"
+            }
+          ],
+          "weight": 2,
+          "name": "irons_jewelry:recipe"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "irons_jewelry:set_held_pattern",
+              "patterns": "#irons_jewelry:high_quality_lootable"
+            }
+          ],
+          "weight": 1,
+          "name": "irons_jewelry:recipe"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "irons_jewelry:set_held_pattern",
+              "patterns": "#irons_jewelry:nether_lootable"
+            }
+          ],
+          "weight": 5,
+          "name": "irons_jewelry:recipe"
+        }
+      ],
+      "conditions": [
+        {
+          "condition": "minecraft:random_chance",
+          "chance": 0.25
+        }
+      ],
+      "rolls": 1
+    }
+  ]
+}

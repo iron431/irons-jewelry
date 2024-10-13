@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "entries": [
+    "irons_jewelry:chest_loot/compat_generic_loot_modifier",
+    "irons_jewelry:chest_loot/vanilla_generic_loot_modifier",
+    "irons_jewelry:chest_loot/nether_loot_modifier",
+    "irons_jewelry:chest_loot/nether_treasure_loot_modifier"
+  ]
+}
