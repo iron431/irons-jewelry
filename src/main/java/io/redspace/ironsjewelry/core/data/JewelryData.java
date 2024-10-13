@@ -32,10 +32,10 @@ import java.util.stream.Collectors;
  */
 public class JewelryData {
     public static final Codec<JewelryData> CODEC = RecordCodecBuilder.create(builder -> builder.group(
-            Utils.idCodec(PatternDataHandler::getSafe, PatternDefinition::id).fieldOf("pattern").forGetter(JewelryData::pattern),
+            Utils.byIdCodec(PatternDataHandler::getSafe, PatternDefinition::id).fieldOf("pattern").forGetter(JewelryData::pattern),
             Codec.unboundedMap(
-                    Utils.idCodec(PartDataHandler::getSafe, PartDefinition::id),
-                    Utils.idCodec(MaterialDataHandler::getSafe, MaterialDefinition::id)).fieldOf("parts").forGetter(JewelryData::parts)
+                    Utils.byIdCodec(PartDataHandler::getSafe, PartDefinition::id),
+                    Utils.byIdCodec(MaterialDataHandler::getSafe, MaterialDefinition::id)).fieldOf("parts").forGetter(JewelryData::parts)
     ).apply(builder, JewelryData::new));
 
     public static final StreamCodec<FriendlyByteBuf, JewelryData> STREAM_CODEC = StreamCodec.of((buf, data) -> {

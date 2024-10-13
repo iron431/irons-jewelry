@@ -25,5 +25,5 @@ public class ComponentRegistry {
     }
 
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<JewelryData>> JEWELRY_COMPONENT = register("jewelry_data", (builder) -> builder.persistent(JewelryData.CODEC).networkSynchronized(JewelryData.STREAM_CODEC).cacheEncoding());
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<PatternDefinition>> STORED_PATTERN = register("stored_pattern", (builder) -> builder.persistent(Utils.idCodec(PatternDataHandler::getSafe, PatternDefinition::id)).networkSynchronized(Utils.idStreamCodec(PatternDataHandler::get, PatternDefinition::id)).cacheEncoding());
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<PatternDefinition>> STORED_PATTERN = register("stored_pattern", (builder) -> builder.persistent(Utils.byIdCodec(PatternDataHandler::getSafe, PatternDefinition::id)).networkSynchronized(Utils.idStreamCodec(PatternDataHandler::get, PatternDefinition::id)).cacheEncoding());
 }

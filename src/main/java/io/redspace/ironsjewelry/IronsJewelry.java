@@ -41,6 +41,7 @@ public class IronsJewelry {
         CreativeTabRegistry.register(modEventBus);
         JewelryTypeRegistry.register(modEventBus);
         ActionRegistry.register(modEventBus);
+        LootRegistry.register(modEventBus);
 
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
     }

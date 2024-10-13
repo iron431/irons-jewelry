@@ -18,8 +18,8 @@ public record BonusSource(Bonus bonus, Either<Map<IBonusParameterType<?>, Object
                           Either<Double, PartDefinition> qualityOrSource, double qualityMultiplier) {
     public static final Codec<BonusSource> CODEC = RecordCodecBuilder.create(builder -> builder.group(
             BonusRegistry.BONUS_REGISTRY.byNameCodec().fieldOf("bonus").forGetter(BonusSource::bonus),
-            Codec.either(IBonusParameterType.BONUS_TO_INSTANCE_CODEC, Utils.idCodec(PartDataHandler::getSafe, PartDefinition::id)).fieldOf("parameter").forGetter(BonusSource::parameterOrSource),
-            Codec.either(Codec.DOUBLE, Utils.idCodec(PartDataHandler::getSafe, PartDefinition::id)).fieldOf("quality").forGetter(BonusSource::qualityOrSource),
+            Codec.either(IBonusParameterType.BONUS_TO_INSTANCE_CODEC, Utils.byIdCodec(PartDataHandler::getSafe, PartDefinition::id)).fieldOf("parameter").forGetter(BonusSource::parameterOrSource),
+            Codec.either(Codec.DOUBLE, Utils.byIdCodec(PartDataHandler::getSafe, PartDefinition::id)).fieldOf("quality").forGetter(BonusSource::qualityOrSource),
             Codec.DOUBLE.optionalFieldOf("qualityMultiplier", 1d).forGetter(BonusSource::qualityMultiplier)
     ).apply(builder, BonusSource::new));
 
