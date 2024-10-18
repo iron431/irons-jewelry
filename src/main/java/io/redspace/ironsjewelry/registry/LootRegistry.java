@@ -3,6 +3,7 @@ package io.redspace.ironsjewelry.registry;
 import com.mojang.serialization.MapCodec;
 import io.redspace.ironsjewelry.IronsJewelry;
 import io.redspace.ironsjewelry.loot.AppendLootModifier;
+import io.redspace.ironsjewelry.loot.GenerateJewelryLootFunction;
 import io.redspace.ironsjewelry.loot.SetHeldPatternLootFunction;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
@@ -19,6 +20,8 @@ public class LootRegistry {
 
     public static final Supplier<LootItemFunctionType<?>> SET_HELD_PATTERN =
             LOOT_FUNCTIONS.register("set_held_pattern", () -> new LootItemFunctionType<>(SetHeldPatternLootFunction.CODEC));
+    public static final Supplier<LootItemFunctionType<?>> GENERATE_JEWELRY =
+            LOOT_FUNCTIONS.register("generate_jewelry", () -> new LootItemFunctionType<>(GenerateJewelryLootFunction.CODEC));
 
     public static final Supplier<MapCodec<? extends IGlobalLootModifier>> APPEND_LOOT_MODIFIER = LOOT_MODIFIER_SERIALIZERS.register("append_loot", AppendLootModifier.CODEC);
 

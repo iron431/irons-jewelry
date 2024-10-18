@@ -1,0 +1,33 @@
+{
+  "type": "minecraft:chest",
+  "pools": [
+    {
+      "bonus_rolls": 0.0,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "irons_jewelry:generate_jewelry",
+              "type": "irons_jewelry:ring",
+              "patterns": [
+                "irons_jewelry:simple_band",
+                "irons_jewelry:gemset_ring",
+                "irons_jewelry:improved_gemset_ring",
+                "irons_jewelry:superior_gemset_ring"
+              ],
+              "qualityMin": 0.0,
+              "qualityMax": 10.0
+            }
+          ],
+          "name": "irons_jewelry:ring"
+        }
+      ],
+      "rolls": {
+        "type": "minecraft:uniform",
+        "max": 6.0,
+        "min": 2.0
+      }
+    }
+  ]
+}
