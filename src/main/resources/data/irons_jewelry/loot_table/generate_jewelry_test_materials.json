@@ -14,7 +14,14 @@
                 "irons_jewelry:gemset_ring",
                 "irons_jewelry:improved_gemset_ring",
                 "irons_jewelry:superior_gemset_ring"
-              ]
+              ],
+              "materials": {
+                "metal": "irons_jewelry:gold",
+                "gem": [
+                  "irons_jewelry:ruby",
+                  "irons_jewelry:diamond"
+                ]
+              }
             }
           ],
           "name": "irons_jewelry:ring"
