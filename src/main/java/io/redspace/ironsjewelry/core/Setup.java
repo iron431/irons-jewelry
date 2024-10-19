@@ -7,10 +7,14 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.npc.VillagerTrades;
 import net.minecraft.world.item.Items;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.neoforge.event.village.WandererTradesEvent;
 
 import java.util.Map;
 
+@EventBusSubscriber
 public class Setup {
     public static void commonSetup(FMLCommonSetupEvent event) {
         event.enqueueWork(() -> {
@@ -47,5 +51,17 @@ public class Setup {
                     }
             )));
         });
+    }
+
+    @SubscribeEvent
+    public static void addWanderingTrades(WandererTradesEvent event) {
+        for (int i = 0; i < 2; i++) {
+            //twice increases weight and allows multiple trades per instance (not rare though, because there's always only one)
+            event.getGenericTrades().add(
+                    new Trades.SellLootTable(ResourceKey.create(Registries.LOOT_TABLE, IronsJewelry.id("trades/wandering_trader_sell_jewelry")), 4, 25, 0.5f, Trades::calculateJewelryPrice));
+            event.getRareTrades().add(
+                    new Trades.SellLootTable(ResourceKey.create(Registries.LOOT_TABLE, IronsJewelry.id("trades/wandering_trader_sell_pattern")), 2, 25, 0.5f, Trades::calculatePatternPrice));
+
+        }
     }
 }

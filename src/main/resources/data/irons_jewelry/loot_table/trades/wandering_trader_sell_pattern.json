@@ -1,0 +1,19 @@
+{
+  "pools": [
+    {
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "irons_jewelry:recipe",
+          "functions": [
+            {
+              "function": "irons_jewelry:set_held_pattern",
+              "patterns": "#irons_jewelry:wandering_trader_sellable_patterns"
+            }
+          ]
+        }
+      ],
+      "rolls": 1
+    }
+  ]
+}
