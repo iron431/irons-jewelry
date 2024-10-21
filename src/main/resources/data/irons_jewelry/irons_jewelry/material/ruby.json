@@ -1,7 +1,7 @@
 {
   "descriptionId": "material.irons_jewelry.ruby",
   "ingredient": {
-    "item": "minecraft:redstone"
+    "tag": "c:gems/ruby"
   },
   "materialType": [
     "gem"

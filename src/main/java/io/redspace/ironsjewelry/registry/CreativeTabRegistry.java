@@ -14,9 +14,18 @@ public class CreativeTabRegistry {
     public static void register(IEventBus eventBus) {
         CREATIVE_TABS.register(eventBus);
     }
+
     public static void addCreative(BuildCreativeModeTabContentsEvent event) {
-        if (event.getTabKey() == CreativeModeTabs.FUNCTIONAL_BLOCKS)
+        if (event.getTabKey() == CreativeModeTabs.FUNCTIONAL_BLOCKS) {
             event.accept(ItemRegistry.JEWELCRAFTING_STATION_BLOCK_ITEM.get());
+        } else if (event.getTabKey() == CreativeModeTabs.INGREDIENTS) {
+            event.accept(ItemRegistry.RUBY.get());
+            event.accept(ItemRegistry.SAPPHIRE.get());
+            event.accept(ItemRegistry.TOPAZ.get());
+            event.accept(ItemRegistry.MOONSTONE.get());
+            event.accept(ItemRegistry.PERIDOT.get());
+            event.accept(ItemRegistry.ONYX.get());
+        }
     }
 //    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> EXAMPLE_TAB = CREATIVE_MODE_TABS.register("example_tab", () -> CreativeModeTab.builder()
 //            .title(Component.translatable("itemGroup.examplemod")) //The language key for the title of your CreativeModeTab

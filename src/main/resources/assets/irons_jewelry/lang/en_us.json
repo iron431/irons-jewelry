@@ -3,6 +3,12 @@
   "item.irons_jewelry.necklace": "Necklace",
   "item.irons_jewelry.invalid_jewelry": "Invalid Jewelry",
   "item.irons_jewelry.recipe": "Artisan Scroll",
+  "item.irons_jewelry.ruby": "Ruby",
+  "item.irons_jewelry.sapphire": "Sapphire",
+  "item.irons_jewelry.topaz": "Topaz",
+  "item.irons_jewelry.moonstone": "Moonstone",
+  "item.irons_jewelry.peridot": "Peridot",
+  "item.irons_jewelry.onyx": "Onyx",
 
   "block.irons_jewelry.jewelcrafting_station": "Jewelcrafting Station",
 
