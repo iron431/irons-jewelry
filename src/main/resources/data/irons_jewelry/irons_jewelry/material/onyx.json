@@ -1,0 +1,21 @@
+{
+  "descriptionId": "material.irons_jewelry.onyx",
+  "ingredient": {
+    "tag": "c:gems/onyx"
+  },
+  "materialType": [
+    "gem"
+  ],
+  "paletteLocation": "irons_jewelry:item/palettes/onyx",
+  "quality": 2,
+  "bonusParameters": {
+    "irons_jewelry:attribute": {
+      "attribute": "apothic_attributes:crit_damage",
+      "amount": 0.15,
+      "operation": "add_value"
+    },
+    "irons_jewelry:negative_effect": {
+      "effect": "minecraft:blindness"
+    }
+  }
+}

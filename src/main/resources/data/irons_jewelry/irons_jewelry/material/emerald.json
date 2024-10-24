@@ -10,7 +10,7 @@
   "quality": 1.5,
   "bonusParameters": {
     "irons_jewelry:attribute": {
-      "attribute": "minecraft:generic.attack_speed",
+      "attribute": "minecraft:generic.movement_speed",
       "amount": 0.05,
       "operation": "add_multiplied_total"
     },
@@ -19,15 +19,6 @@
     },
     "irons_jewelry:negative_effect": {
       "effect": "minecraft:unluck"
-    },
-    "irons_jewelry:defensive_action": {
-      "verbTranslation": "knockback",
-      "targetSelf": false,
-      "cooldownTicks": 100,
-      "action": {
-        "type": "irons_jewelry:knockback",
-        "strength": -2.0
-      }
     }
   }
 }

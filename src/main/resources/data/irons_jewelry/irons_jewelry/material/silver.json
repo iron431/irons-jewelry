@@ -17,36 +17,8 @@
     "irons_jewelry:positive_effect": {
       "effect": "minecraft:speed"
     },
-    "irons_jewelry:enchantment_runnable": {
-      "verbTranslation": "bonus.irons_jewelry.enchantment.wind_burst",
-      "targetSelf": false,
-      "effectiveLevel": 3,
-      "effect": {
-        "type": "minecraft:explode",
-        "block_interaction": "trigger",
-        "immune_blocks": "#minecraft:blocks_wind_charge_explosions",
-        "knockback_multiplier": {
-          "type": "minecraft:lookup",
-          "fallback": {
-            "type": "minecraft:linear",
-            "base": 1.5,
-            "per_level_above_first": 0.35
-          },
-          "values": [
-            1.2,
-            1.75,
-            2.2
-          ]
-        },
-        "large_particle": {
-          "type": "minecraft:gust_emitter_large"
-        },
-        "radius": 3.5,
-        "small_particle": {
-          "type": "minecraft:gust_emitter_small"
-        },
-        "sound": "minecraft:entity.wind_charge.wind_burst"
-      }
+    "irons_jewelry:negative_effect": {
+      "effect": "minecraft:bad_omen"
     }
   }
 }

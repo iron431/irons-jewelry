@@ -1,0 +1,26 @@
+{
+  "descriptionId": "material.irons_jewelry.sapphire",
+  "ingredient": {
+    "tag": "c:gems/sapphire"
+  },
+  "materialType": [
+    "gem"
+  ],
+  "paletteLocation": "irons_jewelry:item/palettes/sapphire",
+  "quality": 2,
+  "bonusParameters": {
+    "irons_jewelry:attribute": {
+      "attribute": "apothic_attributes:dodge_chance",
+      "amount": 0.05,
+      "operation": "add_value"
+    },
+    "irons_jewelry:defensive_action": {
+      "targetSelf": false,
+      "action": {
+        "type": "irons_jewelry:apply_freeze",
+        "amount": 40.0,
+        "instaFreeze": false
+      }
+    }
+  }
+}

@@ -47,6 +47,11 @@
                 "emerald": "irons_jewelry:palettes/emerald",
                 "lapis": "irons_jewelry:palettes/lapis",
                 "ruby": "irons_jewelry:palettes/ruby",
+                "sapphire": "irons_jewelry:palettes/sapphire",
+                "moonstone": "irons_jewelry:palettes/moonstone",
+                "peridot": "irons_jewelry:palettes/peridot",
+                "topaz": "irons_jewelry:palettes/topaz",
+                "onyx": "irons_jewelry:palettes/onyx",
                 "menu": "irons_jewelry:palettes/menu",
                 "menu_bright": "irons_jewelry:palettes/menu_bright"
             }

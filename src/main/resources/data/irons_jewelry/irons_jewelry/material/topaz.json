@@ -1,0 +1,18 @@
+{
+  "descriptionId": "material.irons_jewelry.topaz",
+  "ingredient": {
+    "tag": "c:gems/topaz"
+  },
+  "materialType": [
+    "gem"
+  ],
+  "paletteLocation": "irons_jewelry:item/palettes/topaz",
+  "quality": 2,
+  "bonusParameters": {
+    "irons_jewelry:attribute": {
+      "attribute": "minecraft:generic.armor_toughness",
+      "amount": 2,
+      "operation": "add_value"
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "descriptionId": "material.irons_jewelry.peridot",
+  "ingredient": {
+    "tag": "c:gems/peridot"
+  },
+  "materialType": [
+    "gem"
+  ],
+  "paletteLocation": "irons_jewelry:item/palettes/peridot",
+  "quality": 2,
+  "bonusParameters": {
+    "irons_jewelry:attribute": {
+      "attribute": "apothic_attributes:mining_speed",
+      "amount": 0.15,
+      "operation": "add_value"
+    },
+    "irons_jewelry:negative_effect": {
+      "effect": "minecraft:poison"
+    },
+    "irons_jewelry:positive_effect": {
+      "effect": "minecraft:haste"
+    }
+  }
+}
