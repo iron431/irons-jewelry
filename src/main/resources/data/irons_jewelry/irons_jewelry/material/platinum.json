@@ -1,13 +1,13 @@
 {
-  "descriptionId": "material.irons_jewelry.amethyst",
+  "descriptionId": "material.irons_jewelry.platinum",
   "ingredient": {
-    "tag": "c:gems/amethyst"
+    "tag": "c:ingots/platinum"
   },
   "materialType": [
-    "gem"
+    "metal"
   ],
-  "paletteLocation": "irons_jewelry:item/palettes/amethyst",
-  "quality": 1,
+  "paletteLocation": "irons_jewelry:item/palettes/platinum",
+  "quality": 0.75,
   "bonusParameters": {
     "irons_jewelry:attribute": {
       "attribute": "apothic_attributes:armor_pierce",
@@ -15,19 +15,19 @@
       "operation": "add_value"
     },
     "irons_jewelry:positive_effect": {
-      "effect": "minecraft:regeneration"
+      "effect": "minecraft:resistance"
     },
     "irons_jewelry:negative_effect": {
-      "effect": "minecraft:wither"
+      "effect": "minecraft:weakness"
     },
     "irons_jewelry:defensive_action": {
       "targetSelf": false,
+      "cooldownTicks": 80,
       "action": {
-        "type": "irons_jewelry:apply_damage",
-        "damageType": "minecraft:thorns",
-        "amount": {
-          "base": 1.0,
-          "scalar": 0.5
+        "type": "irons_jewelry:knockback",
+        "strength": {
+          "base": 2.0,
+          "scalar": 1.0
         }
       }
     }

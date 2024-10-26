@@ -26,6 +26,7 @@
                 "iron": "irons_jewelry:palettes/iron",
                 "copper": "irons_jewelry:palettes/copper",
                 "netherite": "irons_jewelry:palettes/netherite",
+                "platinum": "irons_jewelry:palettes/platinum",
                 "menu": "irons_jewelry:palettes/menu",
                 "menu_bright": "irons_jewelry:palettes/menu_bright"
             }

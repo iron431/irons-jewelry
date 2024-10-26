@@ -1,8 +1,9 @@
 {
   "unlockedByDefault": false,
+  "descriptionId": "pattern.irons_jewelry.barbed_band",
+  "nameOffset": 1,
   "qualityMultiplier": 1.5,
   "type": "irons_jewelry:ring",
-  "descriptionId": "pattern.irons_jewelry.barbed_band",
   "parts": [
     {
       "id": "irons_jewelry:band_barbed",
@@ -30,11 +31,11 @@
             "type": "irons_jewelry:apply_damage",
             "damageType": "minecraft:thorns",
             "amount": {
-              "base": 2.0,
+              "base": 1.0,
               "scalar": 0.5
             }
           },
-          "cooldownTicks": 40
+          "cooldownTicks": 60
         }
       },
       "quality": "irons_jewelry:gem_band_barbed"
