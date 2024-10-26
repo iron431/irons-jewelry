@@ -7,7 +7,7 @@
     "metal"
   ],
   "paletteLocation": "irons_jewelry:item/palettes/platinum",
-  "quality": 0.75,
+  "quality": 2.0,
   "bonusParameters": {
     "irons_jewelry:attribute": {
       "attribute": "apothic_attributes:armor_pierce",
