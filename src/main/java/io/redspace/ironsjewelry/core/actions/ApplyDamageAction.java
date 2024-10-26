@@ -3,6 +3,7 @@ package io.redspace.ironsjewelry.core.actions;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import io.redspace.ironsjewelry.core.DamageHelper;
 import io.redspace.ironsjewelry.core.IAction;
 import io.redspace.ironsjewelry.core.Utils;
 import io.redspace.ironsjewelry.core.data.BonusInstance;
@@ -32,10 +33,12 @@ public record ApplyDamageAction(Holder<DamageType> damageType, QualityScalar amo
 
     @Override
     public void apply(ServerLevel serverLevel, double quality, boolean applyToSelf, ServerPlayer wearer, Entity entity) {
-
         var damageSource = new DamageSource(this.damageType, null, wearer, wearer.position());
         var damage = getDamage(quality);
         var target = applyToSelf ? wearer : entity;
+        if (applyToSelf) {
+            DamageHelper.ignoreNextKnockback(wearer);
+        }
         target.hurt(damageSource, damage);
         this.soundEvent.ifPresent(sound -> target.playSound(sound.value()));
     }

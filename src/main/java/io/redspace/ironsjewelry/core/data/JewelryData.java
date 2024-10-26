@@ -167,7 +167,33 @@ public class JewelryData {
             //Fill arguments in reverse (pinnacle piece, ie gem, will be first translation argument)
             ids[parts.size() - 1 - i] = Component.translatable(this.parts.get(parts.get(i).part()).value().descriptionId());
         }
-        return Component.translatable(this.pattern.value().descriptionId() + ".item", ids);
+        var descriptionId = this.pattern.value().descriptionId();
+//        int code = descriptionId.indexOf('$');
+//        if (code >= 0) {
+//            switch (descriptionId.charAt(code + 1)) {
+//                case 'm':
+//                    int end = descriptionId.indexOf(')');
+//                    if (ids[0] == ids[1]) {
+//                        descriptionId = descriptionId.substring(0,code) + "%s"
+//                    }else{
+//
+//                    }
+//                    break;
+//                case '2':
+//                case '3':
+//                case '4':
+//                    int skip = Integer.parseInt(String.valueOf(descriptionId.charAt(code + 1)));
+//                    for (int i = 0; i < skip - 1; i++) {
+//                        for (int j = 1; j < ids.length; j++) {
+//                            ids[j - 1] = ids[j];
+//                        }
+//                    }
+//                    descriptionId = new StringBuilder(descriptionId).delete(code, code + 1).toString();
+//                    break;
+//
+//            }
+//        }
+        return Component.translatable(descriptionId + ".item", ids);
     }
 
     public List<BonusInstance> getBonuses() {

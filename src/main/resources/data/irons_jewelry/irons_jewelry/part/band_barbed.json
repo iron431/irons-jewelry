@@ -1,0 +1,7 @@
+{
+  "descriptionId": "part.irons_jewelry.band_barbed",
+  "allowedMaterialTypes": [
+    "metal"
+  ],
+  "baseTextureLocation": "irons_jewelry:item/base/barbed_band"
+}

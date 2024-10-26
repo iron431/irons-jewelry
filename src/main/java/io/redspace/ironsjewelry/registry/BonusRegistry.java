@@ -17,6 +17,7 @@ public class BonusRegistry {
     public static final Supplier<Bonus> ATTRIBUTE_BONUS = BONUSES.register("attribute_bonus", AttributeBonus::new);
     public static final Supplier<Bonus> EFFECT_ON_HIT_BONUS = BONUSES.register("effect_on_hit_bonus", EffectOnHitBonus::new);
     public static final Supplier<OnProjectileHitBonus> ON_PROJECTILE_HIT_BONUS = BONUSES.register("on_projectile_hit_bonus", OnProjectileHitBonus::new);
+    public static final Supplier<OnAttackBonus> ON_ATTACK_BONUS = BONUSES.register("on_attack", OnAttackBonus::new);
     public static final Supplier<Bonus> EFFECT_IMMUNITY_BONUS = BONUSES.register("effect_immunity_bonus", EffectImmunityBonus::new);
     public static final Supplier<OnShieldBlockBonus> ON_SHIELD_BLOCK_BONUS = BONUSES.register("on_shield_block_bonus", OnShieldBlockBonus::new);
     public static final Supplier<OnTakeDamageBonus> ON_TAKE_DAMAGE_BONUS = BONUSES.register("on_take_damage_bonus", OnTakeDamageBonus::new);

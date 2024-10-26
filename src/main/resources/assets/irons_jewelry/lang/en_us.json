@@ -38,6 +38,8 @@
   "pattern.irons_jewelry.simple_amulet.item": "%s Amulet",
   "pattern.irons_jewelry.amulet_of_protection": "Amulet of Protection",
   "pattern.irons_jewelry.amulet_of_protection.item": "%s Amulet of Protection",
+  "pattern.irons_jewelry.barbed_band": "Barbed Band",
+  "pattern.irons_jewelry.barbed_band.item": "%s Barbed Band",
 
   "material.irons_jewelry.iron": "Iron",
   "material.irons_jewelry.gold": "Gold",
@@ -74,6 +76,8 @@
   "part.irons_jewelry.gem_simple_amulet": "Gemstone",
   "part.irons_jewelry.chain_amulet_of_protection": "Chain",
   "part.irons_jewelry.gem_amulet_of_protection": "Gemstone",
+  "part.irons_jewelry.gem_band_barbed": "Gemstone",
+  "part.irons_jewelry.band_barbed": "Barbed Band",
 
   "bonus.irons_jewelry.attribute_bonus": "Attribute",
   "bonus.irons_jewelry.effect_on_hit_bonus": "Effect on Hit",
@@ -88,6 +92,8 @@
   "bonus.irons_jewelry.on_projectile_hit_bonus.description": "On projectile hit, %s",
   "bonus.irons_jewelry.on_take_damage_bonus": "Action when Attacked",
   "bonus.irons_jewelry.on_take_damage_bonus.description": "When Attacked, %s",
+  "bonus.irons_jewelry.on_attack": "Action on Attack",
+  "bonus.irons_jewelry.on_attack.description": "On Attack, %s",
 
   "action.irons_jewelry.apply_effect.self": "Gain %s (%s)",
   "action.irons_jewelry.apply_effect.entity": "Inflict %s (%s)",

@@ -78,6 +78,15 @@ public class ServerEvents {
                                 action -> action.action().handleAction(player.serverLevel(), instance, action.targetSelf(), action.cooldownTicks(), player, victim));
                     }
                 }
+                /*
+                Action on hit
+                 */
+                else if (instance.bonus().equals(BonusRegistry.ON_ATTACK_BONUS.get())) {
+                    if (damageSource.isDirect()) {
+                        BonusRegistry.ON_ATTACK_BONUS.get().getParameterType().resolve(instance).ifPresent(
+                                action -> action.action().handleAction(player.serverLevel(), instance, action.targetSelf(), action.cooldownTicks(), player, victim));
+                    }
+                }
             }
         }
         /*
