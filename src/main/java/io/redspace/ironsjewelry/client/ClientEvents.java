@@ -14,13 +14,19 @@ import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 @EventBusSubscriber(Dist.CLIENT)
 public class ClientEvents {
 
+    private static boolean isShiftKeyDown;
+
+    public static boolean isIsShiftKeyDown() {
+        return isShiftKeyDown;
+    }
+
     @SubscribeEvent
     public static void onLogOut(PlayerEvent.PlayerLoggedOutEvent event) {
         ClientData.clear();
     }
 
     /**
-     Because we are storing the client data on the player itself instead of a static cache, we need to manually update it when the player reference changes
+     * Because we are storing the client data on the player itself instead of a static cache, we need to manually update it when the player reference changes
      */
     @SubscribeEvent
     public static void onClientClone(ClientPlayerNetworkEvent.Clone event) {
@@ -31,8 +37,13 @@ public class ClientEvents {
 
     @SubscribeEvent
     public static void debug(InputEvent.Key event) {
-        if (event.getKey() == InputConstants.KEY_NUMPAD9) {
+        var button = event.getKey();
+        var action = event.getAction();
+        if (button == InputConstants.KEY_NUMPAD9) {
             IronsJewelry.LOGGER.debug("activating debug!");
+        }
+        if (button == InputConstants.KEY_LSHIFT) {
+            isShiftKeyDown = action >= InputConstants.PRESS;
         }
     }
 }

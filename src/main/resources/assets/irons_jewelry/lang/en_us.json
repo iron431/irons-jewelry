@@ -40,6 +40,8 @@
   "pattern.irons_jewelry.amulet_of_protection.item": "%s Amulet of Protection",
   "pattern.irons_jewelry.barbed_band": "Barbed Band",
   "pattern.irons_jewelry.barbed_band.item": "%s Barbed Band",
+  "pattern.irons_jewelry.stonehewn_band": "Stonehewn Band",
+  "pattern.irons_jewelry.stonehewn_band.item": "%s Stonehewn Band",
 
   "material.irons_jewelry.iron": "Iron",
   "material.irons_jewelry.gold": "Gold",
@@ -79,6 +81,8 @@
   "part.irons_jewelry.gem_amulet_of_protection": "Gemstone",
   "part.irons_jewelry.gem_band_barbed": "Gemstone",
   "part.irons_jewelry.band_barbed": "Barbed Band",
+  "part.irons_jewelry.stonehewn_band": "Band",
+
 
   "bonus.irons_jewelry.attribute_bonus": "Attribute",
   "bonus.irons_jewelry.effect_on_hit_bonus": "Effect on Hit",
@@ -109,6 +113,8 @@
   "action.irons_jewelry.apply_freeze.freeze.entity": "Freeze for %s",
   "action.irons_jewelry.heal": "Heal %s HP",
 
+  "tooltip.irons_jewelry.hold_shift" : "[Hold %s for more info]",
+  "tooltip.irons_jewelry.part_to_material" : "%s: %s",
   "tooltip.irons_jewelry.parts_header" : "Parts:",
   "tooltip.irons_jewelry.bonus_header" : "Bonus:",
   "tooltip.irons_jewelry.bonus_header_plural" : "Bonuses:",

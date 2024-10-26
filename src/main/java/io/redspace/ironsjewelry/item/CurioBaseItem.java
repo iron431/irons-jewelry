@@ -2,15 +2,17 @@ package io.redspace.ironsjewelry.item;
 
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
+import io.redspace.ironsjewelry.client.ClientEvents;
+import io.redspace.ironsjewelry.core.IBonusParameterType;
 import io.redspace.ironsjewelry.core.Utils;
 import io.redspace.ironsjewelry.core.bonuses.AttributeBonus;
 import io.redspace.ironsjewelry.core.bonuses.PiglinNeutralBonus;
-import io.redspace.ironsjewelry.core.data.BonusInstance;
-import io.redspace.ironsjewelry.core.data.JewelryData;
+import io.redspace.ironsjewelry.core.data.*;
 import io.redspace.ironsjewelry.registry.BonusRegistry;
 import io.redspace.ironsjewelry.registry.ComponentRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
@@ -20,6 +22,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import top.theillusivec4.curios.api.CuriosApi;
@@ -27,9 +30,8 @@ import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.api.type.capability.ICurioItem;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class CurioBaseItem extends Item implements ICurioItem {
     String slotIdentifier = "";
@@ -67,7 +69,49 @@ public class CurioBaseItem extends Item implements ICurioItem {
     @Override
     public Component getName(ItemStack itemStack) {
         //TODO: cache or use actual item name component entry
-        return JewelryData.get(itemStack).getItemName();
+        if (!itemStack.has(DataComponents.ITEM_NAME)) {
+            itemStack.set(DataComponents.ITEM_NAME, JewelryData.get(itemStack).getItemName());
+        }
+        return Optional.ofNullable(itemStack.get(DataComponents.ITEM_NAME)).orElse(super.getName(itemStack));
+    }
+
+    @Override
+    public void appendHoverText(ItemStack pStack, TooltipContext pContext, List<Component> pTooltipComponents, TooltipFlag pTooltipFlag) {
+        super.appendHoverText(pStack, pContext, pTooltipComponents, pTooltipFlag);
+        var jewelryData = JewelryData.get(pStack);
+        if (jewelryData.isValid()) {
+            if (ClientEvents.isIsShiftKeyDown()) {
+                var parts = jewelryData.parts().entrySet();
+                var ingredients = jewelryData.pattern().value().partTemplate().stream().collect(Collectors.toMap(PartIngredient::part, PartIngredient::drawOrder));
+                var sorted = parts.stream().sorted(Comparator.comparingInt(entry -> ingredients.get(entry.getKey()))).toList();
+                for (Map.Entry<Holder<PartDefinition>, Holder<MaterialDefinition>> entry : sorted) {
+                    var partComponent = Component.translatable(entry.getKey().value().descriptionId());
+                    var materialComponent = Component.translatable(entry.getValue().value().descriptionId());
+//                    Component contribution;
+                    var bonusContribution = jewelryData.pattern().value().bonuses().stream().filter(bonus -> bonus.parameterOrSource().right().isPresent() && bonus.parameterOrSource().right().get().equals(entry.getKey())).findFirst();
+                    var qualityContribution = jewelryData.pattern().value().bonuses().stream().filter(bonus -> bonus.qualityOrSource().right().isPresent() && bonus.qualityOrSource().right().get().equals(entry.getKey())).findFirst();
+                    if (bonusContribution.isPresent()) {
+                        IBonusParameterType type = bonusContribution.get().bonus().getParameterType();
+                        var value = type.resolve(entry.getValue().value().bonusParameters());
+                        //var bonus = bonusContribution.get().getBonusFor(jewelryData);
+                        if (value.isPresent()) {
+                            Optional<String> string = type.getValueDescriptionId(value.get());
+                            if (string.isPresent()) {
+                                //bonusEntries.add(Component.literal(" ").append(Component.translatable("tooltip.irons_jewelry.bonus_to_source", Component.translatable(source.bonus().getDescriptionId()), Component.translatable(string.get()))));
+                                materialComponent.append(Component.literal(" (").append(Component.translatable(string.get())).append(")"));
+                            }
+                        }
+                    }
+                    if (qualityContribution.isPresent()) {
+                        var quality = jewelryData.parts().get(qualityContribution.get().qualityOrSource().right().get()).value().quality();
+                        materialComponent.append(Component.literal(" (x").append(Component.literal(String.valueOf(quality))).append(")"));
+                    }
+                    pTooltipComponents.add(Component.literal("> ").append(Component.translatable("tooltip.irons_jewelry.part_to_material", partComponent, materialComponent.withStyle(ChatFormatting.DARK_GREEN))).withStyle(ChatFormatting.GRAY));
+                }
+            } else {
+                pTooltipComponents.add(Component.translatable("tooltip.irons_jewelry.hold_shift", Component.translatable("key.keyboard.left.shift")).withStyle(ChatFormatting.GRAY));
+            }
+        }
     }
 
     @Override

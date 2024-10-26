@@ -20,7 +20,7 @@ public class ActionParameter implements IBonusParameterType<ActionParameter.Acti
 
     public static final Codec<ActionParameter.ActionRunnable> CODEC = RecordCodecBuilder.create(builder -> builder.group(
             IAction.CODEC.fieldOf("action").forGetter(ActionRunnable::action),
-            QualityScalar.CODEC.optionalFieldOf("cooldownTicks", new QualityScalar(0, 0)).forGetter(ActionRunnable::cooldownTicks),
+            QualityScalar.CODEC.optionalFieldOf("cooldownTicks", new QualityScalar(0,0, 0)).forGetter(ActionRunnable::cooldownTicks),
             Codec.BOOL.fieldOf("targetSelf").forGetter(ActionRunnable::targetSelf)
     ).apply(builder, ActionRunnable::new));
 

@@ -37,7 +37,7 @@
           },
           "cooldownTicks": {
             "base": 60,
-            "scalar": 20
+            "scalar": 0
           }
         }
       },
