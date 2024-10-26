@@ -19,8 +19,9 @@ public class ActionRegistry {
     public static final Supplier<MapCodec<? extends IAction>> APPLY_EFFECT = ACTIONS.register("apply_effect", () -> ApplyEffectAction.CODEC);
     public static final Supplier<MapCodec<? extends IAction>> APPLY_DAMAGE = ACTIONS.register("apply_damage", () -> ApplyDamageAction.CODEC);
     public static final Supplier<MapCodec<? extends IAction>> APPLY_FREEZE = ACTIONS.register("apply_freeze", () -> ApplyFreezeAction.CODEC);
+    public static final Supplier<MapCodec<? extends IAction>> HEAL = ACTIONS.register("heal", () -> HealAction.CODEC);
 
-    public static void register(IEventBus eventBus){
+    public static void register(IEventBus eventBus) {
         ACTIONS.register(eventBus);
     }
 }

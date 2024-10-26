@@ -70,12 +70,12 @@ public class ServerEvents {
             var bonuses = Utils.getEquippedBonuses(player);
             for (BonusInstance instance : bonuses) {
                 /*
-                Effect on projectile hit
+                Action on projectile hit
                  */
                 if (instance.bonus().equals(BonusRegistry.ON_PROJECTILE_HIT_BONUS.get())) {
                     if (damageSource.getDirectEntity() instanceof Projectile) {
                         BonusRegistry.ON_PROJECTILE_HIT_BONUS.get().getParameterType().resolve(instance).ifPresent(
-                                effect -> effect.action().handleAction(player.serverLevel(), instance, effect.targetSelf(), effect.cooldownTicks(), player, victim));
+                                action -> action.action().handleAction(player.serverLevel(), instance, action.targetSelf(), action.cooldownTicks(), player, victim));
                     }
                 }
             }
