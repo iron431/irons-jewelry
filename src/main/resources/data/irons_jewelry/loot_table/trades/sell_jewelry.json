@@ -7,14 +7,7 @@
           "functions": [
             {
               "function": "irons_jewelry:generate_jewelry",
-              "patterns": [
-                "irons_jewelry:simple_band",
-                "irons_jewelry:gemset_ring",
-                "irons_jewelry:improved_gemset_ring",
-                "irons_jewelry:superior_gemset_ring",
-                "irons_jewelry:ranger_ring",
-                "irons_jewelry:tearstone_ring"
-              ]
+              "patterns": "#irons_jewelry:trader_sellable"
             }
           ],
           "name": "irons_jewelry:ring",
@@ -25,11 +18,7 @@
           "functions": [
             {
               "function": "irons_jewelry:generate_jewelry",
-              "patterns": [
-                "irons_jewelry:simple_chain",
-                "irons_jewelry:simple_amulet",
-                "irons_jewelry:amulet_of_protection"
-              ]
+              "patterns": "#irons_jewelry:trader_sellable"
             }
           ],
           "name": "irons_jewelry:necklace"
