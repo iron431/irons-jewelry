@@ -22,7 +22,10 @@
     },
     "irons_jewelry:defensive_action": {
       "targetSelf": false,
-      "cooldownTicks": 80,
+      "cooldownTicks": {
+        "base": 80,
+        "scalar": 0
+      },
       "action": {
         "type": "irons_jewelry:knockback",
         "strength": {

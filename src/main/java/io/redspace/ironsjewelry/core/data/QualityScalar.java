@@ -3,13 +3,14 @@ package io.redspace.ironsjewelry.core.data;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
-public record QualityScalar(double baseAmount, double qualityScalar) {
+public record QualityScalar(double baseAmount, double qualityScalar, double min) {
 
     public static final Codec<QualityScalar> DIRECT_CODEC = RecordCodecBuilder.create(builder -> builder.group(
             Codec.DOUBLE.fieldOf("base").forGetter(QualityScalar::baseAmount),
-            Codec.DOUBLE.fieldOf("scalar").forGetter(QualityScalar::qualityScalar)
+            Codec.DOUBLE.fieldOf("scalar").forGetter(QualityScalar::qualityScalar),
+            Codec.DOUBLE.optionalFieldOf("min", 0d).forGetter(QualityScalar::min)
     ).apply(builder, QualityScalar::new));
-    public static final Codec<QualityScalar> CONSTANT_CODEC = Codec.DOUBLE.xmap(d -> new QualityScalar(d, d), scalar -> scalar.qualityScalar);
+    public static final Codec<QualityScalar> CONSTANT_CODEC = Codec.DOUBLE.xmap(d -> new QualityScalar(d, d, 0), scalar -> scalar.qualityScalar);
 
     public static final Codec<QualityScalar> CODEC = Codec.withAlternative(DIRECT_CODEC, CONSTANT_CODEC);
 
@@ -19,6 +20,6 @@ public record QualityScalar(double baseAmount, double qualityScalar) {
      */
     public double sample(double quality) {
         double d = baseAmount + (quality - 1) * qualityScalar;
-        return baseAmount < 0 ? Math.min(d, 0) : Math.max(d, 0);
+        return baseAmount < 0 ? Math.min(d, min) : Math.max(d, min);
     }
 }

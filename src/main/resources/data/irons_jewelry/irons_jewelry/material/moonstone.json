@@ -12,7 +12,7 @@
     "irons_jewelry:attribute": {
       "attribute": "apothic_attributes:arrow_damage",
       "amount": 0.1,
-      "operation": "add_value"
+      "operation": "add_multiplied_total"
     }
   }
 }

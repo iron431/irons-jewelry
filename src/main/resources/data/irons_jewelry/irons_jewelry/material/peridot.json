@@ -11,8 +11,8 @@
   "bonusParameters": {
     "irons_jewelry:attribute": {
       "attribute": "apothic_attributes:mining_speed",
-      "amount": 0.15,
-      "operation": "add_value"
+      "amount": 0.10,
+      "operation": "add_multiplied_total"
     },
     "irons_jewelry:negative_effect": {
       "effect": "minecraft:poison"

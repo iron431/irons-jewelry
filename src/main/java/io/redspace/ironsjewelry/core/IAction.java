@@ -4,6 +4,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import io.redspace.ironsjewelry.core.data.BonusInstance;
 import io.redspace.ironsjewelry.core.data.PlayerData;
+import io.redspace.ironsjewelry.core.data.QualityScalar;
 import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -19,8 +20,9 @@ public interface IAction {
 
     void apply(ServerLevel serverLevel, double quality, boolean applyToSelf, ServerPlayer wearer, Entity entity);
 
-    default void handleAction(ServerLevel serverLevel, BonusInstance bonusInstance, boolean applyToSelf, int cooldownTicks, ServerPlayer wearer, Entity entity) {
+    default void handleAction(ServerLevel serverLevel, BonusInstance bonusInstance, boolean applyToSelf, QualityScalar cooldown, ServerPlayer wearer, Entity entity) {
         var playerData = PlayerData.get(wearer);
+        int cooldownTicks = ICooldownHandler.INSTANCE.getCooldown(cooldown, bonusInstance.quality());
         if (cooldownTicks <= 0 || !playerData.isOnCooldown(bonusInstance.bonus())) {
             apply(serverLevel, bonusInstance.quality(), applyToSelf, wearer, entity);
             if (cooldownTicks > 0) {

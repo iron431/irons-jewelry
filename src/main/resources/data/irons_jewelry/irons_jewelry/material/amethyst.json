@@ -11,7 +11,7 @@
   "bonusParameters": {
     "irons_jewelry:attribute": {
       "attribute": "apothic_attributes:armor_pierce",
-      "amount": 0.10,
+      "amount": 1,
       "operation": "add_value"
     },
     "irons_jewelry:positive_effect": {

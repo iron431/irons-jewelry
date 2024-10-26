@@ -1,6 +1,5 @@
 package io.redspace.ironsjewelry.event;
 
-import io.redspace.ironsjewelry.core.ICooldownHandler;
 import io.redspace.ironsjewelry.core.Utils;
 import io.redspace.ironsjewelry.core.bonuses.DeathBonus;
 import io.redspace.ironsjewelry.core.bonuses.EffectOnHitBonus;
@@ -44,7 +43,7 @@ public class ServerEvents {
             for (ItemStack stack : items) {
                 JewelryData.ifPresent(stack, jewelryData -> {
                     jewelryData.forBonuses(BonusRegistry.ON_SHIELD_BLOCK_BONUS.get(), ActionParameter.ActionRunnable.class, (bonus, action) -> {
-                        action.action().handleAction(player.serverLevel(), bonus, action.targetSelf(), ICooldownHandler.INSTANCE.getCooldown(action.cooldownTicks(), bonus.quality()), player, livingAttacker);
+                        action.action().handleAction(player.serverLevel(), bonus, action.targetSelf(), action.cooldownTicks(), player, livingAttacker);
                     });
                 });
             }

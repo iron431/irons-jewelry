@@ -21,7 +21,10 @@
         "amount": 40.0,
         "instaFreeze": false
       },
-      "cooldownTicks": 40
+      "cooldownTicks": {
+        "base": 40,
+        "scalar": 10
+      }
     }
   }
 }

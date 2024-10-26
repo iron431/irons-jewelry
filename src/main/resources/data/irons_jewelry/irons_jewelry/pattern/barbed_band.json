@@ -2,7 +2,7 @@
   "unlockedByDefault": false,
   "descriptionId": "pattern.irons_jewelry.barbed_band",
   "nameOffset": 1,
-  "qualityMultiplier": 1.5,
+  "qualityMultiplier": 3,
   "type": "irons_jewelry:ring",
   "parts": [
     {
@@ -35,7 +35,10 @@
               "scalar": 0.5
             }
           },
-          "cooldownTicks": 60
+          "cooldownTicks": {
+            "base": 60,
+            "scalar": 20
+          }
         }
       },
       "quality": "irons_jewelry:gem_band_barbed"
