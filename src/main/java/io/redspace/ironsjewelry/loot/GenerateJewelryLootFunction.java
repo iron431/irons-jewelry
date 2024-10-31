@@ -54,10 +54,12 @@ public record GenerateJewelryLootFunction(
                 var registry = IronsJewelryRegistries.materialRegistry(lootContext.getLevel().registryAccess());
                 for (PartIngredient part : pattern.value().partTemplate()) {
                     // Find applicable materials by
-                    // a): the material can be used for this part
-                    // b): the material filter is empty, or the material filter does not specify this material type, or this material is specified by type in the material filter
+                    // a): the material exists in this world
+                    // b): the material can be used for this part
+                    // c): the material filter is empty, or the material filter does not specify this material type, or this material is specified by type in the material filter
                     List<MaterialDefinition> applicableMaterials = registry.stream().filter(
                             (material) ->
+                                    !material.ingredient().hasNoItems() &&
                                     part.part().value().canUseMaterial(material.materialType()) &&
                                             (materialFilter.isEmpty() ||
                                                     material.materialType().stream().anyMatch(type -> !materialFilter.get().containsKey(type) || materialFilter.get().get(type).contains(registry.wrapAsHolder(material))))
