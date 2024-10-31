@@ -66,6 +66,8 @@ public class SetupEvents {
         //doing this twice increases weight and allows multiple trades per instance (not rare though, because there's always only one)
         for (int i = 0; i < 2; i++) {
             event.getGenericTrades().add(
+                    new Trades.SellItemTag(TagKey.create(Registries.ITEM, IronsJewelry.id("jeweler_sellable_gems")), 6, 15, 0.5f, 8));
+            event.getGenericTrades().add(
                     new Trades.SellLootTable(ResourceKey.create(Registries.LOOT_TABLE, IronsJewelry.id("trades/sell_jewelry")), 4, 25, 0.5f, Trades::calculateJewelryPrice));
             event.getRareTrades().add(
                     new Trades.SellLootTable(ResourceKey.create(Registries.LOOT_TABLE, IronsJewelry.id("trades/wandering_trader_sell_pattern")), 2, 25, 0.5f, Trades::calculatePatternPrice));
