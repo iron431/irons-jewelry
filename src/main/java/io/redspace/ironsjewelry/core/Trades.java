@@ -3,8 +3,10 @@ package io.redspace.ironsjewelry.core;
 import io.redspace.ironsjewelry.core.data.MaterialDefinition;
 import io.redspace.ironsjewelry.registry.ComponentRegistry;
 import net.minecraft.core.Holder;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.npc.VillagerTrades;
@@ -144,6 +146,26 @@ public class Trades {
                     var price = itemCostFunction.apply(stack, pRandom);
                     Optional<ItemCost> secondPrice = price > 64 ? Optional.of(new ItemCost(Items.EMERALD, price - 64)) : Optional.empty();
                     return new MerchantOffer(new ItemCost(Items.EMERALD, Math.min(price, 64)), secondPrice, stack, this.maxUses, this.villagerXp, this.priceMultiplier);
+                }
+            }
+            return null;
+        }
+    }
+
+    public record SellItemTag(TagKey<Item> itemTag, int maxUses, int villagerXp,
+                              float priceMultiplier,
+                              int emeraldValue) implements VillagerTrades.ItemListing {
+        @Override
+        public MerchantOffer getOffer(Entity pTrader, RandomSource pRandom) {
+            if (pTrader.level() instanceof ServerLevel serverLevel) {
+                var options = BuiltInRegistries.ITEM.getTag(this.itemTag);
+                if (options.isPresent()) {
+                    var set = options.get();
+                    var item = set.getRandomElement(pRandom);
+                    if (item.isPresent()) {
+                        var stack = new ItemStack(item.get());
+                        return new MerchantOffer(new ItemCost(Items.EMERALD, emeraldValue), stack, this.maxUses, this.villagerXp, this.priceMultiplier);
+                    }
                 }
             }
             return null;
