@@ -2,7 +2,6 @@ package io.redspace.ironsjewelry;
 
 import com.mojang.logging.LogUtils;
 import io.redspace.ironsjewelry.client.DynamicModel;
-import io.redspace.ironsjewelry.core.Setup;
 import io.redspace.ironsjewelry.registry.*;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
@@ -22,7 +21,6 @@ public class IronsJewelry {
         modEventBus.addListener(CreativeTabRegistry::addCreative);
         modEventBus.addListener(IronsJewelryRegistries::registerRegistries);
         modEventBus.addListener(IronsJewelryRegistries::registerDatapackRegistries);
-        modEventBus.addListener(Setup::commonSetup);
 
         ComponentRegistry.register(modEventBus);
         BonusRegistry.register(modEventBus);

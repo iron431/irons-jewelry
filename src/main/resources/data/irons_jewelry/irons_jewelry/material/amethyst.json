@@ -26,9 +26,13 @@
         "type": "irons_jewelry:apply_damage",
         "damageType": "minecraft:thorns",
         "amount": {
-          "base": 1.0,
-          "scalar": 0.5
+          "base": 3.0,
+          "scalar": 1
         }
+      },
+      "cooldownTicks": {
+        "base": 60,
+        "scalar": 0
       }
     }
   }

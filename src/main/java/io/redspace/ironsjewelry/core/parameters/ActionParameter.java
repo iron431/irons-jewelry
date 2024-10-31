@@ -20,7 +20,7 @@ public class ActionParameter implements IBonusParameterType<ActionParameter.Acti
 
     public static final Codec<ActionParameter.ActionRunnable> CODEC = RecordCodecBuilder.create(builder -> builder.group(
             IAction.CODEC.fieldOf("action").forGetter(ActionRunnable::action),
-            QualityScalar.CODEC.optionalFieldOf("cooldownTicks", new QualityScalar(0,0, 0)).forGetter(ActionRunnable::cooldownTicks),
+            QualityScalar.CODEC.optionalFieldOf("cooldownTicks", new QualityScalar(0, 0, 0)).forGetter(ActionRunnable::cooldownTicks),
             Codec.BOOL.fieldOf("targetSelf").forGetter(ActionRunnable::targetSelf)
     ).apply(builder, ActionRunnable::new));
 
@@ -43,7 +43,7 @@ public class ActionParameter implements IBonusParameterType<ActionParameter.Acti
     public Optional<Component> getCooldownDescriptor(BonusInstance bonusInstance, ActionParameter.ActionRunnable param) {
         var cooldown = ICooldownHandler.INSTANCE.getCooldown(param.cooldownTicks, bonusInstance.quality());
         if (cooldown > 0) {
-            return Optional.of(Component.translatable("tooltip.irons_jewelry.cooldown", Component.literal(Utils.digitalTimeFromTicks(cooldown) + "s").withStyle(ChatFormatting.YELLOW)).withStyle(ChatFormatting.GREEN));
+            return Optional.of(Component.translatable("tooltip.irons_jewelry.cooldown", Component.literal(Utils.timeFromTicks(cooldown, 1)).withStyle(ChatFormatting.YELLOW)).withStyle(ChatFormatting.GREEN));
         } else {
             return Optional.empty();
         }

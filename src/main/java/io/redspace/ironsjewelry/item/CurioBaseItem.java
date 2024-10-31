@@ -81,12 +81,15 @@ public class CurioBaseItem extends Item implements ICurioItem {
         var jewelryData = JewelryData.get(pStack);
         if (jewelryData.isValid()) {
             if (ClientEvents.isIsShiftKeyDown()) {
+                pTooltipComponents.add(Component.translatable("tooltip.irons_jewelry.hold_shift", Component.translatable("key.keyboard.left.shift").withStyle(ChatFormatting.WHITE)).withStyle(ChatFormatting.GRAY));
                 var parts = jewelryData.parts().entrySet();
                 var ingredients = jewelryData.pattern().value().partTemplate().stream().collect(Collectors.toMap(PartIngredient::part, PartIngredient::drawOrder));
                 var sorted = parts.stream().sorted(Comparator.comparingInt(entry -> ingredients.get(entry.getKey()))).toList();
                 for (Map.Entry<Holder<PartDefinition>, Holder<MaterialDefinition>> entry : sorted) {
                     var partComponent = Component.translatable(entry.getKey().value().descriptionId());
                     var materialComponent = Component.translatable(entry.getValue().value().descriptionId());
+                    Optional<Component> bonusComponent = Optional.empty();
+                    Optional<Component> qualityComponent = Optional.empty();
 //                    Component contribution;
                     var bonusContribution = jewelryData.pattern().value().bonuses().stream().filter(bonus -> bonus.parameterOrSource().right().isPresent() && bonus.parameterOrSource().right().get().equals(entry.getKey())).findFirst();
                     var qualityContribution = jewelryData.pattern().value().bonuses().stream().filter(bonus -> bonus.qualityOrSource().right().isPresent() && bonus.qualityOrSource().right().get().equals(entry.getKey())).findFirst();
@@ -98,18 +101,20 @@ public class CurioBaseItem extends Item implements ICurioItem {
                             Optional<String> string = type.getValueDescriptionId(value.get());
                             if (string.isPresent()) {
                                 //bonusEntries.add(Component.literal(" ").append(Component.translatable("tooltip.irons_jewelry.bonus_to_source", Component.translatable(source.bonus().getDescriptionId()), Component.translatable(string.get()))));
-                                materialComponent.append(Component.literal(" (").append(Component.translatable(string.get())).append(")"));
+                                bonusComponent = Optional.of(Component.literal("  * ").append(Component.translatable(string.get()).withStyle(ChatFormatting.WHITE)).withStyle(ChatFormatting.DARK_GRAY));
                             }
                         }
                     }
                     if (qualityContribution.isPresent()) {
                         var quality = jewelryData.parts().get(qualityContribution.get().qualityOrSource().right().get()).value().quality();
-                        materialComponent.append(Component.literal(" (x").append(Component.literal(String.valueOf(quality))).append(")"));
+                        qualityComponent = Optional.of(Component.literal("  * ").append(Component.translatable("tooltip.irons_jewelry.quality_multiplier",quality).withStyle(ChatFormatting.WHITE)).withStyle(ChatFormatting.DARK_GRAY));
                     }
-                    pTooltipComponents.add(Component.literal("> ").append(Component.translatable("tooltip.irons_jewelry.part_to_material", partComponent, materialComponent.withStyle(ChatFormatting.DARK_GREEN))).withStyle(ChatFormatting.GRAY));
+                    pTooltipComponents.add(Component.literal("> ").append(Component.translatable("tooltip.irons_jewelry.part_to_material", partComponent, materialComponent.withStyle(ChatFormatting.DARK_AQUA))).withStyle(ChatFormatting.GRAY));
+                    bonusComponent.ifPresent(pTooltipComponents::add);
+                    qualityComponent.ifPresent(pTooltipComponents::add);
                 }
             } else {
-                pTooltipComponents.add(Component.translatable("tooltip.irons_jewelry.hold_shift", Component.translatable("key.keyboard.left.shift")).withStyle(ChatFormatting.GRAY));
+                pTooltipComponents.add(Component.translatable("tooltip.irons_jewelry.hold_shift", Component.translatable("key.keyboard.left.shift").withStyle(ChatFormatting.DARK_GRAY)).withStyle(ChatFormatting.GRAY));
             }
         }
     }

@@ -113,8 +113,9 @@
   "action.irons_jewelry.apply_freeze.freeze.entity": "Freeze for %s",
   "action.irons_jewelry.heal": "Heal %s HP",
 
-  "tooltip.irons_jewelry.hold_shift" : "[Hold %s for more info]",
+  "tooltip.irons_jewelry.hold_shift" : "[%s] +",
   "tooltip.irons_jewelry.part_to_material" : "%s: %s",
+  "tooltip.irons_jewelry.quality_multiplier" : "x%s Quality",
   "tooltip.irons_jewelry.parts_header" : "Parts:",
   "tooltip.irons_jewelry.bonus_header" : "Bonus:",
   "tooltip.irons_jewelry.bonus_header_plural" : "Bonuses:",
