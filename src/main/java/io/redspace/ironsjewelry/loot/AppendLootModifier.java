@@ -15,27 +15,30 @@ import net.neoforged.neoforge.common.loot.IGlobalLootModifier;
 import net.neoforged.neoforge.common.loot.LootModifier;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.function.Supplier;
 
 public class AppendLootModifier extends LootModifier {
     public static final Supplier<MapCodec<AppendLootModifier>> CODEC = Suppliers.memoize(()
             -> RecordCodecBuilder.mapCodec(builder -> codecStart(builder).and(
-            Codec.STRING.fieldOf("key").forGetter(m -> m.resourceLocationKey)).apply(builder, AppendLootModifier::new)));
-    private final String resourceLocationKey;
+            Codec.list(Codec.STRING).fieldOf("keys").forGetter(m -> m.resourceLocationKeys)).apply(builder, AppendLootModifier::new)));
+    private final List<String> resourceLocationKeys;
 
-    protected AppendLootModifier(LootItemCondition[] conditionsIn, String resourceLocationKey) {
+    protected AppendLootModifier(LootItemCondition[] conditionsIn, List<String> resourceLocationKey) {
         super(conditionsIn);
-        this.resourceLocationKey = resourceLocationKey;
+        this.resourceLocationKeys = resourceLocationKey;
     }
 
     @Override
     protected @NotNull ObjectArrayList<ItemStack> doApply(ObjectArrayList<ItemStack> generatedLoot, LootContext context) {
-        ResourceLocation path = ResourceLocation.parse(resourceLocationKey);
-        var lootTable = context.getLevel().getServer().reloadableRegistries().getLootTable(ResourceKey.create(Registries.LOOT_TABLE, path));
-        ObjectArrayList<ItemStack> objectarraylist = new ObjectArrayList<>();
-        //use raw to avoid stack overflow/recursively adding all global loot modifiers
-        lootTable.getRandomItemsRaw(context, objectarraylist::add);
-        generatedLoot.addAll(objectarraylist);
+        for (String resourceLocation : resourceLocationKeys) {
+            ResourceLocation path = ResourceLocation.parse(resourceLocation);
+            var lootTable = context.getLevel().getServer().reloadableRegistries().getLootTable(ResourceKey.create(Registries.LOOT_TABLE, path));
+            ObjectArrayList<ItemStack> objectarraylist = new ObjectArrayList<>();
+            //use raw to avoid recursively adding all global loot modifiers again
+            lootTable.getRandomItemsRaw(context, objectarraylist::add);
+            generatedLoot.addAll(objectarraylist);
+        }
         return generatedLoot;
     }
 

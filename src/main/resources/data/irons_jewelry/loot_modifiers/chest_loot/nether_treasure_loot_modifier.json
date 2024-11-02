@@ -11,5 +11,6 @@
       ]
     }
   ],
-  "key": "irons_jewelry:modifiers/nether_treasure_pattern_loot"
+  "keys": ["irons_jewelry:modifiers/nether_treasure_pattern_loot",
+    "irons_jewelry:modifiers/generic_gem_loot"]
 }
