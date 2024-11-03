@@ -19,6 +19,24 @@
     },
     "irons_jewelry:negative_effect": {
       "effect": "minecraft:bad_omen"
+    },
+    "irons_jewelry:defensive_action": {
+      "targetSelf": true,
+      "action": {
+        "type": "irons_jewelry:explode",
+        "translation": "action.irons_jewelry.explode.wind_burst",
+        "affect_self": false,
+        "radius": 3,
+        "block_interaction": "none",
+        "large_particle": {
+          "type": "minecraft:gust_emitter_large"
+        },
+        "small_particle": {
+          "type": "minecraft:gust_emitter_small"
+        },
+        "sound": "minecraft:entity.wind_charge.wind_burst"
+      },
+      "cooldownTicks": 200
     }
   }
 }

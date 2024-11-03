@@ -56,7 +56,10 @@ public record ApplyEffectAction(QualityScalar duration, QualityScalar amplifier,
                     "potion.withAmplifier", effectComponent, Component.translatable("potion.potency." + amp)
             ).withStyle(color);
         }
-        var timeComponenet = effect.value().isInstantenous() ? Component.literal("") : Component.literal(Utils.digitalTimeFromTicks(ticks, true)).withStyle(color);
+        var timeComponenet = Component.empty();
+        if (!effect.value().isInstantenous()) {
+            timeComponenet = Component.literal(String.format(" (%s)", Utils.digitalTimeFromTicks(ticks, true))).withStyle(color);
+        }
         return Component.translatable((applyToSelf ? "action.irons_jewelry.apply_effect.self" : "action.irons_jewelry.apply_effect.entity"), effectComponent, timeComponenet);
     }
 

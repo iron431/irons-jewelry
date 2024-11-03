@@ -100,8 +100,8 @@
   "bonus.irons_jewelry.on_attack": "Action on Attack",
   "bonus.irons_jewelry.on_attack.description": "On Attack, %s",
 
-  "action.irons_jewelry.apply_effect.self": "Gain %s (%s)",
-  "action.irons_jewelry.apply_effect.entity": "Inflict %s (%s)",
+  "action.irons_jewelry.apply_effect.self": "Gain %s%s",
+  "action.irons_jewelry.apply_effect.entity": "Inflict %s%s",
   "action.irons_jewelry.knockback.push": "Knock %s Back",
   "action.irons_jewelry.knockback.pull": "Pull %s In",
   "action.irons_jewelry.ignite": "Ignite %s for %s",
@@ -111,6 +111,8 @@
   "action.irons_jewelry.apply_freeze.freeze.self": "Freeze Self for %s",
   "action.irons_jewelry.apply_freeze.add.entity": "Inflict %s of Freeze",
   "action.irons_jewelry.apply_freeze.freeze.entity": "Freeze for %s",
+  "action.irons_jewelry.explode": "Create a %s explosion",
+  "action.irons_jewelry.explode.wind_burst": "Wind Burst",
   "action.irons_jewelry.heal": "Heal %s HP",
 
   "tooltip.irons_jewelry.hold_shift" : "[%s] +",

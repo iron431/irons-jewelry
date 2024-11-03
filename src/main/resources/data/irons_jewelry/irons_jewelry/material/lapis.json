@@ -13,6 +13,19 @@
       "attribute": "apothic_attributes:experience_gained",
       "amount": 0.10,
       "operation": "add_multiplied_total"
+    },
+    "irons_jewelry:defensive_action": {
+      "targetSelf": false,
+      "action": {
+        "type": "irons_jewelry:apply_effect",
+        "duration": 80,
+        "amplifier": {
+          "base": 0,
+          "scalar": 1,
+          "max": 2
+        },
+        "effect": "minecraft:slowness"
+      }
     }
   }
 }

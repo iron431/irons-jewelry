@@ -7,12 +7,12 @@
   "parts": [
     {
       "id": "irons_jewelry:band_barbed",
-      "materialCost": 4,
+      "materialCost": 8,
       "drawOrder": 0
     },
     {
       "id": "irons_jewelry:gem_band_barbed",
-      "materialCost": 1,
+      "materialCost": 3,
       "drawOrder": 1
     }
   ],

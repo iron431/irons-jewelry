@@ -19,6 +19,21 @@
     },
     "irons_jewelry:negative_effect": {
       "effect": "minecraft:weakness"
+    },
+    "irons_jewelry:defensive_action": {
+      "targetSelf": false,
+      "action": {
+        "type": "irons_jewelry:apply_damage",
+        "damageType": "minecraft:magic",
+        "amount": {
+          "base": 1.0,
+          "scalar": 1
+        }
+      },
+      "cooldownTicks": {
+        "base": 60,
+        "scalar": 0
+      }
     }
   }
 }

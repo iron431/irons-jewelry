@@ -14,6 +14,9 @@
       "amount": 2,
       "operation": "add_value"
     },
+    "irons_jewelry:negative_effect": {
+      "effect": "minecraft:hunger"
+    },
     "irons_jewelry:defensive_action": {
       "targetSelf": false,
       "action": {
