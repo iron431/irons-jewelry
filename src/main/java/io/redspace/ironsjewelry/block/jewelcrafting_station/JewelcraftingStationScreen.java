@@ -214,7 +214,7 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
             var pose = guiGraphics.pose();
             pose.pushPose();
             //pose.translate(leftPos + 61 + 95 / 2f, topPos + 13 + 60 / 2f, 100);
-            pose.translate(leftPos + imageWidth + 9 * scale + 16, topPos + 8 * scale + (baseLines + 1) * font.lineHeight + topBuffer + 4, 100);
+            pose.translate(leftPos + imageWidth + 9 * scale + 16, topPos + 8 * scale + (baseLines + 1) * font.lineHeight + topBuffer + 9, 100);
             pose.scale(16 * scale, -16 * scale, 16 * scale);
             pose.mulPose(Axis.YP.rotationDegrees(Minecraft.getInstance().player.tickCount + pPartialTick * 1.5f));
             Lighting.setupForFlatItems();

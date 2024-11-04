@@ -95,24 +95,25 @@ public class CurioBaseItem extends Item implements ICurioItem {
     public static List<Component> getShiftDescription(PatternDefinition pattern, Map<Holder<PartDefinition>, Holder<MaterialDefinition>> parts, Optional<List<Integer>> materialCost) {
         List<Component> components = new ArrayList<>();
         for (int i = 0; i < pattern.partTemplate().size(); i++) {
-            var part = pattern.partTemplate().get(i);
-            var partComponent = Component.translatable(part.part().value().descriptionId());
+            var partIngredient = pattern.partTemplate().get(i);
+            var part = partIngredient.part();
+            var partComponent = Component.translatable(part.value().descriptionId());
             MutableComponent materialComponent;
             Optional<Component> bonusComponent = Optional.empty();
             Optional<Component> qualityComponent = Optional.empty();
             int i2 = i;
             Optional<MutableComponent> costComponent = materialCost.map(list -> {
-                var count = list.size() > i2 ? list.get(i2) : 0;
-                String cost = String.format("(%s/%s)", count, part.materialCost());
-                return Optional.of(Component.literal("  * ").append(Component.literal(cost).withStyle(count >= part.materialCost() ? ChatFormatting.GREEN : ChatFormatting.RED)).withStyle(ChatFormatting.DARK_GRAY));
+                var count = list.size() > i2 && parts.containsKey(part) && part.value().canUseMaterial(parts.get(part).value().materialType()) ? list.get(i2) : 0;
+                String cost = String.format("(%s/%s)", count, partIngredient.materialCost());
+                return Optional.of(Component.literal("  * ").append(Component.literal(cost).withStyle(count >= partIngredient.materialCost() ? ChatFormatting.GREEN : ChatFormatting.RED)).withStyle(ChatFormatting.DARK_GRAY));
             }).orElse(Optional.empty());
-            if (!parts.containsKey(part.part())) {
+            if (!parts.containsKey(part)) {
                 materialComponent = Component.translatable("tooltip.irons_jewelry.empty").withStyle(ChatFormatting.RED);
             } else {
-                var mat = parts.get(part.part());
+                var mat = parts.get(part);
                 materialComponent = Component.translatable(mat.value().descriptionId()).withStyle(ChatFormatting.DARK_AQUA);
-                var bonusContribution = pattern.bonuses().stream().filter(bonus -> bonus.parameterOrSource().right().isPresent() && bonus.parameterOrSource().right().get().equals(part.part())).findFirst();
-                var qualityContribution = pattern.bonuses().stream().filter(bonus -> bonus.qualityOrSource().right().isPresent() && bonus.qualityOrSource().right().get().equals(part.part())).findFirst();
+                var bonusContribution = pattern.bonuses().stream().filter(bonus -> bonus.parameterOrSource().right().isPresent() && bonus.parameterOrSource().right().get().equals(part)).findFirst();
+                var qualityContribution = pattern.bonuses().stream().filter(bonus -> bonus.qualityOrSource().right().isPresent() && bonus.qualityOrSource().right().get().equals(part)).findFirst();
                 if (bonusContribution.isPresent()) {
                     IBonusParameterType type = bonusContribution.get().bonus().getParameterType();
                     var value = type.resolve(mat.value().bonusParameters());
