@@ -109,6 +109,7 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
     @Override
     protected void init() {
         super.init();
+        leftPos -= 31/2;// recenter based on list addition
         patternButtons = new ArrayList<>();
         for (int i = 0; i < availablePatterns.size(); i++) {
             int index = i;
@@ -172,14 +173,10 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
                 }
             }
         }
-        //todo: lore page
-        //guiGraphics.blitSprite(LORE_PAGE, leftPos + imageWidth, topPos, 80, 165);
     }
 
     private void renderItemPreview(GuiGraphics guiGraphics, float pPartialTick, int pMouseX, int pMouseY) {
         if (selectedPattern >= 0) {
-
-
             var pattern = availablePatterns.get(selectedPattern).value();
             var parts = new HashMap<Holder<PartDefinition>, Holder<MaterialDefinition>>();
             var requiredIngredients = pattern.partTemplate();
@@ -212,9 +209,16 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
             ItemStack stack = new ItemStack(pattern.jewelryType().item());
             stack.set(ComponentRegistry.JEWELRY_COMPONENT, jewelryData);
             var pose = guiGraphics.pose();
+            int width = 0;
+            for (Component component : tooltip) {
+                int i = font.width(component.getString());
+                if (i > width) {
+                    width = i;
+                }
+            }
             pose.pushPose();
             //pose.translate(leftPos + 61 + 95 / 2f, topPos + 13 + 60 / 2f, 100);
-            pose.translate(leftPos + imageWidth + 9 * scale + 16, topPos + 8 * scale + (baseLines + 1) * font.lineHeight + topBuffer + 9, 100);
+            pose.translate(leftPos + imageWidth + width / 2f/* + 9 * scale + 16*/, topPos + 8 * scale + (baseLines + 1) * font.lineHeight + topBuffer + 4, 100);
             pose.scale(16 * scale, -16 * scale, 16 * scale);
             pose.mulPose(Axis.YP.rotationDegrees(Minecraft.getInstance().player.tickCount + pPartialTick * 1.5f));
             Lighting.setupForFlatItems();
@@ -242,11 +246,10 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
             int j2 = j;
             var poseStack = guiGraphics.pose();
             poseStack.pushPose();
-            int j1 = 400;
-            var bgstart = 0xf0100010;
-            var bgend = bgstart;
-            var borderstart = 0x505000FF;
-            var borderend = 0x5028007f;
+            var bgstart = 0xb4260f0c;//0xf0511d17;//0xf0100010;
+            var bgend = bgstart;//0xf0361d17;//bgstart;
+            var borderstart = 0x50e0ca9f;//0x505000FF;
+            var borderend = 0x50a09172;//0x5028007f;
             guiGraphics.drawManaged(() -> TooltipRenderUtil.renderTooltipBackground(guiGraphics, x, y, i2, j2, 0, bgstart, bgend, borderstart, borderend));
             int k1 = y;
 
