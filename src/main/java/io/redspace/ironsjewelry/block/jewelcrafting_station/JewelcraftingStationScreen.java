@@ -4,7 +4,6 @@ import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.math.Axis;
 import io.redspace.ironsjewelry.IronsJewelry;
 import io.redspace.ironsjewelry.client.DynamicModel;
-import io.redspace.ironsjewelry.core.IBonusParameterType;
 import io.redspace.ironsjewelry.core.Utils;
 import io.redspace.ironsjewelry.core.data.*;
 import io.redspace.ironsjewelry.item.CurioBaseItem;
@@ -35,7 +34,6 @@ import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
 public class JewelcraftingStationScreen extends AbstractContainerScreen<JewelcraftingStationMenu> {
@@ -220,7 +218,7 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
             //pose.translate(leftPos + 61 + 95 / 2f, topPos + 13 + 60 / 2f, 100);
             pose.translate(leftPos + imageWidth + width / 2f/* + 9 * scale + 16*/, topPos + 8 * scale + (baseLines + 1) * font.lineHeight + topBuffer + 4, 100);
             pose.scale(16 * scale, -16 * scale, 16 * scale);
-            pose.mulPose(Axis.YP.rotationDegrees(Minecraft.getInstance().player.tickCount + pPartialTick * 1.5f));
+            pose.mulPose(Axis.YP.rotationDegrees(Minecraft.getInstance().player.tickCount + pPartialTick * 1.75f));
             Lighting.setupForFlatItems();
             Minecraft.getInstance().getItemRenderer().renderStatic(stack, ItemDisplayContext.GUI, LightTexture.FULL_BLOCK, OverlayTexture.NO_OVERLAY, pose, guiGraphics.bufferSource(), null, 0);
             guiGraphics.flush();
@@ -238,10 +236,8 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
                 if (k > i) {
                     i = k;
                 }
-
                 j += clienttooltipcomponent.getHeight();
             }
-
             int i2 = i;
             int j2 = j;
             var poseStack = guiGraphics.pose();
@@ -258,15 +254,12 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
                 clienttooltipcomponent1.renderText(font, x, k1, poseStack.last().pose(), guiGraphics.bufferSource());
                 k1 += clienttooltipcomponent1.getHeight() + (l1 == 0 ? 2 : 0);
             }
-
             k1 = y;
-
             for (int k2 = 0; k2 < pComponents.size(); k2++) {
                 ClientTooltipComponent clienttooltipcomponent2 = pComponents.get(k2);
                 clienttooltipcomponent2.renderImage(font, x, k1, guiGraphics);
                 k1 += clienttooltipcomponent2.getHeight() + (k2 == 0 ? 2 : 0);
             }
-
             poseStack.popPose();
         }
     }
@@ -276,86 +269,11 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
     public void render(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
         renderSidebar(guiGraphics, mouseX, mouseY);
-
-        renderLorePage(guiGraphics, mouseX, mouseY);
         this.renderTooltip(guiGraphics, mouseX, mouseY);
     }
 
     private boolean isHovering(int mouseX, int mouseY, int xmin, int ymin, int width, int height) {
         return mouseX > xmin && mouseX < xmin + width && mouseY > ymin && mouseY < ymin + height;
-    }
-
-    private void renderLorePage(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        if (true) {
-            return;
-        }
-        if (selectedPattern < 0 || Minecraft.getInstance().level == null) {
-            return;
-        }
-        /*
-        Example page:
-
-        Gemset Ring
-        Band (0/4)
-        - Empty
-        Gem (1/1)
-         - Diamond: Max Health
-
-         Bonus:
-         +2 Max Health
-         */
-        var pattern = availablePatterns.get(selectedPattern).value();
-        int lorePageWidth = 80;
-        int lineHeight = font.lineHeight;
-        AtomicInteger lineY = new AtomicInteger(3);
-        int maxWidth = lorePageWidth - 15;
-        int leftMargin = leftPos + imageWidth + 2;
-        var title = Component.translatable(pattern.descriptionId()).withStyle(ChatFormatting.UNDERLINE);
-        font.split(title, maxWidth).forEach(text -> guiGraphics.drawCenteredString(font, text, leftPos + imageWidth + lorePageWidth / 2, topPos + lineY.getAndAdd(lineHeight), 0xFFFFFF));
-        lineY.addAndGet(lineHeight / 2);
-        for (int i = 0; i < pattern.partTemplate().size(); i++) {
-            List<Component> bonusEntries = new ArrayList<>();
-            Optional<Component> qualityEntry = Optional.empty();
-            var part = pattern.partTemplate().get(i);
-            String materialOrEmptyKey = "tooltip.irons_jewelry.empty";
-            if (i < menu.workspaceSlots.size()) {
-                var slot = menu.workspaceSlots.get(i);
-                if (slot.isActive()) {
-                    var stack = slot.getItem();
-                    var material = Utils.getMaterialForIngredient(Minecraft.getInstance().level.registryAccess(), stack);
-                    if (material.isPresent() && part.part().value().canUseMaterial(material.get().value().materialType())) {
-                        materialOrEmptyKey = material.get().value().descriptionId();
-                        //is for bonus?
-                        var bonusForPart = pattern.bonuses().stream().filter(source -> source.parameterOrSource().right().isPresent() && source.parameterOrSource().right().get().equals(part.part())).toList();
-                        for (BonusSource source : bonusForPart) {
-                            IBonusParameterType type = source.bonus().getParameterType();
-                            var value = type.resolve(material.get().value().bonusParameters());
-                            if (value.isPresent()) {
-                                Optional<String> string = type.getValueDescriptionId(value.get());
-                                if (string.isPresent()) {
-                                    bonusEntries.add(Component.literal(" ").append(Component.translatable("tooltip.irons_jewelry.bonus_to_source", Component.translatable(source.bonus().getDescriptionId()), Component.translatable(string.get()))));
-                                }
-                            }
-                        }
-                        //is for quality?
-                        var qualityForPart = pattern.bonuses().stream().filter(source -> source.qualityOrSource().right().isPresent() && source.qualityOrSource().right().get().equals(part.part())).findFirst();
-                        if (qualityForPart.isPresent()) {
-                            qualityEntry = Optional.of(Component.literal(" ").append(Component.translatable("tooltip.irons_jewelry.quality_to_source", material.get().value().quality())));
-                        }
-                    }
-                }
-            }
-            int current = getMaterialCount(i, part.part());
-            int cost = part.materialCost();
-            String counter = String.format("(%s/%s)", current, cost);
-            var partHeader = Component.translatable(part.part().value().descriptionId()).append(": ").append(Component.translatable(materialOrEmptyKey)).append(" ").append(Component.literal(counter).withStyle(current >= cost ? ChatFormatting.GREEN : ChatFormatting.RED));
-            //var partEntry = Component.literal("- ").append(Component.translatable(materialOrEmptyKey));
-
-            guiGraphics.drawString(font, partHeader, leftMargin, topPos + lineY.getAndAdd(lineHeight), 0xFFFFFF);
-            //guiGraphics.drawString(font, partEntry, leftMargin, topPos + lineY.getAndAdd(lineHeight), 0xFFFFFF);
-            bonusEntries.forEach(component -> guiGraphics.drawString(font, component, leftMargin, topPos + lineY.getAndAdd(lineHeight), 0xFFFFFF));
-            qualityEntry.ifPresent(component -> guiGraphics.drawString(font, component, leftMargin, topPos + lineY.getAndAdd(lineHeight), 0xFFFFFF));
-        }
     }
 
     private int getMaterialCount(int index, Holder<PartDefinition> forPart) {
