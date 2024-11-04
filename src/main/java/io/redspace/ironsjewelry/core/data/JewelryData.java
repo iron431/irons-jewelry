@@ -91,6 +91,18 @@ public class JewelryData {
                         ).hashCode();
     }
 
+    private JewelryData(PatternDefinition pattern, Map<Holder<PartDefinition>, Holder<MaterialDefinition>> parts) {
+        this.pattern = Holder.direct(pattern);
+        this.parts = parts;
+        this.valid = true;
+        this.bonuses = List.of();
+        this.hashCode = parts.hashCode();
+    }
+
+    public static JewelryData renderable(PatternDefinition pattern, Map<Holder<PartDefinition>, Holder<MaterialDefinition>> parts) {
+        return new JewelryData(pattern, parts);
+    }
+
     private JewelryData() {
         this.pattern = null;
         this.valid = false;

@@ -1,5 +1,7 @@
 package io.redspace.ironsjewelry.block.jewelcrafting_station;
 
+import com.mojang.blaze3d.platform.Lighting;
+import com.mojang.math.Axis;
 import io.redspace.ironsjewelry.IronsJewelry;
 import io.redspace.ironsjewelry.client.DynamicModel;
 import io.redspace.ironsjewelry.core.IBonusParameterType;
@@ -7,12 +9,15 @@ import io.redspace.ironsjewelry.core.Utils;
 import io.redspace.ironsjewelry.core.data.*;
 import io.redspace.ironsjewelry.network.packets.SetJewelcraftingStationPattern;
 import io.redspace.ironsjewelry.network.packets.SyncJewelcraftingSlotStates;
+import io.redspace.ironsjewelry.registry.ComponentRegistry;
 import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
@@ -20,13 +25,12 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.InventoryMenu;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
@@ -147,24 +151,60 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float pPartialTick, int pMouseX, int pMouseY) {
         guiGraphics.blit(BACKGROUND_TEXTURE, leftPos, topPos, 0, 0, this.imageWidth, this.imageHeight);
+        renderItemPreview(guiGraphics, pPartialTick, pMouseX, pMouseY);
         for (int i = 0; i < menu.workspaceSlots.size(); i++) {
             var slot = menu.workspaceSlots.get(i);
             if (!slot.isActive()) {
                 break;
             }
-            guiGraphics.blitSprite(INPUT_SLOT, leftPos + slot.x - 3, topPos + slot.y - 3, 22, 22);
+            guiGraphics.blitSprite(INPUT_SLOT, leftPos + slot.x - 3, topPos + slot.y - 3, 200, 22, 22);
             if (!slot.hasItem()) {
                 if (selectedPattern >= 0) {
                     var pattern = availablePatterns.get(selectedPattern).value();
                     var parts = pattern.partTemplate();
                     if (i < parts.size()) {
-                        guiGraphics.blit(leftPos + slot.x, topPos + slot.y, 0, 16, 16, getMenuSprite(parts.get(i).part(), false));
+                        guiGraphics.blit(leftPos + slot.x, topPos + slot.y, 200, 16, 16, getMenuSprite(parts.get(i).part(), false));
                     }
                 }
             }
         }
         //todo: lore page
         //guiGraphics.blitSprite(LORE_PAGE, leftPos + imageWidth, topPos, 80, 165);
+    }
+
+    private void renderItemPreview(GuiGraphics guiGraphics, float pPartialTick, int pMouseX, int pMouseY) {
+        if (selectedPattern >= 0) {
+            var pattern = availablePatterns.get(selectedPattern).value();
+            var parts = new HashMap<Holder<PartDefinition>, Holder<MaterialDefinition>>();
+            var requiredIngredients = pattern.partTemplate();
+            for (int i = 0; i < requiredIngredients.size(); i++) {
+                var ingredient = requiredIngredients.get(i);
+                var input = menu.workspaceSlots.get(i).getItem();
+                var material = Utils.getMaterialForIngredient(Minecraft.getInstance().player.level.registryAccess(), input);
+                if (material.isPresent() && ingredient.part().value().canUseMaterial(material.get().value().materialType())) {
+                    parts.put(ingredient.part(), material.get());
+                    //var texture = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(DynamicModel.atlasResourceLocaction(ingredient.part(), material.get().value().paletteLocation().getPath()));
+                }
+            }
+            if (parts.isEmpty()) {
+                return;
+            }
+            JewelryData jewelryData = JewelryData.renderable(pattern, parts);
+            //var baker = new ModelBakery.ModelBakerImpl(pTextureGetter, p_351687_)
+            //BakedModel model = DynamicModel.bake(jewelryData, StandaloneGeometryBakingContext.INSTANCE,Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS), new SimpleModelState(Transformation.identity()), new ItemOverrides())
+            ItemStack stack = new ItemStack(pattern.jewelryType().item());
+            stack.set(ComponentRegistry.JEWELRY_COMPONENT, jewelryData);
+            var pose = guiGraphics.pose();
+            pose.pushPose();
+            float scale = 3;
+            pose.translate(leftPos + 61 + 95 / 2f, topPos + 13 + 60 / 2f, 100);
+            pose.scale(16 * scale, -16 * scale, 16 * scale);
+            pose.mulPose(Axis.YP.rotationDegrees(Minecraft.getInstance().player.tickCount + pPartialTick * 1.5f));
+            Lighting.setupForFlatItems();
+            Minecraft.getInstance().getItemRenderer().renderStatic(stack, ItemDisplayContext.GUI, LightTexture.FULL_BLOCK, OverlayTexture.NO_OVERLAY, pose, guiGraphics.bufferSource(), null, 0);
+            guiGraphics.flush();
+            pose.popPose();
+        }
     }
 
 
@@ -259,7 +299,7 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
             var slot = menu.workspaceSlots.get(index);
             if (slot.isActive()) {
                 var stack = slot.getItem();
-                var material = Utils.getMaterialForIngredient(Minecraft.getInstance().level.registryAccess(),stack);
+                var material = Utils.getMaterialForIngredient(Minecraft.getInstance().level.registryAccess(), stack);
                 if (material.isPresent() && forPart.value().canUseMaterial(material.get().value().materialType())) {
                     return stack.getCount();
                 }
