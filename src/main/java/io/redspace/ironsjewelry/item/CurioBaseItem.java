@@ -14,6 +14,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.LivingEntity;
@@ -31,7 +32,6 @@ import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.api.type.capability.ICurioItem;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class CurioBaseItem extends Item implements ICurioItem {
     String slotIdentifier = "";
@@ -82,41 +82,60 @@ public class CurioBaseItem extends Item implements ICurioItem {
         if (jewelryData.isValid()) {
             if (ClientEvents.isIsShiftKeyDown()) {
                 pTooltipComponents.add(Component.translatable("tooltip.irons_jewelry.hold_shift", Component.translatable("key.keyboard.left.shift").withStyle(ChatFormatting.WHITE)).withStyle(ChatFormatting.GRAY));
-                var parts = jewelryData.parts().entrySet();
-                var ingredients = jewelryData.pattern().value().partTemplate().stream().collect(Collectors.toMap(PartIngredient::part, PartIngredient::drawOrder));
-                var sorted = parts.stream().sorted(Comparator.comparingInt(entry -> ingredients.get(entry.getKey()))).toList();
-                for (Map.Entry<Holder<PartDefinition>, Holder<MaterialDefinition>> entry : sorted) {
-                    var partComponent = Component.translatable(entry.getKey().value().descriptionId());
-                    var materialComponent = Component.translatable(entry.getValue().value().descriptionId());
-                    Optional<Component> bonusComponent = Optional.empty();
-                    Optional<Component> qualityComponent = Optional.empty();
-//                    Component contribution;
-                    var bonusContribution = jewelryData.pattern().value().bonuses().stream().filter(bonus -> bonus.parameterOrSource().right().isPresent() && bonus.parameterOrSource().right().get().equals(entry.getKey())).findFirst();
-                    var qualityContribution = jewelryData.pattern().value().bonuses().stream().filter(bonus -> bonus.qualityOrSource().right().isPresent() && bonus.qualityOrSource().right().get().equals(entry.getKey())).findFirst();
-                    if (bonusContribution.isPresent()) {
-                        IBonusParameterType type = bonusContribution.get().bonus().getParameterType();
-                        var value = type.resolve(entry.getValue().value().bonusParameters());
-                        //var bonus = bonusContribution.get().getBonusFor(jewelryData);
-                        if (value.isPresent()) {
-                            Optional<String> string = type.getValueDescriptionId(value.get());
-                            if (string.isPresent()) {
-                                //bonusEntries.add(Component.literal(" ").append(Component.translatable("tooltip.irons_jewelry.bonus_to_source", Component.translatable(source.bonus().getDescriptionId()), Component.translatable(string.get()))));
-                                bonusComponent = Optional.of(Component.literal("  * ").append(Component.translatable(string.get()).withStyle(ChatFormatting.WHITE)).withStyle(ChatFormatting.DARK_GRAY));
-                            }
-                        }
-                    }
-                    if (qualityContribution.isPresent()) {
-                        var quality = jewelryData.parts().get(qualityContribution.get().qualityOrSource().right().get()).value().quality();
-                        qualityComponent = Optional.of(Component.literal("  * ").append(Component.translatable("tooltip.irons_jewelry.quality_multiplier",quality).withStyle(ChatFormatting.WHITE)).withStyle(ChatFormatting.DARK_GRAY));
-                    }
-                    pTooltipComponents.add(Component.literal("> ").append(Component.translatable("tooltip.irons_jewelry.part_to_material", partComponent, materialComponent.withStyle(ChatFormatting.DARK_AQUA))).withStyle(ChatFormatting.GRAY));
-                    bonusComponent.ifPresent(pTooltipComponents::add);
-                    qualityComponent.ifPresent(pTooltipComponents::add);
-                }
+                //var parts = jewelryData.parts().entrySet();
+                //var ingredients = jewelryData.pattern().value().partTemplate().stream().collect(Collectors.toMap(PartIngredient::part, PartIngredient::drawOrder));
+                //var sorted = parts.stream().sorted(Comparator.comparingInt(entry -> ingredients.get(entry.getKey()))).toList();
+                pTooltipComponents.addAll(getShiftDescription(jewelryData.pattern().value(), jewelryData.parts(), Optional.empty()));
             } else {
                 pTooltipComponents.add(Component.translatable("tooltip.irons_jewelry.hold_shift", Component.translatable("key.keyboard.left.shift").withStyle(ChatFormatting.DARK_GRAY)).withStyle(ChatFormatting.GRAY));
             }
         }
+    }
+
+    public static List<Component> getShiftDescription(PatternDefinition pattern, Map<Holder<PartDefinition>, Holder<MaterialDefinition>> parts, Optional<List<Integer>> materialCost) {
+        List<Component> components = new ArrayList<>();
+        for (int i = 0; i < pattern.partTemplate().size(); i++) {
+            var part = pattern.partTemplate().get(i);
+            var partComponent = Component.translatable(part.part().value().descriptionId());
+            MutableComponent materialComponent;
+            Optional<Component> bonusComponent = Optional.empty();
+            Optional<Component> qualityComponent = Optional.empty();
+            int i2 = i;
+            Optional<MutableComponent> costComponent = materialCost.map(list -> {
+                var count = list.size() > i2 ? list.get(i2) : 0;
+                String cost = String.format("(%s/%s)", count, part.materialCost());
+                return Optional.of(Component.literal("  * ").append(Component.literal(cost).withStyle(count >= part.materialCost() ? ChatFormatting.GREEN : ChatFormatting.RED)).withStyle(ChatFormatting.DARK_GRAY));
+            }).orElse(Optional.empty());
+            if (!parts.containsKey(part.part())) {
+                materialComponent = Component.translatable("tooltip.irons_jewelry.empty").withStyle(ChatFormatting.RED);
+            } else {
+                var mat = parts.get(part.part());
+                materialComponent = Component.translatable(mat.value().descriptionId()).withStyle(ChatFormatting.DARK_AQUA);
+                var bonusContribution = pattern.bonuses().stream().filter(bonus -> bonus.parameterOrSource().right().isPresent() && bonus.parameterOrSource().right().get().equals(part.part())).findFirst();
+                var qualityContribution = pattern.bonuses().stream().filter(bonus -> bonus.qualityOrSource().right().isPresent() && bonus.qualityOrSource().right().get().equals(part.part())).findFirst();
+                if (bonusContribution.isPresent()) {
+                    IBonusParameterType type = bonusContribution.get().bonus().getParameterType();
+                    var value = type.resolve(mat.value().bonusParameters());
+                    //var bonus = bonusContribution.get().getBonusFor(jewelryData);
+                    if (value.isPresent()) {
+                        Optional<String> string = type.getValueDescriptionId(value.get());
+                        if (string.isPresent()) {
+                            //bonusEntries.add(Component.literal(" ").append(Component.translatable("tooltip.irons_jewelry.bonus_to_source", Component.translatable(source.bonus().getDescriptionId()), Component.translatable(string.get()))));
+                            bonusComponent = Optional.of(Component.literal("  * ").append(Component.translatable(string.get()).withStyle(ChatFormatting.WHITE)).withStyle(ChatFormatting.DARK_GRAY));
+                        }
+                    }
+                }
+                if (qualityContribution.isPresent()) {
+                    var quality = parts.get(qualityContribution.get().qualityOrSource().right().get()).value().quality();
+                    qualityComponent = Optional.of(Component.literal("  * ").append(Component.translatable("tooltip.irons_jewelry.quality_multiplier", quality).withStyle(ChatFormatting.WHITE)).withStyle(ChatFormatting.DARK_GRAY));
+                }
+            }
+            components.add(Component.literal("> ").append(Component.translatable("tooltip.irons_jewelry.part_to_material", partComponent, materialComponent)).withStyle(ChatFormatting.GRAY));
+            costComponent.ifPresent(components::add);
+            bonusComponent.ifPresent(components::add);
+            qualityComponent.ifPresent(components::add);
+        }
+        return components;
     }
 
     @Override

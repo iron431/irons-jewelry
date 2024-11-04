@@ -7,15 +7,19 @@ import io.redspace.ironsjewelry.client.DynamicModel;
 import io.redspace.ironsjewelry.core.IBonusParameterType;
 import io.redspace.ironsjewelry.core.Utils;
 import io.redspace.ironsjewelry.core.data.*;
+import io.redspace.ironsjewelry.item.CurioBaseItem;
 import io.redspace.ironsjewelry.network.packets.SetJewelcraftingStationPattern;
 import io.redspace.ironsjewelry.network.packets.SyncJewelcraftingSlotStates;
 import io.redspace.ironsjewelry.registry.ComponentRegistry;
 import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.client.gui.screens.inventory.tooltip.TooltipRenderUtil;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -174,6 +178,8 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
 
     private void renderItemPreview(GuiGraphics guiGraphics, float pPartialTick, int pMouseX, int pMouseY) {
         if (selectedPattern >= 0) {
+
+
             var pattern = availablePatterns.get(selectedPattern).value();
             var parts = new HashMap<Holder<PartDefinition>, Holder<MaterialDefinition>>();
             var requiredIngredients = pattern.partTemplate();
@@ -186,6 +192,17 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
                     //var texture = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(DynamicModel.atlasResourceLocaction(ingredient.part(), material.get().value().paletteLocation().getPath()));
                 }
             }
+
+            var tooltip = CurioBaseItem.getShiftDescription(pattern, parts, Optional.of(menu.workspaceSlots.stream().map(slot -> slot.getItem().getCount()).toList()));
+            tooltip.add(0, Component.translatable(pattern.descriptionId()).withStyle(ChatFormatting.UNDERLINE));
+            int baseLines = tooltip.size();
+            float scale = 3;
+            int additionalLines = (int) (16 * scale / font.lineHeight) + 1;
+            int topBuffer = 4;
+            for (int i = 0; i < additionalLines; i++) {
+                tooltip.add(Component.empty());
+            }
+            renderTooltipInternal(guiGraphics, this.font, tooltip, leftPos + imageWidth + 4, topPos + topBuffer);
             if (parts.isEmpty()) {
                 return;
             }
@@ -196,14 +213,58 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
             stack.set(ComponentRegistry.JEWELRY_COMPONENT, jewelryData);
             var pose = guiGraphics.pose();
             pose.pushPose();
-            float scale = 3;
-            pose.translate(leftPos + 61 + 95 / 2f, topPos + 13 + 60 / 2f, 100);
+            //pose.translate(leftPos + 61 + 95 / 2f, topPos + 13 + 60 / 2f, 100);
+            pose.translate(leftPos + imageWidth + 9 * scale + 16, topPos + 8 * scale + (baseLines + 1) * font.lineHeight + topBuffer + 4, 100);
             pose.scale(16 * scale, -16 * scale, 16 * scale);
             pose.mulPose(Axis.YP.rotationDegrees(Minecraft.getInstance().player.tickCount + pPartialTick * 1.5f));
             Lighting.setupForFlatItems();
             Minecraft.getInstance().getItemRenderer().renderStatic(stack, ItemDisplayContext.GUI, LightTexture.FULL_BLOCK, OverlayTexture.NO_OVERLAY, pose, guiGraphics.bufferSource(), null, 0);
             guiGraphics.flush();
             pose.popPose();
+        }
+    }
+
+    private void renderTooltipInternal(GuiGraphics guiGraphics, Font pFont, List<Component> components, int x, int y) {
+        if (!components.isEmpty()) {
+            int i = 0;
+            int j = components.size() == 1 ? -2 : 0;
+            var pComponents = components.stream().map(c -> ClientTooltipComponent.create(c.getVisualOrderText())).toList();
+            for (ClientTooltipComponent clienttooltipcomponent : pComponents) {
+                int k = clienttooltipcomponent.getWidth(pFont);
+                if (k > i) {
+                    i = k;
+                }
+
+                j += clienttooltipcomponent.getHeight();
+            }
+
+            int i2 = i;
+            int j2 = j;
+            var poseStack = guiGraphics.pose();
+            poseStack.pushPose();
+            int j1 = 400;
+            var bgstart = 0xf0100010;
+            var bgend = bgstart;
+            var borderstart = 0x505000FF;
+            var borderend = 0x5028007f;
+            guiGraphics.drawManaged(() -> TooltipRenderUtil.renderTooltipBackground(guiGraphics, x, y, i2, j2, 0, bgstart, bgend, borderstart, borderend));
+            int k1 = y;
+
+            for (int l1 = 0; l1 < pComponents.size(); l1++) {
+                ClientTooltipComponent clienttooltipcomponent1 = pComponents.get(l1);
+                clienttooltipcomponent1.renderText(font, x, k1, poseStack.last().pose(), guiGraphics.bufferSource());
+                k1 += clienttooltipcomponent1.getHeight() + (l1 == 0 ? 2 : 0);
+            }
+
+            k1 = y;
+
+            for (int k2 = 0; k2 < pComponents.size(); k2++) {
+                ClientTooltipComponent clienttooltipcomponent2 = pComponents.get(k2);
+                clienttooltipcomponent2.renderImage(font, x, k1, guiGraphics);
+                k1 += clienttooltipcomponent2.getHeight() + (k2 == 0 ? 2 : 0);
+            }
+
+            poseStack.popPose();
         }
     }
 
