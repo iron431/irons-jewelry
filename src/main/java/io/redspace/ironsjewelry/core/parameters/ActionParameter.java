@@ -2,12 +2,8 @@ package io.redspace.ironsjewelry.core.parameters;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import io.redspace.ironsjewelry.core.IAction;
-import io.redspace.ironsjewelry.core.IBonusParameterType;
-import io.redspace.ironsjewelry.core.ICooldownHandler;
-import io.redspace.ironsjewelry.core.Utils;
+import io.redspace.ironsjewelry.core.*;
 import io.redspace.ironsjewelry.core.data.BonusInstance;
-import io.redspace.ironsjewelry.core.data.QualityScalar;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 
@@ -15,12 +11,11 @@ import java.util.List;
 import java.util.Optional;
 
 public class ActionParameter implements IBonusParameterType<ActionParameter.ActionRunnable> {
-    public record ActionRunnable(IAction action, QualityScalar cooldownTicks, boolean targetSelf) {
+    public record ActionRunnable(IAction action, boolean targetSelf) {
     }
 
     public static final Codec<ActionParameter.ActionRunnable> CODEC = RecordCodecBuilder.create(builder -> builder.group(
             IAction.CODEC.fieldOf("action").forGetter(ActionRunnable::action),
-            QualityScalar.CODEC.optionalFieldOf("cooldownTicks", new QualityScalar(0, 0, 0, Optional.empty())).forGetter(ActionRunnable::cooldownTicks),
             Codec.BOOL.fieldOf("targetSelf").forGetter(ActionRunnable::targetSelf)
     ).apply(builder, ActionRunnable::new));
 
@@ -41,7 +36,7 @@ public class ActionParameter implements IBonusParameterType<ActionParameter.Acti
     }
 
     public Optional<Component> getCooldownDescriptor(BonusInstance bonusInstance, ActionParameter.ActionRunnable param) {
-        var cooldown = ICooldownHandler.INSTANCE.getCooldown(param.cooldownTicks, bonusInstance.quality());
+        int cooldown = bonusInstance.cooldown().map(c -> CooldownHandler.INSTANCE.getCooldown(MinecraftInstanceHelper.getPlayer(), c, bonusInstance.quality())).orElse(0);
         if (cooldown > 0) {
             return Optional.of(Component.translatable("tooltip.irons_jewelry.cooldown", Component.literal(Utils.timeFromTicks(cooldown, 1)).withStyle(ChatFormatting.YELLOW)).withStyle(ChatFormatting.GREEN));
         } else {

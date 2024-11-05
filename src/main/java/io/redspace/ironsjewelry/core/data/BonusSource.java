@@ -11,22 +11,25 @@ import net.minecraft.core.Holder;
 
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.function.Function;
 
 public record BonusSource(Bonus bonus, Either<Map<IBonusParameterType<?>, Object>, Holder<PartDefinition>> parameterOrSource,
-                          Either<Double, Holder<PartDefinition>> qualityOrSource, double qualityMultiplier) {
+                          Either<Double, Holder<PartDefinition>> qualityOrSource, double qualityMultiplier, Optional<QualityScalar> cooldown) {
     public static final Codec<BonusSource> CODEC = RecordCodecBuilder.create(builder -> builder.group(
             IronsJewelryRegistries.BONUS_REGISTRY.byNameCodec().fieldOf("bonus").forGetter(BonusSource::bonus),
             Codec.either(IBonusParameterType.BONUS_TO_INSTANCE_CODEC, IronsJewelryRegistries.Codecs.PART_REGISTRY_CODEC).fieldOf("parameter").forGetter(BonusSource::parameterOrSource),
             Codec.either(Codec.DOUBLE, IronsJewelryRegistries.Codecs.PART_REGISTRY_CODEC).fieldOf("quality").forGetter(BonusSource::qualityOrSource),
-            Codec.DOUBLE.optionalFieldOf("qualityMultiplier", 1d).forGetter(BonusSource::qualityMultiplier)
+            Codec.DOUBLE.optionalFieldOf("qualityMultiplier", 1d).forGetter(BonusSource::qualityMultiplier),
+            QualityScalar.CODEC.optionalFieldOf("cooldown").forGetter(BonusSource::cooldown)
     ).apply(builder, BonusSource::new));
 
     public BonusInstance getBonusFor(JewelryData data) {
         return new BonusInstance(
                 bonus,
                 mapEither(qualityOrSource, Function.identity(), (right) -> qualityFromPart(right, data)) * data.pattern().value().qualityMultiplier()  * qualityMultiplier,
-                mapEither(parameterOrSource, Function.identity(), (right) -> parameterFromPart(right, data))
+                mapEither(parameterOrSource, Function.identity(), (right) -> parameterFromPart(right, data)),
+                cooldown
         );
     }
 

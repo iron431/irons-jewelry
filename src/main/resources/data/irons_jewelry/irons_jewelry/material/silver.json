@@ -35,8 +35,7 @@
           "type": "minecraft:gust_emitter_small"
         },
         "sound": "minecraft:entity.wind_charge.wind_burst"
-      },
-      "cooldownTicks": 200
+      }
     }
   }
 }

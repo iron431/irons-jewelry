@@ -46,4 +46,5 @@ public class IronsJewelry {
     public static ResourceLocation id(String path) {
         return ResourceLocation.fromNamespaceAndPath(IronsJewelry.MODID, path);
     }
+
 }

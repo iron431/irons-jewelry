@@ -25,10 +25,6 @@
           "base": 4.0,
           "scalar": 2.0
         }
-      },
-      "cooldownTicks": {
-        "base": 100,
-        "scalar": 0
       }
     }
   }

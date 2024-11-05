@@ -43,7 +43,7 @@ public class ServerEvents {
             for (ItemStack stack : items) {
                 JewelryData.ifPresent(stack, jewelryData -> {
                     jewelryData.forBonuses(BonusRegistry.ON_SHIELD_BLOCK_BONUS.get(), ActionParameter.ActionRunnable.class, (bonus, action) -> {
-                        action.action().handleAction(player.serverLevel(), bonus, action.targetSelf(), action.cooldownTicks(), player, livingAttacker);
+                        action.action().handleAction(player.serverLevel(), bonus, action.targetSelf(), bonus.cooldown(), player, livingAttacker);
                     });
                 });
             }
@@ -74,7 +74,7 @@ public class ServerEvents {
                 if (instance.bonus().equals(BonusRegistry.ON_PROJECTILE_HIT_BONUS.get())) {
                     if (damageSource.getDirectEntity() instanceof Projectile) {
                         BonusRegistry.ON_PROJECTILE_HIT_BONUS.get().getParameterType().resolve(instance).ifPresent(
-                                action -> action.action().handleAction(player.serverLevel(), instance, action.targetSelf(), action.cooldownTicks(), player, victim));
+                                action -> action.action().handleAction(player.serverLevel(), instance, action.targetSelf(), instance.cooldown(), player, victim));
                     }
                 }
                 /*
@@ -83,7 +83,7 @@ public class ServerEvents {
                 else if (instance.bonus().equals(BonusRegistry.ON_ATTACK_BONUS.get())) {
                     if (damageSource.isDirect()) {
                         BonusRegistry.ON_ATTACK_BONUS.get().getParameterType().resolve(instance).ifPresent(
-                                action -> action.action().handleAction(player.serverLevel(), instance, action.targetSelf(), action.cooldownTicks(), player, victim));
+                                action -> action.action().handleAction(player.serverLevel(), instance, action.targetSelf(), instance.cooldown(), player, victim));
                     }
                 }
             }
@@ -103,7 +103,7 @@ public class ServerEvents {
                 } else if (instance.bonus().equals(BonusRegistry.ON_TAKE_DAMAGE_BONUS.get()) && attacker != null) {
                     //TODO: create map of bonus to consumer or something?
                     BonusRegistry.ON_TAKE_DAMAGE_BONUS.get().getParameterType().resolve(instance).ifPresent(
-                            effect -> effect.action().handleAction(player.serverLevel(), instance, effect.targetSelf(), effect.cooldownTicks(), player, attacker));
+                            effect -> effect.action().handleAction(player.serverLevel(), instance, effect.targetSelf(), instance.cooldown(), player, attacker));
                 }
             }
         }

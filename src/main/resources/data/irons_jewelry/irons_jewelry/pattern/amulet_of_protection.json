@@ -18,7 +18,11 @@
     {
       "bonus": "irons_jewelry:on_take_damage_bonus",
       "parameter": "irons_jewelry:gem_amulet_of_protection",
-      "quality": "irons_jewelry:chain_amulet_of_protection"
+      "quality": "irons_jewelry:chain_amulet_of_protection",
+      "cooldown": {
+        "base": 200,
+        "scalar": -20
+      }
     }
   ],
   "qualityMultiplier": 1.5

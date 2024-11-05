@@ -1,6 +1,7 @@
 package io.redspace.ironsjewelry.event;
 
 import io.redspace.ironsjewelry.IronsJewelry;
+import io.redspace.ironsjewelry.compat.CompatHandler;
 import io.redspace.ironsjewelry.core.Trades;
 import io.redspace.ironsjewelry.registry.ItemRegistry;
 import io.redspace.ironsjewelry.registry.VillagerRegistry;
@@ -10,6 +11,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Items;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.event.village.VillagerTradesEvent;
 import net.neoforged.neoforge.event.village.WandererTradesEvent;
 

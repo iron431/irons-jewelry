@@ -14,7 +14,8 @@
     {
       "bonus": "irons_jewelry:on_shield_block_bonus",
       "parameter": "irons_jewelry:band_flat_top",
-      "quality": 1.0
+      "quality": 1.0,
+      "cooldown": 80
     }
   ]
 }

@@ -20,10 +20,6 @@
         "type": "irons_jewelry:apply_freeze",
         "amount": 40.0,
         "instaFreeze": false
-      },
-      "cooldownTicks": {
-        "base": 40,
-        "scalar": 10
       }
     }
   }

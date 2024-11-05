@@ -11,6 +11,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 
+import java.util.Optional;
 import java.util.function.Function;
 
 public interface IAction {
@@ -20,9 +21,9 @@ public interface IAction {
 
     void apply(ServerLevel serverLevel, double quality, boolean applyToSelf, ServerPlayer wearer, Entity entity);
 
-    default void handleAction(ServerLevel serverLevel, BonusInstance bonusInstance, boolean applyToSelf, QualityScalar cooldown, ServerPlayer wearer, Entity entity) {
+    default void handleAction(ServerLevel serverLevel, BonusInstance bonusInstance, boolean applyToSelf, Optional<QualityScalar> cooldown, ServerPlayer wearer, Entity entity) {
         var playerData = PlayerData.get(wearer);
-        int cooldownTicks = ICooldownHandler.INSTANCE.getCooldown(cooldown, bonusInstance.quality());
+        int cooldownTicks = cooldown.map(scalar -> CooldownHandler.INSTANCE.getCooldown(wearer, scalar, bonusInstance.quality())).orElse(0);
         if (cooldownTicks <= 0 || !playerData.isOnCooldown(bonusInstance.bonus())) {
             apply(serverLevel, bonusInstance.quality(), applyToSelf, wearer, entity);
             if (cooldownTicks > 0) {
@@ -31,6 +32,7 @@ public interface IAction {
         }
 
     }
+
     Component formatTooltip(BonusInstance bonusInstance, boolean applyToSelf);
 
     MapCodec<? extends IAction> codec();
