@@ -70,6 +70,7 @@ public class AtlasHelper {
         gemPermutations.put("moonstone", IronsJewelry.id("palettes/moonstone"));
         gemPermutations.put("peridot", IronsJewelry.id("palettes/peridot"));
         gemPermutations.put("topaz", IronsJewelry.id("palettes/topaz"));
+        gemPermutations.put("onyx", IronsJewelry.id("palettes/onyx"));
         gemPermutations.put("menu", IronsJewelry.id("palettes/menu"));
         gemPermutations.put("menu_bright", IronsJewelry.id("palettes/menu_bright"));
         sources.add(new PalettedPermutations(gemTextures, gemPaletteKey, gemPermutations));
