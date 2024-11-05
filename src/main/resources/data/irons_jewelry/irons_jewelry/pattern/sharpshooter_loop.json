@@ -1,7 +1,7 @@
 {
   "unlockedByDefault": false,
   "type": "irons_jewelry:ring",
-  "descriptionId": "pattern.irons_jewelry.ranger_ring",
+  "descriptionId": "pattern.irons_jewelry.sharpshooter_loop",
   "parts": [
     {
       "id": "irons_jewelry:band_gem_thin",
