@@ -41,7 +41,7 @@
   "pattern.irons_jewelry.amulet_of_protection": "Amulet of Protection",
   "pattern.irons_jewelry.amulet_of_protection.item": "%s Amulet of Protection",
   "pattern.irons_jewelry.barbed_band": "Barbed Band",
-  "pattern.irons_jewelry.barbed_band.item": "%s Barbed Band",
+  "pattern.irons_jewelry.barbed_band.item": "%2$s Barbed Band",
   "pattern.irons_jewelry.stonehewn_band": "Stonehewn Band",
   "pattern.irons_jewelry.stonehewn_band.item": "%s Stonehewn Band",
 

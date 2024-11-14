@@ -176,18 +176,11 @@ public class JewelryData {
         var parts = pattern.value().partTemplate();
         Component[] ids = new Component[parts.size()];
         for (int i = 0; i < parts.size(); i++) {
-            //Fill arguments in reverse (pinnacle piece, ie gem, will be first translation argument)
+            // Fill arguments in reverse (pinnacle piece, ie gem, will be first translation argument)
+            // This order is most commonly preferred, although language index indicators can always work too (%2$s for the second argument)
             ids[parts.size() - 1 - i] = Component.translatable(this.parts.get(parts.get(i).part()).value().descriptionId());
         }
         var descriptionId = this.pattern.value().descriptionId();
-        this.pattern.value().nameOffset().ifPresent(skip -> {
-            for (int i = 0; i < skip; i++) {
-                for (int j = 1; j < ids.length; j++) {
-                    ids[j - 1] = ids[j];
-                }
-            }
-        });
-
         return Component.translatable(descriptionId + ".item", ids);
     }
 

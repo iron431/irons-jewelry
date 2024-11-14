@@ -1,7 +1,6 @@
 {
   "unlockedByDefault": false,
   "descriptionId": "pattern.irons_jewelry.barbed_band",
-  "nameOffset": 1,
   "qualityMultiplier": 3,
   "type": "irons_jewelry:ring",
   "parts": [

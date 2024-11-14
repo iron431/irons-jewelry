@@ -23,13 +23,12 @@ import java.util.Optional;
  * @param unlockedByDefault
  * @param qualityMultiplier
  */
-public record PatternDefinition(String descriptionId, Optional<Integer> nameOffset, JewelryType jewelryType,
+public record PatternDefinition(String descriptionId, JewelryType jewelryType,
                                 List<PartIngredient> partTemplate, List<BonusSource> bonuses,
                                 boolean unlockedByDefault,
                                 double qualityMultiplier) {
     public static final Codec<PatternDefinition> CODEC = RecordCodecBuilder.create(builder -> builder.group(
             Codec.STRING.fieldOf("descriptionId").forGetter(PatternDefinition::descriptionId),
-            Codec.INT.optionalFieldOf("nameOffset").forGetter(PatternDefinition::nameOffset),
             IronsJewelryRegistries.JEWELRY_TYPE_REGISTRY.byNameCodec().fieldOf("type").forGetter(PatternDefinition::jewelryType),
             Codec.list(PartIngredient.CODEC).fieldOf("parts").forGetter(PatternDefinition::partTemplate),
             Codec.list(BonusSource.CODEC).fieldOf("bonuses").forGetter(PatternDefinition::bonuses),
@@ -37,10 +36,9 @@ public record PatternDefinition(String descriptionId, Optional<Integer> nameOffs
             Codec.DOUBLE.optionalFieldOf("qualityMultiplier", 1d).forGetter(PatternDefinition::qualityMultiplier)
     ).apply(builder, PatternDefinition::new));
 
-    public PatternDefinition(String descriptionId, Optional<Integer> nameOffset, JewelryType jewelryType, List<PartIngredient> partTemplate, List<BonusSource> bonuses, boolean unlockedByDefault,
+    public PatternDefinition(String descriptionId, JewelryType jewelryType, List<PartIngredient> partTemplate, List<BonusSource> bonuses, boolean unlockedByDefault,
                              double qualityMultiplier) {
         this.descriptionId = descriptionId;
-        this.nameOffset = nameOffset;
         this.jewelryType = jewelryType;
         this.partTemplate = partTemplate.stream().sorted(Comparator.comparingInt(PartIngredient::drawOrder)).toList();
         this.bonuses = bonuses;
