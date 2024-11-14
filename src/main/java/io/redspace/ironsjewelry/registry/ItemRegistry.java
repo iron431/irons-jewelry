@@ -4,7 +4,6 @@ import io.redspace.ironsjewelry.IronsJewelry;
 import io.redspace.ironsjewelry.datagen.ItemModelDataGenerator;
 import io.redspace.ironsjewelry.item.CurioBaseItem;
 import io.redspace.ironsjewelry.item.PatternRecipeItem;
-import io.redspace.ironsjewelry.item.TempItem;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
@@ -26,12 +25,12 @@ public class ItemRegistry {
     public static final DeferredHolder<Item, CurioBaseItem> NECKLACE = ITEMS.register("necklace", () -> new CurioBaseItem(new Item.Properties().stacksTo(1), "necklace"));
     public static final DeferredHolder<Item, PatternRecipeItem> RECIPE = ITEMS.register("recipe", () -> new PatternRecipeItem(new Item.Properties().stacksTo(1).rarity(Rarity.UNCOMMON)));
 
-    public static final DeferredHolder<Item, Item> RUBY = registerSimpleItem("ruby", () -> new TempItem(new Item.Properties()));
-    public static final DeferredHolder<Item, Item> SAPPHIRE = registerSimpleItem("sapphire", () -> new TempItem(new Item.Properties()));
-    public static final DeferredHolder<Item, Item> TOPAZ = registerSimpleItem("topaz", () -> new TempItem(new Item.Properties()));
-    public static final DeferredHolder<Item, Item> MOONSTONE = registerSimpleItem("moonstone", () -> new TempItem(new Item.Properties()));
-    public static final DeferredHolder<Item, Item> PERIDOT = registerSimpleItem("peridot", () -> new TempItem(new Item.Properties()));
-    public static final DeferredHolder<Item, Item> ONYX = registerSimpleItem("onyx", () -> new TempItem(new Item.Properties()));
+    public static final DeferredHolder<Item, Item> RUBY = registerSimpleItem("ruby", () -> new Item(new Item.Properties()));
+    public static final DeferredHolder<Item, Item> SAPPHIRE = registerSimpleItem("sapphire", () -> new Item(new Item.Properties()));
+    public static final DeferredHolder<Item, Item> TOPAZ = registerSimpleItem("topaz", () -> new Item(new Item.Properties()));
+    public static final DeferredHolder<Item, Item> MOONSTONE = registerSimpleItem("moonstone", () -> new Item(new Item.Properties()));
+    public static final DeferredHolder<Item, Item> PERIDOT = registerSimpleItem("peridot", () -> new Item(new Item.Properties()));
+    public static final DeferredHolder<Item, Item> ONYX = registerSimpleItem("onyx", () -> new Item(new Item.Properties()));
 
     public static final DeferredHolder<Item, BlockItem> JEWELCRAFTING_STATION_BLOCK_ITEM = ITEMS.register("jewelcrafting_station", () -> new BlockItem(BlockRegistry.JEWELCRAFTING_STATION_BLOCK.get(), new Item.Properties()));
 
