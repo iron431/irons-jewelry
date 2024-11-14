@@ -15,8 +15,8 @@ public class DamageHelper {
     public static void ignoreNextKnockback(LivingEntity livingEntity) {
         if (livingEntity.getServer() != null) {
             var tickCount = livingEntity.getServer().getTickCount();
-            //help manage memory
-            knockbackImmunes.entrySet().stream().filter(entry -> tickCount - entry.getValue() >= 10).forEach(entry -> knockbackImmunes.remove(entry.getKey()));
+            //garbage collect
+            knockbackImmunes.entrySet().stream().filter(entry -> tickCount - entry.getValue() >= 10).toList().forEach(entry -> knockbackImmunes.remove(entry.getKey()));
             //enter entity
             knockbackImmunes.put(livingEntity.getUUID(), tickCount);
         }
