@@ -4,6 +4,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.redspace.ironsjewelry.core.*;
 import io.redspace.ironsjewelry.core.data.BonusInstance;
+import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 
@@ -26,6 +27,10 @@ public class ActionParameter implements IBonusParameterType<ActionParameter.Acti
 
     @Override
     public Optional<String> getValueDescriptionId(ActionParameter.ActionRunnable value) {
+        var resource = IronsJewelryRegistries.ACTION_REGISTRY.getKey(value.action.codec());
+        if (resource != null) {
+            return Optional.of(String.format("action.%s.%s.name", resource.getNamespace(), resource.getPath()));
+        }
         return Optional.empty();
     }
 
