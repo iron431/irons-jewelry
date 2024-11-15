@@ -10,7 +10,10 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.phys.Vec3;
 
 public record KnockbackAction(QualityScalar strength) implements IAction {
@@ -31,7 +34,8 @@ public record KnockbackAction(QualityScalar strength) implements IAction {
         Vec3 direction = entity.getBoundingBox().getCenter().subtract(wearer.getBoundingBox().getCenter());
         direction = direction.normalize().scale(strength).scale(applyToSelf ? -1 : 1);
         var target = applyToSelf ? wearer : entity;
-        target.setDeltaMovement(target.getDeltaMovement().add(direction.add(0, 0.3, 0)));
+        double resistance = target instanceof LivingEntity livingEntity ? Mth.clamp(1 - livingEntity.getAttributeValue(Attributes.KNOCKBACK_RESISTANCE), .5f, 1f) : 1;
+        target.setDeltaMovement(target.getDeltaMovement().add(direction.add(0, 0.3, 0).scale(resistance)));
         target.hurtMarked = true;
     }
 
