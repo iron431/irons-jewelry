@@ -1,7 +1,6 @@
 package io.redspace.ironsjewelry.event;
 
 import io.redspace.ironsjewelry.core.Utils;
-import io.redspace.ironsjewelry.core.bonuses.DeathBonus;
 import io.redspace.ironsjewelry.core.bonuses.EffectOnHitBonus;
 import io.redspace.ironsjewelry.core.data.BonusInstance;
 import io.redspace.ironsjewelry.core.data.JewelryData;
@@ -69,7 +68,7 @@ public class ServerEvents {
             var bonuses = Utils.getEquippedBonuses(player);
             for (BonusInstance instance : bonuses) {
                 /*
-                Action on projectile hit
+                Action on projectile hit Bonus
                  */
                 if (instance.bonus().equals(BonusRegistry.ON_PROJECTILE_HIT_BONUS.get())) {
                     if (damageSource.getDirectEntity() instanceof Projectile) {
@@ -78,7 +77,7 @@ public class ServerEvents {
                     }
                 }
                 /*
-                Action on hit
+                Action on Hit Bonus
                  */
                 else if (instance.bonus().equals(BonusRegistry.ON_ATTACK_BONUS.get())) {
                     if (damageSource.isDirect()) {
@@ -94,13 +93,18 @@ public class ServerEvents {
         if (victim instanceof ServerPlayer player) {
             var bonuses = Utils.getEquippedBonuses(player);
             for (BonusInstance instance : bonuses) {
-                if (instance.bonus() instanceof DeathBonus) {
-                    player.die(player.level().damageSources().fellOutOfWorld());
-                } else if (instance.bonus() instanceof EffectOnHitBonus effectOnHitBonus) {
+                /*
+                Effect when hit Bonus
+                 */
+                if (instance.bonus() instanceof EffectOnHitBonus effectOnHitBonus) {
                     effectOnHitBonus.getParameterType().resolve(instance.parameter()).ifPresent(effect ->
                             player.addEffect(new MobEffectInstance(effect, effectOnHitBonus.durationInTicks(effect, instance.quality())))
                     );
-                } else if (instance.bonus().equals(BonusRegistry.ON_TAKE_DAMAGE_BONUS.get()) && attacker != null) {
+                }
+                /*
+                Action on Take Damage Bonus
+                 */
+                else if (instance.bonus().equals(BonusRegistry.ON_TAKE_DAMAGE_BONUS.get()) && attacker != null) {
                     //TODO: create map of bonus to consumer or something?
                     BonusRegistry.ON_TAKE_DAMAGE_BONUS.get().getParameterType().resolve(instance).ifPresent(
                             effect -> effect.action().handleAction(player.serverLevel(), instance, effect.targetSelf(), instance.cooldown(), player, attacker));

@@ -33,14 +33,11 @@
               "base": 1.0,
               "scalar": 0.5
             }
-          },
-          "cooldownTicks": {
-            "base": 60,
-            "scalar": 0
           }
         }
       },
-      "quality": "irons_jewelry:gem_band_barbed"
+      "quality": "irons_jewelry:gem_band_barbed",
+      "cooldown": 60
     }
   ]
 }

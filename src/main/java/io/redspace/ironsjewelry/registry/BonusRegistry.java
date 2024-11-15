@@ -12,7 +12,6 @@ public class BonusRegistry {
     private static final DeferredRegister<Bonus> BONUSES = DeferredRegister.create(IronsJewelryRegistries.BONUS_REGISTRY, IronsJewelry.MODID);
 
     public static final Supplier<Bonus> EMPTY = BONUSES.register("empty", EmptyBonus::new);
-    //public static final Supplier<IBonus> DEATH = BONUSES.register("death", () -> DeathBonus.CODEC);
     public static final Supplier<Bonus> PIGLIN_NEUTRAL_BONUS = BONUSES.register("piglin_neutral_bonus", PiglinNeutralBonus::new);
     public static final Supplier<Bonus> ATTRIBUTE_BONUS = BONUSES.register("attribute_bonus", AttributeBonus::new);
     public static final Supplier<Bonus> EFFECT_ON_HIT_BONUS = BONUSES.register("effect_on_hit_bonus", EffectOnHitBonus::new);
