@@ -4,6 +4,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.redspace.ironsjewelry.core.IAction;
+import io.redspace.ironsjewelry.core.Utils;
 import io.redspace.ironsjewelry.core.data.BonusInstance;
 import io.redspace.ironsjewelry.core.data.QualityScalar;
 import net.minecraft.ChatFormatting;
@@ -128,7 +129,8 @@ public record ExplodeAction(
 
     @Override
     public Component formatTooltip(BonusInstance bonusInstance, boolean applyToSelf) {
-        return Component.translatable("action.irons_jewelry.explode", Component.translatable(this.translation).withStyle(ChatFormatting.RED));
+        String string = applyToSelf ? "action.irons_jewelry.explode.self" : "action.irons_jewelry.explode";
+        return Component.translatable(string, Component.translatable(this.translation).withStyle(ChatFormatting.RED), Utils.stringTruncation(radius.sample(bonusInstance.quality()), 1));
     }
 
     @Override

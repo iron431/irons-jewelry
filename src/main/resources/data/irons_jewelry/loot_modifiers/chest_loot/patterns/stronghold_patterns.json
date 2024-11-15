@@ -1,0 +1,17 @@
+{
+  "type": "irons_jewelry:append_loot",
+  "conditions": [
+    {
+      "condition": "minecraft:any_of",
+      "terms": [
+        {
+          "condition": "neoforge:loot_table_id",
+          "loot_table_id": "minecraft:chests/stronghold_library"
+        }
+      ]
+    }
+  ],
+  "keys": [
+    "irons_jewelry:modifiers/library_pattern_loot"
+  ]
+}

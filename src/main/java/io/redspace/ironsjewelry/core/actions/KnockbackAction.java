@@ -3,6 +3,7 @@ package io.redspace.ironsjewelry.core.actions;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.redspace.ironsjewelry.core.IAction;
+import io.redspace.ironsjewelry.core.Utils;
 import io.redspace.ironsjewelry.core.data.BonusInstance;
 import io.redspace.ironsjewelry.core.data.QualityScalar;
 import net.minecraft.ChatFormatting;
@@ -20,6 +21,13 @@ public record KnockbackAction(QualityScalar strength) implements IAction {
     @Override
     public void apply(ServerLevel serverLevel, double quality, boolean applyToSelf, ServerPlayer wearer, Entity entity) {
         double strength = this.strength.sample(quality);
+        if (!applyToSelf && strength < 0) {
+            //we are pulling attacker in, limit strength so that they don't overshoot
+            float maxStrength = -wearer.distanceTo(entity) * 0.5714f; // (x/1.75)
+            if (strength < maxStrength) {
+                strength = maxStrength;
+            }
+        }
         Vec3 direction = entity.getBoundingBox().getCenter().subtract(wearer.getBoundingBox().getCenter());
         direction = direction.normalize().scale(strength).scale(applyToSelf ? -1 : 1);
         var target = applyToSelf ? wearer : entity;
@@ -30,9 +38,9 @@ public record KnockbackAction(QualityScalar strength) implements IAction {
     @Override
     public Component formatTooltip(BonusInstance bonusInstance, boolean applyToSelf) {
         Component target = applyToSelf ? Component.translatable("tooltip.irons_jewelry.self").withStyle(ChatFormatting.GREEN) : Component.translatable("tooltip.irons_jewelry.attacker").withStyle(ChatFormatting.RED);
-        //fixme: i dont think this works. with the current translation wording, i dont think it can work
+        var strengthText = Utils.stringTruncation(Math.abs(strength().sample(bonusInstance.quality())), 1);
         boolean push = (applyToSelf && strength.baseAmount() > 0) || (!applyToSelf && strength.baseAmount() > 0);
-        return Component.translatable((push ? "action.irons_jewelry.knockback.push" : "action.irons_jewelry.knockback.pull"), target);
+        return Component.translatable((push ? "action.irons_jewelry.knockback.push" : "action.irons_jewelry.knockback.pull"), target, strengthText);
     }
 
     @Override

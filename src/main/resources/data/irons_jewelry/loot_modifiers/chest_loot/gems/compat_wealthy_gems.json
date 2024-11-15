@@ -6,21 +6,24 @@
       "terms": [
         {
           "condition": "neoforge:loot_table_id",
-          "loot_table_id": "minecraft:chests/nether_bridge"
+          "loot_table_id": "betterdeserttemples:chests/pharaoh_hidden"
         },
         {
           "condition": "neoforge:loot_table_id",
-          "loot_table_id": "minecraft:chests/bastion_bridge"
+          "loot_table_id": "betterfortresses:chests/worship"
         },
         {
           "condition": "neoforge:loot_table_id",
-          "loot_table_id": "minecraft:chests/bastion_other"
+          "loot_table_id": "irons_spellbooks:chests/generic_magic_treasure"
+        },
+        {
+          "condition": "neoforge:loot_table_id",
+          "loot_table_id": "irons_spellbooks:chests/catacombs/crypt_loot"
         }
       ]
     }
   ],
   "keys": [
-    "irons_jewelry:modifiers/nether_pattern_loot",
     "irons_jewelry:modifiers/generic_gem_loot"
   ]
 }

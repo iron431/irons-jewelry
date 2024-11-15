@@ -1,9 +1,14 @@
 {
   "replace": false,
   "entries": [
-    "irons_jewelry:chest_loot/compat_generic_loot_modifier",
-    "irons_jewelry:chest_loot/vanilla_generic_loot_modifier",
-    "irons_jewelry:chest_loot/nether_loot_modifier",
-    "irons_jewelry:chest_loot/nether_treasure_loot_modifier"
+    "irons_jewelry:chest_loot/gems/compat_generic_gems",
+    "irons_jewelry:chest_loot/gems/compat_wealthy_gems",
+    "irons_jewelry:chest_loot/gems/vanilla_generic_gems",
+    "irons_jewelry:chest_loot/gems/vanilla_wealthy_gems",
+    "irons_jewelry:chest_loot/patterns/compat_generic_patterns",
+    "irons_jewelry:chest_loot/patterns/nether_patterns",
+    "irons_jewelry:chest_loot/patterns/nether_treasure_patterns",
+    "irons_jewelry:chest_loot/patterns/stronghold_patterns",
+    "irons_jewelry:chest_loot/patterns/vanilla_generic_patterns"
   ]
 }

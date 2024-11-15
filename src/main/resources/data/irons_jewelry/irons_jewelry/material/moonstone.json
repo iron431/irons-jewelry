@@ -13,6 +13,26 @@
       "attribute": "apothic_attributes:arrow_damage",
       "amount": 0.1,
       "operation": "add_multiplied_total"
+    },
+    "irons_jewelry:action": {
+      "targetSelf": false,
+      "action": {
+        "type": "irons_jewelry:explode",
+        "translation": "action.irons_jewelry.explode.wind_burst",
+        "affect_self": false,
+        "radius": {
+          "base": 3,
+          "scalar": 1
+        },
+        "block_interaction": "none",
+        "large_particle": {
+          "type": "minecraft:gust_emitter_large"
+        },
+        "small_particle": {
+          "type": "minecraft:gust_emitter_small"
+        },
+        "sound": "minecraft:entity.wind_charge.wind_burst"
+      }
     }
   }
 }

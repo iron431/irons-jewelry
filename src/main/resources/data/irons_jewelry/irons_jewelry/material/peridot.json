@@ -19,6 +19,16 @@
     },
     "irons_jewelry:positive_effect": {
       "effect": "minecraft:haste"
+    },
+    "irons_jewelry:action": {
+      "targetSelf": false,
+      "action": {
+        "type": "irons_jewelry:knockback",
+        "strength": {
+          "base": -2.0,
+          "scalar": -1.0
+        }
+      }
     }
   }
 }
