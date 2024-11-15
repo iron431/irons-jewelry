@@ -11,7 +11,7 @@ import java.util.List;
 public class OnProjectileHitBonus extends Bonus {
     @Override
     public ActionParameter getParameterType() {
-        return ParameterTypeRegistry.DEFENSIVE_ACTION_PARAMETER.get();
+        return ParameterTypeRegistry.ACTION_PARAMETER.get();
     }
 
     @Override
@@ -19,7 +19,7 @@ public class OnProjectileHitBonus extends Bonus {
         var param = getParameterType().resolve(bonus);
         if (param.isPresent()) {
             var enchant = param.get();
-            return ParameterTypeRegistry.DEFENSIVE_ACTION_PARAMETER.get().getActionTooltip(getTooltipDescriptionId(), enchant, bonus);
+            return ParameterTypeRegistry.ACTION_PARAMETER.get().getActionTooltip(getTooltipDescriptionId(), enchant, bonus);
         }
         return super.getTooltipDescription(bonus);
     }

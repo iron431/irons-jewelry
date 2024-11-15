@@ -20,12 +20,16 @@
     "irons_jewelry:negative_effect": {
       "effect": "minecraft:wither"
     },
-    "irons_jewelry:defensive_action": {
+    "irons_jewelry:action": {
       "targetSelf": true,
       "action": {
         "type": "irons_jewelry:apply_effect",
         "duration": 120,
-        "amplifier": 1,
+        "amplifier": {
+          "base": 0,
+          "scalar": 1,
+          "max": 2
+        },
         "effect": "minecraft:strength"
       }
     }

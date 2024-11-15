@@ -17,7 +17,7 @@
     "irons_jewelry:negative_effect": {
       "effect": "minecraft:blindness"
     },
-    "irons_jewelry:defensive_action": {
+    "irons_jewelry:action": {
       "targetSelf": true,
       "action": {
         "type": "irons_jewelry:heal",

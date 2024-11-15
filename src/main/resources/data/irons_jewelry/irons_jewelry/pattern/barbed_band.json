@@ -24,7 +24,7 @@
     {
       "bonus": "irons_jewelry:on_attack",
       "parameter": {
-        "irons_jewelry:defensive_action": {
+        "irons_jewelry:action": {
           "targetSelf": true,
           "action": {
             "type": "irons_jewelry:apply_damage",

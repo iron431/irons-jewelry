@@ -14,7 +14,7 @@
       "amount": 0.03,
       "operation": "add_value"
     },
-    "irons_jewelry:defensive_action": {
+    "irons_jewelry:action": {
       "targetSelf": false,
       "action": {
         "type": "irons_jewelry:apply_freeze",
