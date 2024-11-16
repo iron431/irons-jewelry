@@ -6,6 +6,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.redspace.ironsjewelry.IronsJewelry;
 import io.redspace.ironsjewelry.core.Bonus;
 import io.redspace.ironsjewelry.core.IBonusParameterType;
+import io.redspace.ironsjewelry.core.MaterialModiferDataHandler;
 import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
 import net.minecraft.core.Holder;
 
@@ -14,8 +15,10 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.function.Function;
 
-public record BonusSource(Bonus bonus, Either<Map<IBonusParameterType<?>, Object>, Holder<PartDefinition>> parameterOrSource,
-                          Either<Double, Holder<PartDefinition>> qualityOrSource, double qualityMultiplier, Optional<QualityScalar> cooldown) {
+public record BonusSource(Bonus bonus,
+                          Either<Map<IBonusParameterType<?>, Object>, Holder<PartDefinition>> parameterOrSource,
+                          Either<Double, Holder<PartDefinition>> qualityOrSource, double qualityMultiplier,
+                          Optional<QualityScalar> cooldown) {
     public static final Codec<BonusSource> CODEC = RecordCodecBuilder.create(builder -> builder.group(
             IronsJewelryRegistries.BONUS_REGISTRY.byNameCodec().fieldOf("bonus").forGetter(BonusSource::bonus),
             Codec.either(IBonusParameterType.BONUS_TO_INSTANCE_CODEC, IronsJewelryRegistries.Codecs.PART_REGISTRY_CODEC).fieldOf("parameter").forGetter(BonusSource::parameterOrSource),
@@ -27,7 +30,7 @@ public record BonusSource(Bonus bonus, Either<Map<IBonusParameterType<?>, Object
     public BonusInstance getBonusFor(JewelryData data) {
         return new BonusInstance(
                 bonus,
-                mapEither(qualityOrSource, Function.identity(), (right) -> qualityFromPart(right, data)) * data.pattern().value().qualityMultiplier()  * qualityMultiplier,
+                mapEither(qualityOrSource, Function.identity(), (right) -> qualityFromPart(right, data)) * data.pattern().value().qualityMultiplier() * qualityMultiplier,
                 mapEither(parameterOrSource, Function.identity(), (right) -> parameterFromPart(right, data)),
                 cooldown
         );
@@ -58,6 +61,11 @@ public record BonusSource(Bonus bonus, Either<Map<IBonusParameterType<?>, Object
             var param = params.get(targetParameter);
             if (param != null) {
                 return Map.of(targetParameter, param);
+            } else {
+                var modifier = MaterialModiferDataHandler.getModifiedParameterValue(material, targetParameter);
+                if (modifier.isPresent()) {
+                    return Map.of(targetParameter, modifier.get());
+                }
             }
         }
         IronsJewelry.LOGGER.warn("Part {} unable to find bonus parameter {} in jewelry: {}", part, targetParameter, data);
