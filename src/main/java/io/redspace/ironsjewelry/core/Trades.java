@@ -152,6 +152,24 @@ public class Trades {
         }
     }
 
+    public record BuyItemTag(TagKey<Item> itemTag, int buyCount, int emeraldCost, int maxUses, int villagerXp,
+                             float priceMultiplier) implements VillagerTrades.ItemListing {
+        @Override
+        public MerchantOffer getOffer(Entity pTrader, RandomSource pRandom) {
+            if (pTrader.level() instanceof ServerLevel serverLevel) {
+                var options = BuiltInRegistries.ITEM.getTag(this.itemTag);
+                if (options.isPresent()) {
+                    var set = options.get();
+                    var item = set.getRandomElement(pRandom);
+                    if (item.isPresent()) {
+                        return new MerchantOffer(new ItemCost(item.get().value(), buyCount), new ItemStack(Items.EMERALD,emeraldCost), this.maxUses, this.villagerXp, this.priceMultiplier);
+                    }
+                }
+            }
+            return null;
+        }
+    }
+
     public record SellItemTag(TagKey<Item> itemTag, int maxUses, int villagerXp,
                               float priceMultiplier,
                               int emeraldValue) implements VillagerTrades.ItemListing {

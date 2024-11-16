@@ -1,9 +1,7 @@
 package io.redspace.ironsjewelry.event;
 
 import io.redspace.ironsjewelry.IronsJewelry;
-import io.redspace.ironsjewelry.compat.CompatHandler;
 import io.redspace.ironsjewelry.core.Trades;
-import io.redspace.ironsjewelry.registry.ItemRegistry;
 import io.redspace.ironsjewelry.registry.VillagerRegistry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
@@ -11,7 +9,6 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Items;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.event.village.VillagerTradesEvent;
 import net.neoforged.neoforge.event.village.WandererTradesEvent;
 
@@ -31,35 +28,28 @@ public class SetupEvents {
              */
             novice.add(new Trades.BuyItem(Items.GOLD_INGOT, 6, 1, 12, 1, 0.05F));
             novice.add(new Trades.BuyItem(Items.COPPER_INGOT, 9, 1, 12, 1, 0.05F));
-            novice.add(new Trades.SellLootTable(ResourceKey.create(Registries.LOOT_TABLE, IronsJewelry.id("trades/sell_default_jewelry")), 2, 8, 0.5f, Trades::calculateJewelryPrice));
+            novice.add(new Trades.SellLootTable(ResourceKey.create(Registries.LOOT_TABLE, IronsJewelry.id("trades/sell_default_jewelry")), 2, 8, 0.05f, Trades::calculateJewelryPrice));
             /*
             Apprentice
              */
-            apprentice.add(new Trades.BuyItem(Items.DIAMOND, 1, 1, 12, 10, 0.05F));
-            apprentice.add(new Trades.BuyItem(Items.AMETHYST_SHARD, 3, 1, 12, 10, 0.05F));
-            apprentice.add(new Trades.BuyItem(Items.LAPIS_LAZULI, 6, 1, 12, 8, 0.05F));
-            apprentice.add(new Trades.BuyItem(ItemRegistry.RUBY.get(), 4, 1, 12, 10, 0.05F));
-            apprentice.add(new Trades.BuyItem(ItemRegistry.SAPPHIRE.get(), 4, 1, 12, 10, 0.05F));
-            apprentice.add(new Trades.BuyItem(ItemRegistry.TOPAZ.get(), 4, 1, 12, 10, 0.05F));
-            apprentice.add(new Trades.BuyItem(ItemRegistry.MOONSTONE.get(), 4, 1, 12, 10, 0.05F));
-            apprentice.add(new Trades.BuyItem(ItemRegistry.PERIDOT.get(), 4, 1, 12, 10, 0.05F));
-            apprentice.add(new Trades.BuyItem(ItemRegistry.ONYX.get(), 4, 1, 12, 10, 0.05F));
+            apprentice.add(new Trades.BuyItemTag(TagKey.create(Registries.ITEM, IronsJewelry.id("jeweler_buyable_gems")), 6, 1, 12, 8, 0.05F));
+            apprentice.add(new Trades.SellItemTag(TagKey.create(Registries.ITEM, IronsJewelry.id("jeweler_sellable_gems")), 4, 15, 0.05f, 8));
 
             /*
             Journeyman
              */
-            journeyman.add(new Trades.SellLootTable(ResourceKey.create(Registries.LOOT_TABLE, IronsJewelry.id("trades/sell_basic_pattern")), 1, 25, 0.5f, Trades::calculatePatternPrice));
-            journeyman.add(new Trades.SellLootTable(ResourceKey.create(Registries.LOOT_TABLE, IronsJewelry.id("trades/sell_jewelry")), 2, 15, 0.5f, Trades::calculateJewelryPrice));
+            journeyman.add(new Trades.SellLootTable(ResourceKey.create(Registries.LOOT_TABLE, IronsJewelry.id("trades/sell_basic_pattern")), 1, 25, 0.05f, Trades::calculatePatternPrice));
+            journeyman.add(new Trades.SellLootTable(ResourceKey.create(Registries.LOOT_TABLE, IronsJewelry.id("trades/sell_jewelry")), 2, 15, 0.05f, Trades::calculateJewelryPrice));
             /*
             Expert
              */
-            expert.add(new Trades.SellItemTag(TagKey.create(Registries.ITEM, IronsJewelry.id("jeweler_sellable_gems")), 6, 15, 0.5f, 8));
-            expert.add(new Trades.SellLootTable(ResourceKey.create(Registries.LOOT_TABLE, IronsJewelry.id("trades/sell_jewelry")), 2, 15, 0.5f, Trades::calculateJewelryPrice));
+            expert.add(new Trades.SellLootTable(ResourceKey.create(Registries.LOOT_TABLE, IronsJewelry.id("trades/sell_jewelry")), 2, 15, 0.05f, Trades::calculateJewelryPrice));
+            expert.add(new Trades.SellItemTag(TagKey.create(Registries.ITEM, IronsJewelry.id("jeweler_sellable_gems")), 6, 15, 0.05f, 8));
             /*
             Master
              */
-            master.add(new Trades.SellLootTable(ResourceKey.create(Registries.LOOT_TABLE, IronsJewelry.id("trades/sell_advanced_pattern")), 1, 25, 0.5f, Trades::calculatePatternPrice));
-            master.add(new Trades.SellLootTable(ResourceKey.create(Registries.LOOT_TABLE, IronsJewelry.id("trades/sell_jewelry")), 2, 15, 0.5f, Trades::calculateJewelryPrice));
+            master.add(new Trades.SellLootTable(ResourceKey.create(Registries.LOOT_TABLE, IronsJewelry.id("trades/sell_jewelry")), 2, 15, 0.05f, Trades::calculateJewelryPrice));
+            master.add(new Trades.SellLootTable(ResourceKey.create(Registries.LOOT_TABLE, IronsJewelry.id("trades/sell_advanced_pattern")), 1, 25, 0.05f, Trades::calculatePatternPrice));
         }
     }
 
