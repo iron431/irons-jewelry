@@ -1,0 +1,18 @@
+{
+  "descriptionId": "material.irons_jewelry.brass",
+  "ingredient": {
+    "tag": "c:ingots/brass"
+  },
+  "materialType": [
+    "metal"
+  ],
+  "paletteLocation": "irons_jewelry:item/palettes/brass",
+  "quality": 0.75,
+  "bonusParameters": {
+    "irons_jewelry:attribute": {
+      "attribute": "minecraft:generic.knockback_resistance",
+      "amount": 0.1,
+      "operation": "add_value"
+    }
+  }
+}

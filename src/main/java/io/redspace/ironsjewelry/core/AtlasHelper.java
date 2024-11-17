@@ -43,6 +43,11 @@ public class AtlasHelper {
         metalPermutations.put("copper", IronsJewelry.id("palettes/copper"));
         metalPermutations.put("netherite", IronsJewelry.id("palettes/netherite"));
         metalPermutations.put("platinum", IronsJewelry.id("palettes/platinum"));
+        metalPermutations.put("brass", IronsJewelry.id("palettes/brass"));
+        metalPermutations.put("bronze", IronsJewelry.id("palettes/bronze"));
+        metalPermutations.put("allthemodium", IronsJewelry.id("palettes/allthemodium"));
+        metalPermutations.put("vibranium", IronsJewelry.id("palettes/vibranium"));
+        metalPermutations.put("unobtainium", IronsJewelry.id("palettes/unobtainium"));
         metalPermutations.put("menu", IronsJewelry.id("palettes/menu"));
         metalPermutations.put("menu_bright", IronsJewelry.id("palettes/menu_bright"));
         sources.add(new PalettedPermutations(metalTextures, metalPaletteKey, metalPermutations));

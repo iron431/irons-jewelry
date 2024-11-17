@@ -61,6 +61,11 @@
   "material.irons_jewelry.moonstone": "Moonstone",
   "material.irons_jewelry.peridot": "Peridot",
   "material.irons_jewelry.platinum": "Platinum",
+  "material.irons_jewelry.brass": "Brass",
+  "material.irons_jewelry.bronze": "Bronze",
+  "material.irons_jewelry.allthemodium": "Allthemodium",
+  "material.irons_jewelry.vibranium": "Vibranium",
+  "material.irons_jewelry.unobtainium": "Unobtainium",
 
   "part.irons_jewelry.band_simple": "Band",
   "part.irons_jewelry.band_gem": "Band",
