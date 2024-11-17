@@ -49,7 +49,7 @@ public record GenerateJewelryLootFunction(
                 }
             }
             if (!weightedPatterns.isEmpty()) {
-                var pattern = weightedPatterns.lowerEntry(lootContext.getRandom().nextInt(total)).getValue();
+                var pattern = weightedPatterns.lowerEntry(lootContext.getRandom().nextInt(total) + 1).getValue();
                 HashMap<Holder<PartDefinition>, Holder<MaterialDefinition>> materials = new HashMap<>();
                 var registry = IronsJewelryRegistries.materialRegistry(lootContext.getLevel().registryAccess());
                 for (PartIngredient part : pattern.value().partTemplate()) {
@@ -60,7 +60,7 @@ public record GenerateJewelryLootFunction(
                     List<MaterialDefinition> applicableMaterials = registry.stream().filter(
                             (material) ->
                                     !material.ingredient().hasNoItems() &&
-                                    part.part().value().canUseMaterial(material.materialType()) &&
+                                            part.part().value().canUseMaterial(material.materialType()) &&
                                             (materialFilter.isEmpty() ||
                                                     material.materialType().stream().anyMatch(type -> !materialFilter.get().containsKey(type) || materialFilter.get().get(type).contains(registry.wrapAsHolder(material))))
                     ).toList();

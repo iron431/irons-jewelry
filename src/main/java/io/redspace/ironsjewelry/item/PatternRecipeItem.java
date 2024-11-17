@@ -33,7 +33,7 @@ public class PatternRecipeItem extends Item {
             var playerData = pPlayer.getData(DataAttachmentRegistry.PLAYER_DATA);
             if (!playerData.isLearned(pattern)) {
                 if (pPlayer instanceof ServerPlayer serverPlayer) {
-                    playerData.learn(serverPlayer, pattern);
+                    playerData.learnAndSync(serverPlayer, pattern);
                     if (!pPlayer.isCreative()) {
                         stack.shrink(1);
                         pPlayer.setItemInHand(pUsedHand, stack);

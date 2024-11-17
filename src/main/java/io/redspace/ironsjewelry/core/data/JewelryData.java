@@ -36,27 +36,6 @@ public class JewelryData {
                     IronsJewelryRegistries.Codecs.MATERIAL_REGISTRY_CODEC).fieldOf("parts").forGetter(JewelryData::parts)
     ).apply(builder, JewelryData::new));
 
-    //    public static final StreamCodec<RegistryFriendlyByteBuf, JewelryData> STREAM_CODEC = StreamCodec.of((buf, data) -> {
-//        buf.writeResourceLocation(data.pattern.getKey().location());
-//        var parts = data.parts.entrySet();
-//        buf.writeInt(parts.size());
-//        for (Map.Entry<Holder<PartDefinition>, MaterialDefinition> entry : parts) {
-//            buf.writeResourceLocation(entry.getKey().id());
-//            buf.writeResourceLocation(entry.getValue().id());
-//        }
-//    }, (buf) -> {
-//        Map<Holder<PartDefinition>, MaterialDefinition> parts = new HashMap<>();
-//        ResourceLocation patternid = buf.readResourceLocation();
-//        int i = buf.readInt();
-//        for (int j = 0; j < i; j++) {
-//            var opt1 = PartDataHandler.getSafe(buf.readResourceLocation());
-//            var opt2 = MaterialDataHandler.getSafe(buf.readResourceLocation());
-//            if (opt1.isPresent() && opt2.isPresent()) {
-//                parts.put(opt1.get(), opt2.get());
-//            }
-//        }
-//        return new JewelryData(Objects.requireNonNull(buf.registryAccess().registryOrThrow(JewelryDataRegistries.PATTERN_REGISTRY_KEY).getHolder(patternid).orElseThrow(() -> new IllegalStateException("Missing pattern: " + patternid))), parts);
-//    });
     public static final StreamCodec<RegistryFriendlyByteBuf, JewelryData> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.holderRegistry(IronsJewelryRegistries.Keys.PATTERN_REGISTRY_KEY),
             jewelryData -> jewelryData.pattern,
@@ -64,14 +43,6 @@ public class JewelryData {
             jewelryData -> jewelryData.parts,
             JewelryData::new
     );
-    //TODO: mc have cool stream codec utilities
-//    public static final StreamCodec<RegistryFriendlyByteBuf, JewelryData> STREAM_CODEC = StreamCodec.composite(
-//            ByteBufCodecs.map(HashMap::new, PartDefinition.STREAM_CODEC, ByteBufCodecs.VAR_INT),
-//            p_340784_ -> p_340784_.enchantments,
-//            ByteBufCodecs.BOOL,
-//            p_330450_ -> p_330450_.showInTooltip,
-//            ItemEnchantments::new
-//    );
 
     private final Holder<PatternDefinition> pattern;
     private final Map<Holder<PartDefinition>, Holder<MaterialDefinition>> parts;
@@ -99,6 +70,11 @@ public class JewelryData {
         this.hashCode = parts.hashCode();
     }
 
+    /**
+     * @param pattern
+     * @param parts
+     * @return Returns a special use-case of jewelry data for rendering. returned JewelryData is not practically useful, but is able to render as an item for intermediary previews.
+     */
     public static JewelryData renderable(PatternDefinition pattern, Map<Holder<PartDefinition>, Holder<MaterialDefinition>> parts) {
         return new JewelryData(pattern, parts);
     }

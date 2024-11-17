@@ -59,7 +59,12 @@ public class PlayerData {
         cooldowns.put(k, new CooldownInstance(ticks));
     }
 
-    public boolean learn(ServerPlayer serverPlayer, Holder<PatternDefinition> patternDefinition) {
+
+    public boolean learn(Holder<PatternDefinition> patternDefinition) {
+        return learnedPatterns.add(patternDefinition);
+    }
+
+    public boolean learnAndSync(ServerPlayer serverPlayer, Holder<PatternDefinition> patternDefinition) {
         if (learnedPatterns.add(patternDefinition)) {
             sync(serverPlayer);
             return true;

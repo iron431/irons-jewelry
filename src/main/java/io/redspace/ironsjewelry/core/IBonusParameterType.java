@@ -29,7 +29,6 @@ public interface IBonusParameterType<T> {
 
     default Optional<T> resolve(Map<IBonusParameterType<?>, Object> parameters) {
         var param = parameters.get(this);
-        //TODO: instanceof T?
         try {
             return param == null ? Optional.empty() : Optional.of((T) param);
         } catch (ClassCastException e) {
