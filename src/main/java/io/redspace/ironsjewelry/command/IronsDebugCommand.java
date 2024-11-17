@@ -7,14 +7,17 @@ import com.mojang.brigadier.suggestion.SuggestionProvider;
 import io.redspace.ironsjewelry.IronsJewelry;
 import io.redspace.ironsjewelry.client.ClientData;
 import io.redspace.ironsjewelry.core.data.PatternDefinition;
+import io.redspace.ironsjewelry.registry.ComponentRegistry;
 import io.redspace.ironsjewelry.registry.DataAttachmentRegistry;
 import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
+import io.redspace.ironsjewelry.registry.ItemRegistry;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -40,7 +43,28 @@ public class IronsDebugCommand {
         )).then(Commands.literal("clearClientCache").executes((commandContext -> {
             ClientData.MODEL_CACHE.clear();
             return 1;
-        }))));
+        }))).then(Commands.literal("createPatternItem").then(Commands.argument("pattern", PatternCommandArgument.patternArgument()).suggests(PATTERN_SUGGESTIONS).executes((commandContext) -> {
+                    return createPatternItem(commandContext.getSource(), commandContext.getArgument("pattern", String.class));
+                }))
+        ));
+    }
+
+    private static int createPatternItem(CommandSourceStack source, String patternId) throws CommandSyntaxException {
+        if (!patternId.contains(":")) {
+            patternId = IronsJewelry.MODID + ":" + patternId;
+        }
+
+        var registry = IronsJewelryRegistries.patternRegistry(source.registryAccess());
+        var pattern = registry.getHolder(ResourceLocation.parse(patternId));
+        if (pattern.isPresent()) {
+            var serverPlayer = source.getPlayer();
+            ItemStack stack = new ItemStack(ItemRegistry.RECIPE.get());
+            stack.set(ComponentRegistry.STORED_PATTERN, pattern.get());
+            serverPlayer.getInventory().add(stack);
+            return 1;
+        }
+
+        throw ERROR_FAILED.create();
     }
 
     private static int learnPattern(CommandSourceStack source, String patternId) throws CommandSyntaxException {
@@ -53,7 +77,7 @@ public class IronsDebugCommand {
         if (pattern != null) {
             var serverPlayer = source.getPlayer();
             if (serverPlayer != null) {
-                return serverPlayer.getData(DataAttachmentRegistry.PLAYER_DATA).learn(serverPlayer, registry.wrapAsHolder(pattern)) ? 1 : 0;
+                return serverPlayer.getData(DataAttachmentRegistry.PLAYER_DATA).learnAndSync(serverPlayer, registry.wrapAsHolder(pattern)) ? 1 : 0;
             }
 
         }
@@ -67,8 +91,9 @@ public class IronsDebugCommand {
             var data = serverPlayer.getData(DataAttachmentRegistry.PLAYER_DATA);
             var registry = IronsJewelryRegistries.patternRegistry(source.registryAccess());
             for (Map.Entry<ResourceKey<PatternDefinition>, PatternDefinition> entry : registry.entrySet()) {
-                data.learn(serverPlayer, registry.wrapAsHolder(entry.getValue()));
+                data.learn(registry.wrapAsHolder(entry.getValue()));
             }
+            data.sync(serverPlayer);
             return 1;
         }
 
