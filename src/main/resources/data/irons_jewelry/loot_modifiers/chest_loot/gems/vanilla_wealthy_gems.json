@@ -11,6 +11,18 @@
         {
           "condition": "neoforge:loot_table_id",
           "loot_table_id": "minecraft:chests/bastion_treasure"
+        },
+        {
+          "condition": "neoforge:loot_table_id",
+          "loot_table_id": "minecraft:chests/buried_treasure"
+        },
+        {
+          "condition": "neoforge:loot_table_id",
+          "loot_table_id": "minecraft:chests/desert_pyramid"
+        },
+        {
+          "condition": "neoforge:loot_table_id",
+          "loot_table_id": "minecraft:chests/abandoned_mineshaft"
         }
       ]
     }

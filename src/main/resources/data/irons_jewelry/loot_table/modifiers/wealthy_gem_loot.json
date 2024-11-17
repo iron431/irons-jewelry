@@ -19,7 +19,7 @@
           "count": {
             "type": "minecraft:binomial",
             "n": 5,
-            "p": 0.5
+            "p": 0.6
           }
         }
       ]

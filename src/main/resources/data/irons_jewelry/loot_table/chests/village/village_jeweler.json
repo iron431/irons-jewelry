@@ -65,7 +65,7 @@
             }
           ],
           "name": "minecraft:emerald",
-          "weight": 15
+          "weight": 10
         },
         {
           "type": "minecraft:item",
@@ -81,7 +81,7 @@
             }
           ],
           "name": "minecraft:bread",
-          "weight": 15
+          "weight": 10
         },
         {
           "type": "minecraft:item",
@@ -90,21 +90,42 @@
               "add": false,
               "count": {
                 "type": "minecraft:uniform",
-                "max": 2.0,
-                "min": 1.0
+                "max": 5.0,
+                "min": 2.0
               },
               "function": "minecraft:set_count"
             }
           ],
           "name": "minecraft:gold_ingot",
-          "weight": 5
+          "weight": 15
         }
       ],
       "rolls": {
         "type": "minecraft:uniform",
-        "max": 3.0,
+        "max": 2.0,
         "min": 1.0
       }
+    },
+    {
+      "bonus_rolls": 0.0,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "add": false,
+              "count": {
+                "type": "minecraft:uniform",
+                "max": 4.0,
+                "min": 1.0
+              },
+              "function": "minecraft:set_count"
+            }
+          ],
+          "name": "minecraft:bread"
+        }
+      ],
+      "rolls":1
     },
     {
       "rolls": 1,

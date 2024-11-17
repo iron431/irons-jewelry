@@ -68,7 +68,6 @@ public class CurioBaseItem extends Item implements ICurioItem {
 
     @Override
     public Component getName(ItemStack itemStack) {
-        //TODO: cache or use actual item name component entry
         if (!itemStack.has(DataComponents.ITEM_NAME)) {
             itemStack.set(DataComponents.ITEM_NAME, JewelryData.get(itemStack).getItemName());
         }
@@ -82,9 +81,6 @@ public class CurioBaseItem extends Item implements ICurioItem {
         if (jewelryData.isValid()) {
             if (ClientEvents.isIsShiftKeyDown()) {
                 pTooltipComponents.add(Component.translatable("tooltip.irons_jewelry.hold_shift", Component.translatable("key.keyboard.left.shift").withStyle(ChatFormatting.WHITE)).withStyle(ChatFormatting.GRAY));
-                //var parts = jewelryData.parts().entrySet();
-                //var ingredients = jewelryData.pattern().value().partTemplate().stream().collect(Collectors.toMap(PartIngredient::part, PartIngredient::drawOrder));
-                //var sorted = parts.stream().sorted(Comparator.comparingInt(entry -> ingredients.get(entry.getKey()))).toList();
                 pTooltipComponents.addAll(getShiftDescription(jewelryData.pattern().value(), jewelryData.parts(), Optional.empty()));
             } else {
                 pTooltipComponents.add(Component.translatable("tooltip.irons_jewelry.hold_shift", Component.translatable("key.keyboard.left.shift").withStyle(ChatFormatting.DARK_GRAY)).withStyle(ChatFormatting.GRAY));
