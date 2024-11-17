@@ -13,6 +13,19 @@
       "attribute": "minecraft:generic.armor_toughness",
       "amount": 2,
       "operation": "add_value"
+    },
+    "irons_jewelry:negative_effect": {
+      "effect": "minecraft:levitation"
+    },
+    "irons_jewelry:action": {
+      "targetSelf": true,
+      "action": {
+        "type": "irons_jewelry:knockback",
+        "strength": {
+          "base": -2.0,
+          "scalar": -1.0
+        }
+      }
     }
   }
 }

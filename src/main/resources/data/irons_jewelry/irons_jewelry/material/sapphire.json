@@ -14,6 +14,9 @@
       "amount": 0.03,
       "operation": "add_value"
     },
+    "irons_jewelry:negative_effect": {
+      "effect": "minecraft:slowness"
+    },
     "irons_jewelry:action": {
       "targetSelf": false,
       "action": {

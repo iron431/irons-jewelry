@@ -113,6 +113,7 @@ dependencies {
 //    localRuntime "curse.maven:geckolib-388172:5605715"
 //    localRuntime "curse.maven:playeranimator-658587:5698755"
 
+    localRuntime "curse.maven:spark-361579:5759671"
 }
 
 tasks.withType(ProcessResources).configureEach {

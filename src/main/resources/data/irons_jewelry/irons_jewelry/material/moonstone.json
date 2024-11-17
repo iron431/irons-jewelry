@@ -14,6 +14,9 @@
       "amount": 0.1,
       "operation": "add_multiplied_total"
     },
+    "irons_jewelry:negative_effect": {
+      "effect": "minecraft:blindness"
+    },
     "irons_jewelry:action": {
       "targetSelf": false,
       "action": {

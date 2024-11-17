@@ -15,10 +15,26 @@
       "operation": "add_multiplied_total"
     },
     "irons_jewelry:positive_effect": {
-      "effect": "minecraft:luck"
+      "effect": "minecraft:speed"
     },
-    "irons_jewelry:negative_effect": {
-      "effect": "minecraft:unluck"
+    "irons_jewelry:action": {
+      "targetSelf": false,
+      "action": {
+        "type": "irons_jewelry:create_items",
+        "item": "minecraft:emerald",
+        "chance": {
+          "base": 0.05,
+          "scalar": 0.05,
+          "min": 0.01,
+          "max": 1
+        },
+        "minCount": 1,
+        "maxCount": {
+          "base": 4,
+          "scalar": 2
+        },
+        "sound": "irons_jewelry:action.create_items.emeralds"
+      }
     }
   }
 }

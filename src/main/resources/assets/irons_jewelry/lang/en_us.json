@@ -129,6 +129,11 @@
   "action.irons_jewelry.explode.wind_burst": "Wind Burst",
   "action.irons_jewelry.heal.name": "Heal",
   "action.irons_jewelry.heal": "Heal %s HP",
+  "action.irons_jewelry.create_items.name": "Create Items",
+  "action.irons_jewelry.create_items.chance": "%s%% chance to Create %s %s Items",
+  "action.irons_jewelry.create_items": "Create %s %s Items",
+  "action.irons_jewelry.create_items.chance.singular": "%s%% chance to Create %s",
+  "action.irons_jewelry.create_items.singular": "Create %s",
 
   "tooltip.irons_jewelry.hold_shift" : "[%s] +",
   "tooltip.irons_jewelry.part_to_material" : "%s: %s",

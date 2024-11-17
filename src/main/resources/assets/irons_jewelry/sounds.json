@@ -1,0 +1,7 @@
+{
+  "action.create_items.emeralds": {
+    "sounds": [
+      "irons_jewelry:create_emeralds"
+    ]
+  }
+}
