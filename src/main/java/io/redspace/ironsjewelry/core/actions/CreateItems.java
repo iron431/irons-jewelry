@@ -60,7 +60,7 @@ public record CreateItems(
             itemEntity.setPickUpDelay(20);
             serverLevel.addFreshEntity(itemEntity);
         }
-        this.sound.ifPresent(sound -> serverLevel.playSound(null, origin.x, origin.y, origin.z, sound.value(), SoundSource.PLAYERS));
+        this.sound.ifPresent(sound -> serverLevel.playSound(null, origin.x, origin.y, origin.z, sound.value(), SoundSource.PLAYERS, 1.5f, random.nextIntBetweenInclusive(8, 12) * .1f));
     }
 
 
