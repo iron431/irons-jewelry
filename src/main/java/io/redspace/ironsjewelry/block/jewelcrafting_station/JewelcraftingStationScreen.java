@@ -4,8 +4,10 @@ import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.math.Axis;
 import io.redspace.ironsjewelry.IronsJewelry;
 import io.redspace.ironsjewelry.client.DynamicModel;
+import io.redspace.ironsjewelry.core.MinecraftInstanceHelper;
 import io.redspace.ironsjewelry.core.Utils;
 import io.redspace.ironsjewelry.core.data.*;
+import io.redspace.ironsjewelry.event.SetupJewelcraftingResultEvent;
 import io.redspace.ironsjewelry.item.CurioBaseItem;
 import io.redspace.ironsjewelry.network.packets.SetJewelcraftingStationPattern;
 import io.redspace.ironsjewelry.network.packets.SyncJewelcraftingSlotStates;
@@ -30,6 +32,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 
@@ -175,7 +178,8 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
 
     private void renderItemPreview(GuiGraphics guiGraphics, float pPartialTick, int pMouseX, int pMouseY) {
         if (selectedPattern >= 0) {
-            var pattern = availablePatterns.get(selectedPattern).value();
+            var holder = availablePatterns.get(selectedPattern);
+            var pattern = holder.value();
             var parts = new HashMap<Holder<PartDefinition>, Holder<MaterialDefinition>>();
             var requiredIngredients = pattern.partTemplate();
             for (int i = 0; i < requiredIngredients.size(); i++) {
@@ -201,11 +205,17 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
             if (parts.isEmpty()) {
                 return;
             }
-            JewelryData jewelryData = JewelryData.renderable(pattern, parts);
-            //var baker = new ModelBakery.ModelBakerImpl(pTextureGetter, p_351687_)
-            //BakedModel model = DynamicModel.bake(jewelryData, StandaloneGeometryBakingContext.INSTANCE,Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS), new SimpleModelState(Transformation.identity()), new ItemOverrides())
+
+            JewelryData jewelryData = JewelryData.renderable(holder, parts);
             ItemStack stack = new ItemStack(pattern.jewelryType().item());
             stack.set(ComponentRegistry.JEWELRY_COMPONENT, jewelryData);
+            //Event posting
+            var event = new SetupJewelcraftingResultEvent(holder, MinecraftInstanceHelper.getPlayer(), stack);
+            if (NeoForge.EVENT_BUS.post(event).isCanceled()) {
+                stack = ItemStack.EMPTY;
+            } else {
+                stack = event.getResult();
+            }
             var pose = guiGraphics.pose();
             int width = 0;
             for (Component component : tooltip) {

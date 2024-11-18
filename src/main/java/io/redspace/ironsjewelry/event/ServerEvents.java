@@ -28,6 +28,24 @@ import org.jetbrains.annotations.Nullable;
 @EventBusSubscriber
 public class ServerEvents {
 
+//    @SubscribeEvent
+//    public static void testEvent(SetupJewelcraftingResultEvent event) {
+//        if (!FMLLoader.isProduction()) {
+//            var stack = event.getResult();
+//            if (!stack.isEmpty()) {
+//                var data = JewelryData.get(stack);
+//                var gold = IronsJewelryRegistries.materialRegistry(event.getPlayer().registryAccess()).getHolderOrThrow(ResourceKey.create(IronsJewelryRegistries.Keys.MATERIAL_REGISTRY_KEY, IronsJewelry.id("gold")));
+//                if (data.parts().containsValue(gold)) {
+//                    var map = data.parts();
+//                    map.replaceAll((p, v) -> gold);
+//                    JewelryData jewelryData = new JewelryData(data.pattern(), map);
+//                    event.getResult().set(ComponentRegistry.JEWELRY_COMPONENT, jewelryData);
+//                    event.getResult().set(DataComponents.CUSTOM_NAME, Component.literal("Midas Touch"));
+//                }
+//            }
+//        }
+//    }
+
     @SubscribeEvent
     public static void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
         if (event.getEntity() instanceof ServerPlayer serverPlayer) {

@@ -2,6 +2,7 @@ package io.redspace.ironsjewelry.block.jewelcrafting_station;
 
 import io.redspace.ironsjewelry.core.Utils;
 import io.redspace.ironsjewelry.core.data.*;
+import io.redspace.ironsjewelry.event.SetupJewelcraftingResultEvent;
 import io.redspace.ironsjewelry.network.packets.SyncJewelcraftingSlotStates;
 import io.redspace.ironsjewelry.registry.BlockRegistry;
 import io.redspace.ironsjewelry.registry.ComponentRegistry;
@@ -16,6 +17,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
@@ -134,6 +136,13 @@ public class JewelcraftingStationMenu extends AbstractContainerMenu {
             if (jewelryData.isValid()) {
                 result = new ItemStack(currentPattern.jewelryType().item());
                 result.set(ComponentRegistry.JEWELRY_COMPONENT, jewelryData);
+            }
+            //Event posting
+            var event = new SetupJewelcraftingResultEvent(this.currentPattern, this.player, result);
+            if (NeoForge.EVENT_BUS.post(event).isCanceled() || (!event.getResult().isEmpty() && !JewelryData.get(event.getResult()).isValid())) {
+                result = ItemStack.EMPTY;
+            } else {
+                result = event.getResult();
             }
         }
         resultSlot.set(result);

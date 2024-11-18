@@ -62,11 +62,11 @@ public class JewelryData {
                         ).hashCode();
     }
 
-    private JewelryData(PatternDefinition pattern, Map<Holder<PartDefinition>, Holder<MaterialDefinition>> parts) {
-        this.pattern = Holder.direct(pattern);
+    private JewelryData(Holder<PatternDefinition> pattern, Map<Holder<PartDefinition>, Holder<MaterialDefinition>> parts, boolean valid, List<BonusInstance> bonuses) {
+        this.pattern = pattern;
         this.parts = parts;
-        this.valid = true;
-        this.bonuses = List.of();
+        this.valid = valid;
+        this.bonuses = bonuses;
         this.hashCode = parts.hashCode();
     }
 
@@ -75,8 +75,8 @@ public class JewelryData {
      * @param parts
      * @return Returns a special use-case of jewelry data for rendering. returned JewelryData is not practically useful, but is able to render as an item for intermediary previews.
      */
-    public static JewelryData renderable(PatternDefinition pattern, Map<Holder<PartDefinition>, Holder<MaterialDefinition>> parts) {
-        return new JewelryData(pattern, parts);
+    public static JewelryData renderable(Holder<PatternDefinition> pattern, Map<Holder<PartDefinition>, Holder<MaterialDefinition>> parts) {
+        return new JewelryData(pattern, parts, true, List.of());
     }
 
     private JewelryData() {

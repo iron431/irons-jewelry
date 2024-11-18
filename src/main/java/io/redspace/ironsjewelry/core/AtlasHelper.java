@@ -66,6 +66,7 @@ public class AtlasHelper {
                 IronsJewelry.id("item/base/barbed_band_gem")
         );
         var gemPermutations = new HashMap<String, ResourceLocation>();
+        gemPermutations.put("gold", IronsJewelry.id("palettes/gold"));
         gemPermutations.put("diamond", IronsJewelry.id("palettes/diamond"));
         gemPermutations.put("amethyst", IronsJewelry.id("palettes/amethyst"));
         gemPermutations.put("emerald", IronsJewelry.id("palettes/emerald"));
