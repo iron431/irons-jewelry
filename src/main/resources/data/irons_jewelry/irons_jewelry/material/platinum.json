@@ -6,7 +6,7 @@
   "materialType": [
     "metal"
   ],
-  "paletteLocation": "irons_jewelry:item/palettes/platinum",
+  "paletteLocation": "irons_jewelry:palettes/platinum",
   "quality": 2.0,
   "bonusParameters": {
     "irons_jewelry:attribute": {

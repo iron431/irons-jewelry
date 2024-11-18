@@ -6,7 +6,7 @@
   "materialType": [
     "gem"
   ],
-  "paletteLocation": "irons_jewelry:item/palettes/topaz",
+  "paletteLocation": "irons_jewelry:palettes/topaz",
   "quality": 2,
   "bonusParameters": {
     "irons_jewelry:attribute": {

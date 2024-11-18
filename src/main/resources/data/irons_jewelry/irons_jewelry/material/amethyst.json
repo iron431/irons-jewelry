@@ -6,7 +6,7 @@
   "materialType": [
     "gem"
   ],
-  "paletteLocation": "irons_jewelry:item/palettes/amethyst",
+  "paletteLocation": "irons_jewelry:palettes/amethyst",
   "quality": 1,
   "bonusParameters": {
     "irons_jewelry:attribute": {

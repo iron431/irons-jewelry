@@ -6,7 +6,7 @@
   "materialType": [
     "metal"
   ],
-  "paletteLocation": "irons_jewelry:item/palettes/netherite",
+  "paletteLocation": "irons_jewelry:palettes/netherite",
   "quality": 2.5,
   "bonusParameters": {
     "irons_jewelry:attribute": {

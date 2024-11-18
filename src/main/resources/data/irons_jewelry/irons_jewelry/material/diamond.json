@@ -6,7 +6,7 @@
   "materialType": [
     "gem"
   ],
-  "paletteLocation": "irons_jewelry:item/palettes/diamond",
+  "paletteLocation": "irons_jewelry:palettes/diamond",
   "quality": 2,
   "bonusParameters": {
     "irons_jewelry:attribute": {

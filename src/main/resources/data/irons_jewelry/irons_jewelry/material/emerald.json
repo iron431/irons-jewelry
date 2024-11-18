@@ -6,7 +6,7 @@
   "materialType": [
     "gem"
   ],
-  "paletteLocation": "irons_jewelry:item/palettes/emerald",
+  "paletteLocation": "irons_jewelry:palettes/emerald",
   "quality": 1.5,
   "bonusParameters": {
     "irons_jewelry:attribute": {

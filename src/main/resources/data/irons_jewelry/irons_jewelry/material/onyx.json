@@ -6,7 +6,7 @@
   "materialType": [
     "gem"
   ],
-  "paletteLocation": "irons_jewelry:item/palettes/onyx",
+  "paletteLocation": "irons_jewelry:palettes/onyx",
   "quality": 2,
   "bonusParameters": {
     "irons_jewelry:attribute": {

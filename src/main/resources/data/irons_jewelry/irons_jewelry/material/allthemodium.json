@@ -6,7 +6,7 @@
   "materialType": [
     "metal"
   ],
-  "paletteLocation": "irons_jewelry:item/palettes/allthemodium",
+  "paletteLocation": "irons_jewelry:palettes/allthemodium",
   "quality": 3.0,
   "bonusParameters": {
     "irons_jewelry:attribute": {

@@ -6,7 +6,7 @@
   "materialType": [
     "gem"
   ],
-  "paletteLocation": "irons_jewelry:item/palettes/sapphire",
+  "paletteLocation": "irons_jewelry:palettes/sapphire",
   "quality": 2,
   "bonusParameters": {
     "irons_jewelry:attribute": {

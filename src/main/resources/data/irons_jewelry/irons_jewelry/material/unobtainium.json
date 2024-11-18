@@ -6,7 +6,7 @@
   "materialType": [
     "metal"
   ],
-  "paletteLocation": "irons_jewelry:item/palettes/unobtainium",
+  "paletteLocation": "irons_jewelry:palettes/unobtainium",
   "quality": 4,
   "bonusParameters": {
     "irons_jewelry:attribute": {

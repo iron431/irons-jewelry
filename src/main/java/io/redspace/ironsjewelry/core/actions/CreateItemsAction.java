@@ -21,20 +21,20 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.Optional;
 
-public record CreateItems(
+public record CreateItemsAction(
         Optional<QualityScalar> chance,
         Holder<Item> item,
         Optional<Holder<SoundEvent>> sound,
         QualityScalar minCount,
         QualityScalar maxCount
 ) implements IAction {
-    public static final MapCodec<CreateItems> CODEC = RecordCodecBuilder.mapCodec(builder -> builder.group(
-            QualityScalar.CODEC.optionalFieldOf("chance").forGetter(CreateItems::chance),
-            BuiltInRegistries.ITEM.holderByNameCodec().fieldOf("item").forGetter(CreateItems::item),
-            BuiltInRegistries.SOUND_EVENT.holderByNameCodec().optionalFieldOf("sound").forGetter(CreateItems::sound),
-            QualityScalar.CODEC.fieldOf("minCount").forGetter(CreateItems::minCount),
-            QualityScalar.CODEC.fieldOf("maxCount").forGetter(CreateItems::maxCount)
-    ).apply(builder, CreateItems::new));
+    public static final MapCodec<CreateItemsAction> CODEC = RecordCodecBuilder.mapCodec(builder -> builder.group(
+            QualityScalar.CODEC.optionalFieldOf("chance").forGetter(CreateItemsAction::chance),
+            BuiltInRegistries.ITEM.holderByNameCodec().fieldOf("item").forGetter(CreateItemsAction::item),
+            BuiltInRegistries.SOUND_EVENT.holderByNameCodec().optionalFieldOf("sound").forGetter(CreateItemsAction::sound),
+            QualityScalar.CODEC.fieldOf("minCount").forGetter(CreateItemsAction::minCount),
+            QualityScalar.CODEC.fieldOf("maxCount").forGetter(CreateItemsAction::maxCount)
+    ).apply(builder, CreateItemsAction::new));
 
     @Override
     public void apply(ServerLevel serverLevel, double quality, boolean applyToSelf, ServerPlayer wearer, Entity entity) {

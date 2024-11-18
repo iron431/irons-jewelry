@@ -7,7 +7,7 @@
     "metal",
     "gold"
   ],
-  "paletteLocation": "irons_jewelry:item/palettes/gold",
+  "paletteLocation": "irons_jewelry:palettes/gold",
   "quality": 1.5,
   "bonusParameters": {
     "irons_jewelry:attribute": {

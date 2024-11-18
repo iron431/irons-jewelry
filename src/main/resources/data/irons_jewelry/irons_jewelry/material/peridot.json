@@ -6,7 +6,7 @@
   "materialType": [
     "gem"
   ],
-  "paletteLocation": "irons_jewelry:item/palettes/peridot",
+  "paletteLocation": "irons_jewelry:palettes/peridot",
   "quality": 2,
   "bonusParameters": {
     "irons_jewelry:attribute": {
