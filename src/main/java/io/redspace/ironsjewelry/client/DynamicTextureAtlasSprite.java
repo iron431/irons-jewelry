@@ -28,7 +28,7 @@ public class DynamicTextureAtlasSprite extends TextureAtlasSprite {
     static final ResourceLocation paletteKey = IronsJewelry.id("palettes/gold");
 
     protected DynamicTextureAtlasSprite(TextureAtlasSprite textureAtlasSprite, ResourceLocation baseTexture, ResourceLocation paletteLocation) {
-        super(textureAtlasSprite.atlasLocation(), apply(textureAtlasSprite.contents(),baseTexture, paletteLocation), (int) (textureAtlasSprite.getX() / textureAtlasSprite.getU0()), (int) (textureAtlasSprite.getY() / textureAtlasSprite.getV0()), textureAtlasSprite.getX(), textureAtlasSprite.getY());
+        super(textureAtlasSprite.atlasLocation(), apply(textureAtlasSprite.contents(),baseTexture, paletteLocation), (int) (textureAtlasSprite.getX() / textureAtlasSprite.getU0())+5, (int) (textureAtlasSprite.getY() / textureAtlasSprite.getV0()), textureAtlasSprite.getX(), textureAtlasSprite.getY());
         this.baseTexture = baseTexture;
         this.paletteLocation = paletteLocation;
     }
