@@ -120,7 +120,11 @@ public class DynamicModel implements IUnbakedGeometry<DynamicModel> {
             Transformation rootTransform = context.getRootTransform();
 
             for (int i = 0; i < parts.size(); i++) {
-                TextureAtlasSprite sprite = spriteGetter.apply(new Material(InventoryMenu.BLOCK_ATLAS, atlasResourceLocaction(parts.get(i).getKey(), parts.get(i).getValue())));
+                TextureAtlasSprite sprite = new DynamicTextureAtlasSprite(
+                        spriteGetter.apply(new Material(InventoryMenu.BLOCK_ATLAS, parts.get(i).getKey().value().baseTextureLocation()/*atlasResourceLocaction(parts.get(i).getKey(), parts.get(i).getValue())*/)),
+                        parts.get(i).getKey().value().baseTextureLocation(),
+                        parts.get(i).getValue().value().paletteLocation()
+                );
 
                 ModelState subState = new SimpleModelState(modelState.getRotation().compose(
                         rootTransform.compose(new Transformation(
