@@ -145,8 +145,10 @@ public class DynamicModel implements IUnbakedGeometry<DynamicModel> {
                 // texturemanager#byname
                 ResourceLocation location = atlasResourceLocaction(parts.get(i).getKey(), parts.get(i).getValue());
                 Minecraft.getInstance().getTextureManager().register(location, new DynamicTexture(sprite.contents().getOriginalImage()));
-
                 RenderTypeGroup renderTypes = new RenderTypeGroup(RenderType.solid(),NeoForgeRenderTypes.getUnsortedTranslucent(location));
+                if(!IronsJewelry.JEWELRY_ATLAS.hasBuilt){
+                    IronsJewelry.JEWELRY_ATLAS.buildCustomContents();
+                }
                 builder.addQuads(renderTypes, quads);
             }
             return builder.build();
