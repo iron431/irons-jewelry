@@ -7,45 +7,87 @@ import io.redspace.ironsjewelry.IronsJewelry;
 import io.redspace.ironsjewelry.core.data.MaterialDefinition;
 import io.redspace.ironsjewelry.core.data.PartDefinition;
 import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
+import net.minecraft.ResourceLocationException;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.*;
 import net.minecraft.client.renderer.texture.atlas.SpriteResourceLoader;
 import net.minecraft.client.renderer.texture.atlas.SpriteSource;
 import net.minecraft.client.renderer.texture.atlas.sources.PalettedPermutations;
-import net.minecraft.client.resources.TextureAtlasHolder;
+import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.util.profiling.ProfilerFiller;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-public class JewelryAtlas extends TextureAtlasHolder {
+public class JewelryAtlas extends TextureAtlas implements PreparableReloadListener/*, AutoCloseable*/ {
+    public String getPermutationName(Holder<MaterialDefinition> material) {
+        var materialKey = material.getKey().location();
+        var materialName = splitEnd(materialKey.getPath());
+        return String.format("%s_%s", materialKey.getNamespace(), materialName);
+    }
+
+    public ResourceLocation getSpriteLocation(Holder<PartDefinition> part, Holder<MaterialDefinition> material) {
+        try {
+            String base = part.value().baseTextureLocation().toString();
+            var permutationName = getPermutationName(material);
+            return ResourceLocation.parse(String.format("%s_%s", base, permutationName));
+        } catch (ResourceLocationException exception) {
+            IronsJewelry.LOGGER.error("Error parsing atlas sprite location: {}", exception.getMessage());
+        } catch (Exception ignored) {
+        }
+        return ResourceLocation.withDefaultNamespace("missingno");
+    }
+
+    public TextureAtlasSprite getSprite(Holder<PartDefinition> part, Holder<MaterialDefinition> material) {
+        return getSprite(getSpriteLocation(part, material));
+    }
+
+    public ResourceLocation getMenuSpriteLocation(Holder<PartDefinition> partDefinition, boolean bright) {
+        return ResourceLocation.parse(String.format("%s_%s", partDefinition.value().baseTextureLocation().toString(), bright ? "menu_bright" : "menu"));
+    }
+
     public boolean hasBuilt = false;
-    public static final ResourceLocation ATLAS_OUTPUT_LOCATION = IronsJewelry.id("textures/atlas/test_atlas.png");
-    public static final ResourceLocation ATLAS_JSON_NAME = IronsJewelry.id("test");
+    public static final ResourceLocation ATLAS_OUTPUT_LOCATION = IronsJewelry.id("textures/atlas/jewelry.png");
+
+    public void reset() {
+        if (hasBuilt) {
+            clearTextureData();
+            hasBuilt = false;
+        }
+    }
 
     public JewelryAtlas(TextureManager pTextureManager) {
-        super(pTextureManager, ATLAS_OUTPUT_LOCATION, ATLAS_JSON_NAME);
+        super(ATLAS_OUTPUT_LOCATION);
+        pTextureManager.register(ATLAS_OUTPUT_LOCATION, this);
     }
 
     public void buildCustomContents() {
-        var loader = SpriteLoader.create(this.textureAtlas);
+        IronsJewelry.LOGGER.info("JewelryAtlas: Building custom contents start");
+        var loader = SpriteLoader.create(this);
         SpriteResourceLoader spriteresourceloader = SpriteResourceLoader.create(SpriteLoader.DEFAULT_METADATA_SECTIONS);
 
         List<SpriteSource> sources = new ArrayList<>(/*AtlasHelper.getSources()*/);
         Multimap<ResourceLocation, ResourceLocation> byPaletteKey = LinkedListMultimap.create();
-        Map<String, ResourceLocation> permutations = new HashMap<>();
-        Iterable<MaterialDefinition> materials = IronsJewelryRegistries.materialRegistry(Minecraft.getInstance().level.registryAccess());
-        Iterable<PartDefinition> parts = IronsJewelryRegistries.partRegistry(Minecraft.getInstance().level.registryAccess());
-        for (PartDefinition part : parts) {
-            byPaletteKey.put(part.paletteKey(), part.baseTextureLocation());
-        }
-        for (MaterialDefinition materialDefinition : materials) {
-            ResourceLocation palette = materialDefinition.paletteLocation();
-            //String name = String.format("%s$%s", palette.getNamespace(), splitEnd(palette.getPath()));
-            permutations.put(splitEnd(palette.toString()), palette);
-        }
+        Map<String, ResourceLocation> permutations = new HashMap<>(Map.of(
+                "menu", IronsJewelry.id("palettes/menu"),
+                "menu_bright", IronsJewelry.id("palettes/menu_bright")
+        ));
+        IronsJewelryRegistries.materialRegistry(Minecraft.getInstance().level.registryAccess()).holders().forEach(
+                material -> {
+                    ResourceLocation palette = material.value().paletteLocation();
+                    permutations.put(getPermutationName(material), palette);
+                }
+        );
+        IronsJewelryRegistries.partRegistry(Minecraft.getInstance().level.registryAccess()).forEach(part ->
+                byPaletteKey.put(part.paletteKey(), part.baseTextureLocation())
+        );
+
         for (ResourceLocation paletteKey : byPaletteKey.keySet()) {
             var entries = byPaletteKey.get(paletteKey).stream().toList();
             sources.add(new PalettedPermutations(entries, paletteKey, permutations));
@@ -54,11 +96,12 @@ public class JewelryAtlas extends TextureAtlasHolder {
         var factories = list(sources, Minecraft.getInstance().getResourceManager());
         List<SpriteContents> contents = factories.stream().map(factory -> factory.apply(spriteresourceloader)).toList();
         var preparations = loader.stitch(contents, 0, Runnable::run);
-        this.textureAtlas.upload(preparations);
+        this.upload(preparations);
+        IronsJewelry.LOGGER.info("JewelryAtlas: Building custom contents finish ({} sprites)", contents.size());
         hasBuilt = true;
     }
 
-    private String splitEnd(String string) {
+    private static String splitEnd(String string) {
         var a = string.split("/");
         return a[a.length - 1];
     }
@@ -102,4 +145,38 @@ public class JewelryAtlas extends TextureAtlasHolder {
         }
         return super.getSprite(pLocation);
     }
+
+    @Override
+    public CompletableFuture<Void> reload(PreparationBarrier pPreparationBarrier, ResourceManager pResourceManager, ProfilerFiller pPreparationsProfiler, ProfilerFiller pReloadProfiler, Executor pBackgroundExecutor, Executor pGameExecutor) {
+        return CompletableFuture.runAsync(() -> {
+                    //no preparations
+                }).thenCompose(pPreparationBarrier::wait)
+                .thenRun(() -> {
+                    // If we have already built, rebuild. If not, then the game is still loading and we do nothing
+                    if (hasBuilt) {
+                        buildCustomContents();
+                        //TODO: really this should be in its own handler but i dont want to make a new one rn
+                        ClientData.clear();
+                    }
+                });
+    }
+//
+//    @Override
+//    public void close() {
+//        this.clearTextureData();
+//    }
+//
+//    @Override
+//    public CompletableFuture<Void> reload(PreparationBarrier pPreparationBarrier, ResourceManager pResourceManager, ProfilerFiller pPreparationsProfiler, ProfilerFiller pReloadProfiler, Executor pBackgroundExecutor, Executor pGameExecutor) {
+//        var action = CompletableFuture.runAsync(() -> {
+//        });
+//        // Check if this is not the initial load by checking if we have contents yet
+//        if (hasBuilt) {
+//            //action = CompletableFuture.runAsync(() -> {
+//                clearTextureData();
+//                hasBuilt = false;
+//            //});
+//        }
+//        return action;
+//    }
 }

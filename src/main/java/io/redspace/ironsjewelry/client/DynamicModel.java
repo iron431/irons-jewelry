@@ -5,7 +5,6 @@ import com.google.gson.JsonObject;
 import com.mojang.math.Transformation;
 import io.redspace.ironsjewelry.IronsJewelry;
 import io.redspace.ironsjewelry.core.data.JewelryData;
-import io.redspace.ironsjewelry.core.data.MaterialDefinition;
 import io.redspace.ironsjewelry.core.data.PartDefinition;
 import io.redspace.ironsjewelry.core.data.PartIngredient;
 import net.minecraft.client.Minecraft;
@@ -115,12 +114,11 @@ public class DynamicModel implements IUnbakedGeometry<DynamicModel> {
         IronsJewelry.LOGGER.debug("JewelryModel bake: {}", jewelryData);
         var parts = jewelryData.parts().entrySet().stream().sorted(Comparator.comparingInt(entry -> get(entry.getKey(), jewelryData.pattern().value().partTemplate()).drawOrder())).toList();
         if (!parts.isEmpty()) {
-            TextureAtlasSprite particle = spriteGetter.apply(new Material(InventoryMenu.BLOCK_ATLAS, atlasResourceLocaction(parts.getFirst().getKey(), parts.getFirst().getValue())));
+            TextureAtlasSprite particle = ClientData.JEWELRY_ATLAS.getSprite(parts.getFirst().getKey(), parts.getFirst().getValue());
             CompositeModel.Baked.Builder builder = CompositeModel.Baked.builder(context, particle, overrides, context.getTransforms());
             Transformation rootTransform = context.getRootTransform();
             for (int i = 0; i < parts.size(); i++) {
-                ResourceLocation location = atlasResourceLocaction(parts.get(i).getKey(), parts.get(i).getValue());
-                TextureAtlasSprite sprite = IronsJewelry.JEWELRY_ATLAS.getSprite(location);
+                TextureAtlasSprite sprite = ClientData.JEWELRY_ATLAS.getSprite(parts.get(i).getKey(), parts.get(i).getValue());
 
                 ModelState subState = new SimpleModelState(modelState.getRotation().compose(
                         rootTransform.compose(new Transformation(
@@ -131,14 +129,7 @@ public class DynamicModel implements IUnbakedGeometry<DynamicModel> {
 
                 List<BlockElement> unbaked = UnbakedGeometryHelper.createUnbakedItemElements(i, sprite);
                 List<BakedQuad> quads = UnbakedGeometryHelper.bakeElements(unbaked, (material2) -> sprite, subState);
-
-                //TODO: custom render type to custom atlas here???
-                // yes
-                // how the fuck does that point to an atlas if an atlas is virtual?
-                // public DynamicTexture(NativeImage pPixels)
-                // texturemanager#byname
-                //Minecraft.getInstance().getTextureManager().register(location, new DynamicTexture(sprite.contents().getOriginalImage()));
-                RenderTypeGroup renderTypes = new RenderTypeGroup(RenderType.solid(),NeoForgeRenderTypes.getUnsortedTranslucent(JewelryAtlas.ATLAS_OUTPUT_LOCATION));
+                RenderTypeGroup renderTypes = new RenderTypeGroup(RenderType.solid(), NeoForgeRenderTypes.getUnsortedTranslucent(JewelryAtlas.ATLAS_OUTPUT_LOCATION));
 
                 builder.addQuads(renderTypes, quads);
             }
@@ -155,29 +146,6 @@ public class DynamicModel implements IUnbakedGeometry<DynamicModel> {
             }
         }
         return null;
-    }
-
-    public static ResourceLocation atlasResourceLocaction(Holder<PartDefinition> part, Holder<MaterialDefinition> material) {
-        try {
-            String composite = part.value().baseTextureLocation().toString();
-            var components = material.value().paletteLocation().getPath().split("/");
-            composite += "_" + components[components.length - 1];
-            return ResourceLocation.parse(composite);
-        } catch (Exception e) {
-            //TODO: something better
-            return ResourceLocation.parse("unknown");
-        }
-    }
-
-    public static ResourceLocation atlasResourceLocaction(Holder<PartDefinition> part, String paletteName) {
-        try {
-            String composite = part.value().baseTextureLocation().toString();
-            composite += "_" + paletteName;
-            return ResourceLocation.parse(composite);
-        } catch (Exception e) {
-            //TODO: something better
-            return ResourceLocation.parse("unknown");
-        }
     }
 
     public static final class Loader implements IGeometryLoader<DynamicModel> {

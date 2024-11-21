@@ -1,6 +1,7 @@
 package io.redspace.ironsjewelry;
 
 import com.mojang.logging.LogUtils;
+import io.redspace.ironsjewelry.client.ClientData;
 import io.redspace.ironsjewelry.client.DynamicModel;
 import io.redspace.ironsjewelry.client.JewelryAtlas;
 import io.redspace.ironsjewelry.core.MaterialModiferDataHandler;
@@ -22,7 +23,6 @@ public class IronsJewelry {
     public static final String MODID = "irons_jewelry";
     public static final Logger LOGGER = LogUtils.getLogger();
 
-    public static JewelryAtlas JEWELRY_ATLAS;
     public IronsJewelry(IEventBus modEventBus, ModContainer modContainer) {
         modEventBus.addListener(this::registerModelLoader);
         modEventBus.addListener(this::registerAtlas);
@@ -54,8 +54,8 @@ public class IronsJewelry {
     }
 
     public void registerAtlas(RegisterClientReloadListenersEvent event){
-        JEWELRY_ATLAS = new JewelryAtlas(Minecraft.getInstance().getTextureManager());
-        event.registerReloadListener(JEWELRY_ATLAS);
+        ClientData.JEWELRY_ATLAS = new JewelryAtlas(Minecraft.getInstance().getTextureManager());
+        event.registerReloadListener(ClientData.JEWELRY_ATLAS);
     }
     public void registerModelLoader(ModelEvent.RegisterGeometryLoaders event) {
         event.register(id("dynamic_model"), DynamicModel.Loader.INSTANCE);

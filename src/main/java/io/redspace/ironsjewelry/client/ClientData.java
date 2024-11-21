@@ -9,11 +9,10 @@ public class ClientData {
      * Map of HashCodes to baked geometry. Every unique combination of colors/materials/patterns should generate a unique, deterministic hash code.
      */
     public static final HashMap<Integer, BakedModel> MODEL_CACHE = new HashMap<>();
-
-    //public static PlayerData localPlayerData = new PlayerData();
+    public static JewelryAtlas JEWELRY_ATLAS;
 
     public static void clear() {
-        //localPlayerData.clear();
         MODEL_CACHE.clear();
+        JEWELRY_ATLAS.reset();
     }
 }

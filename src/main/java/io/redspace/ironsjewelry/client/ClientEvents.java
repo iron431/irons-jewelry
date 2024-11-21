@@ -1,7 +1,6 @@
 package io.redspace.ironsjewelry.client;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import io.redspace.ironsjewelry.IronsJewelry;
 import io.redspace.ironsjewelry.registry.DataAttachmentRegistry;
 import net.minecraft.client.Minecraft;
 import net.neoforged.api.distmarker.Dist;
@@ -36,12 +35,9 @@ public class ClientEvents {
     }
 
     @SubscribeEvent
-    public static void debug(InputEvent.Key event) {
+    public static void onKeyInput(InputEvent.Key event) {
         var button = event.getKey();
         var action = event.getAction();
-        if (button == InputConstants.KEY_NUMPAD9) {
-            IronsJewelry.LOGGER.debug("activating debug!");
-        }
         if (button == InputConstants.KEY_LSHIFT) {
             isShiftKeyDown = action >= InputConstants.PRESS;
         }
