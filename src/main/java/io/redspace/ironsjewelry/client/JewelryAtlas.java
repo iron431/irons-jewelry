@@ -97,7 +97,7 @@ public class JewelryAtlas extends TextureAtlas implements PreparableReloadListen
         List<SpriteContents> contents = factories.stream().map(factory -> factory.apply(spriteresourceloader)).toList();
         var preparations = loader.stitch(contents, 0, Runnable::run);
         this.upload(preparations);
-        IronsJewelry.LOGGER.info("JewelryAtlas: Building custom contents finish ({} sprites)", contents.size());
+        IronsJewelry.LOGGER.info("JewelryAtlas: Building custom contents finish ({} sprites)", preparations.regions().size());
         hasBuilt = true;
     }
 
