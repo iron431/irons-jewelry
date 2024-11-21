@@ -15,6 +15,8 @@ public class SoundRegistry {
     }
 
     public static final DeferredHolder<SoundEvent, SoundEvent> EMERALDS = registerSoundEvent("action.create_items.emeralds");
+    public static final DeferredHolder<SoundEvent, SoundEvent> JEWELCRAFT = registerSoundEvent("block.jewelcrafting_station.jewelcraft");
+    public static final DeferredHolder<SoundEvent, SoundEvent> GENERIC_ACTION = registerSoundEvent("action.generic.trigger");
 
     private static DeferredHolder<SoundEvent, SoundEvent> registerSoundEvent(String name) {
         return SOUNDS.register(name, () -> SoundEvent.createVariableRangeEvent(IronsJewelry.id(name)));

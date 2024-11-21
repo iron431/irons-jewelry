@@ -26,6 +26,7 @@ public interface IAction {
         int cooldownTicks = cooldown.map(scalar -> CooldownHandler.INSTANCE.getCooldown(wearer, scalar, bonusInstance.quality())).orElse(0);
         if (cooldownTicks <= 0 || !playerData.isOnCooldown(bonusInstance.bonus())) {
             apply(serverLevel, bonusInstance.quality(), applyToSelf, wearer, entity);
+//            wearer.level.playSound(null, wearer.blockPosition(), SoundRegistry.GENERIC_ACTION.get(), SoundSource.PLAYERS);
             if (cooldownTicks > 0) {
                 playerData.addCooldown(bonusInstance.bonus(), cooldownTicks);
             }

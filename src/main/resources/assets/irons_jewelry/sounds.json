@@ -3,5 +3,15 @@
     "sounds": [
       "irons_jewelry:create_emeralds"
     ]
+  },
+  "action.generic.trigger": {
+    "sounds": [
+      "irons_jewelry:generic_action_trigger"
+    ]
+  },
+  "block.jewelcrafting_station.jewelcraft": {
+    "sounds": [
+      "irons_jewelry:jewelcraft"
+    ]
   }
 }

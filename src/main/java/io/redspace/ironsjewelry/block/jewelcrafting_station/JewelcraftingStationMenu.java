@@ -9,6 +9,8 @@ import io.redspace.ironsjewelry.registry.ComponentRegistry;
 import io.redspace.ironsjewelry.registry.MenuRegistry;
 import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
@@ -96,6 +98,7 @@ public class JewelcraftingStationMenu extends AbstractContainerMenu {
                     }
                     slot.remove(slot.currentCost);
                 }
+                pPlayer.level.playLocalSound(pPlayer.blockPosition(), SoundEvents.SMITHING_TABLE_USE, SoundSource.BLOCKS, 1.0F, pPlayer.level.random.nextFloat() * 0.1F + 0.9F, false);
                 JewelcraftingStationMenu.this.setupResult();
             }
         });
