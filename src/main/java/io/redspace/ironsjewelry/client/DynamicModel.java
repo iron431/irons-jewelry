@@ -15,7 +15,6 @@ import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockElement;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
-import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.*;
 import net.minecraft.core.Direction;
@@ -119,14 +118,9 @@ public class DynamicModel implements IUnbakedGeometry<DynamicModel> {
             TextureAtlasSprite particle = spriteGetter.apply(new Material(InventoryMenu.BLOCK_ATLAS, atlasResourceLocaction(parts.getFirst().getKey(), parts.getFirst().getValue())));
             CompositeModel.Baked.Builder builder = CompositeModel.Baked.builder(context, particle, overrides, context.getTransforms());
             Transformation rootTransform = context.getRootTransform();
-
             for (int i = 0; i < parts.size(); i++) {
-                TextureAtlasSprite sprite = new DynamicTextureAtlasSprite(
-                        spriteGetter.apply(new Material(InventoryMenu.BLOCK_ATLAS, parts.get(i).getKey().value().baseTextureLocation()/*atlasResourceLocaction(parts.get(i).getKey(), parts.get(i).getValue())*/)),
-                        parts.get(i).getKey().value().baseTextureLocation(),
-                        parts.get(i).getValue().value().paletteLocation(),
-                        true
-                );
+                ResourceLocation location = atlasResourceLocaction(parts.get(i).getKey(), parts.get(i).getValue());
+                TextureAtlasSprite sprite = IronsJewelry.JEWELRY_ATLAS.getSprite(location);
 
                 ModelState subState = new SimpleModelState(modelState.getRotation().compose(
                         rootTransform.compose(new Transformation(
@@ -143,12 +137,9 @@ public class DynamicModel implements IUnbakedGeometry<DynamicModel> {
                 // how the fuck does that point to an atlas if an atlas is virtual?
                 // public DynamicTexture(NativeImage pPixels)
                 // texturemanager#byname
-                ResourceLocation location = atlasResourceLocaction(parts.get(i).getKey(), parts.get(i).getValue());
-                Minecraft.getInstance().getTextureManager().register(location, new DynamicTexture(sprite.contents().getOriginalImage()));
-                RenderTypeGroup renderTypes = new RenderTypeGroup(RenderType.solid(),NeoForgeRenderTypes.getUnsortedTranslucent(location));
-                if(!IronsJewelry.JEWELRY_ATLAS.hasBuilt){
-                    IronsJewelry.JEWELRY_ATLAS.buildCustomContents();
-                }
+                //Minecraft.getInstance().getTextureManager().register(location, new DynamicTexture(sprite.contents().getOriginalImage()));
+                RenderTypeGroup renderTypes = new RenderTypeGroup(RenderType.solid(),NeoForgeRenderTypes.getUnsortedTranslucent(JewelryAtlas.ATLAS_OUTPUT_LOCATION));
+
                 builder.addQuads(renderTypes, quads);
             }
             return builder.build();

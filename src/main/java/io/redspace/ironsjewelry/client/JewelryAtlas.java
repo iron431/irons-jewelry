@@ -1,12 +1,17 @@
 package io.redspace.ironsjewelry.client;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.LinkedListMultimap;
+import com.google.common.collect.Multimap;
 import io.redspace.ironsjewelry.IronsJewelry;
-import io.redspace.ironsjewelry.core.AtlasHelper;
+import io.redspace.ironsjewelry.core.data.MaterialDefinition;
+import io.redspace.ironsjewelry.core.data.PartDefinition;
+import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.*;
 import net.minecraft.client.renderer.texture.atlas.SpriteResourceLoader;
 import net.minecraft.client.renderer.texture.atlas.SpriteSource;
+import net.minecraft.client.renderer.texture.atlas.sources.PalettedPermutations;
 import net.minecraft.client.resources.TextureAtlasHolder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -28,12 +33,34 @@ public class JewelryAtlas extends TextureAtlasHolder {
         var loader = SpriteLoader.create(this.textureAtlas);
         SpriteResourceLoader spriteresourceloader = SpriteResourceLoader.create(SpriteLoader.DEFAULT_METADATA_SECTIONS);
 
-        List<SpriteSource> permutations = new ArrayList<>(AtlasHelper.getSources());
-        var factories = list(permutations, Minecraft.getInstance().getResourceManager());
+        List<SpriteSource> sources = new ArrayList<>(/*AtlasHelper.getSources()*/);
+        Multimap<ResourceLocation, ResourceLocation> byPaletteKey = LinkedListMultimap.create();
+        Map<String, ResourceLocation> permutations = new HashMap<>();
+        Iterable<MaterialDefinition> materials = IronsJewelryRegistries.materialRegistry(Minecraft.getInstance().level.registryAccess());
+        Iterable<PartDefinition> parts = IronsJewelryRegistries.partRegistry(Minecraft.getInstance().level.registryAccess());
+        for (PartDefinition part : parts) {
+            byPaletteKey.put(part.paletteKey(), part.baseTextureLocation());
+        }
+        for (MaterialDefinition materialDefinition : materials) {
+            ResourceLocation palette = materialDefinition.paletteLocation();
+            //String name = String.format("%s$%s", palette.getNamespace(), splitEnd(palette.getPath()));
+            permutations.put(splitEnd(palette.toString()), palette);
+        }
+        for (ResourceLocation paletteKey : byPaletteKey.keySet()) {
+            var entries = byPaletteKey.get(paletteKey).stream().toList();
+            sources.add(new PalettedPermutations(entries, paletteKey, permutations));
+        }
+
+        var factories = list(sources, Minecraft.getInstance().getResourceManager());
         List<SpriteContents> contents = factories.stream().map(factory -> factory.apply(spriteresourceloader)).toList();
         var preparations = loader.stitch(contents, 0, Runnable::run);
         this.textureAtlas.upload(preparations);
         hasBuilt = true;
+    }
+
+    private String splitEnd(String string) {
+        var a = string.split("/");
+        return a[a.length - 1];
     }
 
     public List<Function<SpriteResourceLoader, SpriteContents>> list(List<SpriteSource> sources, ResourceManager pResourceManager) {
@@ -69,6 +96,10 @@ public class JewelryAtlas extends TextureAtlasHolder {
 
     @Override
     public TextureAtlasSprite getSprite(ResourceLocation pLocation) {
+        if (!hasBuilt) {
+            buildCustomContents();
+            hasBuilt = true;
+        }
         return super.getSprite(pLocation);
     }
 }

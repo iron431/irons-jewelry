@@ -6,10 +6,13 @@ import net.minecraft.resources.ResourceLocation;
 
 import java.util.List;
 
-public record PartDefinition(String descriptionId, List<String> allowedMaterials,
+public record PartDefinition(String descriptionId,
+                             ResourceLocation paletteKey,
+                             List<String> allowedMaterials,
                              ResourceLocation baseTextureLocation) {
     public static final Codec<PartDefinition> CODEC = RecordCodecBuilder.create(builder -> builder.group(
             Codec.STRING.fieldOf("descriptionId").forGetter(PartDefinition::descriptionId),
+            ResourceLocation.CODEC.fieldOf("paletteKey").forGetter(PartDefinition::paletteKey),
             Codec.list(Codec.STRING).optionalFieldOf("allowedMaterialTypes", List.of()).forGetter(PartDefinition::allowedMaterials),
             ResourceLocation.CODEC.fieldOf("baseTextureLocation").forGetter(PartDefinition::baseTextureLocation)
     ).apply(builder, PartDefinition::new));
