@@ -3,5 +3,6 @@
   "allowedMaterialTypes": [
     "gem"
   ],
+  "paletteKey": "irons_jewelry:palettes/diamond",
   "baseTextureLocation": "irons_jewelry:item/base/gem_tearstone"
 }

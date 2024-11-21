@@ -3,5 +3,6 @@
   "allowedMaterialTypes": [
     "gold"
   ],
+  "paletteKey": "irons_jewelry:palettes/gold",
   "baseTextureLocation": "irons_jewelry:item/base/piglin_signet"
 }

@@ -3,7 +3,7 @@ package io.redspace.ironsjewelry.block.jewelcrafting_station;
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.math.Axis;
 import io.redspace.ironsjewelry.IronsJewelry;
-import io.redspace.ironsjewelry.client.DynamicModel;
+import io.redspace.ironsjewelry.client.ClientData;
 import io.redspace.ironsjewelry.core.MinecraftInstanceHelper;
 import io.redspace.ironsjewelry.core.Utils;
 import io.redspace.ironsjewelry.core.data.*;
@@ -29,7 +29,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.common.NeoForge;
@@ -63,7 +62,7 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
     }
 
     private static TextureAtlasSprite getMenuSprite(Holder<PartDefinition> partDefinition, boolean bright) {
-        return Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(DynamicModel.atlasResourceLocaction(partDefinition, bright ? "menu_bright" : "menu"));
+        return ClientData.JEWELRY_ATLAS.getSprite(ClientData.JEWELRY_ATLAS.getMenuSpriteLocation(partDefinition, bright));
     }
 
     public static final ResourceLocation BACKGROUND_TEXTURE = IronsJewelry.id("textures/gui/jewelcrafting_station.png");
@@ -110,7 +109,7 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
     @Override
     protected void init() {
         super.init();
-        leftPos -= 31/2;// recenter based on list addition
+        leftPos -= 31 / 2;// recenter based on list addition
         patternButtons = new ArrayList<>();
         for (int i = 0; i < availablePatterns.size(); i++) {
             int index = i;

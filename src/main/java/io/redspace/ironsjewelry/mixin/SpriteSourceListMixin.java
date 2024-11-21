@@ -1,6 +1,5 @@
 package io.redspace.ironsjewelry.mixin;
 
-import io.redspace.ironsjewelry.core.AtlasHelper;
 import net.minecraft.client.renderer.texture.atlas.SpriteSourceList;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -16,7 +15,7 @@ public class SpriteSourceListMixin {
     private static void addAtlasSources(ResourceManager pResourceManager, ResourceLocation pSprite, CallbackInfoReturnable<SpriteSourceList> cir) {
         if (pSprite.toString().equals("minecraft:blocks")) {
             SpriteSourceList list = cir.getReturnValue();
-            list.sources.addAll(AtlasHelper.getSources());
+//            list.sources.addAll(AtlasHelper.getSources());
         }
     }
 }
