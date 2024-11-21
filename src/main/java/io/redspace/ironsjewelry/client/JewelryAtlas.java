@@ -71,7 +71,7 @@ public class JewelryAtlas extends TextureAtlas implements PreparableReloadListen
         IronsJewelry.LOGGER.info("JewelryAtlas: Building custom contents start");
         var loader = SpriteLoader.create(this);
         SpriteResourceLoader spriteresourceloader = SpriteResourceLoader.create(SpriteLoader.DEFAULT_METADATA_SECTIONS);
-
+        var resourceManager = Minecraft.getInstance().getResourceManager();
         List<SpriteSource> sources = new ArrayList<>(/*AtlasHelper.getSources()*/);
         Multimap<ResourceLocation, ResourceLocation> byPaletteKey = LinkedListMultimap.create();
         Map<String, ResourceLocation> permutations = new HashMap<>(Map.of(
@@ -81,11 +81,24 @@ public class JewelryAtlas extends TextureAtlas implements PreparableReloadListen
         IronsJewelryRegistries.materialRegistry(Minecraft.getInstance().level.registryAccess()).holders().forEach(
                 material -> {
                     ResourceLocation palette = material.value().paletteLocation();
-                    permutations.put(getPermutationName(material), palette);
+                    if (resourceManager.getResource(palette.withPrefix("textures/").withSuffix(".png")).isEmpty()) {
+                        IronsJewelry.LOGGER.warn("Invalid palette: \"{}\" in material: {}", palette, material.key().location());
+                    } else {
+                        permutations.put(getPermutationName(material), palette);
+                    }
                 }
         );
-        IronsJewelryRegistries.partRegistry(Minecraft.getInstance().level.registryAccess()).forEach(part ->
-                byPaletteKey.put(part.paletteKey(), part.baseTextureLocation())
+        IronsJewelryRegistries.partRegistry(Minecraft.getInstance().level.registryAccess()).holders().forEach(part -> {
+                    var paletteKey = part.value().paletteKey();
+                    var texture = part.value().baseTextureLocation();
+                    if (resourceManager.getResource(paletteKey.withPrefix("textures/").withSuffix(".png")).isEmpty()) {
+                        IronsJewelry.LOGGER.warn("Invalid palette key: \"{}\" in part: {}", paletteKey, part.key().location());
+                    } else if (resourceManager.getResource(texture.withPrefix("textures/").withSuffix(".png")).isEmpty()) {
+                        IronsJewelry.LOGGER.warn("Invalid texture location: \"{}\" in part: {}", texture, part.key().location());
+                    } else {
+                        byPaletteKey.put(paletteKey, texture);
+                    }
+                }
         );
 
         for (ResourceLocation paletteKey : byPaletteKey.keySet()) {
@@ -94,7 +107,7 @@ public class JewelryAtlas extends TextureAtlas implements PreparableReloadListen
         }
 
         var factories = list(sources, Minecraft.getInstance().getResourceManager());
-        List<SpriteContents> contents = factories.stream().map(factory -> factory.apply(spriteresourceloader)).toList();
+        List<SpriteContents> contents = factories.stream().map(factory -> factory.apply(spriteresourceloader)).filter(Objects::nonNull).toList();
         var preparations = loader.stitch(contents, 0, Runnable::run);
         this.upload(preparations);
         IronsJewelry.LOGGER.info("JewelryAtlas: Building custom contents finish ({} sprites)", preparations.regions().size());
