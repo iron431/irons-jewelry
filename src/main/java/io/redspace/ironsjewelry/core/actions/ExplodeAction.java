@@ -65,7 +65,7 @@ public record ExplodeAction(
 
     @Override
     public void apply(ServerLevel serverLevel, double quality, boolean applyToSelf, ServerPlayer wearer, Entity entity) {
-        Vec3 origin = applyToSelf ? wearer.getBoundingBox().getCenter() : entity.getBoundingBox().getCenter();
+        Vec3 origin = (applyToSelf ? wearer : entity).position().add(serverLevel.random.nextDouble() * .1 - .05, serverLevel.random.nextDouble() * .2 + .2, serverLevel.random.nextDouble() * .1 - .05);
         Vec3 vec3 = origin.add(this.offset);
         var exRadius = Math.max((float) this.radius.sample(quality), 0.0F);
         Explosion explosion = new IgnorableExplosion(
