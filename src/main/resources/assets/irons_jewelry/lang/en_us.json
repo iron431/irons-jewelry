@@ -9,6 +9,7 @@
   "item.irons_jewelry.moonstone": "Moonstone",
   "item.irons_jewelry.peridot": "Peridot",
   "item.irons_jewelry.onyx": "Onyx",
+  "item.irons_jewelry.garnet": "Garnet",
 
   "block.irons_jewelry.jewelcrafting_station": "Jewelcrafting Station",
 
@@ -66,6 +67,7 @@
   "material.irons_jewelry.allthemodium": "Allthemodium",
   "material.irons_jewelry.vibranium": "Vibranium",
   "material.irons_jewelry.unobtainium": "Unobtainium",
+  "material.irons_jewelry.garnet": "Garnet",
 
   "part.irons_jewelry.band_simple": "Band",
   "part.irons_jewelry.band_gem": "Band",

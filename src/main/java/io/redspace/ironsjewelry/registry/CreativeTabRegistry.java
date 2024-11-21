@@ -25,6 +25,7 @@ public class CreativeTabRegistry {
             event.accept(ItemRegistry.MOONSTONE.get());
             event.accept(ItemRegistry.PERIDOT.get());
             event.accept(ItemRegistry.ONYX.get());
+            event.accept(ItemRegistry.GARNET.get());
         }
     }
 //    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> EXAMPLE_TAB = CREATIVE_MODE_TABS.register("example_tab", () -> CreativeModeTab.builder()

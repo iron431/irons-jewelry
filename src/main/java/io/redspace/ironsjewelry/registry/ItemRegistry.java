@@ -31,6 +31,7 @@ public class ItemRegistry {
     public static final DeferredHolder<Item, Item> MOONSTONE = registerSimpleItem("moonstone", () -> new Item(new Item.Properties()));
     public static final DeferredHolder<Item, Item> PERIDOT = registerSimpleItem("peridot", () -> new Item(new Item.Properties()));
     public static final DeferredHolder<Item, Item> ONYX = registerSimpleItem("onyx", () -> new Item(new Item.Properties()));
+    public static final DeferredHolder<Item, Item> GARNET = registerSimpleItem("garnet", () -> new Item(new Item.Properties()));
 
     public static final DeferredHolder<Item, BlockItem> JEWELCRAFTING_STATION_BLOCK_ITEM = ITEMS.register("jewelcrafting_station", () -> new BlockItem(BlockRegistry.JEWELCRAFTING_STATION_BLOCK.get(), new Item.Properties()));
 
