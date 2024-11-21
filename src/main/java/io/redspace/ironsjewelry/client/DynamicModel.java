@@ -15,6 +15,7 @@ import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockElement;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
+import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.*;
 import net.minecraft.core.Direction;
@@ -123,7 +124,8 @@ public class DynamicModel implements IUnbakedGeometry<DynamicModel> {
                 TextureAtlasSprite sprite = new DynamicTextureAtlasSprite(
                         spriteGetter.apply(new Material(InventoryMenu.BLOCK_ATLAS, parts.get(i).getKey().value().baseTextureLocation()/*atlasResourceLocaction(parts.get(i).getKey(), parts.get(i).getValue())*/)),
                         parts.get(i).getKey().value().baseTextureLocation(),
-                        parts.get(i).getValue().value().paletteLocation()
+                        parts.get(i).getValue().value().paletteLocation(),
+                        true
                 );
 
                 ModelState subState = new SimpleModelState(modelState.getRotation().compose(
@@ -137,7 +139,14 @@ public class DynamicModel implements IUnbakedGeometry<DynamicModel> {
                 List<BakedQuad> quads = UnbakedGeometryHelper.bakeElements(unbaked, (material2) -> sprite, subState);
 
                 //TODO: custom render type to custom atlas here???
-                RenderTypeGroup renderTypes = new RenderTypeGroup(RenderType.solid(), NeoForgeRenderTypes.ITEM_UNSORTED_TRANSLUCENT.get());
+                // yes
+                // how the fuck does that point to an atlas if an atlas is virtual?
+                // public DynamicTexture(NativeImage pPixels)
+                // texturemanager#byname
+                ResourceLocation location = atlasResourceLocaction(parts.get(i).getKey(), parts.get(i).getValue());
+                Minecraft.getInstance().getTextureManager().register(location, new DynamicTexture(sprite.contents().getOriginalImage()));
+
+                RenderTypeGroup renderTypes = new RenderTypeGroup(RenderType.solid(),NeoForgeRenderTypes.getUnsortedTranslucent(location));
                 builder.addQuads(renderTypes, quads);
             }
             return builder.build();

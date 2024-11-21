@@ -32,6 +32,11 @@ public class DynamicTextureAtlasSprite extends TextureAtlasSprite {
         this.baseTexture = baseTexture;
         this.paletteLocation = paletteLocation;
     }
+    protected DynamicTextureAtlasSprite(TextureAtlasSprite textureAtlasSprite, ResourceLocation baseTexture, ResourceLocation paletteLocation, boolean b) {
+        super(textureAtlasSprite.atlasLocation(), apply(textureAtlasSprite.contents(),baseTexture, paletteLocation), 16, 16, 0, 0);
+        this.baseTexture = baseTexture;
+        this.paletteLocation = paletteLocation;
+    }
 
     @Override
     public SpriteContents contents() {
