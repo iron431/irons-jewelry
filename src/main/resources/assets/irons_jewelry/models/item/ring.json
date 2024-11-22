@@ -8,5 +8,5 @@
     }
   },
   "loader": "atlas_api:dynamic_model",
-  "type": "irons_jewelry:jewelry"
+  "handler": "irons_jewelry:jewelry"
 }

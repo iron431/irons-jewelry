@@ -114,8 +114,8 @@ dependencies {
     localRuntime "curse.maven:atlasviewer-633577:5490697"
     localRuntime "curse.maven:ato-405593:5500624"
 
-    compileOnly "io.redspace:atlas_api:0.0.0-SNAPSHOT:api"
-    localRuntime "io.redspace:atlas_api:0.0.0-SNAPSHOT"
+    compileOnly "io.redspace:atlas_api:0.0.3-SNAPSHOT:api"
+    localRuntime "io.redspace:atlas_api:0.0.3-SNAPSHOT"
 
     implementation "dev.shadowsoffire:ApothicAttributes:${minecraft_version}-${attribute_lib_version}"
     localRuntime "dev.shadowsoffire:Placebo:${minecraft_version}-${placebo_version}"

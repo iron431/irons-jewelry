@@ -2,7 +2,9 @@ package io.redspace.ironsjewelry.client;
 
 import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.Multimap;
-import io.redspace.atlasapi.api.ModelType;
+import io.redspace.atlasapi.api.AssetHandler;
+import io.redspace.atlasapi.api.data.BakingPreparations;
+import io.redspace.atlasapi.api.data.ModelLayer;
 import io.redspace.ironsjewelry.IronsJewelry;
 import io.redspace.ironsjewelry.core.data.JewelryData;
 import io.redspace.ironsjewelry.core.data.MaterialDefinition;
@@ -23,7 +25,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-public class JewelryModelType extends ModelType {
+public class JewelryAssetHandler extends AssetHandler {
 
     private static PartIngredient get(Holder<PartDefinition> definition, List<PartIngredient> list) {
         for (PartIngredient i : list) {
@@ -35,14 +37,14 @@ public class JewelryModelType extends ModelType {
     }
 
     @Override
-    public @NotNull BakingPreparations makePreparations(ItemStack itemStack, @Nullable ClientLevel clientLevel, @Nullable LivingEntity livingEntity, int seed) {
+    public @NotNull BakingPreparations makeBakedModelPreparations(ItemStack itemStack, @Nullable ClientLevel clientLevel, @Nullable LivingEntity livingEntity, int seed) {
         JewelryData jewelryData = JewelryData.get(itemStack);
         if (jewelryData.isValid()) {
             var parts = jewelryData.parts().entrySet();
             if (!parts.isEmpty()) {
-                List<Layer> layers = parts.stream().map(part -> {
+                List<ModelLayer> layers = parts.stream().map(part -> {
                     ResourceLocation sprite = getSpriteLocation(part.getKey(), part.getValue());
-                    return new Layer(sprite, get(part.getKey(), jewelryData.pattern().value().partTemplate()).drawOrder(), Optional.empty());
+                    return new ModelLayer(sprite, get(part.getKey(), jewelryData.pattern().value().partTemplate()).drawOrder(), Optional.empty());
                 }).toList();
 
                 return new BakingPreparations(layers);

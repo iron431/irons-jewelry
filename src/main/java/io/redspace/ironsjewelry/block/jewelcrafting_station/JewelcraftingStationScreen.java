@@ -2,7 +2,6 @@ package io.redspace.ironsjewelry.block.jewelcrafting_station;
 
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.math.Axis;
-import io.redspace.atlasapi.api.AtlasApiHelper;
 import io.redspace.ironsjewelry.IronsJewelry;
 import io.redspace.ironsjewelry.core.MinecraftInstanceHelper;
 import io.redspace.ironsjewelry.core.Utils;
@@ -13,7 +12,7 @@ import io.redspace.ironsjewelry.network.packets.SetJewelcraftingStationPattern;
 import io.redspace.ironsjewelry.network.packets.SyncJewelcraftingSlotStates;
 import io.redspace.ironsjewelry.registry.ComponentRegistry;
 import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
-import io.redspace.ironsjewelry.registry.ModelTypeRegistry;
+import io.redspace.ironsjewelry.registry.AssetHandlerRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -87,7 +86,7 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
     }
 
     private static TextureAtlasSprite getMenuSprite(Holder<PartDefinition> partDefinition, boolean bright) {
-        return AtlasApiHelper.getAtlas(ModelTypeRegistry.JEWELRY_MODEL_TYPE.get().getAtlasLocation()).getSprite(ModelTypeRegistry.JEWELRY_MODEL_TYPE.get().getMenuSpriteLocation(partDefinition, bright));
+        return AssetHandlerRegistry.JEWELRY_HANDLER.get().getSprite(AssetHandlerRegistry.JEWELRY_HANDLER.get().getMenuSpriteLocation(partDefinition, bright));
     }
 
     public static final ResourceLocation BACKGROUND_TEXTURE = IronsJewelry.id("textures/gui/jewelcrafting_station.png");
