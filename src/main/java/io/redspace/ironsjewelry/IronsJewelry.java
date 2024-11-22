@@ -1,8 +1,6 @@
 package io.redspace.ironsjewelry;
 
 import com.mojang.logging.LogUtils;
-import io.redspace.ironsjewelry.api.internal.AtlasHandler;
-import io.redspace.ironsjewelry.api.internal.DynamicModel;
 import io.redspace.ironsjewelry.core.MaterialModiferDataHandler;
 import io.redspace.ironsjewelry.registry.*;
 import net.minecraft.resources.ResourceLocation;
@@ -22,8 +20,6 @@ public class IronsJewelry {
     public static final Logger LOGGER = LogUtils.getLogger();
 
     public IronsJewelry(IEventBus modEventBus, ModContainer modContainer) {
-        modEventBus.addListener(this::registerModelLoader);
-        modEventBus.addListener(this::registerClientListeners);
         modEventBus.addListener(CreativeTabRegistry::addCreative);
         modEventBus.addListener(IronsJewelryRegistries::registerRegistries);
         modEventBus.addListener(IronsJewelryRegistries::registerDatapackRegistries);
@@ -50,14 +46,6 @@ public class IronsJewelry {
 
     public static void registerReloadListeners(AddReloadListenerEvent event) {
         event.addListener(new MaterialModiferDataHandler());
-    }
-
-    public void registerClientListeners(RegisterClientReloadListenersEvent event) {
-        event.registerReloadListener(new AtlasHandler());
-    }
-
-    public void registerModelLoader(ModelEvent.RegisterGeometryLoaders event) {
-        event.register(id("dynamic_model"), DynamicModel.Loader.INSTANCE);
     }
 
     public static ResourceLocation id(String path) {

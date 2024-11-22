@@ -1,7 +1,6 @@
 package io.redspace.ironsjewelry.client;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import io.redspace.ironsjewelry.api.internal.AtlasHandler;
 import io.redspace.ironsjewelry.registry.DataAttachmentRegistry;
 import net.minecraft.client.Minecraft;
 import net.neoforged.api.distmarker.Dist;
@@ -9,7 +8,6 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.client.event.InputEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 
 @EventBusSubscriber(Dist.CLIENT)
 public class ClientEvents {
@@ -18,11 +16,6 @@ public class ClientEvents {
 
     public static boolean isIsShiftKeyDown() {
         return isShiftKeyDown;
-    }
-
-    @SubscribeEvent
-    public static void onLogOut(PlayerEvent.PlayerLoggedOutEvent event) {
-        AtlasHandler.clear();
     }
 
     /**

@@ -8,7 +8,6 @@
     "WanderingTraderMixin"
   ],
   "client": [
-    "SpriteSourceListMixin"
   ],
   "injectors": {
     "defaultRequire": 1

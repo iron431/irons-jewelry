@@ -2,8 +2,8 @@ package io.redspace.ironsjewelry.client;
 
 import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.Multimap;
+import io.redspace.atlasapi.api.ModelType;
 import io.redspace.ironsjewelry.IronsJewelry;
-import io.redspace.ironsjewelry.api.ModelType;
 import io.redspace.ironsjewelry.core.data.JewelryData;
 import io.redspace.ironsjewelry.core.data.MaterialDefinition;
 import io.redspace.ironsjewelry.core.data.PartDefinition;

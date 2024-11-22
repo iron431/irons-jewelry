@@ -7,6 +7,6 @@
       "scale": [ 0.4, 0.4, 0.4 ]
     }
   },
-  "loader": "irons_jewelry:dynamic_model",
+  "loader": "atlas_api:dynamic_model",
   "type": "irons_jewelry:jewelry"
 }

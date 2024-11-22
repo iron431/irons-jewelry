@@ -3,7 +3,6 @@ package io.redspace.ironsjewelry.registry;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import io.redspace.ironsjewelry.IronsJewelry;
-import io.redspace.ironsjewelry.api.ModelTypeRegistry;
 import io.redspace.ironsjewelry.core.Bonus;
 import io.redspace.ironsjewelry.core.IAction;
 import io.redspace.ironsjewelry.core.IBonusParameterType;
@@ -78,7 +77,6 @@ public class IronsJewelryRegistries {
     }
 
     public static void registerRegistries(NewRegistryEvent event) {
-        event.register(ModelTypeRegistry.MODEL_TYPE_REGISTRY);
         event.register(BONUS_REGISTRY);
         event.register(PARAMETER_TYPE_REGISTRY);
         event.register(ACTION_REGISTRY);
