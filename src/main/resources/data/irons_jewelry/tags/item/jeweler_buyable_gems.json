@@ -8,6 +8,7 @@
     "#c:gems/peridot",
     "#c:gems/ruby",
     "#c:gems/sapphire",
-    "#c:gems/topaz"
+    "#c:gems/topaz",
+    "#c:gems/garnet"
   ]
 }
