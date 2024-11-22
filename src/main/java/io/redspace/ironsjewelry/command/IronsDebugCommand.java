@@ -5,7 +5,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import io.redspace.ironsjewelry.IronsJewelry;
-import io.redspace.ironsjewelry.client.ClientData;
+import io.redspace.ironsjewelry.api.internal.AtlasHandler;
 import io.redspace.ironsjewelry.core.data.MaterialDefinition;
 import io.redspace.ironsjewelry.core.data.PartIngredient;
 import io.redspace.ironsjewelry.core.data.PatternDefinition;
@@ -45,7 +45,7 @@ public class IronsDebugCommand {
                 })).then(Commands.literal("all").executes(context -> learnAllPatterns(context.getSource()))
                 ).then(Commands.literal("unlearnAll").executes(context -> unlearnAllPatterns(context.getSource()))
                 )).then(Commands.literal("clearClientCache").executes((commandContext -> {
-                    ClientData.MODEL_CACHE.clear();
+                    AtlasHandler.MODEL_CACHE.clear();
                     return 1;
                 }))).then(Commands.literal("createPatternItem").then(Commands.argument("pattern", PatternCommandArgument.patternArgument()).suggests(PATTERN_SUGGESTIONS).executes((commandContext) -> {
                             return createPatternItem(commandContext.getSource(), commandContext.getArgument("pattern", String.class));

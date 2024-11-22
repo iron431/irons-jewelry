@@ -1,6 +1,7 @@
 package io.redspace.ironsjewelry.client;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import io.redspace.ironsjewelry.api.internal.AtlasHandler;
 import io.redspace.ironsjewelry.registry.DataAttachmentRegistry;
 import net.minecraft.client.Minecraft;
 import net.neoforged.api.distmarker.Dist;
@@ -21,7 +22,7 @@ public class ClientEvents {
 
     @SubscribeEvent
     public static void onLogOut(PlayerEvent.PlayerLoggedOutEvent event) {
-        ClientData.clear();
+        AtlasHandler.clear();
     }
 
     /**

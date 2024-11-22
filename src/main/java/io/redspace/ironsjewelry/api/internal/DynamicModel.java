@@ -7,7 +7,6 @@ import com.mojang.math.Transformation;
 import io.redspace.ironsjewelry.IronsJewelry;
 import io.redspace.ironsjewelry.api.ModelType;
 import io.redspace.ironsjewelry.api.ModelTypeRegistry;
-import io.redspace.ironsjewelry.client.ClientData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.RenderType;
@@ -41,7 +40,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 
-protected class DynamicModel implements IUnbakedGeometry<DynamicModel> {
+public class DynamicModel implements IUnbakedGeometry<DynamicModel> {
     final ModelType type;
 
     public DynamicModel(ModelType type) {
@@ -68,7 +67,7 @@ protected class DynamicModel implements IUnbakedGeometry<DynamicModel> {
                 @Override
                 public BakedModel resolve(BakedModel pModel, ItemStack pStack, @Nullable ClientLevel pLevel, @Nullable LivingEntity pEntity, int pSeed) {
                     int id = type.modelId(pStack, pLevel, pEntity, pSeed);
-                    return ClientData.MODEL_CACHE.computeIfAbsent(id, (i) -> bake(type, type.makePreparations(pStack, pLevel, pEntity, pSeed), context, modelState, new ItemOverrides(baker, blockmodel, List.of(), baker.getModelTextureGetter())));
+                    return AtlasHandler.MODEL_CACHE.computeIfAbsent(id, (i) -> bake(type, type.makePreparations(pStack, pLevel, pEntity, pSeed), context, modelState, new ItemOverrides(baker, blockmodel, List.of(), baker.getModelTextureGetter())));
                 }
             };
         }
@@ -111,15 +110,16 @@ protected class DynamicModel implements IUnbakedGeometry<DynamicModel> {
 
     public static BakedModel bake(ModelType type, ModelType.BakingPreparations preparations, IGeometryBakingContext context, ModelState modelState, ItemOverrides overrides) {
         IronsJewelry.LOGGER.debug("JewelryModel bake: {}", preparations);
+        var atlas = AtlasHandler.getAtlas(type.getAtlasLocation());
         var layers = preparations.layers().stream().sorted(Comparator.comparingInt(ModelType.Layer::drawOrder)).toList();
         if (!layers.isEmpty()) {
-            TextureAtlasSprite particle = layers.getFirst().sprite();
+            TextureAtlasSprite particle = atlas.getSprite(layers.getFirst().sprite());
             CompositeModel.Baked.Builder builder = CompositeModel.Baked.builder(context, particle, overrides, context.getTransforms());
             Transformation rootTransform = context.getRootTransform();
             for (int i = 0; i < layers.size(); i++) {
                 var layer = layers.get(i);
 
-                TextureAtlasSprite sprite = layer.sprite();
+                TextureAtlasSprite sprite =  atlas.getSprite(layer.sprite());
                 Transformation transformation = layer.transformation().orElse(new Transformation(
                         new Vector3f(0, 0, 0),
                         new Quaternionf(), new Vector3f(1, 1, 1),

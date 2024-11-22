@@ -2,7 +2,6 @@ package io.redspace.ironsjewelry.api;
 
 import com.mojang.math.Transformation;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.atlas.SpriteSource;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
@@ -15,15 +14,19 @@ import java.util.Optional;
 
 public abstract class ModelType {
 
+//    public ModelType() {
+//        AtlasHandler.ATLASES.put(getAtlasLocation(), new DynamicAtlas(this, Minecraft.getInstance().getTextureManager()));
+//    }
+
     /**
      * @param sprite         Sprite for this layer
      * @param drawOrder      Order to draw. Lower values are drawn first, and thus appear at the bottom
      * @param transformation If specified, a transformation to be applied to this layer when baked. For example, if using 32x32 textures, you can scale by x2 to preverse vanilla pixel density
      */
-    public record Layer(TextureAtlasSprite sprite, int drawOrder, Optional<Transformation> transformation) {
+    public record Layer(ResourceLocation sprite, int drawOrder, Optional<Transformation> transformation) {
         @Override
         public int hashCode() {
-            return transformation.map(Transformation::hashCode).orElse(0) * 31 + sprite.atlasLocation().hashCode();
+            return transformation.map(Transformation::hashCode).orElse(0) * 31 + sprite.hashCode();
         }
     }
 
@@ -42,7 +45,9 @@ public abstract class ModelType {
     @NotNull
     public abstract BakingPreparations makePreparations(ItemStack itemStack, @Nullable ClientLevel clientLevel, @Nullable LivingEntity livingEntity, int seed);
 
-    public abstract ResourceLocation getAtlasLocation();
+    public final ResourceLocation getAtlasLocation() {
+        return ModelTypeRegistry.MODEL_TYPE_REGISTRY.getKey(this);
+    }
 
     /**
      * @return A unique id for this set of contextual parameters. For example, if the model is based on an item component, the id should be the component's hash code.

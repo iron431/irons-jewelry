@@ -1,12 +1,10 @@
 package io.redspace.ironsjewelry;
 
 import com.mojang.logging.LogUtils;
+import io.redspace.ironsjewelry.api.internal.AtlasHandler;
 import io.redspace.ironsjewelry.api.internal.DynamicModel;
-import io.redspace.ironsjewelry.client.ClientData;
-import io.redspace.ironsjewelry.client.JewelryAtlas;
 import io.redspace.ironsjewelry.core.MaterialModiferDataHandler;
 import io.redspace.ironsjewelry.registry.*;
-import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
@@ -25,7 +23,7 @@ public class IronsJewelry {
 
     public IronsJewelry(IEventBus modEventBus, ModContainer modContainer) {
         modEventBus.addListener(this::registerModelLoader);
-        modEventBus.addListener(this::registerAtlas);
+        modEventBus.addListener(this::registerClientListeners);
         modEventBus.addListener(CreativeTabRegistry::addCreative);
         modEventBus.addListener(IronsJewelryRegistries::registerRegistries);
         modEventBus.addListener(IronsJewelryRegistries::registerDatapackRegistries);
@@ -45,6 +43,7 @@ public class IronsJewelry {
         LootRegistry.register(modEventBus);
         VillagerRegistry.register(modEventBus);
         SoundRegistry.register(modEventBus);
+        ModelTypeRegistry.register(modEventBus);
 
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
     }
@@ -53,10 +52,10 @@ public class IronsJewelry {
         event.addListener(new MaterialModiferDataHandler());
     }
 
-    public void registerAtlas(RegisterClientReloadListenersEvent event){
-        ClientData.JEWELRY_ATLAS = new JewelryAtlas(Minecraft.getInstance().getTextureManager());
-        event.registerReloadListener(ClientData.JEWELRY_ATLAS);
+    public void registerClientListeners(RegisterClientReloadListenersEvent event) {
+        event.registerReloadListener(new AtlasHandler());
     }
+
     public void registerModelLoader(ModelEvent.RegisterGeometryLoaders event) {
         event.register(id("dynamic_model"), DynamicModel.Loader.INSTANCE);
     }
