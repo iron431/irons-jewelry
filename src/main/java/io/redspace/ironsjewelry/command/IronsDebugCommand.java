@@ -6,6 +6,8 @@ import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import io.redspace.ironsjewelry.IronsJewelry;
 import io.redspace.ironsjewelry.client.ClientData;
+import io.redspace.ironsjewelry.core.data.MaterialDefinition;
+import io.redspace.ironsjewelry.core.data.PartIngredient;
 import io.redspace.ironsjewelry.core.data.PatternDefinition;
 import io.redspace.ironsjewelry.registry.ComponentRegistry;
 import io.redspace.ironsjewelry.registry.DataAttachmentRegistry;
@@ -19,6 +21,8 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -35,18 +39,46 @@ public class IronsDebugCommand {
     public static void register(CommandDispatcher<CommandSourceStack> pDispatcher) {
 
         pDispatcher.register(Commands.literal("ironsJewelry").requires((p_138819_) -> {
-            return p_138819_.hasPermission(2);
-        }).then(Commands.literal("learnPattern").then(Commands.argument("pattern", PatternCommandArgument.patternArgument()).suggests(PATTERN_SUGGESTIONS).executes((commandContext) -> {
-            return learnPattern(commandContext.getSource(), commandContext.getArgument("pattern", String.class));
-        })).then(Commands.literal("all").executes(context -> learnAllPatterns(context.getSource()))
-        ).then(Commands.literal("unlearnAll").executes(context -> unlearnAllPatterns(context.getSource()))
-        )).then(Commands.literal("clearClientCache").executes((commandContext -> {
-            ClientData.MODEL_CACHE.clear();
-            return 1;
-        }))).then(Commands.literal("createPatternItem").then(Commands.argument("pattern", PatternCommandArgument.patternArgument()).suggests(PATTERN_SUGGESTIONS).executes((commandContext) -> {
-                    return createPatternItem(commandContext.getSource(), commandContext.getArgument("pattern", String.class));
+                    return p_138819_.hasPermission(2);
+                }).then(Commands.literal("learnPattern").then(Commands.argument("pattern", PatternCommandArgument.patternArgument()).suggests(PATTERN_SUGGESTIONS).executes((commandContext) -> {
+                    return learnPattern(commandContext.getSource(), commandContext.getArgument("pattern", String.class));
+                })).then(Commands.literal("all").executes(context -> learnAllPatterns(context.getSource()))
+                ).then(Commands.literal("unlearnAll").executes(context -> unlearnAllPatterns(context.getSource()))
+                )).then(Commands.literal("clearClientCache").executes((commandContext -> {
+                    ClientData.MODEL_CACHE.clear();
+                    return 1;
+                }))).then(Commands.literal("createPatternItem").then(Commands.argument("pattern", PatternCommandArgument.patternArgument()).suggests(PATTERN_SUGGESTIONS).executes((commandContext) -> {
+                            return createPatternItem(commandContext.getSource(), commandContext.getArgument("pattern", String.class));
+                        }))
+                ).then(Commands.literal("countCombos").executes((commandContext) -> {
+                    return enumerateCombos(commandContext.getSource());
                 }))
-        ));
+        );
+    }
+
+    private static int enumerateCombos(CommandSourceStack source) {
+        var registry = source.registryAccess();
+        int total = 0;
+        var materials = IronsJewelryRegistries.materialRegistry(registry);
+        for (PatternDefinition patternDefinition : IronsJewelryRegistries.patternRegistry(registry)) {
+            List<Integer> options = new ArrayList<>();
+            for (PartIngredient part : patternDefinition.partTemplate()) {
+                int option = 0;
+                for (MaterialDefinition materialDefinition : materials) {
+                    if (part.part().value().canUseMaterial(materialDefinition.materialType())) {
+                        option++;
+                    }
+                }
+                options.add(option);
+            }
+            int subtotal = options.getFirst();
+            for (int i = 1; i < options.size(); i++) {
+                subtotal *= options.get(i);
+            }
+            total += subtotal;
+        }
+        source.sendSystemMessage(Component.literal(String.valueOf(total)));
+        return total;
     }
 
     private static int createPatternItem(CommandSourceStack source, String patternId) throws CommandSyntaxException {
