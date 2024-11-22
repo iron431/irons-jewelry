@@ -58,8 +58,15 @@ public class JewelcraftingStationMenu extends AbstractContainerMenu {
         public void setChanged() {
             super.setChanged();
             JewelcraftingStationMenu.this.setupResult();
+            JewelcraftingStationMenu.this.slotsChanged(this);
         }
     };
+
+    @Override
+    public void broadcastChanges() {
+        super.broadcastChanges();
+    }
+
     public final List<JewelcraftingInputSlot> workspaceSlots = new ArrayList<>();
     private final SimpleContainer resultContainer = new SimpleContainer(1);
     public final Slot resultSlot;

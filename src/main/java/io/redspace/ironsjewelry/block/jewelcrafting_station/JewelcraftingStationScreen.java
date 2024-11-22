@@ -30,6 +30,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ContainerListener;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.common.NeoForge;
@@ -39,9 +41,31 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 import java.util.stream.Stream;
 
-public class JewelcraftingStationScreen extends AbstractContainerScreen<JewelcraftingStationMenu> {
+public class JewelcraftingStationScreen extends AbstractContainerScreen<JewelcraftingStationMenu> implements ContainerListener {
+    boolean tooltipDirty = true;
+    public final List<Component> INFO_PAGE_CACHE = new ArrayList<>();
+
     public void handleSlotSync(SyncJewelcraftingSlotStates packet) {
+        tooltipDirty = true;
         this.menu.handleClientSideSlotSync(packet.slotStates());
+    }
+
+    @Override
+    public void slotChanged(AbstractContainerMenu pContainerToSend, int pDataSlotIndex, ItemStack pStack) {
+        if (pDataSlotIndex <= 10) {
+            tooltipDirty = true;
+        }
+    }
+
+    @Override
+    public void dataChanged(AbstractContainerMenu pContainerMenu, int pDataSlotIndex, int pValue) {
+
+    }
+
+    @Override
+    public void removed() {
+        super.removed();
+        this.menu.removeSlotListener(this);
     }
 
     static class PatternButton extends Button {
@@ -76,10 +100,10 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
     private static final ResourceLocation LORE_PAGE = IronsJewelry.id("jewelcrafting_station/lore_page");
     private static final int MAX_PATTERNS = 8;
 
-    int scrollOff;
-    int selectedPattern;
-    List<Holder<PatternDefinition>> availablePatterns;
-    List<PatternButton> patternButtons;
+    public int scrollOff;
+    public int selectedPattern;
+    public List<Holder<PatternDefinition>> availablePatterns;
+    private List<PatternButton> patternButtons;
 
     public JewelcraftingStationScreen(JewelcraftingStationMenu pMenu, Inventory pPlayerInventory, Component pTitle) {
         super(pMenu, pPlayerInventory, pTitle);
@@ -120,6 +144,7 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
             })));
         }
         positionPatternButtons();
+        this.menu.addSlotListener(this);
     }
 
     @Override
@@ -176,7 +201,9 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
         }
     }
 
+
     private void renderItemPreview(GuiGraphics guiGraphics, float pPartialTick, int pMouseX, int pMouseY) {
+        List<Component> tooltip = new ArrayList<>();
         if (selectedPattern >= 0) {
             var holder = availablePatterns.get(selectedPattern);
             var pattern = holder.value();
@@ -192,7 +219,7 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
                 }
             }
 
-            var tooltip = CurioBaseItem.getShiftDescription(pattern, parts, Optional.of(menu.workspaceSlots.stream().map(slot -> slot.getItem().getCount()).toList()));
+            tooltip = CurioBaseItem.getShiftDescription(pattern, parts, Optional.of(menu.workspaceSlots.stream().map(slot -> slot.getItem().getCount()).toList()));
             tooltip.add(0, Component.translatable(pattern.descriptionId()).withStyle(ChatFormatting.UNDERLINE));
             int baseLines = tooltip.size();
             float scale = 3;
@@ -202,37 +229,41 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
                 tooltip.add(Component.empty());
             }
             renderTooltipInternal(guiGraphics, this.font, tooltip, leftPos + imageWidth + 4, topPos + topBuffer);
-            if (parts.isEmpty()) {
-                return;
-            }
+            if (!parts.isEmpty()) {
 
-            JewelryData jewelryData = JewelryData.renderable(holder, parts);
-            ItemStack stack = new ItemStack(pattern.jewelryType().item());
-            stack.set(ComponentRegistry.JEWELRY_COMPONENT, jewelryData);
-            //Event posting
-            var event = new SetupJewelcraftingResultEvent(holder, MinecraftInstanceHelper.getPlayer(), stack);
-            if (NeoForge.EVENT_BUS.post(event).isCanceled()) {
-                stack = ItemStack.EMPTY;
-            } else {
-                stack = event.getResult();
-            }
-            var pose = guiGraphics.pose();
-            int width = 0;
-            for (Component component : tooltip) {
-                int i = font.width(component.getString());
-                if (i > width) {
-                    width = i;
+                JewelryData jewelryData = JewelryData.renderable(holder, parts);
+                ItemStack stack = new ItemStack(pattern.jewelryType().item());
+                stack.set(ComponentRegistry.JEWELRY_COMPONENT, jewelryData);
+                //Event posting
+                var event = new SetupJewelcraftingResultEvent(holder, MinecraftInstanceHelper.getPlayer(), stack);
+                if (NeoForge.EVENT_BUS.post(event).isCanceled()) {
+                    stack = ItemStack.EMPTY;
+                } else {
+                    stack = event.getResult();
                 }
+                var pose = guiGraphics.pose();
+                int width = 0;
+                for (Component component : tooltip) {
+                    int i = font.width(component.getString());
+                    if (i > width) {
+                        width = i;
+                    }
+                }
+                pose.pushPose();
+                //pose.translate(leftPos + 61 + 95 / 2f, topPos + 13 + 60 / 2f, 100);
+                pose.translate(leftPos + imageWidth + width / 2f/* + 9 * scale + 16*/, topPos + 8 * scale + (baseLines + 1) * font.lineHeight + topBuffer + 4, 100);
+                pose.scale(16 * scale, -16 * scale, 16 * scale);
+                pose.mulPose(Axis.YP.rotationDegrees((Minecraft.getInstance().player.tickCount + pPartialTick) * 1.25f));
+                Lighting.setupForFlatItems();
+                Minecraft.getInstance().getItemRenderer().renderStatic(stack, ItemDisplayContext.GUI, LightTexture.FULL_BLOCK, OverlayTexture.NO_OVERLAY, pose, guiGraphics.bufferSource(), null, 0);
+                guiGraphics.flush();
+                pose.popPose();
             }
-            pose.pushPose();
-            //pose.translate(leftPos + 61 + 95 / 2f, topPos + 13 + 60 / 2f, 100);
-            pose.translate(leftPos + imageWidth + width / 2f/* + 9 * scale + 16*/, topPos + 8 * scale + (baseLines + 1) * font.lineHeight + topBuffer + 4, 100);
-            pose.scale(16 * scale, -16 * scale, 16 * scale);
-            pose.mulPose(Axis.YP.rotationDegrees((Minecraft.getInstance().player.tickCount + pPartialTick) * 1.25f));
-            Lighting.setupForFlatItems();
-            Minecraft.getInstance().getItemRenderer().renderStatic(stack, ItemDisplayContext.GUI, LightTexture.FULL_BLOCK, OverlayTexture.NO_OVERLAY, pose, guiGraphics.bufferSource(), null, 0);
-            guiGraphics.flush();
-            pose.popPose();
+        }
+        if (tooltipDirty) {
+            INFO_PAGE_CACHE.clear();
+            INFO_PAGE_CACHE.addAll(tooltip);
+            tooltipDirty = false;
         }
     }
 
@@ -400,5 +431,10 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
         );
 
         return super.mouseClicked(pMouseX, pMouseY, pButton);
+    }
+
+    @Override
+    protected void handleSlotStateChanged(int pSlotId, int pContainerId, boolean pNewState) {
+        super.handleSlotStateChanged(pSlotId, pContainerId, pNewState);
     }
 }
