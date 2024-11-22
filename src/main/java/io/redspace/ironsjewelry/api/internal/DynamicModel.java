@@ -1,12 +1,13 @@
-package io.redspace.ironsjewelry.client;
+package io.redspace.ironsjewelry.api.internal;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import com.mojang.math.Transformation;
 import io.redspace.ironsjewelry.IronsJewelry;
-import io.redspace.ironsjewelry.core.data.JewelryData;
-import io.redspace.ironsjewelry.core.data.PartDefinition;
-import io.redspace.ironsjewelry.core.data.PartIngredient;
+import io.redspace.ironsjewelry.api.ModelType;
+import io.redspace.ironsjewelry.api.ModelTypeRegistry;
+import io.redspace.ironsjewelry.client.ClientData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.RenderType;
@@ -17,11 +18,9 @@ import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.*;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.client.NeoForgeRenderTypes;
@@ -39,24 +38,27 @@ import org.joml.Vector3f;
 import javax.annotation.Nullable;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 
-public class DynamicModel implements IUnbakedGeometry<DynamicModel> {
+protected class DynamicModel implements IUnbakedGeometry<DynamicModel> {
+    final ModelType type;
 
-    public DynamicModel() {
-        ResourceLocation atlasToUse = InventoryMenu.BLOCK_ATLAS;
+    public DynamicModel(ModelType type) {
+        this.type = type;
     }
 
     @Override
     public BakedModel bake(IGeometryBakingContext context, ModelBaker baker, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelState, ItemOverrides overrides) {
-        return new BakedHolder(context, baker, modelState);
+        return new BakedHolder(type, context, baker, modelState);
     }
 
     public static class BakedHolder implements BakedModel {
         BakedModel model;
         ItemOverrides overrides;
+        ModelType type;
 
-        public BakedHolder(IGeometryBakingContext context, ModelBaker baker, ModelState modelState) {
+        public BakedHolder(ModelType type, IGeometryBakingContext context, ModelBaker baker, ModelState modelState) {
             this.model = Minecraft.getInstance().getModelManager().getMissingModel();
             var blockmodel = (BlockModel) baker.getModel(ModelBakery.MISSING_MODEL_LOCATION);
             this.overrides = new ItemOverrides(baker, blockmodel,
@@ -65,11 +67,8 @@ public class DynamicModel implements IUnbakedGeometry<DynamicModel> {
                 @Nullable
                 @Override
                 public BakedModel resolve(BakedModel pModel, ItemStack pStack, @Nullable ClientLevel pLevel, @Nullable LivingEntity pEntity, int pSeed) {
-                    JewelryData data = JewelryData.get(pStack);
-                    if (data.isValid()) {
-                        return ClientData.MODEL_CACHE.computeIfAbsent(data.hashCode(), (i) -> bake(data, context, baker.getModelTextureGetter(), modelState, new ItemOverrides(baker, blockmodel, List.of(), baker.getModelTextureGetter())));
-                    }
-                    return EmptyModel.BAKED;
+                    int id = type.modelId(pStack, pLevel, pEntity, pSeed);
+                    return ClientData.MODEL_CACHE.computeIfAbsent(id, (i) -> bake(type, type.makePreparations(pStack, pLevel, pEntity, pSeed), context, modelState, new ItemOverrides(baker, blockmodel, List.of(), baker.getModelTextureGetter())));
                 }
             };
         }
@@ -110,26 +109,28 @@ public class DynamicModel implements IUnbakedGeometry<DynamicModel> {
         }
     }
 
-    public static BakedModel bake(JewelryData jewelryData, IGeometryBakingContext context, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelState, ItemOverrides overrides) {
-        IronsJewelry.LOGGER.debug("JewelryModel bake: {}", jewelryData);
-        var parts = jewelryData.parts().entrySet().stream().sorted(Comparator.comparingInt(entry -> get(entry.getKey(), jewelryData.pattern().value().partTemplate()).drawOrder())).toList();
-        if (!parts.isEmpty()) {
-            TextureAtlasSprite particle = ClientData.JEWELRY_ATLAS.getSprite(parts.getFirst().getKey(), parts.getFirst().getValue());
+    public static BakedModel bake(ModelType type, ModelType.BakingPreparations preparations, IGeometryBakingContext context, ModelState modelState, ItemOverrides overrides) {
+        IronsJewelry.LOGGER.debug("JewelryModel bake: {}", preparations);
+        var layers = preparations.layers().stream().sorted(Comparator.comparingInt(ModelType.Layer::drawOrder)).toList();
+        if (!layers.isEmpty()) {
+            TextureAtlasSprite particle = layers.getFirst().sprite();
             CompositeModel.Baked.Builder builder = CompositeModel.Baked.builder(context, particle, overrides, context.getTransforms());
             Transformation rootTransform = context.getRootTransform();
-            for (int i = 0; i < parts.size(); i++) {
-                TextureAtlasSprite sprite = ClientData.JEWELRY_ATLAS.getSprite(parts.get(i).getKey(), parts.get(i).getValue());
+            for (int i = 0; i < layers.size(); i++) {
+                var layer = layers.get(i);
 
-                ModelState subState = new SimpleModelState(modelState.getRotation().compose(
-                        rootTransform.compose(new Transformation(
-                                new Vector3f(0, 0, 0), //translate texture here
-                                new Quaternionf(), new Vector3f(1, 1, 1), //scale texture here (ie 32x32)
-                                new Quaternionf())
-                        )), modelState.isUvLocked());
+                TextureAtlasSprite sprite = layer.sprite();
+                Transformation transformation = layer.transformation().orElse(new Transformation(
+                        new Vector3f(0, 0, 0),
+                        new Quaternionf(), new Vector3f(1, 1, 1),
+                        new Quaternionf())
+                );
+
+                ModelState subState = new SimpleModelState(modelState.getRotation().compose(rootTransform.compose(transformation)), modelState.isUvLocked());
 
                 List<BlockElement> unbaked = UnbakedGeometryHelper.createUnbakedItemElements(i, sprite);
                 List<BakedQuad> quads = UnbakedGeometryHelper.bakeElements(unbaked, (material2) -> sprite, subState);
-                RenderTypeGroup renderTypes = new RenderTypeGroup(RenderType.solid(), NeoForgeRenderTypes.getUnsortedTranslucent(JewelryAtlas.ATLAS_OUTPUT_LOCATION));
+                RenderTypeGroup renderTypes = new RenderTypeGroup(RenderType.solid(), NeoForgeRenderTypes.getUnsortedTranslucent(type.getAtlasLocation()));
 
                 builder.addQuads(renderTypes, quads);
             }
@@ -137,15 +138,6 @@ public class DynamicModel implements IUnbakedGeometry<DynamicModel> {
         }
         return EmptyModel.BAKED;
 
-    }
-
-    private static PartIngredient get(Holder<PartDefinition> definition, List<PartIngredient> list) {
-        for (PartIngredient i : list) {
-            if (i.part().equals(definition)) {
-                return i;
-            }
-        }
-        return null;
     }
 
     public static final class Loader implements IGeometryLoader<DynamicModel> {
@@ -156,7 +148,13 @@ public class DynamicModel implements IUnbakedGeometry<DynamicModel> {
 
         @Override
         public DynamicModel read(JsonObject jsonObject, JsonDeserializationContext deserializationContext) {
-            return new DynamicModel();
+            try {
+                String typestring = jsonObject.get("type").getAsString();
+                ModelType type = Objects.requireNonNull(ModelTypeRegistry.MODEL_TYPE_REGISTRY.get(ResourceLocation.parse(typestring)));
+                return new DynamicModel(type);
+            } catch (Exception e) {
+                throw new JsonParseException(e.getMessage());
+            }
         }
     }
 }

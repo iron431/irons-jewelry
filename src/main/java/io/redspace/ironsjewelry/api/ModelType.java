@@ -3,9 +3,11 @@ package io.redspace.ironsjewelry.api;
 import com.mojang.math.Transformation;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.texture.atlas.SpriteSource;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -35,8 +37,15 @@ public abstract class ModelType {
         }
     }
 
+    public abstract List<SpriteSource> buildSpriteSources();
+
+    @NotNull
     public abstract BakingPreparations makePreparations(ItemStack itemStack, @Nullable ClientLevel clientLevel, @Nullable LivingEntity livingEntity, int seed);
 
     public abstract ResourceLocation getAtlasLocation();
 
+    /**
+     * @return A unique id for this set of contextual parameters. For example, if the model is based on an item component, the id should be the component's hash code.
+     */
+    public abstract int modelId(ItemStack itemStack, @Nullable ClientLevel clientLevel, @Nullable LivingEntity livingEntity, int seed);
 }

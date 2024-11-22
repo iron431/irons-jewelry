@@ -1,4 +1,4 @@
-package io.redspace.ironsjewelry.api;
+package io.redspace.ironsjewelry.api.internal;
 
 import com.google.common.collect.ImmutableList;
 import io.redspace.ironsjewelry.IronsJewelry;
@@ -22,7 +22,7 @@ import java.util.concurrent.Executor;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-public abstract class DynamicAtlas extends TextureAtlas implements PreparableReloadListener, AutoCloseable {
+protected class DynamicAtlas extends TextureAtlas implements PreparableReloadListener, AutoCloseable {
     public String getPermutationName(Holder<MaterialDefinition> material) {
         var materialKey = material.getKey().location();
         var materialName = splitEnd(materialKey.getPath());
@@ -64,7 +64,7 @@ public abstract class DynamicAtlas extends TextureAtlas implements PreparableRel
         pTextureManager.register(ATLAS_OUTPUT_LOCATION, this);
     }
 
-    abstract List<SpriteSource> buildSpriteSources();
+    protected abstract List<SpriteSource> buildSpriteSources();
 
     public void buildCustomContents() {
         IronsJewelry.LOGGER.info("Atlas {}: Building custom contents start", this.location());

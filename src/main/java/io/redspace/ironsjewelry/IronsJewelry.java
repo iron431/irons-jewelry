@@ -1,8 +1,8 @@
 package io.redspace.ironsjewelry;
 
 import com.mojang.logging.LogUtils;
+import io.redspace.ironsjewelry.api.internal.DynamicModel;
 import io.redspace.ironsjewelry.client.ClientData;
-import io.redspace.ironsjewelry.client.DynamicModel;
 import io.redspace.ironsjewelry.client.JewelryAtlas;
 import io.redspace.ironsjewelry.core.MaterialModiferDataHandler;
 import io.redspace.ironsjewelry.registry.*;
