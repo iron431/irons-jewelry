@@ -114,8 +114,8 @@ dependencies {
     localRuntime "curse.maven:atlasviewer-633577:5490697"
     localRuntime "curse.maven:ato-405593:5500624"
 
-    compileOnly "io.redspace:atlas_api:0.0.3-SNAPSHOT:api"
-    localRuntime "io.redspace:atlas_api:0.0.3-SNAPSHOT"
+    compileOnly "io.redspace:atlas_api:${atlas_api_version}"
+    localRuntime "io.redspace:atlas_api:${atlas_api_version}"
 
     implementation "dev.shadowsoffire:ApothicAttributes:${minecraft_version}-${attribute_lib_version}"
     localRuntime "dev.shadowsoffire:Placebo:${minecraft_version}-${placebo_version}"
@@ -143,7 +143,8 @@ tasks.withType(ProcessResources).configureEach {
             mod_description        : mod_description,
             attribute_lib_version  : attribute_lib_version,
             placebo_version        : placebo_version,
-            spellbooks_version     : spellbooks_version
+            spellbooks_version     : spellbooks_version,
+            atlas_api_version      : atlas_api_version
     ]
     inputs.properties replaceProperties
 
