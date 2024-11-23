@@ -108,7 +108,7 @@ dependencies {
 
     compileOnly "mezz.jei:jei-${minecraft_version}-common-api:19.5.0.32"
     compileOnly "mezz.jei:jei-${minecraft_version}-neoforge-api:19.5.0.32"
-//    runtimeOnly "mezz.jei:jei-${minecraft_version}-neoforge:19.5.0.32"
+    runtimeOnly "mezz.jei:jei-${minecraft_version}-neoforge:19.5.0.32"
 
     implementation "curse.maven:adorned-1036809:5684431"
     localRuntime "curse.maven:atlasviewer-633577:5490697"
