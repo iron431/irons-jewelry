@@ -13,7 +13,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 
 public class JewelcraftingStationBlock extends Block {
-    private static final Component CONTAINER_TITLE = Component.translatable("block.irons_jewelry.jewelcrafting_station");
+    private static final Component CONTAINER_TITLE = Component.translatable("container.irons_jewelry.jewelcrafting_station");
 
     public JewelcraftingStationBlock(Properties p_49795_) {
         super(p_49795_);

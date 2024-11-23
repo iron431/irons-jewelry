@@ -13,6 +13,8 @@
 
   "block.irons_jewelry.jewelcrafting_station": "Jewelcrafting Station",
 
+  "container.irons_jewelry.jewelcrafting_station": "Jewelcrafting Station",
+
   "entity.minecraft.villager.irons_jewelry.jeweler": "Jeweler",
 
   "pattern.irons_jewelry.simple_band": "Simple Ring",

@@ -36,12 +36,13 @@ public class JewelcraftingJeiRecipeCategory implements IRecipeCategory<PatternDe
 
     private final IDrawable background;
     private final IDrawable icon;
+    private static final int buffer = 32;
     private static final int width = 127;
     private static final int height = 60;
 
     public JewelcraftingJeiRecipeCategory(IGuiHelper guiHelper) {
         background = guiHelper.drawableBuilder(IronsJewelry.id("textures/gui/sprites/jewelcrafting_station/jei_bg.png"), 0, 0, width, height)
-                //.addPadding(0, 0, 0, 32)
+                .addPadding(0, 0, buffer, 0)
                 .setTextureSize(width, height)
                 .build();
         icon = guiHelper.createDrawableItemStack(new ItemStack(BlockRegistry.JEWELCRAFTING_STATION_BLOCK.get()));
@@ -54,7 +55,7 @@ public class JewelcraftingJeiRecipeCategory implements IRecipeCategory<PatternDe
 
     @Override
     public Component getTitle() {
-        return Component.empty();
+        return Component.translatable("container.irons_jewelry.jewelcrafting_station");
     }
 
     @Override
@@ -71,12 +72,12 @@ public class JewelcraftingJeiRecipeCategory implements IRecipeCategory<PatternDe
     public void setRecipe(IRecipeLayoutBuilder builder, PatternDefinition recipe, IFocusGroup focuses) {
         var materialRegistry = IronsJewelryRegistries.materialRegistry(Minecraft.getInstance().level.registryAccess());
         ItemStack output = new ItemStack(recipe.jewelryType().item());
-        Holder<MaterialDefinition> iron = materialRegistry.getHolder(IronsJewelry.id("iron")).get();
+        Holder<MaterialDefinition> iron = materialRegistry.getHolder(IronsJewelry.id("platinum")).get();
         var parts = recipe.partTemplate().stream().map(PartIngredient::part).collect(Collectors.toMap(Function.identity(),
                 (p) -> iron));
         JewelryData jewelryData = JewelryData.renderable(IronsJewelryRegistries.patternRegistry(Minecraft.getInstance().level.registryAccess()).wrapAsHolder(recipe), parts);
         output.set(ComponentRegistry.JEWELRY_COMPONENT, jewelryData);
-        IRecipeSlotBuilder outputSlot = builder.addSlot(RecipeIngredientRole.OUTPUT, 105, 22)
+        IRecipeSlotBuilder outputSlot = builder.addSlot(RecipeIngredientRole.OUTPUT, buffer + 105, 22)
                 .addItemStacks(List.of(output))
                 .setSlotName("output");
         int totalWidth = 95;
@@ -89,7 +90,7 @@ public class JewelcraftingJeiRecipeCategory implements IRecipeCategory<PatternDe
             var part = partIngredient.part().value();
             var stacks = materialRegistry.stream().filter(material -> part.canUseMaterial(material.materialType())).map(MaterialDefinition::ingredient).filter(ingr -> !ingr.hasNoItems()).flatMap(ingredient -> Arrays.stream(ingredient.getItems())).toList();
             stacks.forEach(stack -> stack.setCount(partIngredient.materialCost()));
-            builder.addSlot(RecipeIngredientRole.INPUT, leftPos + i * widthPer, 9 + 5 + 6)
+            builder.addSlot(RecipeIngredientRole.INPUT, buffer + leftPos + i * widthPer, 9 + 5 + 6)
                     .addItemStacks(stacks)
                     .setSlotName("input" + i);
         }
@@ -97,12 +98,10 @@ public class JewelcraftingJeiRecipeCategory implements IRecipeCategory<PatternDe
 
     @Override
     public void draw(PatternDefinition recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
-
-
         IRecipeCategory.super.draw(recipe, recipeSlotsView, guiGraphics, mouseX, mouseY);
         Component title = Component.translatable(recipe.descriptionId()).withStyle(ChatFormatting.UNDERLINE);
         int width = Minecraft.getInstance().font.width(title);
-        int x = 47 - width / 2;
+        int x = buffer + 47 - width / 2;
         int y = 4;
         var bgstart = 0xb4260f0c;//0xf0511d17;//0xf0100010;
         var bgend = bgstart;//0xf0361d17;//bgstart;
