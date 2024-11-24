@@ -1,10 +1,10 @@
 package io.redspace.ironsjewelry.item;
 
+import io.redspace.ironsjewelry.core.MinecraftInstanceHelper;
 import io.redspace.ironsjewelry.core.data.PlayerData;
 import io.redspace.ironsjewelry.registry.ComponentRegistry;
 import io.redspace.ironsjewelry.registry.DataAttachmentRegistry;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundSetActionBarTextPacket;
 import net.minecraft.server.level.ServerPlayer;
@@ -61,11 +61,11 @@ public class PatternRecipeItem extends Item {
         if (stack.has(ComponentRegistry.STORED_PATTERN)) {
             var pattern = stack.get(ComponentRegistry.STORED_PATTERN);
             pTooltipComponents.add(Component.translatable("tooltip.irons_jewelry.stored_pattern", Component.translatable(pattern.value().descriptionId()).withStyle(ChatFormatting.GOLD)).withStyle(ChatFormatting.GRAY));
-            var player = Minecraft.getInstance().player;
+            var player = MinecraftInstanceHelper.getPlayer();
             if (player != null) {
                 var playerData = PlayerData.get(player);
                 if (!playerData.isLearned(pattern)) {
-                    pTooltipComponents.add(Component.translatable("tooltip.irons_jewelry.use_to_learn", Component.keybind(Minecraft.getInstance().options.keyUse.getName())).withStyle(ChatFormatting.BLUE));
+                    pTooltipComponents.add(Component.translatable("tooltip.irons_jewelry.use_to_learn", Component.keybind("key.use")).withStyle(ChatFormatting.BLUE));
                 } else {
                     pTooltipComponents.add(Component.translatable("tooltip.irons_jewelry.already_learned").withStyle(ChatFormatting.RED));
                 }
