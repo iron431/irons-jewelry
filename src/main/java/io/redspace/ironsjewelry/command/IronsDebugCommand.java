@@ -19,6 +19,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
+import net.neoforged.fml.loading.FMLLoader;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,18 +38,26 @@ public class IronsDebugCommand {
 
     public static void register(CommandDispatcher<CommandSourceStack> pDispatcher) {
 
-        pDispatcher.register(Commands.literal("ironsJewelry").requires((p_138819_) -> {
-                    return p_138819_.hasPermission(2);
-                }).then(Commands.literal("learnPattern").then(Commands.argument("pattern", PatternCommandArgument.patternArgument()).suggests(PATTERN_SUGGESTIONS).executes((commandContext) -> {
-                    return learnPattern(commandContext.getSource(), commandContext.getArgument("pattern", String.class));
-                })).then(Commands.literal("all").executes(context -> learnAllPatterns(context.getSource()))
-                ).then(Commands.literal("unlearnAll").executes(context -> unlearnAllPatterns(context.getSource()))
-                )).then(Commands.literal("createPatternItem").then(Commands.argument("pattern", PatternCommandArgument.patternArgument()).suggests(PATTERN_SUGGESTIONS).executes((commandContext) -> {
-                            return createPatternItem(commandContext.getSource(), commandContext.getArgument("pattern", String.class));
-                        }))
-                ).then(Commands.literal("countCombos").executes((commandContext) -> {
-                    return enumerateCombos(commandContext.getSource());
+        var command = Commands.literal("ironsJewelry").requires((p_138819_) -> {
+            return p_138819_.hasPermission(2);
+        }).then(Commands.literal("learnPattern").then(Commands.argument("pattern", PatternCommandArgument.patternArgument()).suggests(PATTERN_SUGGESTIONS).executes((commandContext) -> {
+            return learnPattern(commandContext.getSource(), commandContext.getArgument("pattern", String.class));
+        })).then(Commands.literal("all").executes(context -> learnAllPatterns(context.getSource()))
+        ).then(Commands.literal("unlearnAll").executes(context -> unlearnAllPatterns(context.getSource()))
+        )).then(Commands.literal("createPatternItem").then(Commands.argument("pattern", PatternCommandArgument.patternArgument()).suggests(PATTERN_SUGGESTIONS).executes((commandContext) -> {
+                    return createPatternItem(commandContext.getSource(), commandContext.getArgument("pattern", String.class));
                 }))
+        );
+
+        if (!FMLLoader.isProduction()) {
+            command.then(Commands.literal("countCombos").executes((commandContext) -> {
+                return enumerateCombos(commandContext.getSource());
+            })).then(Commands.literal("generateSiteData").executes((commandContext) -> {
+                return GenerateSiteData.generateSiteData(commandContext.getSource());
+            }));
+        }
+        pDispatcher.register(
+                command
         );
     }
 
@@ -57,7 +66,7 @@ public class IronsDebugCommand {
         int total = 0;
         var materials = IronsJewelryRegistries.materialRegistry(registry);
         for (PatternDefinition patternDefinition : IronsJewelryRegistries.patternRegistry(registry)) {
-            List<Integer> options = new ArrayList<>();
+            List<Integer> lengths = new ArrayList<>();
             for (PartIngredient part : patternDefinition.partTemplate()) {
                 int option = 0;
                 for (MaterialDefinition materialDefinition : materials) {
@@ -65,11 +74,12 @@ public class IronsDebugCommand {
                         option++;
                     }
                 }
-                options.add(option);
+                lengths.add(option);
             }
-            int subtotal = options.getFirst();
-            for (int i = 1; i < options.size(); i++) {
-                subtotal *= options.get(i);
+            //take cartesian product of the possible options for each part entry
+            int subtotal = lengths.getFirst();
+            for (int i = 1; i < lengths.size(); i++) {
+                subtotal *= lengths.get(i);
             }
             total += subtotal;
         }
