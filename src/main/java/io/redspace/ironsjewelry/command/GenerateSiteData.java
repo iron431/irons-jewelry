@@ -2,6 +2,7 @@ package io.redspace.ironsjewelry.command;
 
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import io.redspace.ironsjewelry.IronsJewelry;
+import io.redspace.ironsjewelry.registry.ItemRegistry;
 import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -82,6 +83,7 @@ public class GenerateSiteData {
 
     protected static int generateSiteData(CommandSourceStack source) {
         generateRecipeData(source);
+
 //        generateSpellData();
 
         return 1;
@@ -103,6 +105,7 @@ public class GenerateSiteData {
             level = source.getLevel();
 
             Set<Item> itemsTracked = new HashSet<>();
+            handleArtisanScrollEntry(itemBuilder, itemsTracked, source);
             getVisibleItems()
                     .stream()
                     .sorted(Comparator.comparing(Item::getDescriptionId))
@@ -187,6 +190,17 @@ public class GenerateSiteData {
             }
         }
         return null;
+    }
+
+    private static void handleArtisanScrollEntry(StringBuilder curioBuilder, Set<Item> itemsTracked, CommandSourceStack source) {
+        var item = ItemRegistry.RECIPE.get();
+        itemsTracked.add(item);
+        var itemResource = BuiltInRegistries.ITEM.getKey(item);
+        var name = item.getName(ItemStack.EMPTY).getString();
+        appendToBuilder3(curioBuilder, name, itemResource, "All",
+                "Artisan Scrolls can be found, looted, or traded for, and can be consumed to learn a new jewelry pattern."
+        );
+
     }
 
     private static String postProcess(StringBuilder sb) {
