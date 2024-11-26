@@ -1,6 +1,6 @@
 package io.redspace.ironsjewelry.core.bonuses;
 
-import io.redspace.ironsjewelry.core.Bonus;
+import io.redspace.ironsjewelry.core.BonusType;
 import io.redspace.ironsjewelry.core.data.BonusInstance;
 import io.redspace.ironsjewelry.core.parameters.ActionParameter;
 import io.redspace.ironsjewelry.registry.ParameterTypeRegistry;
@@ -8,7 +8,7 @@ import net.minecraft.network.chat.Component;
 
 import java.util.List;
 
-public class OnProjectileHitBonus extends Bonus {
+public class OnProjectileHitBonusType extends BonusType {
     @Override
     public ActionParameter getParameterType() {
         return ParameterTypeRegistry.ACTION_PARAMETER.get();

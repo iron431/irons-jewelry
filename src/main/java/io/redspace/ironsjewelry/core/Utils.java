@@ -1,5 +1,6 @@
 package io.redspace.ironsjewelry.core;
 
+import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import io.netty.buffer.ByteBuf;
@@ -20,6 +21,7 @@ import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotResult;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -37,6 +39,16 @@ public class Utils {
 
     public static <T> StreamCodec<ByteBuf, T> idStreamCodec(Function<ResourceLocation, T> idToObj, Function<T, ResourceLocation> objToId) {
         return ResourceLocation.STREAM_CODEC.map(idToObj, objToId);
+    }
+
+    public static <L, R, T> T mapEither(Either<L, R> either, Function<L, T> leftToValue, Function<R, T> rightToValue) {
+        if (either.left().isPresent()) {
+            return leftToValue.apply(either.left().get());
+        } else if (either.right().isPresent()) {
+            return rightToValue.apply(either.right().get());
+        } else {
+            throw new NoSuchElementException("Neither right nor left present in either");
+        }
     }
 
     public static Optional<Holder<MaterialDefinition>> getMaterialForIngredient(RegistryAccess access, ItemStack ingredient) {

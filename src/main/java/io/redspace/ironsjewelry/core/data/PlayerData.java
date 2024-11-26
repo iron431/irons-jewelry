@@ -1,7 +1,7 @@
 package io.redspace.ironsjewelry.core.data;
 
 import io.redspace.ironsjewelry.IronsJewelry;
-import io.redspace.ironsjewelry.core.Bonus;
+import io.redspace.ironsjewelry.core.BonusType;
 import io.redspace.ironsjewelry.network.packets.SyncPlayerDataPacket;
 import io.redspace.ironsjewelry.registry.DataAttachmentRegistry;
 import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
@@ -42,16 +42,16 @@ public class PlayerData {
         return c.getRemainingTicks() <= 0;
     }
 
-    public boolean isOnCooldown(Bonus bonus) {
-        return isOnCooldown(IronsJewelryRegistries.BONUS_REGISTRY.getKey(bonus));
+    public boolean isOnCooldown(BonusType bonusType) {
+        return isOnCooldown(IronsJewelryRegistries.BONUS_TYPE_REGISTRY.getKey(bonusType));
     }
 
     public boolean isOnCooldown(ResourceLocation resourceLocation) {
         return cooldowns.containsKey(resourceLocation) && cooldowns.get(resourceLocation).firstTick;
     }
 
-    public void addCooldown(Bonus bonus, int ticks) {
-        var k = IronsJewelryRegistries.BONUS_REGISTRY.getKey(bonus);
+    public void addCooldown(BonusType bonusType, int ticks) {
+        var k = IronsJewelryRegistries.BONUS_TYPE_REGISTRY.getKey(bonusType);
         var cooldown = cooldowns.get(k);
         if (cooldown != null && cooldown.remainingTicks >= ticks) {
             return;

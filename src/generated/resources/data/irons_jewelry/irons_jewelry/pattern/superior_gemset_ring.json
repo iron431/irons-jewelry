@@ -1,0 +1,35 @@
+{
+  "type": "irons_jewelry:ring",
+  "descriptionId": "pattern.irons_jewelry.superior_gemset_ring",
+  "partForQuality": "irons_jewelry:band_gem_superior",
+  "parts": [
+    {
+      "drawOrder": 0,
+      "id": "irons_jewelry:band_gem_superior",
+      "materialCost": 6
+    },
+    {
+      "bonuses": [
+        {
+          "bonusType": "irons_jewelry:attribute_bonus",
+          "qualityMultiplier": 0.5
+        }
+      ],
+      "drawOrder": 1,
+      "id": "irons_jewelry:gems_side",
+      "materialCost": 1
+    },
+    {
+      "bonuses": [
+        {
+          "bonusType": "irons_jewelry:attribute_bonus"
+        }
+      ],
+      "drawOrder": 2,
+      "id": "irons_jewelry:gem_pointy",
+      "materialCost": 2
+    }
+  ],
+  "qualityMultiplier": 1.75,
+  "unlockedByDefault": false
+}

@@ -15,7 +15,7 @@ public class ParameterTypeRegistry {
     public static final Supplier<AttributeParameter> ATTRIBUTE_PARAMETER = PARAMETER_TYPES.register("attribute", AttributeParameter::new);
     public static final Supplier<EffectParameter> POSITIVE_EFFECT_PARAMETER = PARAMETER_TYPES.register("positive_effect", EffectParameter::new);
     public static final Supplier<EffectParameter> NEGATIVE_EFFECT_PARAMETER = PARAMETER_TYPES.register("negative_effect", EffectParameter::new);
-    public static final Supplier<EnchantmentRunnableParameter> ENCHANTMENT_PARAMETER = PARAMETER_TYPES.register("enchantment_runnable", EnchantmentRunnableParameter::new);
+//    public static final Supplier<EnchantmentRunnableParameter> ENCHANTMENT_PARAMETER = PARAMETER_TYPES.register("enchantment_runnable", EnchantmentRunnableParameter::new);
     public static final Supplier<ActionParameter> ACTION_PARAMETER = PARAMETER_TYPES.register("action", ActionParameter::new);
 
     public static void register(IEventBus eventBus) {

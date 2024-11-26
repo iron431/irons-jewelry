@@ -1,0 +1,22 @@
+{
+  "type": "irons_jewelry:ring",
+  "descriptionId": "pattern.irons_jewelry.gemset_ring",
+  "partForQuality": "irons_jewelry:band_gem",
+  "parts": [
+    {
+      "drawOrder": 0,
+      "id": "irons_jewelry:band_gem",
+      "materialCost": 4
+    },
+    {
+      "bonuses": [
+        {
+          "bonusType": "irons_jewelry:attribute_bonus"
+        }
+      ],
+      "drawOrder": 1,
+      "id": "irons_jewelry:gem_round",
+      "materialCost": 1
+    }
+  ]
+}

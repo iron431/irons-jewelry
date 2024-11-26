@@ -1,0 +1,23 @@
+{
+  "type": "irons_jewelry:ring",
+  "descriptionId": "pattern.irons_jewelry.piglin_signet_ring",
+  "parts": [
+    {
+      "drawOrder": 0,
+      "id": "irons_jewelry:band_gem",
+      "materialCost": 4
+    },
+    {
+      "bonuses": [
+        {
+          "bonusType": "irons_jewelry:piglin_neutral_bonus"
+        }
+      ],
+      "drawOrder": 1,
+      "id": "irons_jewelry:piglin_signet",
+      "materialCost": 4
+    }
+  ],
+  "qualityMultiplier": 2.0,
+  "unlockedByDefault": false
+}

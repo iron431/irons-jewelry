@@ -1,0 +1,27 @@
+{
+  "type": "irons_jewelry:ring",
+  "descriptionId": "pattern.irons_jewelry.sharpshooter_loop",
+  "partForQuality": "irons_jewelry:band_gem_thin",
+  "parts": [
+    {
+      "drawOrder": 0,
+      "id": "irons_jewelry:band_gem_thin",
+      "materialCost": 6
+    },
+    {
+      "bonuses": [
+        {
+          "bonusType": "irons_jewelry:on_projectile_hit_bonus",
+          "cooldown": {
+            "base": 100.0,
+            "scalar": -20.0
+          }
+        }
+      ],
+      "drawOrder": 1,
+      "id": "irons_jewelry:gem_pointy",
+      "materialCost": 2
+    }
+  ],
+  "unlockedByDefault": false
+}

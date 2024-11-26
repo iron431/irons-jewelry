@@ -1,0 +1,24 @@
+{
+  "type": "irons_jewelry:ring",
+  "descriptionId": "pattern.irons_jewelry.improved_gemset_ring",
+  "partForQuality": "irons_jewelry:band_gem",
+  "parts": [
+    {
+      "drawOrder": 0,
+      "id": "irons_jewelry:band_gem",
+      "materialCost": 6
+    },
+    {
+      "bonuses": [
+        {
+          "bonusType": "irons_jewelry:attribute_bonus"
+        }
+      ],
+      "drawOrder": 1,
+      "id": "irons_jewelry:gem_pointy",
+      "materialCost": 1
+    }
+  ],
+  "qualityMultiplier": 1.5,
+  "unlockedByDefault": false
+}

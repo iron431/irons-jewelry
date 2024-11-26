@@ -24,11 +24,11 @@ public interface IAction {
     default void handleAction(ServerLevel serverLevel, BonusInstance bonusInstance, boolean applyToSelf, Optional<QualityScalar> cooldown, ServerPlayer wearer, Entity entity) {
         var playerData = PlayerData.get(wearer);
         int cooldownTicks = cooldown.map(scalar -> CooldownHandler.INSTANCE.getCooldown(wearer, scalar, bonusInstance.quality())).orElse(0);
-        if (cooldownTicks <= 0 || !playerData.isOnCooldown(bonusInstance.bonus())) {
+        if (cooldownTicks <= 0 || !playerData.isOnCooldown(bonusInstance.bonusType())) {
             apply(serverLevel, bonusInstance.quality(), applyToSelf, wearer, entity);
 //            wearer.level.playSound(null, wearer.blockPosition(), SoundRegistry.GENERIC_ACTION.get(), SoundSource.PLAYERS);
             if (cooldownTicks > 0) {
-                playerData.addCooldown(bonusInstance.bonus(), cooldownTicks);
+                playerData.addCooldown(bonusInstance.bonusType(), cooldownTicks);
             }
         }
 

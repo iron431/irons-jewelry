@@ -1,6 +1,6 @@
 package io.redspace.ironsjewelry.core.bonuses;
 
-import io.redspace.ironsjewelry.core.Bonus;
+import io.redspace.ironsjewelry.core.BonusType;
 import io.redspace.ironsjewelry.core.data.BonusInstance;
 import io.redspace.ironsjewelry.core.parameters.EffectParameter;
 import io.redspace.ironsjewelry.registry.ParameterTypeRegistry;
@@ -9,7 +9,7 @@ import net.minecraft.network.chat.Component;
 
 import java.util.List;
 
-public class EffectImmunityBonus extends Bonus {
+public class EffectImmunityBonusType extends BonusType {
     @Override
     public EffectParameter getParameterType() {
         return ParameterTypeRegistry.NEGATIVE_EFFECT_PARAMETER.get();

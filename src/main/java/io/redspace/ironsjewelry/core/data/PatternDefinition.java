@@ -5,9 +5,11 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.redspace.ironsjewelry.core.IBonusParameterType;
 import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
+import net.minecraft.util.Tuple;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -23,27 +25,34 @@ import java.util.Optional;
  * @param unlockedByDefault
  * @param qualityMultiplier
  */
-public record PatternDefinition(String descriptionId, JewelryType jewelryType,
-                                List<PartIngredient> partTemplate, List<BonusSource> bonuses,
+public record PatternDefinition(String descriptionId,
+                                JewelryType jewelryType,
+                                List<PartIngredient> partTemplate,
+                                Optional<Holder<PartDefinition>> partForQuality,
                                 boolean unlockedByDefault,
                                 double qualityMultiplier) {
     public static final Codec<PatternDefinition> CODEC = RecordCodecBuilder.create(builder -> builder.group(
             Codec.STRING.fieldOf("descriptionId").forGetter(PatternDefinition::descriptionId),
             IronsJewelryRegistries.JEWELRY_TYPE_REGISTRY.byNameCodec().fieldOf("type").forGetter(PatternDefinition::jewelryType),
             Codec.list(PartIngredient.CODEC).fieldOf("parts").forGetter(PatternDefinition::partTemplate),
-            Codec.list(BonusSource.CODEC).fieldOf("bonuses").forGetter(PatternDefinition::bonuses),
+            IronsJewelryRegistries.Codecs.PART_REGISTRY_CODEC.optionalFieldOf("partForQuality").forGetter(PatternDefinition::partForQuality),
             Codec.BOOL.optionalFieldOf("unlockedByDefault", true).forGetter(PatternDefinition::unlockedByDefault),
             Codec.DOUBLE.optionalFieldOf("qualityMultiplier", 1d).forGetter(PatternDefinition::qualityMultiplier)
     ).apply(builder, PatternDefinition::new));
 
-    public PatternDefinition(String descriptionId, JewelryType jewelryType, List<PartIngredient> partTemplate, List<BonusSource> bonuses, boolean unlockedByDefault,
+    public PatternDefinition(String descriptionId, JewelryType jewelryType, List<PartIngredient> partTemplate, Optional<Holder<PartDefinition>> partForQuality,
+                             boolean unlockedByDefault,
                              double qualityMultiplier) {
         this.descriptionId = descriptionId;
         this.jewelryType = jewelryType;
         this.partTemplate = partTemplate.stream().sorted(Comparator.comparingInt(PartIngredient::drawOrder)).toList();
-        this.bonuses = bonuses;
+        this.partForQuality = partForQuality;
         this.unlockedByDefault = unlockedByDefault;
         this.qualityMultiplier = qualityMultiplier;
+    }
+
+    public List<Tuple<PartIngredient, Bonus>> bonuses(){
+        return partTemplate.stream().flatMap(part->part.bonuses().stream().map(bonus->(Tuple<PartIngredient, Bonus>)new Tuple(part,bonus))).toList();
     }
 
     public List<Component> getFullPatternTooltip() {
@@ -53,24 +62,30 @@ public record PatternDefinition(String descriptionId, JewelryType jewelryType,
         Component title = Component.translatable(this.descriptionId()).withStyle(titleStyle);
         Component partHeader = Component.translatable("tooltip.irons_jewelry.parts_header").withStyle(headerStyle);
         var parts = this.partTemplate.stream().map(part -> Component.translatable(part.part().value().descriptionId()).withStyle(infoStyle)).toList();
-        Component bonusHeader = Component.translatable(this.bonuses.size() > 1 ? "tooltip.irons_jewelry.bonus_header_plural" : "tooltip.irons_jewelry.bonus_header").withStyle(headerStyle);
-        var bonuses = this.bonuses.stream().map(source -> {
+
+        Component bonusHeader = Component.translatable(this.bonuses().size() > 1 ? "tooltip.irons_jewelry.bonus_header_plural" : "tooltip.irons_jewelry.bonus_header").withStyle(headerStyle);
+        var bonuses = this.bonuses().stream().map(tuple -> {
             MutableComponent component = null;
-            if (source.parameterOrSource().right().isPresent()) {
-                component = Component.translatable("tooltip.irons_jewelry.bonus_with_source", Component.translatable(source.bonus().getDescriptionId()), Component.translatable(source.parameterOrSource().right().get().value().descriptionId()));
-            } else if (source.parameterOrSource().left().isPresent()) {
-                var entries = source.parameterOrSource().left().get();
-                IBonusParameterType type = source.bonus().getParameterType();
+            if (tuple.getA().parameterValue().isEmpty()) {
+                // Value is not hardcoded, it is dependent on the material this part is made from
+                // Text returned is: "Bonus x (from part y)"
+                component = Component.translatable("tooltip.irons_jewelry.bonus_with_source",
+                        Component.translatable(tuple.getB().bonusType().getDescriptionId()), Component.translatable(tuple.getA().part().value().descriptionId()));
+            } else {
+                // Value is hardcoded. Text returned is: "Bonus x (y)" for some value y
+                var entries = tuple.getA().parameterValue().get();
+                var bonus = tuple.getB().bonusType();
+                IBonusParameterType type = bonus.getParameterType();
                 var value = type.resolve(entries);
                 if (value.isPresent()) {
                     Optional<String> string = type.getValueDescriptionId(value.get());
                     if (string.isPresent()) {
-                        component = Component.translatable("tooltip.irons_jewelry.bonus_with_direct_source", Component.translatable(source.bonus().getDescriptionId()), Component.translatable(string.get()));
+                        component = Component.translatable("tooltip.irons_jewelry.bonus_with_direct_source", Component.translatable(bonus.getDescriptionId()), Component.translatable(string.get()));
                     }
                 }
             }
             if (component == null) {
-                component = Component.translatable(source.bonus().getDescriptionId());
+                component = Component.translatable(tuple.getB().bonusType().getDescriptionId());
             }
             return component.withStyle(infoStyle);
         }).toList();

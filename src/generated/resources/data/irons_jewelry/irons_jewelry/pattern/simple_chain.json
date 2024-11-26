@@ -1,0 +1,16 @@
+{
+  "type": "irons_jewelry:necklace",
+  "descriptionId": "pattern.irons_jewelry.simple_chain",
+  "parts": [
+    {
+      "bonuses": [
+        {
+          "bonusType": "irons_jewelry:attribute_bonus"
+        }
+      ],
+      "drawOrder": 0,
+      "id": "irons_jewelry:chain_simple",
+      "materialCost": 4
+    }
+  ]
+}

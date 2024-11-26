@@ -1,14 +1,14 @@
 package io.redspace.ironsjewelry.core.bonuses;
 
 import io.redspace.ironsjewelry.IronsJewelry;
-import io.redspace.ironsjewelry.core.Bonus;
+import io.redspace.ironsjewelry.core.BonusType;
 import io.redspace.ironsjewelry.core.data.AttributeInstance;
 import io.redspace.ironsjewelry.core.parameters.AttributeParameter;
 import io.redspace.ironsjewelry.registry.ParameterTypeRegistry;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import top.theillusivec4.curios.api.SlotContext;
 
-public class AttributeBonus extends Bonus {
+public class AttributeBonusType extends BonusType {
 //    public static final MapCodec<AttributeBonus> CODEC = RecordCodecBuilder.mapCodec(builder -> builder.group(
 //            Attribute.CODEC.fieldOf("attribute").forGetter(AttributeBonus::attribute),
 //            Codec.DOUBLE.fieldOf("amount").forGetter(AttributeBonus::amount),

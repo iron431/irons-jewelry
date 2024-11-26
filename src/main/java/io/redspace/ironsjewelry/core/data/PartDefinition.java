@@ -2,6 +2,7 @@ package io.redspace.ironsjewelry.core.data;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import io.redspace.ironsjewelry.IronsJewelry;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.List;
@@ -23,5 +24,22 @@ public record PartDefinition(String descriptionId,
 
     public boolean canUseMaterial(List<String> materialTypes) {
         return allowedMaterials.isEmpty() || materialTypes.stream().anyMatch(allowedMaterials::contains);
+    }
+
+    public static PartDefinition simpleMetalPart(String namespace, String name) {
+        return new PartDefinition(
+                String.format("part.%s.%s", namespace, name),
+                IronsJewelry.id("palettes/gold"),
+                List.of("metal"),
+                ResourceLocation.fromNamespaceAndPath(namespace, String.format("item/base/%s", name))
+        );
+    }
+    public static PartDefinition simpleGemPart(String namespace, String name) {
+        return new PartDefinition(
+                String.format("part.%s.%s", namespace, name),
+                IronsJewelry.id("palettes/diamond"),
+                List.of("gem"),
+                ResourceLocation.fromNamespaceAndPath(namespace, String.format("item/base/%s", name))
+        );
     }
 }

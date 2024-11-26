@@ -1,0 +1,8 @@
+{
+  "allowedMaterialTypes": [
+    "gem"
+  ],
+  "baseTextureLocation": "irons_jewelry:item/base/gems_side",
+  "descriptionId": "part.irons_jewelry.gems_side",
+  "paletteKey": "irons_jewelry:palettes/diamond"
+}

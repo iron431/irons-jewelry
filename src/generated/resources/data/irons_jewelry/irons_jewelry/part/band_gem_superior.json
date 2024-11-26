@@ -1,0 +1,8 @@
+{
+  "allowedMaterialTypes": [
+    "metal"
+  ],
+  "baseTextureLocation": "irons_jewelry:item/base/band_gem_superior",
+  "descriptionId": "part.irons_jewelry.band_gem_superior",
+  "paletteKey": "irons_jewelry:palettes/gold"
+}

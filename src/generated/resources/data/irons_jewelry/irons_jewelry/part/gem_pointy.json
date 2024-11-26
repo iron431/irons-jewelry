@@ -1,0 +1,8 @@
+{
+  "allowedMaterialTypes": [
+    "gem"
+  ],
+  "baseTextureLocation": "irons_jewelry:item/base/gem_pointy",
+  "descriptionId": "part.irons_jewelry.gem_pointy",
+  "paletteKey": "irons_jewelry:palettes/diamond"
+}

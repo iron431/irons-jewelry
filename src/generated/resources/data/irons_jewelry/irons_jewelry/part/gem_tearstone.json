@@ -1,0 +1,8 @@
+{
+  "allowedMaterialTypes": [
+    "gem"
+  ],
+  "baseTextureLocation": "irons_jewelry:item/base/gem_tearstone",
+  "descriptionId": "part.irons_jewelry.gem_tearstone",
+  "paletteKey": "irons_jewelry:palettes/diamond"
+}

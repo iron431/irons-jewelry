@@ -1,0 +1,44 @@
+{
+  "type": "irons_jewelry:ring",
+  "descriptionId": "pattern.irons_jewelry.barbed_band",
+  "partForQuality": "irons_jewelry:gem_band_barbed",
+  "parts": [
+    {
+      "bonuses": [
+        {
+          "bonusType": "irons_jewelry:attribute_bonus"
+        },
+        {
+          "bonusType": "irons_jewelry:on_attack",
+          "cooldown": {
+            "base": 60.0,
+            "scalar": 0.0
+          }
+        }
+      ],
+      "drawOrder": 0,
+      "id": "irons_jewelry:band_barbed",
+      "materialCost": 8,
+      "parameterValue": {
+        "irons_jewelry:action": {
+          "action": {
+            "type": "irons_jewelry:apply_damage",
+            "amount": {
+              "base": 1.0,
+              "scalar": 0.5
+            },
+            "damageType": "minecraft:thorns"
+          },
+          "targetSelf": true
+        }
+      }
+    },
+    {
+      "drawOrder": 1,
+      "id": "irons_jewelry:gem_band_barbed",
+      "materialCost": 3
+    }
+  ],
+  "qualityMultiplier": 3.0,
+  "unlockedByDefault": false
+}

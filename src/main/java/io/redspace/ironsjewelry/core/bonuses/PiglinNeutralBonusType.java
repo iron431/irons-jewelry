@@ -1,6 +1,6 @@
 package io.redspace.ironsjewelry.core.bonuses;
 
-import io.redspace.ironsjewelry.core.Bonus;
+import io.redspace.ironsjewelry.core.BonusType;
 import io.redspace.ironsjewelry.core.IBonusParameterType;
 import io.redspace.ironsjewelry.core.data.BonusInstance;
 import io.redspace.ironsjewelry.registry.ParameterTypeRegistry;
@@ -9,7 +9,7 @@ import net.minecraft.network.chat.Component;
 
 import java.util.List;
 
-public class PiglinNeutralBonus extends Bonus {
+public class PiglinNeutralBonusType extends BonusType {
     @Override
     public IBonusParameterType<?> getParameterType() {
         return ParameterTypeRegistry.EMPTY.get();

@@ -24,7 +24,7 @@ public class IronsJewelry {
         NeoForge.EVENT_BUS.addListener(IronsJewelry::registerReloadListeners);
 
         ComponentRegistry.register(modEventBus);
-        BonusRegistry.register(modEventBus);
+        BonusTypeRegistry.register(modEventBus);
         ParameterTypeRegistry.register(modEventBus);
         ItemRegistry.register(modEventBus);
         BlockRegistry.register(modEventBus);

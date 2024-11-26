@@ -13,6 +13,15 @@ public record QualityScalar(double baseAmount, double qualityScalar, double min,
             Codec.DOUBLE.optionalFieldOf("min", 0d).forGetter(QualityScalar::min),
             Codec.DOUBLE.optionalFieldOf("max").forGetter(QualityScalar::max)
     ).apply(builder, QualityScalar::new));
+
+    public QualityScalar(double baseAmount, double qualityScalar) {
+        this(baseAmount, qualityScalar, 0, Optional.empty());
+    }
+
+    public QualityScalar(double baseAmount) {
+        this(baseAmount, 0, 0, Optional.empty());
+    }
+
     public static final Codec<QualityScalar> CONSTANT_CODEC = Codec.DOUBLE.xmap(d -> new QualityScalar(d, 0, 0, Optional.empty()), scalar -> scalar.baseAmount);
 
     public static final Codec<QualityScalar> CODEC = Codec.withAlternative(DIRECT_CODEC, CONSTANT_CODEC);

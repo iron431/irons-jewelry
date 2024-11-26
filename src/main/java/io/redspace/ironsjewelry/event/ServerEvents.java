@@ -1,12 +1,12 @@
 package io.redspace.ironsjewelry.event;
 
 import io.redspace.ironsjewelry.core.Utils;
-import io.redspace.ironsjewelry.core.bonuses.EffectOnHitBonus;
+import io.redspace.ironsjewelry.core.bonuses.EffectOnHitBonusType;
 import io.redspace.ironsjewelry.core.data.BonusInstance;
 import io.redspace.ironsjewelry.core.data.JewelryData;
 import io.redspace.ironsjewelry.core.parameters.ActionParameter;
 import io.redspace.ironsjewelry.network.packets.SyncPlayerDataPacket;
-import io.redspace.ironsjewelry.registry.BonusRegistry;
+import io.redspace.ironsjewelry.registry.BonusTypeRegistry;
 import io.redspace.ironsjewelry.registry.DataAttachmentRegistry;
 import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerPlayer;
@@ -59,7 +59,7 @@ public class ServerEvents {
             var items = Utils.getEquippedJewelry(player);
             for (ItemStack stack : items) {
                 JewelryData.ifPresent(stack, jewelryData -> {
-                    jewelryData.forBonuses(BonusRegistry.ON_SHIELD_BLOCK_BONUS.get(), ActionParameter.ActionRunnable.class, (bonus, action) -> {
+                    jewelryData.forBonuses(BonusTypeRegistry.ON_SHIELD_BLOCK_BONUS.get(), ActionParameter.ActionRunnable.class, (bonus, action) -> {
                         action.action().handleAction(player.serverLevel(), bonus, action.targetSelf(), bonus.cooldown(), player, livingAttacker);
                     });
                 });
@@ -88,18 +88,18 @@ public class ServerEvents {
                 /*
                 Action on projectile hit Bonus
                  */
-                if (instance.bonus().equals(BonusRegistry.ON_PROJECTILE_HIT_BONUS.get())) {
+                if (instance.bonusType().equals(BonusTypeRegistry.ON_PROJECTILE_HIT_BONUS.get())) {
                     if (damageSource.getDirectEntity() instanceof Projectile) {
-                        BonusRegistry.ON_PROJECTILE_HIT_BONUS.get().getParameterType().resolve(instance).ifPresent(
+                        BonusTypeRegistry.ON_PROJECTILE_HIT_BONUS.get().getParameterType().resolve(instance).ifPresent(
                                 action -> action.action().handleAction(player.serverLevel(), instance, action.targetSelf(), instance.cooldown(), player, victim));
                     }
                 }
                 /*
                 Action on Hit Bonus
                  */
-                else if (instance.bonus().equals(BonusRegistry.ON_ATTACK_BONUS.get())) {
+                else if (instance.bonusType().equals(BonusTypeRegistry.ON_ATTACK_BONUS.get())) {
                     if (damageSource.isDirect()) {
-                        BonusRegistry.ON_ATTACK_BONUS.get().getParameterType().resolve(instance).ifPresent(
+                        BonusTypeRegistry.ON_ATTACK_BONUS.get().getParameterType().resolve(instance).ifPresent(
                                 action -> action.action().handleAction(player.serverLevel(), instance, action.targetSelf(), instance.cooldown(), player, victim));
                     }
                 }
@@ -114,7 +114,7 @@ public class ServerEvents {
                 /*
                 Effect when hit Bonus
                  */
-                if (instance.bonus() instanceof EffectOnHitBonus effectOnHitBonus) {
+                if (instance.bonusType() instanceof EffectOnHitBonusType effectOnHitBonus) {
                     effectOnHitBonus.getParameterType().resolve(instance.parameter()).ifPresent(effect ->
                             player.addEffect(new MobEffectInstance(effect, effectOnHitBonus.durationInTicks(effect, instance.quality())))
                     );
@@ -122,9 +122,9 @@ public class ServerEvents {
                 /*
                 Action on Take Damage Bonus
                  */
-                else if (instance.bonus().equals(BonusRegistry.ON_TAKE_DAMAGE_BONUS.get()) && attacker != null) {
+                else if (instance.bonusType().equals(BonusTypeRegistry.ON_TAKE_DAMAGE_BONUS.get()) && attacker != null) {
                     //TODO: create map of bonus to consumer or something?
-                    BonusRegistry.ON_TAKE_DAMAGE_BONUS.get().getParameterType().resolve(instance).ifPresent(
+                    BonusTypeRegistry.ON_TAKE_DAMAGE_BONUS.get().getParameterType().resolve(instance).ifPresent(
                             effect -> effect.action().handleAction(player.serverLevel(), instance, effect.targetSelf(), instance.cooldown(), player, attacker));
                 }
             }
@@ -135,7 +135,7 @@ public class ServerEvents {
     public static void onEffectApplication(MobEffectEvent.Applicable event) {
         if (event.getEntity() instanceof Player player) {
             Utils.getEquippedJewelry(player).forEach(stack ->
-                    JewelryData.ifPresent(stack, data -> data.forBonuses(BonusRegistry.EFFECT_IMMUNITY_BONUS.get(), Holder.class,
+                    JewelryData.ifPresent(stack, data -> data.forBonuses(BonusTypeRegistry.EFFECT_IMMUNITY_BONUS.get(), Holder.class,
                             (bonus, param) -> {
                                 if (event.getEffectInstance() != null && event.getEffectInstance().getEffect().equals(param)) {
                                     event.setResult(MobEffectEvent.Applicable.Result.DO_NOT_APPLY);

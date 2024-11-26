@@ -1,0 +1,17 @@
+{
+  "type": "irons_jewelry:ring",
+  "descriptionId": "pattern.irons_jewelry.simple_band",
+  "parts": [
+    {
+      "bonuses": [
+        {
+          "bonusType": "irons_jewelry:attribute_bonus"
+        }
+      ],
+      "drawOrder": 0,
+      "id": "irons_jewelry:band_simple",
+      "materialCost": 4
+    }
+  ],
+  "qualityMultiplier": 0.75
+}

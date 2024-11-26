@@ -1,0 +1,8 @@
+{
+  "allowedMaterialTypes": [
+    "gem"
+  ],
+  "baseTextureLocation": "irons_jewelry:item/base/gem_simple_amulet",
+  "descriptionId": "part.irons_jewelry.gem_simple_amulet",
+  "paletteKey": "irons_jewelry:palettes/diamond"
+}

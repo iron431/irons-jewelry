@@ -2,7 +2,7 @@ package io.redspace.ironsjewelry.core.data;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import io.redspace.ironsjewelry.core.Bonus;
+import io.redspace.ironsjewelry.core.BonusType;
 import io.redspace.ironsjewelry.registry.ComponentRegistry;
 import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
 import net.minecraft.core.Holder;
@@ -10,6 +10,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.util.Tuple;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
@@ -101,11 +102,11 @@ public class JewelryData {
         }
     }
 
-    public <T> void forBonuses(Bonus bonus, Class<T> clazz, BiConsumer<BonusInstance, T> consumer) {
+    public <T> void forBonuses(BonusType bonusType, Class<T> clazz, BiConsumer<BonusInstance, T> consumer) {
         var bonuses = this.getBonuses();
         for (BonusInstance instance : bonuses) {
-            if (instance.bonus().equals(bonus)) {
-                instance.bonus().getParameterType().resolve(instance).ifPresent(param ->
+            if (instance.bonusType().equals(bonusType)) {
+                instance.bonusType().getParameterType().resolve(instance).ifPresent(param ->
                         {
                             if (clazz.isInstance(param)) {
                                 consumer.accept(instance, (T) param);
@@ -141,9 +142,25 @@ public class JewelryData {
         if (!valid) {
             return List.of();
         }
-        return pattern.value().bonuses().stream().map(source -> source.getBonusFor(this)).toList();
-        //return pattern.bonuses().stream().flatMap(source -> parts.get(source.partForBonus()).bonuses().stream().map(bonus -> new BonusInstance(bonus, parts.get(source.partForQuality()).qualityOrSource() * pattern.qualityMultiplier()))).toList();
+        return pattern.value().bonuses().stream().map(this::getBonusFor).toList();
     }
+
+    public BonusInstance getBonusFor(Tuple<PartIngredient, Bonus> tuple) {
+        return new BonusInstance(
+                tuple.getB().bonusType(),
+                pattern.value().qualityMultiplier() * tuple.getB().qualityMultiplier() * pattern.value().partForQuality().map(PartDefinition -> this.parts.get(PartDefinition).value().quality()).orElse(1d),
+                tuple.getA().parameterValue().filter(map -> map.containsKey(tuple.getB().bonusType().getParameterType())).orElse(this.parts.get(tuple.getA().part()).value().bonusParameters())
+                /*tuple.getA().parameterValue().orElse(this.parts.get(tuple.getA().part()).value().bonusParameters())*/,
+                tuple.getB().cooldown()
+        );
+    }
+    /*
+    var values;
+    if(map.present && map.contains(type))
+        values = map.get(type);
+    else
+        values = material.getValues
+     */
 
     public Component getItemName() {
         if (!this.isValid()) {

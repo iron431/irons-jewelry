@@ -1,0 +1,8 @@
+{
+  "allowedMaterialTypes": [
+    "metal"
+  ],
+  "baseTextureLocation": "irons_jewelry:item/base/chain_simple",
+  "descriptionId": "part.irons_jewelry.chain_simple",
+  "paletteKey": "irons_jewelry:palettes/gold"
+}

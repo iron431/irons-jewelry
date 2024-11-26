@@ -1,0 +1,23 @@
+{
+  "type": "irons_jewelry:ring",
+  "descriptionId": "pattern.irons_jewelry.tearstone_ring",
+  "parts": [
+    {
+      "drawOrder": 0,
+      "id": "irons_jewelry:band_tearstone",
+      "materialCost": 4
+    },
+    {
+      "bonuses": [
+        {
+          "bonusType": "irons_jewelry:effect_immunity_bonus"
+        }
+      ],
+      "drawOrder": 1,
+      "id": "irons_jewelry:gem_tearstone",
+      "materialCost": 4
+    }
+  ],
+  "qualityMultiplier": 1.5,
+  "unlockedByDefault": false
+}

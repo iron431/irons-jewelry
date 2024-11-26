@@ -1,0 +1,8 @@
+{
+  "allowedMaterialTypes": [
+    "gem"
+  ],
+  "baseTextureLocation": "irons_jewelry:item/base/gem_amulet_of_protection",
+  "descriptionId": "part.irons_jewelry.gem_amulet_of_protection",
+  "paletteKey": "irons_jewelry:palettes/diamond"
+}

@@ -1,0 +1,8 @@
+{
+  "allowedMaterialTypes": [
+    "metal"
+  ],
+  "baseTextureLocation": "irons_jewelry:item/base/chain_amulet_of_protection",
+  "descriptionId": "part.irons_jewelry.chain_amulet_of_protection",
+  "paletteKey": "irons_jewelry:palettes/gold"
+}

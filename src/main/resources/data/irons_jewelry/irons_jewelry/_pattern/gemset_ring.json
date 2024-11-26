@@ -2,6 +2,7 @@
   "unlockedByDefault": true,
   "type": "irons_jewelry:ring",
   "descriptionId": "pattern.irons_jewelry.gemset_ring",
+  "partForQuality": "irons_jewelry:band_gem",
   "parts": [
     {
       "id": "irons_jewelry:band_gem",
@@ -11,14 +12,12 @@
     {
       "id": "irons_jewelry:gem_round",
       "materialCost": 1,
-      "drawOrder": 1
-    }
-  ],
-  "bonuses": [
-    {
-      "bonus": "irons_jewelry:attribute_bonus",
-      "parameter": "irons_jewelry:gem_round",
-      "quality": "irons_jewelry:band_gem"
+      "drawOrder": 1,
+      "bonusSources": [
+        {
+          "bonus": "irons_jewelry:attribute_bonus"
+        }
+      ]
     }
   ]
 }

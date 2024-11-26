@@ -1,6 +1,6 @@
 package io.redspace.ironsjewelry.core.bonuses;
 
-import io.redspace.ironsjewelry.core.Bonus;
+import io.redspace.ironsjewelry.core.BonusType;
 import io.redspace.ironsjewelry.core.Utils;
 import io.redspace.ironsjewelry.core.data.BonusInstance;
 import io.redspace.ironsjewelry.core.parameters.EffectParameter;
@@ -12,7 +12,7 @@ import net.minecraft.world.effect.MobEffect;
 
 import java.util.List;
 
-public class EffectOnHitBonus extends Bonus {
+public class EffectOnHitBonusType extends BonusType {
     @Override
     public EffectParameter getParameterType() {
         return ParameterTypeRegistry.POSITIVE_EFFECT_PARAMETER.get();

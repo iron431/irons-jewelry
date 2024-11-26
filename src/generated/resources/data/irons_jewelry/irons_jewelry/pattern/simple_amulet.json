@@ -1,0 +1,22 @@
+{
+  "type": "irons_jewelry:necklace",
+  "descriptionId": "pattern.irons_jewelry.simple_amulet",
+  "partForQuality": "irons_jewelry:chain_simple_amulet",
+  "parts": [
+    {
+      "drawOrder": 0,
+      "id": "irons_jewelry:chain_simple_amulet",
+      "materialCost": 4
+    },
+    {
+      "bonuses": [
+        {
+          "bonusType": "irons_jewelry:attribute_bonus"
+        }
+      ],
+      "drawOrder": 1,
+      "id": "irons_jewelry:gem_simple_amulet",
+      "materialCost": 1
+    }
+  ]
+}

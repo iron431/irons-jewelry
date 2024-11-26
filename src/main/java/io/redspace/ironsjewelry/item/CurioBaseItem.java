@@ -5,10 +5,10 @@ import com.google.common.collect.Multimap;
 import io.redspace.ironsjewelry.client.ClientEvents;
 import io.redspace.ironsjewelry.core.IBonusParameterType;
 import io.redspace.ironsjewelry.core.Utils;
-import io.redspace.ironsjewelry.core.bonuses.AttributeBonus;
-import io.redspace.ironsjewelry.core.bonuses.PiglinNeutralBonus;
+import io.redspace.ironsjewelry.core.bonuses.AttributeBonusType;
+import io.redspace.ironsjewelry.core.bonuses.PiglinNeutralBonusType;
 import io.redspace.ironsjewelry.core.data.*;
-import io.redspace.ironsjewelry.registry.BonusRegistry;
+import io.redspace.ironsjewelry.registry.BonusTypeRegistry;
 import io.redspace.ironsjewelry.registry.ComponentRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
@@ -92,28 +92,29 @@ public class CurioBaseItem extends Item implements ICurioItem {
         List<Component> components = new ArrayList<>();
         for (int i = 0; i < pattern.partTemplate().size(); i++) {
             var partIngredient = pattern.partTemplate().get(i);
-            var part = partIngredient.part();
-            var partComponent = Component.translatable(part.value().descriptionId());
+            var currentPart = partIngredient.part();
+            var partComponent = Component.translatable(currentPart.value().descriptionId());
             MutableComponent materialComponent;
             Optional<Component> bonusComponent = Optional.empty();
             Optional<Component> qualityComponent = Optional.empty();
             int i2 = i;
             Optional<MutableComponent> costComponent = materialCost.map(list -> {
-                var count = list.size() > i2 && parts.containsKey(part) && part.value().canUseMaterial(parts.get(part).value().materialType()) ? list.get(i2) : 0;
+                var count = list.size() > i2 && parts.containsKey(currentPart) && currentPart.value().canUseMaterial(parts.get(currentPart).value().materialType()) ? list.get(i2) : 0;
                 String cost = String.format("(%s/%s)", count, partIngredient.materialCost());
                 return Optional.of(Component.literal("  * ").append(Component.literal(cost).withStyle(count >= partIngredient.materialCost() ? ChatFormatting.GREEN : ChatFormatting.RED)).withStyle(ChatFormatting.DARK_GRAY));
             }).orElse(Optional.empty());
-            if (!parts.containsKey(part)) {
+            if (!parts.containsKey(currentPart)) {
                 materialComponent = Component.translatable("tooltip.irons_jewelry.empty").withStyle(ChatFormatting.RED);
             } else {
-                var mat = parts.get(part);
+                var mat = parts.get(currentPart);
                 materialComponent = Component.translatable(mat.value().descriptionId()).withStyle(ChatFormatting.DARK_AQUA);
-                var bonusContribution = pattern.bonuses().stream().filter(bonus -> bonus.parameterOrSource().right().isPresent() && bonus.parameterOrSource().right().get().equals(part)).findFirst();
-                var qualityContribution = pattern.bonuses().stream().filter(bonus -> bonus.qualityOrSource().right().isPresent() && bonus.qualityOrSource().right().get().equals(part)).findFirst();
+                var bonusContribution = pattern.bonuses().stream().filter(tuple -> tuple.getA().parameterValue().filter(map -> map.containsKey(tuple.getB().bonusType().getParameterType())).isEmpty() && tuple.getA().part().equals(currentPart)).findFirst();
+                var qualityContribution = pattern.partForQuality().filter(partThatDrivesQuality -> partThatDrivesQuality.equals(currentPart));
                 if (bonusContribution.isPresent()) {
-                    IBonusParameterType type = bonusContribution.get().bonus().getParameterType();
+                    // if bonusContribution is present, the tuple's PartIngredient's #parameterValue is not
+                    var tuple = bonusContribution.get();
+                    IBonusParameterType type = tuple.getB().bonusType().getParameterType();
                     var value = type.resolve(mat.value().bonusParameters());
-                    //var bonus = bonusContribution.get().getBonusFor(jewelryData);
                     if (value.isPresent()) {
                         Optional<String> string = type.getValueDescriptionId(value.get());
                         if (string.isPresent()) {
@@ -123,7 +124,7 @@ public class CurioBaseItem extends Item implements ICurioItem {
                     }
                 }
                 if (qualityContribution.isPresent()) {
-                    var quality = parts.get(qualityContribution.get().qualityOrSource().right().get()).value().quality();
+                    var quality = parts.get(qualityContribution.get()).value().quality();
                     qualityComponent = Optional.of(Component.literal("  * ").append(Component.translatable("tooltip.irons_jewelry.quality_multiplier", quality).withStyle(ChatFormatting.WHITE)).withStyle(ChatFormatting.DARK_GRAY));
                 }
             }
@@ -137,13 +138,13 @@ public class CurioBaseItem extends Item implements ICurioItem {
 
     @Override
     public boolean makesPiglinsNeutral(ItemStack stack, LivingEntity wearer) {
-        return wearer instanceof Player player && Utils.getEquippedBonuses(player).stream().map(BonusInstance::bonus).anyMatch(bonus -> bonus instanceof PiglinNeutralBonus);
+        return wearer instanceof Player player && Utils.getEquippedBonuses(player).stream().map(BonusInstance::bonusType).anyMatch(bonus -> bonus instanceof PiglinNeutralBonusType);
     }
 
     @Override
     public void onEquip(SlotContext slotContext, ItemStack prevStack, ItemStack stack) {
         ICurioItem.super.onEquip(slotContext, prevStack, stack);
-        JewelryData.ifPresent(stack, data -> data.forBonuses(BonusRegistry.EFFECT_IMMUNITY_BONUS.get(), Holder.class, (bonus, param) -> slotContext.entity().removeEffect(param)));
+        JewelryData.ifPresent(stack, data -> data.forBonuses(BonusTypeRegistry.EFFECT_IMMUNITY_BONUS.get(), Holder.class, (bonus, param) -> slotContext.entity().removeEffect(param)));
     }
 
     @Override
@@ -155,7 +156,7 @@ public class CurioBaseItem extends Item implements ICurioItem {
             // We want to combine like modifiers by operation, so instead of two "+2 health"'s, we get one "+4 health"
             Map<Holder<Attribute>, Map<AttributeModifier.Operation, AttributeModifier>> collapsedModifiers = new HashMap<>();
             for (BonusInstance instance : bonuses) {
-                if (instance.bonus() instanceof AttributeBonus attributeBonus) {
+                if (instance.bonusType() instanceof AttributeBonusType attributeBonus) {
                     attributeBonus.getParameterType().resolve(instance.parameter()).ifPresent(
                             attributeInstance -> {
                                 // If this is the first modifier of this attribute and operation, store it.

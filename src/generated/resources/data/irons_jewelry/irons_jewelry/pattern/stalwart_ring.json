@@ -1,0 +1,21 @@
+{
+  "type": "irons_jewelry:ring",
+  "descriptionId": "pattern.irons_jewelry.stalwart_ring",
+  "parts": [
+    {
+      "bonuses": [
+        {
+          "bonusType": "irons_jewelry:on_shield_block_bonus",
+          "cooldown": {
+            "base": 80.0,
+            "scalar": 0.0
+          }
+        }
+      ],
+      "drawOrder": 0,
+      "id": "irons_jewelry:band_stalwart",
+      "materialCost": 6
+    }
+  ],
+  "unlockedByDefault": false
+}
