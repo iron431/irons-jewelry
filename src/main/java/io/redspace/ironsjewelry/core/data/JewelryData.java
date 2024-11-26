@@ -149,18 +149,10 @@ public class JewelryData {
         return new BonusInstance(
                 tuple.getB().bonusType(),
                 pattern.value().qualityMultiplier() * tuple.getB().qualityMultiplier() * pattern.value().partForQuality().map(PartDefinition -> this.parts.get(PartDefinition).value().quality()).orElse(1d),
-                tuple.getA().parameterValue().filter(map -> map.containsKey(tuple.getB().bonusType().getParameterType())).orElse(this.parts.get(tuple.getA().part()).value().bonusParameters())
-                /*tuple.getA().parameterValue().orElse(this.parts.get(tuple.getA().part()).value().bonusParameters())*/,
+                tuple.getB().parameterValue().containsKey(tuple.getB().bonusType().getParameterType()) ? tuple.getB().parameterValue() : (this.parts.get(tuple.getA().part()).value().bonusParameters()),
                 tuple.getB().cooldown()
         );
     }
-    /*
-    var values;
-    if(map.present && map.contains(type))
-        values = map.get(type);
-    else
-        values = material.getValues
-     */
 
     public Component getItemName() {
         if (!this.isValid()) {

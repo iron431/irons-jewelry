@@ -66,14 +66,14 @@ public record PatternDefinition(String descriptionId,
         Component bonusHeader = Component.translatable(this.bonuses().size() > 1 ? "tooltip.irons_jewelry.bonus_header_plural" : "tooltip.irons_jewelry.bonus_header").withStyle(headerStyle);
         var bonuses = this.bonuses().stream().map(tuple -> {
             MutableComponent component = null;
-            if (tuple.getA().parameterValue().isEmpty()) {
+            if (!tuple.getB().parameterValue().containsKey(tuple.getB().bonusType().getParameterType())) {
                 // Value is not hardcoded, it is dependent on the material this part is made from
                 // Text returned is: "Bonus x (from part y)"
                 component = Component.translatable("tooltip.irons_jewelry.bonus_with_source",
                         Component.translatable(tuple.getB().bonusType().getDescriptionId()), Component.translatable(tuple.getA().part().value().descriptionId()));
             } else {
                 // Value is hardcoded. Text returned is: "Bonus x (y)" for some value y
-                var entries = tuple.getA().parameterValue().get();
+                var entries = tuple.getB().parameterValue();
                 var bonus = tuple.getB().bonusType();
                 IBonusParameterType type = bonus.getParameterType();
                 var value = type.resolve(entries);

@@ -179,7 +179,7 @@ public class IronsJewelryRegistries {
                         "pattern.irons_jewelry.simple_band",
                         JewelryTypeRegistry.RING.get(),
                         List.of(
-                                new PartIngredient(BAND_SIMPLE, 4, 0, List.of(new Bonus(BonusTypeRegistry.ATTRIBUTE_BONUS.get(), 1, Optional.empty())), Optional.empty())
+                                new PartIngredient(BAND_SIMPLE, 4, 0, List.of(new Bonus(BonusTypeRegistry.ATTRIBUTE_BONUS.get(), 1)))
                         ),
                         Optional.empty(),
                         true, 0.75
@@ -188,10 +188,8 @@ public class IronsJewelryRegistries {
                         "pattern.irons_jewelry.gemset_ring",
                         JewelryTypeRegistry.RING.get(),
                         List.of(
-                                new PartIngredient(BAND_GEM, 4, 0, List.of(), Optional.empty()),
-                                new PartIngredient(GEM_ROUND, 1, 1, List.of(
-                                        new Bonus(BonusTypeRegistry.ATTRIBUTE_BONUS.get(), 1, Optional.empty())
-                                ), Optional.empty())
+                                new PartIngredient(BAND_GEM, 4, 0, List.of()),
+                                new PartIngredient(GEM_ROUND, 1, 1, List.of(new Bonus(BonusTypeRegistry.ATTRIBUTE_BONUS.get(), 1)))
                         ),
                         Optional.of(BAND_GEM),
                         true, 1
@@ -200,10 +198,10 @@ public class IronsJewelryRegistries {
                         "pattern.irons_jewelry.amulet_of_protection",
                         JewelryTypeRegistry.NECKLACE.get(),
                         List.of(
-                                new PartIngredient(CHAIN_AMULET_OF_PROTECTION, 6, 0, List.of(), Optional.empty()),
+                                new PartIngredient(CHAIN_AMULET_OF_PROTECTION, 6, 0, List.of()),
                                 new PartIngredient(GEM_AMULET_OF_PROTECTION, 2, 1, List.of(
-                                        new Bonus(BonusTypeRegistry.ON_TAKE_DAMAGE_BONUS.get(), 1, Optional.of(new QualityScalar(200, -20)))
-                                ), Optional.empty())
+                                        new Bonus(BonusTypeRegistry.ON_TAKE_DAMAGE_BONUS.get(), 1, Optional.of(new QualityScalar(200, -20)), Map.of())
+                                ))
                         ),
                         Optional.of(CHAIN_AMULET_OF_PROTECTION),
                         false,
@@ -214,19 +212,18 @@ public class IronsJewelryRegistries {
                         JewelryTypeRegistry.RING.get(),
                         List.of(
                                 new PartIngredient(BAND_BARBED, 8, 0, List.of(
-                                        new Bonus(BonusTypeRegistry.ATTRIBUTE_BONUS.get(), 1, Optional.empty()),
-                                        new Bonus(BonusTypeRegistry.ON_ATTACK_BONUS.get(), 1, Optional.of(new QualityScalar(60)))
+                                        new Bonus(BonusTypeRegistry.ATTRIBUTE_BONUS.get(), 1),
+                                        new Bonus(BonusTypeRegistry.ON_ATTACK_BONUS.get(), 1, Optional.of(new QualityScalar(60)),
+                                                Map.of(ParameterTypeRegistry.ACTION_PARAMETER.get(), new ActionParameter.ActionRunnable(
+                                                        new ApplyDamageAction(
+                                                                damageGetter.getOrThrow(DamageTypes.THORNS),
+                                                                new QualityScalar(1, 0.5),
+                                                                Optional.empty(),
+                                                                Optional.empty()
+                                                        ), true)))
 
-                                ), Optional.of(Map.of(
-                                        ParameterTypeRegistry.ACTION_PARAMETER.get(), new ActionParameter.ActionRunnable(
-                                                new ApplyDamageAction(
-                                                        damageGetter.getOrThrow(DamageTypes.THORNS),
-                                                        new QualityScalar(1, 0.5),
-                                                        Optional.empty(),
-                                                        Optional.empty()
-                                                ), true)
-                                ))),
-                                new PartIngredient(GEM_BAND_BARBED, 3, 1, List.of(), Optional.empty())
+                                )),
+                                new PartIngredient(GEM_BAND_BARBED, 3, 1, List.of())
                         ),
                         Optional.of(GEM_BAND_BARBED),
                         false,
@@ -236,10 +233,10 @@ public class IronsJewelryRegistries {
                         "pattern.irons_jewelry.improved_gemset_ring",
                         JewelryTypeRegistry.RING.get(),
                         List.of(
-                                new PartIngredient(BAND_GEM, 6, 0, List.of(), Optional.empty()),
+                                new PartIngredient(BAND_GEM, 6, 0, List.of()),
                                 new PartIngredient(GEM_POINTY, 1, 1, List.of(
-                                        new Bonus(BonusTypeRegistry.ATTRIBUTE_BONUS.get(), 1, Optional.empty())
-                                ), Optional.empty())
+                                        new Bonus(BonusTypeRegistry.ATTRIBUTE_BONUS.get(), 1)
+                                ))
                         ),
                         Optional.of(BAND_GEM),
                         false, 1.5
@@ -248,13 +245,13 @@ public class IronsJewelryRegistries {
                         "pattern.irons_jewelry.superior_gemset_ring",
                         JewelryTypeRegistry.RING.get(),
                         List.of(
-                                new PartIngredient(BAND_GEM_SUPERIOR, 6, 0, List.of(), Optional.empty()),
+                                new PartIngredient(BAND_GEM_SUPERIOR, 6, 0, List.of()),
                                 new PartIngredient(GEMS_SIDE, 1, 1, List.of(
-                                        new Bonus(BonusTypeRegistry.ATTRIBUTE_BONUS.get(), 0.5, Optional.empty())
-                                ), Optional.empty()),
+                                        new Bonus(BonusTypeRegistry.ATTRIBUTE_BONUS.get(), 0.5)
+                                )),
                                 new PartIngredient(GEM_POINTY, 2, 2, List.of(
-                                        new Bonus(BonusTypeRegistry.ATTRIBUTE_BONUS.get(), 1, Optional.empty())
-                                ), Optional.empty())
+                                        new Bonus(BonusTypeRegistry.ATTRIBUTE_BONUS.get(), 1)
+                                ))
                         ),
                         Optional.of(BAND_GEM_SUPERIOR),
                         false, 1.75
@@ -263,10 +260,10 @@ public class IronsJewelryRegistries {
                         "pattern.irons_jewelry.piglin_signet_ring",
                         JewelryTypeRegistry.RING.get(),
                         List.of(
-                                new PartIngredient(BAND_GEM, 4, 0, List.of(), Optional.empty()),
+                                new PartIngredient(BAND_GEM, 4, 0, List.of()),
                                 new PartIngredient(PIGLIN_SIGNET, 4, 1, List.of(
-                                        new Bonus(BonusTypeRegistry.PIGLIN_NEUTRAL_BONUS.get(), 1, Optional.empty())
-                                ), Optional.empty())
+                                        new Bonus(BonusTypeRegistry.PIGLIN_NEUTRAL_BONUS.get(), 1)
+                                ))
                         ),
                         Optional.empty(),
                         false, 2
@@ -276,10 +273,10 @@ public class IronsJewelryRegistries {
                         JewelryTypeRegistry.RING.get(),
                         List.of(
                                 new PartIngredient(BAND_GEM_THIN, 6, 0, List.of(
-                                ), Optional.empty()),
+                                )),
                                 new PartIngredient(GEM_POINTY, 2, 1, List.of(
-                                        new Bonus(BonusTypeRegistry.ON_PROJECTILE_HIT_BONUS.get(), 1, Optional.of(new QualityScalar(100, -20)))
-                                ), Optional.empty())
+                                        new Bonus(BonusTypeRegistry.ON_PROJECTILE_HIT_BONUS.get(), 1, Optional.of(new QualityScalar(100, -20)),Map.of())
+                                ))
                         ),
                         Optional.of(BAND_GEM_THIN),
                         false,
@@ -289,11 +286,10 @@ public class IronsJewelryRegistries {
                         "pattern.irons_jewelry.simple_amulet",
                         JewelryTypeRegistry.NECKLACE.get(),
                         List.of(
-                                new PartIngredient(CHAIN_SIMPLE_AMULET, 4, 0, List.of(
-                                ), Optional.empty()),
+                                new PartIngredient(CHAIN_SIMPLE_AMULET, 4, 0, List.of()),
                                 new PartIngredient(GEM_SIMPLE_AMULET, 1, 1, List.of(
-                                        new Bonus(BonusTypeRegistry.ATTRIBUTE_BONUS.get(), 1, Optional.empty())
-                                ), Optional.empty())
+                                        new Bonus(BonusTypeRegistry.ATTRIBUTE_BONUS.get(), 1)
+                                ))
                         ),
                         Optional.of(CHAIN_SIMPLE_AMULET),
                         true,
@@ -304,8 +300,8 @@ public class IronsJewelryRegistries {
                         JewelryTypeRegistry.NECKLACE.get(),
                         List.of(
                                 new PartIngredient(CHAIN_SIMPLE, 4, 0, List.of(
-                                        new Bonus(BonusTypeRegistry.ATTRIBUTE_BONUS.get(), 1, Optional.empty())
-                                ), Optional.empty())
+                                        new Bonus(BonusTypeRegistry.ATTRIBUTE_BONUS.get(), 1)
+                                ))
                         ),
                         Optional.empty(),
                         true,
@@ -316,8 +312,8 @@ public class IronsJewelryRegistries {
                         JewelryTypeRegistry.RING.get(),
                         List.of(
                                 new PartIngredient(BAND_STALWART, 6, 0, List.of(
-                                        new Bonus(BonusTypeRegistry.ON_SHIELD_BLOCK_BONUS.get(), 1, Optional.of(new QualityScalar(80)))
-                                ), Optional.empty())
+                                        new Bonus(BonusTypeRegistry.ON_SHIELD_BLOCK_BONUS.get(), 1, Optional.of(new QualityScalar(80)),Map.of())
+                                ))
                         ),
                         Optional.empty(),
                         false,
@@ -328,10 +324,10 @@ public class IronsJewelryRegistries {
                         JewelryTypeRegistry.RING.get(),
                         List.of(
                                 new PartIngredient(BAND_TEARSTONE, 4, 0, List.of(
-                                ), Optional.empty()),
+                                )),
                                 new PartIngredient(GEM_TEARSTONE, 4, 1, List.of(
-                                        new Bonus(BonusTypeRegistry.EFFECT_IMMUNITY_BONUS.get(), 1, Optional.empty())
-                                ), Optional.empty())
+                                        new Bonus(BonusTypeRegistry.EFFECT_IMMUNITY_BONUS.get(), 1)
+                                ))
                         ),
                         Optional.empty(),
                         false,

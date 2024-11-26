@@ -13,25 +13,25 @@
           "cooldown": {
             "base": 60.0,
             "scalar": 0.0
+          },
+          "parameterValue": {
+            "irons_jewelry:action": {
+              "action": {
+                "type": "irons_jewelry:apply_damage",
+                "amount": {
+                  "base": 1.0,
+                  "scalar": 0.5
+                },
+                "damageType": "minecraft:thorns"
+              },
+              "targetSelf": true
+            }
           }
         }
       ],
       "drawOrder": 0,
       "id": "irons_jewelry:band_barbed",
-      "materialCost": 8,
-      "parameterValue": {
-        "irons_jewelry:action": {
-          "action": {
-            "type": "irons_jewelry:apply_damage",
-            "amount": {
-              "base": 1.0,
-              "scalar": 0.5
-            },
-            "damageType": "minecraft:thorns"
-          },
-          "targetSelf": true
-        }
-      }
+      "materialCost": 8
     },
     {
       "drawOrder": 1,

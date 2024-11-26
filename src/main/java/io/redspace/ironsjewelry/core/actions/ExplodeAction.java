@@ -60,7 +60,6 @@ public record ExplodeAction(
             ParticleTypes.CODEC.fieldOf("small_particle").forGetter(ExplodeAction::smallParticle),
             ParticleTypes.CODEC.fieldOf("large_particle").forGetter(ExplodeAction::largeParticle),
             SoundEvent.CODEC.fieldOf("sound").forGetter(ExplodeAction::sound)
-
     ).apply(builder, ExplodeAction::new));
 
     @Override

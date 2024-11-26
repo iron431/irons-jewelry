@@ -108,7 +108,8 @@ public class CurioBaseItem extends Item implements ICurioItem {
             } else {
                 var mat = parts.get(currentPart);
                 materialComponent = Component.translatable(mat.value().descriptionId()).withStyle(ChatFormatting.DARK_AQUA);
-                var bonusContribution = pattern.bonuses().stream().filter(tuple -> tuple.getA().parameterValue().filter(map -> map.containsKey(tuple.getB().bonusType().getParameterType())).isEmpty() && tuple.getA().part().equals(currentPart)).findFirst();
+                var bonusContribution = pattern.bonuses().stream().filter(tuple ->
+                        !tuple.getB().parameterValue().containsKey(tuple.getB().bonusType().getParameterType()) && tuple.getA().part().equals(currentPart)).findFirst();
                 var qualityContribution = pattern.partForQuality().filter(partThatDrivesQuality -> partThatDrivesQuality.equals(currentPart));
                 if (bonusContribution.isPresent()) {
                     // if bonusContribution is present, the tuple's PartIngredient's #parameterValue is not

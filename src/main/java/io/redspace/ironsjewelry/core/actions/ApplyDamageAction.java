@@ -28,7 +28,6 @@ public record ApplyDamageAction(Holder<DamageType> damageType, QualityScalar amo
             QualityScalar.CODEC.fieldOf("amount").forGetter(ApplyDamageAction::amount),
             Codec.DOUBLE.optionalFieldOf("maximum").forGetter(ApplyDamageAction::maximumDamage),
             SoundEvent.CODEC.optionalFieldOf("sound").forGetter(ApplyDamageAction::soundEvent)
-
     ).apply(builder, ApplyDamageAction::new));
 
     @Override
