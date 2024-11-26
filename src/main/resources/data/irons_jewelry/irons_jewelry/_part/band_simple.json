@@ -1,8 +1,0 @@
-{
-  "descriptionId": "part.irons_jewelry.band_simple",
-  "allowedMaterialTypes": [
-    "metal"
-  ],
-  "paletteKey": "irons_jewelry:palettes/gold",
-  "baseTextureLocation": "irons_jewelry:item/base/gold_ring"
-}

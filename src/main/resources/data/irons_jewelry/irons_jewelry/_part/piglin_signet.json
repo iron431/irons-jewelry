@@ -1,8 +1,0 @@
-{
-  "descriptionId": "part.irons_jewelry.piglin_signet",
-  "allowedMaterialTypes": [
-    "gold"
-  ],
-  "paletteKey": "irons_jewelry:palettes/gold",
-  "baseTextureLocation": "irons_jewelry:item/base/piglin_signet"
-}

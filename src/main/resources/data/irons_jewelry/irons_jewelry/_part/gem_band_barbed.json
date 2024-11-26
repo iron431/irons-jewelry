@@ -1,8 +1,0 @@
-{
-  "descriptionId": "part.irons_jewelry.gem_band_barbed",
-  "allowedMaterialTypes": [
-    "gem"
-  ],
-  "paletteKey": "irons_jewelry:palettes/diamond",
-  "baseTextureLocation": "irons_jewelry:item/base/barbed_band_gem"
-}

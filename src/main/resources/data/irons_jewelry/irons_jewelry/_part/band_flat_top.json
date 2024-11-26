@@ -1,8 +1,0 @@
-{
-  "descriptionId": "part.irons_jewelry.band_flat_top",
-  "allowedMaterialTypes": [
-    "metal"
-  ],
-  "baseTextureLocation": "irons_jewelry:item/base/band_flat_top",
-  "paletteKey": "irons_jewelry:palettes/gold"
-}

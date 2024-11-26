@@ -1,9 +1,0 @@
-{
-  "descriptionId": "part.irons_jewelry.chain_simple_amulet",
-  "allowedMaterialTypes": [
-    "metal",
-    "strap"
-  ],
-  "paletteKey": "irons_jewelry:palettes/gold",
-  "baseTextureLocation": "irons_jewelry:item/base/chain_simple_amulet"
-}
