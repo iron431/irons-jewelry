@@ -24,9 +24,10 @@
         "translation": "action.irons_jewelry.explode.wind_burst",
         "affect_self": false,
         "radius": {
-          "base": 3,
+          "base": 2,
           "scalar": 1
         },
+        "knockback_multiplier": 2.5,
         "block_interaction": "none",
         "large_particle": {
           "type": "minecraft:gust_emitter_large"
