@@ -144,7 +144,8 @@ tasks.withType(ProcessResources).configureEach {
             attribute_lib_version  : attribute_lib_version,
             placebo_version        : placebo_version,
             spellbooks_version     : spellbooks_version,
-            atlas_api_version      : atlas_api_version
+            atlas_api_version      : atlas_api_version,
+            mod_logo_file          : mod_logo_file
     ]
     inputs.properties replaceProperties
 
