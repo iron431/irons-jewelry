@@ -108,8 +108,8 @@
   "bonus.irons_jewelry.on_projectile_hit_bonus.description": "On projectile hit, %s",
   "bonus.irons_jewelry.on_take_damage_bonus": "Action when Attacked",
   "bonus.irons_jewelry.on_take_damage_bonus.description": "When Attacked, %s",
-  "bonus.irons_jewelry.on_attack": "Action on Attack",
-  "bonus.irons_jewelry.on_attack.description": "On Attack, %s",
+  "bonus.irons_jewelry.on_attack_bonus": "Action on Attack",
+  "bonus.irons_jewelry.on_attack_bonus.description": "On Attack, %s",
 
   "action.irons_jewelry.apply_effect.name": "Apply Effect",
   "action.irons_jewelry.apply_effect.self": "Gain %s%s",
