@@ -9,7 +9,7 @@
           "bonusType": "irons_jewelry:attribute_bonus"
         },
         {
-          "bonusType": "irons_jewelry:on_attack",
+          "bonusType": "irons_jewelry:on_attack_bonus",
           "cooldown": {
             "base": 60.0,
             "scalar": 0.0
