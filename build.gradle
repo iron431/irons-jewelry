@@ -121,6 +121,8 @@ dependencies {
     localRuntime "dev.shadowsoffire:Placebo:${minecraft_version}-${placebo_version}"
 
     compileOnly "io.redspace:irons_spellbooks:${minecraft_version}-${spellbooks_version}:api"
+    implementation "curse.maven:apothic-enchanting-1063926:5609595"
+
 //    localRuntime "io.redspace:irons_spellbooks:${minecraft_version}-${spellbooks_version}"
 //    localRuntime "curse.maven:geckolib-388172:5605715"
 //    localRuntime "curse.maven:playeranimator-658587:5698755"
@@ -153,16 +155,42 @@ tasks.withType(ProcessResources).configureEach {
         expand replaceProperties
     }
 }
-
+java {
+    withSourcesJar()
+}
+artifacts {
+//    archives apiJar
+    archives sourcesJar
+}
 publishing {
+    tasks.publish.dependsOn 'build'
     publications {
-        register('mavenJava', MavenPublication) {
-            from components.java
+
+        mavenJava(MavenPublication) {
+            artifactId project.archivesBaseName
+            artifact jar
+            artifact sourcesJar
+//            artifact apiJar
         }
     }
+
     repositories {
         maven {
-            url "file://${project.projectDir}/repo"
+            name = "redspace"
+
+            if (project.version.endsWith('-SNAPSHOT')) {
+                url uri("https://code.redspace.io/snapshots")
+            } else {
+                url uri("https://code.redspace.io/releases")
+            }
+
+            credentials {
+                username = System.getenv("MAVEN_USER")
+                password = System.getenv("MAVEN_PASS")
+            }
+            authentication {
+                basic(BasicAuthentication)
+            }
         }
     }
 }

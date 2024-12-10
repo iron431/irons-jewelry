@@ -1,5 +1,6 @@
 package io.redspace.ironsjewelry.core;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import com.google.gson.GsonBuilder;
@@ -18,15 +19,14 @@ import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
 
 import java.util.Map;
-import java.util.Optional;
 
 public class MaterialModiferDataHandler extends SimpleJsonResourceReloadListener {
-    record Modifier(Holder<MaterialDefinition> targetMaterial, Map<IBonusParameterType<?>, Object> parameter) {
+    record Modifier(Holder<MaterialDefinition> targetMaterial, Map<IBonusParameterType<?>, Object> parameterOverrides) {
     }
 
     private static final Codec<Modifier> CODEC = RecordCodecBuilder.create(builder -> builder.group(
             IronsJewelryRegistries.Codecs.MATERIAL_REGISTRY_CODEC.fieldOf("targetMaterial").forGetter(Modifier::targetMaterial),
-            IBonusParameterType.BONUS_TO_INSTANCE_CODEC.fieldOf("parameters").forGetter(Modifier::parameter)
+            IBonusParameterType.BONUS_TO_INSTANCE_CODEC.fieldOf("bonusParameters").forGetter(Modifier::parameterOverrides)
     ).apply(builder, Modifier::new));
 
     private static Multimap<Holder<MaterialDefinition>, Modifier> INSTANCE;
@@ -58,13 +58,15 @@ public class MaterialModiferDataHandler extends SimpleJsonResourceReloadListener
 
     }
 
-    public static Optional<Object> getModifiedParameterValue(Holder<MaterialDefinition> material, IBonusParameterType<?> parameterType) {
+    public static Map<IBonusParameterType<?>, Object> getParametersWithOverrides(Holder<MaterialDefinition> material) {
+        ImmutableMap.Builder builder = ImmutableMap.builder().putAll(material.value().bonusParameters());
         for (Modifier modifier : INSTANCE.get(material)) {
-            var value = modifier.parameter.get(parameterType);
-            if (value != null) {
-                return Optional.of(value);
+            var overrides = modifier.parameterOverrides;
+            for (Map.Entry<IBonusParameterType<?>, Object> e : overrides.entrySet()) {
+                builder.put(e.getKey(), e.getValue());
             }
         }
-        return Optional.empty();
+        var map = builder.buildKeepingLast();
+        return (Map<IBonusParameterType<?>, Object>) map;
     }
 }

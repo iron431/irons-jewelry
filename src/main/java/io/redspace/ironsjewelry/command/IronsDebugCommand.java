@@ -38,16 +38,14 @@ public class IronsDebugCommand {
 
     public static void register(CommandDispatcher<CommandSourceStack> pDispatcher) {
 
-        var command = Commands.literal("ironsJewelry").requires((p_138819_) -> {
-            return p_138819_.hasPermission(2);
-        }).then(Commands.literal("learnPattern").then(Commands.argument("pattern", PatternCommandArgument.patternArgument()).suggests(PATTERN_SUGGESTIONS).executes((commandContext) -> {
-            return learnPattern(commandContext.getSource(), commandContext.getArgument("pattern", String.class));
-        })).then(Commands.literal("all").executes(context -> learnAllPatterns(context.getSource()))
-        ).then(Commands.literal("unlearnAll").executes(context -> unlearnAllPatterns(context.getSource()))
-        )).then(Commands.literal("createPatternItem").then(Commands.argument("pattern", PatternCommandArgument.patternArgument()).suggests(PATTERN_SUGGESTIONS).executes((commandContext) -> {
-                    return createPatternItem(commandContext.getSource(), commandContext.getArgument("pattern", String.class));
-                }))
-        );
+        var command = Commands.literal("ironsJewelry").requires((p_138819_) -> p_138819_.hasPermission(2)).
+                then(Commands.literal("learnPattern")
+                        .then(Commands.argument("pattern", PatternCommandArgument.patternArgument()).suggests(PATTERN_SUGGESTIONS).executes((commandContext) -> learnPattern(commandContext.getSource(), commandContext.getArgument("pattern", String.class)))).then(Commands.literal("all").executes(context -> learnAllPatterns(context.getSource())))
+                        .then(Commands.literal("unlearnAll").executes(context -> unlearnAllPatterns(context.getSource()))))
+                .then(Commands.literal("createPatternItem").then(Commands.argument("pattern", PatternCommandArgument.patternArgument()).suggests(PATTERN_SUGGESTIONS).executes((commandContext) -> {
+                            return createPatternItem(commandContext.getSource(), commandContext.getArgument("pattern", String.class));
+                        }))
+                );
 
         if (!FMLLoader.isProduction()) {
             command.then(Commands.literal("countCombos").executes((commandContext) -> {

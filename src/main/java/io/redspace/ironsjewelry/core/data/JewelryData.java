@@ -3,6 +3,7 @@ package io.redspace.ironsjewelry.core.data;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.redspace.ironsjewelry.core.BonusType;
+import io.redspace.ironsjewelry.core.MaterialModiferDataHandler;
 import io.redspace.ironsjewelry.registry.ComponentRegistry;
 import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
 import net.minecraft.core.Holder;
@@ -149,7 +150,7 @@ public class JewelryData {
         return new BonusInstance(
                 tuple.getB().bonusType(),
                 pattern.value().qualityMultiplier() * tuple.getB().qualityMultiplier() * pattern.value().partForQuality().map(PartDefinition -> this.parts.get(PartDefinition).value().quality()).orElse(1d),
-                tuple.getB().parameterValue().containsKey(tuple.getB().bonusType().getParameterType()) ? tuple.getB().parameterValue() : (this.parts.get(tuple.getA().part()).value().bonusParameters()),
+                tuple.getB().parameterValue().containsKey(tuple.getB().bonusType().getParameterType()) ? tuple.getB().parameterValue() : MaterialModiferDataHandler.getParametersWithOverrides(this.parts.get(tuple.getA().part())),
                 tuple.getB().cooldown()
         );
     }
