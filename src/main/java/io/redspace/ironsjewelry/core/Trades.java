@@ -39,10 +39,13 @@ public class Trades {
 
     public static int calculateJewelryPrice(ItemStack stack, RandomSource randomSource) {
         var jewelryData = stack.get(ComponentRegistry.JEWELRY_COMPONENT);
-        if (jewelryData != null) {
-            int cost = (int) (randomSource.nextIntBetweenInclusive(8, 13) * jewelryData.pattern().value().qualityMultiplier());
+        if (jewelryData != null && jewelryData.isValid()) {
+            int cost = (int) (12 * jewelryData.pattern().value().qualityMultiplier());
             for (Holder<MaterialDefinition> part : jewelryData.parts().values()) {
-                cost += (int) (6 * part.value().quality());
+                cost += (int) (4 * part.value().quality());
+            }
+            if (jewelryData.pattern().value().partForQuality().isPresent()) {
+                cost = (int) (cost * jewelryData.parts().get(jewelryData.pattern().value().partForQuality().get()).value().quality());
             }
             return cost;
         }
@@ -143,9 +146,21 @@ public class Trades {
                 var items = loottable.getRandomItems(context);
                 if (!items.isEmpty()) {
                     var stack = items.getFirst();
-                    var price = itemCostFunction.apply(stack, pRandom);
-                    Optional<ItemCost> secondPrice = price > 64 ? Optional.of(new ItemCost(Items.EMERALD, price - 64)) : Optional.empty();
-                    return new MerchantOffer(new ItemCost(Items.EMERALD, Math.min(price, 64)), secondPrice, stack, this.maxUses, this.villagerXp, this.priceMultiplier);
+                    int price = itemCostFunction.apply(stack, pRandom);
+                    ItemCost primaryCost;
+                    Optional<ItemCost> secondaryCost = Optional.empty();
+                    if (price > 64 * 9) {
+                        price /= 9;
+                        primaryCost = new ItemCost(Items.EMERALD_BLOCK, 64);
+                        secondaryCost = Optional.of(new ItemCost(Items.EMERALD_BLOCK, price - 64));
+                    } else if (price > 64) {
+                        int blocks = price / 9;
+                        primaryCost = new ItemCost(Items.EMERALD_BLOCK, blocks);
+                        secondaryCost = Optional.of(new ItemCost(Items.EMERALD, price % 9));
+                    } else {
+                        primaryCost = new ItemCost(Items.EMERALD, price);
+                    }
+                    return new MerchantOffer(primaryCost, secondaryCost, stack, this.maxUses, this.villagerXp, this.priceMultiplier);
                 }
             }
             return null;
@@ -162,7 +177,7 @@ public class Trades {
                     var set = options.get();
                     var item = set.getRandomElement(pRandom);
                     if (item.isPresent()) {
-                        return new MerchantOffer(new ItemCost(item.get().value(), buyCount), new ItemStack(Items.EMERALD,emeraldCost), this.maxUses, this.villagerXp, this.priceMultiplier);
+                        return new MerchantOffer(new ItemCost(item.get().value(), buyCount), new ItemStack(Items.EMERALD, emeraldCost), this.maxUses, this.villagerXp, this.priceMultiplier);
                     }
                 }
             }
