@@ -105,7 +105,7 @@ public class JewelcraftingStationMenu extends AbstractContainerMenu {
                     }
                     slot.remove(slot.currentCost);
                 }
-                pPlayer.level.playLocalSound(pPlayer.blockPosition(), SoundEvents.SMITHING_TABLE_USE, SoundSource.BLOCKS, 1.0F, pPlayer.level.random.nextFloat() * 0.1F + 0.9F, false);
+                pPlayer.level.playLocalSound(pPlayer.blockPosition(), SoundEvents.SMITHING_TABLE_USE, SoundSource.BLOCKS, 1.0F, pPlayer.getRandom().nextFloat() * 0.1F + 0.9F, false);
                 JewelcraftingStationMenu.this.setupResult();
             }
         });

@@ -3,6 +3,7 @@ package io.redspace.ironsjewelry.core.data;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.redspace.ironsjewelry.core.BonusType;
+import io.redspace.ironsjewelry.core.IBonusParameterType;
 import io.redspace.ironsjewelry.core.MaterialModiferDataHandler;
 import io.redspace.ironsjewelry.registry.ComponentRegistry;
 import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
@@ -18,6 +19,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -143,15 +145,36 @@ public class JewelryData {
         if (!valid) {
             return List.of();
         }
-        return pattern.value().bonuses().stream().map(this::getBonusFor).toList();
+        return pattern.value().bonuses().stream().map(this::getBonusFor).filter(inst -> !inst.parameter().isEmpty()).toList();
     }
 
     public BonusInstance getBonusFor(Tuple<PartIngredient, Bonus> tuple) {
+        Bonus bonus = tuple.getB();
+        // Get type directly from bonus instance
+        BonusType type = bonus.bonusType();
+        // Calculate total quality based on the pattern's multiplier, the bonus instance multiplier, and the partForQuality's quality
+        double totalQuality = pattern.value().qualityMultiplier() *
+                bonus.qualityMultiplier() *
+                pattern.value().partForQuality().map(PartDefinition -> this.parts.get(PartDefinition).value().quality()).orElse(1d);
+        // Get cooldown directly from bonus instance
+        Optional<QualityScalar> cooldown = bonus.cooldown();
+        // Get all the parameters from either the bonus instance override (if present), or this part's material's bonuses
+        Map<IBonusParameterType<?>, Object> allParameters = bonus.parameterValue().containsKey(bonus.bonusType().getParameterType()) ?
+                bonus.parameterValue() :
+                MaterialModiferDataHandler.getParametersWithOverrides(this.parts.get(tuple.getA().part()));
+        Map<IBonusParameterType<?>, Object> parameter;
+        // Filter data into just the bonus we need, or empty if it is not present
+        if (allParameters.containsKey(type.getParameterType())) {
+            parameter = Map.of(type.getParameterType(), allParameters.get(type.getParameterType()));
+        } else {
+            parameter = Map.of();
+        }
+
         return new BonusInstance(
-                tuple.getB().bonusType(),
-                pattern.value().qualityMultiplier() * tuple.getB().qualityMultiplier() * pattern.value().partForQuality().map(PartDefinition -> this.parts.get(PartDefinition).value().quality()).orElse(1d),
-                tuple.getB().parameterValue().containsKey(tuple.getB().bonusType().getParameterType()) ? tuple.getB().parameterValue() : MaterialModiferDataHandler.getParametersWithOverrides(this.parts.get(tuple.getA().part())),
-                tuple.getB().cooldown()
+                type,
+                totalQuality,
+                parameter,
+                cooldown
         );
     }
 
