@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:barter",
+  "pools": [
+    {
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "irons_jewelry:set_held_pattern",
+              "patterns": "#irons_jewelry:nether_lootable"
+            }
+          ],
+          "weight": 5,
+          "name": "irons_jewelry:recipe"
+        }
+      ],
+      "rolls": 1
+    }
+  ]
+}

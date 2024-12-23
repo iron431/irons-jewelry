@@ -9,6 +9,7 @@
     "irons_jewelry:chest_loot/patterns/nether_patterns",
     "irons_jewelry:chest_loot/patterns/nether_treasure_patterns",
     "irons_jewelry:chest_loot/patterns/stronghold_patterns",
-    "irons_jewelry:chest_loot/patterns/vanilla_generic_patterns"
+    "irons_jewelry:chest_loot/patterns/vanilla_generic_patterns",
+    "irons_jewelry:entity_drops/piglin_barter_replacement"
   ]
 }

@@ -4,6 +4,7 @@ import com.mojang.serialization.MapCodec;
 import io.redspace.ironsjewelry.IronsJewelry;
 import io.redspace.ironsjewelry.loot.AppendLootModifier;
 import io.redspace.ironsjewelry.loot.GenerateJewelryLootFunction;
+import io.redspace.ironsjewelry.loot.ReplaceLootModifier;
 import io.redspace.ironsjewelry.loot.SetHeldPatternLootFunction;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
@@ -24,6 +25,7 @@ public class LootRegistry {
             LOOT_FUNCTIONS.register("generate_jewelry", () -> new LootItemFunctionType<>(GenerateJewelryLootFunction.CODEC));
 
     public static final Supplier<MapCodec<? extends IGlobalLootModifier>> APPEND_LOOT_MODIFIER = LOOT_MODIFIER_SERIALIZERS.register("append_loot", AppendLootModifier.CODEC);
+    public static final Supplier<MapCodec<? extends IGlobalLootModifier>> REPLACE_LOOT_MODIFIER = LOOT_MODIFIER_SERIALIZERS.register("replace_loot", ReplaceLootModifier.CODEC);
 
     public static void register(IEventBus modEventBus) {
         LOOT_FUNCTIONS.register(modEventBus);

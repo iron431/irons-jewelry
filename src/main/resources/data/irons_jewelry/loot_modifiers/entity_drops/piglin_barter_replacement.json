@@ -1,0 +1,16 @@
+{
+  "type": "irons_jewelry:replace_loot",
+  "conditions": [
+    {
+      "condition": "minecraft:any_of",
+      "terms": [
+        {
+          "condition": "neoforge:loot_table_id",
+          "loot_table_id": "minecraft:gameplay/piglin_bartering"
+        }
+      ]
+    }
+  ],
+  "key": "irons_jewelry:modifiers/piglin_barter_replacement",
+  "chanceToReplace": 0.0025
+}
