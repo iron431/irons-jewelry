@@ -1,7 +1,7 @@
 package io.redspace.ironsjewelry;
 
 import com.mojang.logging.LogUtils;
-import io.redspace.ironsjewelry.core.MaterialModiferDataHandler;
+import io.redspace.ironsjewelry.core.MaterialModifierDataHandler;
 import io.redspace.ironsjewelry.registry.*;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
@@ -40,7 +40,7 @@ public class IronsJewelry {
     }
 
     public static void registerReloadListeners(AddReloadListenerEvent event) {
-        event.addListener(new MaterialModiferDataHandler());
+        event.addListener(new MaterialModifierDataHandler());
     }
 
     public static ResourceLocation id(String path) {

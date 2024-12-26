@@ -20,18 +20,19 @@ import net.minecraft.util.profiling.ProfilerFiller;
 
 import java.util.Map;
 
-public class MaterialModiferDataHandler extends SimpleJsonResourceReloadListener {
-    record Modifier(Holder<MaterialDefinition> targetMaterial, Map<IBonusParameterType<?>, Object> parameterOverrides) {
+public class MaterialModifierDataHandler extends SimpleJsonResourceReloadListener {
+    public record Modifier(Holder<MaterialDefinition> targetMaterial,
+                           Map<IBonusParameterType<?>, Object> parameterOverrides) {
     }
 
-    private static final Codec<Modifier> CODEC = RecordCodecBuilder.create(builder -> builder.group(
+    public static final Codec<Modifier> CODEC = RecordCodecBuilder.create(builder -> builder.group(
             IronsJewelryRegistries.Codecs.MATERIAL_REGISTRY_CODEC.fieldOf("targetMaterial").forGetter(Modifier::targetMaterial),
             IBonusParameterType.BONUS_TO_INSTANCE_CODEC.fieldOf("bonusParameters").forGetter(Modifier::parameterOverrides)
     ).apply(builder, Modifier::new));
 
     private static Multimap<Holder<MaterialDefinition>, Modifier> INSTANCE;
 
-    public MaterialModiferDataHandler() {
+    public MaterialModifierDataHandler() {
         super(new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create(), "irons_jewelry/material_modifier");
     }
 
@@ -59,6 +60,9 @@ public class MaterialModiferDataHandler extends SimpleJsonResourceReloadListener
     }
 
     public static Map<IBonusParameterType<?>, Object> getParametersWithOverrides(Holder<MaterialDefinition> material) {
+        if (INSTANCE == null) {
+            return material.value().bonusParameters();
+        }
         ImmutableMap.Builder builder = ImmutableMap.builder().putAll(material.value().bonusParameters());
         for (Modifier modifier : INSTANCE.get(material)) {
             var overrides = modifier.parameterOverrides;
