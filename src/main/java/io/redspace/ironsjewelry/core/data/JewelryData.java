@@ -4,7 +4,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.redspace.ironsjewelry.core.BonusType;
 import io.redspace.ironsjewelry.core.IBonusParameterType;
-import io.redspace.ironsjewelry.core.MaterialModiferDataHandler;
+import io.redspace.ironsjewelry.core.MaterialModifierDataHandler;
 import io.redspace.ironsjewelry.registry.ComponentRegistry;
 import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
 import net.minecraft.core.Holder;
@@ -161,7 +161,7 @@ public class JewelryData {
         // Get all the parameters from either the bonus instance override (if present), or this part's material's bonuses
         Map<IBonusParameterType<?>, Object> allParameters = bonus.parameterValue().containsKey(bonus.bonusType().getParameterType()) ?
                 bonus.parameterValue() :
-                MaterialModiferDataHandler.getParametersWithOverrides(this.parts.get(tuple.getA().part()));
+                MaterialModifierDataHandler.getParametersWithOverrides(this.parts.get(tuple.getA().part()));
         Map<IBonusParameterType<?>, Object> parameter;
         // Filter data into just the bonus we need, or empty if it is not present
         if (allParameters.containsKey(type.getParameterType())) {
