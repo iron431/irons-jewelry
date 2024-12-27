@@ -53,17 +53,56 @@ public class CurioBaseItem extends Item implements ICurioItem {
 
     @Override
     public List<Component> getAttributesTooltip(List<Component> tooltips, ItemStack stack) {
-        var tooltip = ICurioItem.super.getAttributesTooltip(tooltips, stack);
-        boolean needHeader = tooltip.isEmpty();
-        JewelryData.ifPresent(stack, (jewelryData) -> {
-            var bonuses = jewelryData.getBonuses();
-            if (needHeader && !bonuses.isEmpty()) {
-                tooltips.add(Component.empty());
-                tooltips.add(Component.translatable("curios.modifiers." + slotIdentifier).withStyle(ChatFormatting.GOLD));
-            }
-            bonuses.forEach(bonus -> tooltips.addAll(bonus.getTooltipDescription()));
-        });
-        return tooltip;
+        //todo: delete this when adorned updates
+        var jewelryData = JewelryData.get(stack);
+        if (!jewelryData.isValid()) {
+            return List.of();
+        }
+        var shiftTooltip = new ArrayList<Component>();
+        if (ClientEvents.isIsShiftKeyDown()) {
+            shiftTooltip.add(Component.translatable("tooltip.irons_jewelry.hold_shift", Component.translatable("key.keyboard.left.shift").withStyle(ChatFormatting.WHITE)).withStyle(ChatFormatting.GRAY));
+            shiftTooltip.addAll(getShiftDescription(jewelryData.pattern().value(), jewelryData.parts(), Optional.empty()));
+        } else {
+            shiftTooltip.add(Component.translatable("tooltip.irons_jewelry.hold_shift", Component.translatable("key.keyboard.left.shift").withStyle(ChatFormatting.DARK_GRAY)).withStyle(ChatFormatting.GRAY));
+        }
+        var attrTooltip = ICurioItem.super.getAttributesTooltip(tooltips, stack);
+        boolean needHeader = attrTooltip.isEmpty();
+        var bonuses = jewelryData.getBonuses();
+        if (needHeader && !bonuses.isEmpty()) {
+            attrTooltip.add(Component.empty());
+            attrTooltip.add(Component.translatable("curios.modifiers." + slotIdentifier).withStyle(ChatFormatting.GOLD));
+        }
+        bonuses.forEach(bonus -> attrTooltip.addAll(bonus.getTooltipDescription()));
+
+        shiftTooltip.addAll(attrTooltip);
+        return shiftTooltip;
+    }
+
+    @Override
+    public List<Component> getAttributesTooltip(List<Component> tooltips, TooltipContext tooltipContext, ItemStack stack) {
+        //todo: abstract this out into helper and override deprecated method for cross-curio-port compat
+        var jewelryData = JewelryData.get(stack);
+        if (!jewelryData.isValid()) {
+            return List.of();
+        }
+        var shiftTooltip = new ArrayList<Component>();
+        if (ClientEvents.isIsShiftKeyDown()) {
+            shiftTooltip.add(Component.translatable("tooltip.irons_jewelry.hold_shift", Component.translatable("key.keyboard.left.shift").withStyle(ChatFormatting.WHITE)).withStyle(ChatFormatting.GRAY));
+            shiftTooltip.addAll(getShiftDescription(jewelryData.pattern().value(), jewelryData.parts(), Optional.empty()));
+        } else {
+            shiftTooltip.add(Component.translatable("tooltip.irons_jewelry.hold_shift", Component.translatable("key.keyboard.left.shift").withStyle(ChatFormatting.DARK_GRAY)).withStyle(ChatFormatting.GRAY));
+        }
+        var attrTooltip = ICurioItem.super.getAttributesTooltip(tooltips, tooltipContext, stack);
+        boolean needHeader = attrTooltip.isEmpty();
+        var bonuses = jewelryData.getBonuses();
+        if (needHeader && !bonuses.isEmpty()) {
+            attrTooltip.add(Component.empty());
+            attrTooltip.add(Component.translatable("curios.modifiers." + slotIdentifier).withStyle(ChatFormatting.GOLD));
+        }
+        bonuses.forEach(bonus -> attrTooltip.addAll(bonus.getTooltipDescription()));
+
+        shiftTooltip.addAll(attrTooltip);
+        return shiftTooltip;
     }
 
     @Override
@@ -72,20 +111,6 @@ public class CurioBaseItem extends Item implements ICurioItem {
             itemStack.set(DataComponents.ITEM_NAME, JewelryData.get(itemStack).getItemName());
         }
         return Optional.ofNullable(itemStack.get(DataComponents.ITEM_NAME)).orElse(super.getName(itemStack));
-    }
-
-    @Override
-    public void appendHoverText(ItemStack pStack, TooltipContext pContext, List<Component> pTooltipComponents, TooltipFlag pTooltipFlag) {
-        super.appendHoverText(pStack, pContext, pTooltipComponents, pTooltipFlag);
-        var jewelryData = JewelryData.get(pStack);
-        if (jewelryData.isValid()) {
-            if (ClientEvents.isIsShiftKeyDown()) {
-                pTooltipComponents.add(Component.translatable("tooltip.irons_jewelry.hold_shift", Component.translatable("key.keyboard.left.shift").withStyle(ChatFormatting.WHITE)).withStyle(ChatFormatting.GRAY));
-                pTooltipComponents.addAll(getShiftDescription(jewelryData.pattern().value(), jewelryData.parts(), Optional.empty()));
-            } else {
-                pTooltipComponents.add(Component.translatable("tooltip.irons_jewelry.hold_shift", Component.translatable("key.keyboard.left.shift").withStyle(ChatFormatting.DARK_GRAY)).withStyle(ChatFormatting.GRAY));
-            }
-        }
     }
 
     public static List<Component> getShiftDescription(PatternDefinition pattern, Map<Holder<PartDefinition>, Holder<MaterialDefinition>> parts, Optional<List<Integer>> materialCost) {
