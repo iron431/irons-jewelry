@@ -115,9 +115,9 @@ dependencies {
     compileOnly "mezz.jei:jei-${minecraft_version}-neoforge-api:${jei_version}"
     runtimeOnly "mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}"
 
-    implementation 'top.theillusivec4.curios:curios-neoforge:9.0.15+1.21.1'
+    implementation "top.theillusivec4.curios:curios-neoforge:${curios_version}+${minecraft_version}"
 
-//    implementation "curse.maven:adorned-1036809:5684431"
+
     localRuntime "curse.maven:atlasviewer-633577:5490697"
     localRuntime "curse.maven:ato-405593:5500624"
 
@@ -151,6 +151,7 @@ tasks.withType(ProcessResources).configureEach {
             spellbooks_version     : spellbooks_version,
             atlas_api_version      : atlas_api_version,
             jei_version            : jei_version,
+            curios_version         : curios_version,
             mod_logo_file          : mod_logo_file
     ]
     inputs.properties replaceProperties
