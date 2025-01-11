@@ -37,8 +37,8 @@ repositories {
         }
     }
     maven {
-        name = "OctoStudios"
-        url = uri("https://maven.octo-studios.com/releases")
+        name = "Illusive Soulworks maven"
+        url = "https://maven.theillusivec4.top/"
     }
 
     maven { url = "https://maven.blamejared.com" }
@@ -116,7 +116,6 @@ dependencies {
     runtimeOnly "mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}"
 
     implementation "top.theillusivec4.curios:curios-neoforge:${curios_version}+${minecraft_version}"
-
 
     localRuntime "curse.maven:atlasviewer-633577:5490697"
     localRuntime "curse.maven:ato-405593:5500624"
