@@ -7,11 +7,13 @@ import io.redspace.ironsjewelry.registry.BlockRegistry;
 import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
 import io.redspace.ironsjewelry.registry.ItemRegistry;
 import mezz.jei.api.IModPlugin;
-import mezz.jei.api.ingredients.subtypes.IIngredientSubtypeInterpreter;
+import mezz.jei.api.ingredients.subtypes.ISubtypeInterpreter;
+import mezz.jei.api.ingredients.subtypes.UidContext;
 import mezz.jei.api.registration.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
 @mezz.jei.api.JeiPlugin
 public class JeiPlugin implements IModPlugin {
@@ -48,8 +50,21 @@ public class JeiPlugin implements IModPlugin {
         registration.addRecipeCatalyst(new ItemStack(BlockRegistry.JEWELCRAFTING_STATION_BLOCK.get()), JewelcraftingJeiRecipeCategory.RECIPE_TYPE);
     }
 
-    public static final IIngredientSubtypeInterpreter<ItemStack> JEWELRY_INTERPRETER = (stack, context) -> {
-        return JewelryData.get(stack).pattern().getKey().location().toString();
+    public static final ISubtypeInterpreter<ItemStack> JEWELRY_INTERPRETER = new ISubtypeInterpreter<ItemStack>() {
+        @Override
+        public @Nullable String getSubtypeData(ItemStack ingredient, UidContext context) {
+            var pattern = JewelryData.get(ingredient).pattern().getKey();
+            if (pattern != null) {
+                return pattern.location().toString();
+            }
+
+            return null;
+        }
+
+        @Override
+        public String getLegacyStringSubtypeInfo(ItemStack ingredient, UidContext context) {
+            return getSubtypeData(ingredient, context);
+        }
     };
 }
 
