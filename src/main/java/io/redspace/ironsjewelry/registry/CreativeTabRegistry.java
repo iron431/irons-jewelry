@@ -1,6 +1,9 @@
 package io.redspace.ironsjewelry.registry;
 
 import io.redspace.ironsjewelry.IronsJewelry;
+import io.redspace.ironsjewelry.core.data.PatternDefinition;
+import io.redspace.ironsjewelry.item.PatternRecipeItem;
+import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
@@ -26,13 +29,10 @@ public class CreativeTabRegistry {
             event.accept(ItemRegistry.PERIDOT.get());
             event.accept(ItemRegistry.ONYX.get());
             event.accept(ItemRegistry.GARNET.get());
+
+            event.getParameters().holders().lookup(IronsJewelryRegistries.Keys.PATTERN_REGISTRY_KEY).ifPresent(patternRegistry->{
+                patternRegistry.listElements().filter(pattern->pattern.isBound() && !pattern.value().unlockedByDefault()).forEach(pattern->event.accept(PatternRecipeItem.of(pattern)));
+            });
         }
     }
-//    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> EXAMPLE_TAB = CREATIVE_MODE_TABS.register("example_tab", () -> CreativeModeTab.builder()
-//            .title(Component.translatable("itemGroup.examplemod")) //The language key for the title of your CreativeModeTab
-//            .withTabsBefore(CreativeModeTabs.COMBAT)
-//            .icon(() -> EXAMPLE_ITEM.get().getDefaultInstance())
-//            .displayItems((parameters, output) -> {
-//                output.accept(EXAMPLE_ITEM.get()); // Add the example item to the tab. For your own tabs, this method is preferred over the event
-//            }).build());
 }

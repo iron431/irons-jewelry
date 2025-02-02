@@ -1,10 +1,13 @@
 package io.redspace.ironsjewelry.item;
 
 import io.redspace.ironsjewelry.core.MinecraftInstanceHelper;
+import io.redspace.ironsjewelry.core.data.PatternDefinition;
 import io.redspace.ironsjewelry.core.data.PlayerData;
 import io.redspace.ironsjewelry.registry.ComponentRegistry;
 import io.redspace.ironsjewelry.registry.DataAttachmentRegistry;
+import io.redspace.ironsjewelry.registry.ItemRegistry;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundSetActionBarTextPacket;
 import net.minecraft.server.level.ServerPlayer;
@@ -71,5 +74,11 @@ public class PatternRecipeItem extends Item {
                 }
             }
         }
+    }
+
+    public static ItemStack of(Holder<PatternDefinition> patternDefinitionHolder) {
+        ItemStack stack = new ItemStack(ItemRegistry.RECIPE);
+        stack.set(ComponentRegistry.STORED_PATTERN, patternDefinitionHolder);
+        return stack;
     }
 }

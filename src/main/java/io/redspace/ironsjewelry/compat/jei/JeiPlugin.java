@@ -4,6 +4,7 @@ import io.redspace.ironsjewelry.IronsJewelry;
 import io.redspace.ironsjewelry.block.jewelcrafting_station.JewelcraftingStationScreen;
 import io.redspace.ironsjewelry.core.data.JewelryData;
 import io.redspace.ironsjewelry.registry.BlockRegistry;
+import io.redspace.ironsjewelry.registry.ComponentRegistry;
 import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
 import io.redspace.ironsjewelry.registry.ItemRegistry;
 import mezz.jei.api.IModPlugin;
@@ -43,6 +44,7 @@ public class JeiPlugin implements IModPlugin {
     public void registerItemSubtypes(ISubtypeRegistration registration) {
         registration.registerSubtypeInterpreter(ItemRegistry.RING.get(), JEWELRY_INTERPRETER);
         registration.registerSubtypeInterpreter(ItemRegistry.NECKLACE.get(), JEWELRY_INTERPRETER);
+        registration.registerSubtypeInterpreter(ItemRegistry.RECIPE.get(), PATTERN_INTERPRETER);
     }
 
     @Override
@@ -56,6 +58,22 @@ public class JeiPlugin implements IModPlugin {
             var pattern = JewelryData.get(ingredient).pattern().getKey();
             if (pattern != null) {
                 return pattern.location().toString();
+            }
+
+            return null;
+        }
+
+        @Override
+        public String getLegacyStringSubtypeInfo(ItemStack ingredient, UidContext context) {
+            return getSubtypeData(ingredient, context);
+        }
+    };
+    public static final ISubtypeInterpreter<ItemStack> PATTERN_INTERPRETER = new ISubtypeInterpreter<ItemStack>() {
+        @Override
+        public @Nullable String getSubtypeData(ItemStack ingredient, UidContext context) {
+            var pattern = ingredient.get(ComponentRegistry.STORED_PATTERN);
+            if (pattern != null && pattern.getKey() != null) {
+                return pattern.getKey().location().toString();
             }
 
             return null;
