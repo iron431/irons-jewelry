@@ -208,6 +208,8 @@ public class JewelryData {
 
     @Override
     public boolean equals(Object obj) {
-        return obj != null && this.hashCode() == obj.hashCode();
+        return obj instanceof JewelryData other
+                && this.pattern.equals(other.pattern)
+                && this.parts.equals(other.parts);
     }
 }
