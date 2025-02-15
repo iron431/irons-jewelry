@@ -147,20 +147,22 @@ public class Trades {
                 if (!items.isEmpty()) {
                     var stack = items.getFirst();
                     int price = itemCostFunction.apply(stack, pRandom);
-                    ItemCost primaryCost;
-                    Optional<ItemCost> secondaryCost = Optional.empty();
-                    if (price > 64 * 9) {
-                        price /= 9;
-                        primaryCost = new ItemCost(Items.EMERALD_BLOCK, 64);
-                        secondaryCost = Optional.of(new ItemCost(Items.EMERALD_BLOCK, price - 64));
-                    } else if (price > 64) {
-                        int blocks = price / 9;
-                        primaryCost = new ItemCost(Items.EMERALD_BLOCK, blocks);
-                        secondaryCost = Optional.of(new ItemCost(Items.EMERALD, price % 9));
-                    } else {
-                        primaryCost = new ItemCost(Items.EMERALD, price);
+                    if (price > 0) {
+                        ItemCost primaryCost;
+                        Optional<ItemCost> secondaryCost = Optional.empty();
+                        if (price > 64 * 9) {
+                            price /= 9;
+                            primaryCost = new ItemCost(Items.EMERALD_BLOCK, 64);
+                            secondaryCost = Optional.of(new ItemCost(Items.EMERALD_BLOCK, price - 64));
+                        } else if (price > 64) {
+                            int blocks = price / 9;
+                            primaryCost = new ItemCost(Items.EMERALD_BLOCK, blocks);
+                            secondaryCost = Optional.of(new ItemCost(Items.EMERALD, price % 9));
+                        } else {
+                            primaryCost = new ItemCost(Items.EMERALD, price);
+                        }
+                        return new MerchantOffer(primaryCost, secondaryCost, stack, this.maxUses, this.villagerXp, this.priceMultiplier);
                     }
-                    return new MerchantOffer(primaryCost, secondaryCost, stack, this.maxUses, this.villagerXp, this.priceMultiplier);
                 }
             }
             return null;
