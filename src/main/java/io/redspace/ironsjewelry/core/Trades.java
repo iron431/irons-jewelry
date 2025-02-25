@@ -52,80 +52,6 @@ public class Trades {
         return 0;
     }
 
-    public static class SellItem implements VillagerTrades.ItemListing {
-        private final ItemStack itemStack;
-        private final int emeraldCost;
-        private final int maxUses;
-        private final int villagerXp;
-        private final float priceMultiplier;
-        private final Optional<ResourceKey<EnchantmentProvider>> enchantmentProvider;
-
-        public SellItem(Block pBlock, int pEmeraldCost, int pNumberOfItems, int pMaxUses, int pVillagerXp) {
-            this(new ItemStack(pBlock), pEmeraldCost, pNumberOfItems, pMaxUses, pVillagerXp);
-        }
-
-        public SellItem(Item pItem, int pEmeraldCost, int pNumberOfItems, int pVillagerXp) {
-            this(new ItemStack(pItem), pEmeraldCost, pNumberOfItems, 12, pVillagerXp);
-        }
-
-        public SellItem(Item pItem, int pEmeraldCost, int pNumberOfItems, int pMaxUses, int pVillagerXp) {
-            this(new ItemStack(pItem), pEmeraldCost, pNumberOfItems, pMaxUses, pVillagerXp);
-        }
-
-        public SellItem(ItemStack pItemStack, int pEmeraldCost, int pNumberOfItems, int pMaxUses, int pVillagerXp) {
-            this(pItemStack, pEmeraldCost, pNumberOfItems, pMaxUses, pVillagerXp, 0.05F);
-        }
-
-        public SellItem(Item pItem, int pEmeraldCost, int pNumberOfItems, int pMaxUses, int pVillagerXp, float pPriceMultiplier) {
-            this(new ItemStack(pItem), pEmeraldCost, pNumberOfItems, pMaxUses, pVillagerXp, pPriceMultiplier);
-        }
-
-        public SellItem(
-                Item pItem, int pEmeraldCost, int pNumberOfItems, int pMaxUses, int pVillagerXp, float pPriceMultiplier, ResourceKey<EnchantmentProvider> pEnchantmentProvider
-        ) {
-            this(new ItemStack(pItem), pEmeraldCost, pNumberOfItems, pMaxUses, pVillagerXp, pPriceMultiplier, Optional.of(pEnchantmentProvider));
-        }
-
-        public SellItem(ItemStack pItemStack, int pEmeraldCost, int pNumberOfItems, int pMaxUses, int pVillagerXp, float pPriceMultiplier) {
-            this(pItemStack, pEmeraldCost, pNumberOfItems, pMaxUses, pVillagerXp, pPriceMultiplier, Optional.empty());
-        }
-
-        public SellItem(
-                ItemStack pItemStack,
-                int pEmeraldCost,
-                int pNumberOfItems,
-                int pMaxUses,
-                int pVillagerXp,
-                float pPriceMultiplier,
-                Optional<ResourceKey<EnchantmentProvider>> pEnchantmentProvider
-        ) {
-            this.itemStack = pItemStack;
-            this.emeraldCost = pEmeraldCost;
-            this.itemStack.setCount(pNumberOfItems);
-            this.maxUses = pMaxUses;
-            this.villagerXp = pVillagerXp;
-            this.priceMultiplier = pPriceMultiplier;
-            this.enchantmentProvider = pEnchantmentProvider;
-        }
-
-        @Override
-        public MerchantOffer getOffer(Entity pTrader, RandomSource pRandom) {
-            ItemStack itemstack = this.itemStack.copy();
-            Level level = pTrader.level();
-            this.enchantmentProvider
-                    .ifPresent(
-                            p_348340_ -> EnchantmentHelper.enchantItemFromProvider(
-                                    itemstack,
-                                    level.registryAccess(),
-                                    (ResourceKey<EnchantmentProvider>) p_348340_,
-                                    level.getCurrentDifficultyAt(pTrader.blockPosition()),
-                                    pRandom
-                            )
-                    );
-            return new MerchantOffer(new ItemCost(Items.EMERALD, this.emeraldCost), itemstack, this.maxUses, this.villagerXp, this.priceMultiplier);
-        }
-    }
-
     public record BuyItem(Item toBuy, int toBuyCount, int emeraldCost, int maxUses, int villagerXp,
                           float priceMultiplier) implements VillagerTrades.ItemListing {
         @Override
@@ -140,30 +66,39 @@ public class Trades {
         @Override
         public MerchantOffer getOffer(Entity pTrader, RandomSource pRandom) {
             if (pTrader.level() instanceof ServerLevel serverLevel) {
-
                 LootTable loottable = serverLevel.getServer().reloadableRegistries().getLootTable(this.lootTable);
                 var context = new LootParams.Builder(serverLevel).create(LootContextParamSets.EMPTY);
                 var items = loottable.getRandomItems(context);
-                if (!items.isEmpty()) {
-                    var stack = items.getFirst();
-                    int price = itemCostFunction.apply(stack, pRandom);
-                    if (price > 0) {
-                        ItemCost primaryCost;
-                        Optional<ItemCost> secondaryCost = Optional.empty();
-                        if (price > 64 * 9) {
-                            price /= 9;
-                            primaryCost = new ItemCost(Items.EMERALD_BLOCK, 64);
-                            secondaryCost = Optional.of(new ItemCost(Items.EMERALD_BLOCK, price - 64));
-                        } else if (price > 64) {
-                            int blocks = price / 9;
-                            primaryCost = new ItemCost(Items.EMERALD_BLOCK, blocks);
-                            secondaryCost = Optional.of(new ItemCost(Items.EMERALD, price % 9));
-                        } else {
-                            primaryCost = new ItemCost(Items.EMERALD, price);
-                        }
-                        return new MerchantOffer(primaryCost, secondaryCost, stack, this.maxUses, this.villagerXp, this.priceMultiplier);
-                    }
+                if (items.isEmpty()) {
+                    return null;
                 }
+                var stack = items.getFirst();
+                int price = itemCostFunction.apply(stack, pRandom);
+                if (price == 0) {
+                    return null;
+                }
+                ItemCost primaryCost;
+                Optional<ItemCost> secondaryCost = Optional.empty();
+                if (price > 64 * 9) {
+                    // price is greater than one stack of blocks, therefore the inputs are in units of blocks
+                    price = price - 64 * 9;
+                    primaryCost = new ItemCost(Items.EMERALD_BLOCK, 64);
+                    if (price >= 9) {
+                        secondaryCost = Optional.of(new ItemCost(Items.EMERALD_BLOCK, Math.max(1, price / 9)));
+                    }
+                } else if (price > 64) {
+                    // price is greater than one stack, therefore inputs are in blocks and change
+                    int blocks = price / 9;
+                    primaryCost = new ItemCost(Items.EMERALD_BLOCK, blocks);
+                    price = price - blocks * 9;
+                    if (price > 0) {
+                        secondaryCost = Optional.of(new ItemCost(Items.EMERALD, price % 9));
+                    }
+                } else {
+                    // price is less than one stack, literal interpretation
+                    primaryCost = new ItemCost(Items.EMERALD, price);
+                }
+                return new MerchantOffer(primaryCost, secondaryCost, stack, this.maxUses, this.villagerXp, this.priceMultiplier);
             }
             return null;
         }
