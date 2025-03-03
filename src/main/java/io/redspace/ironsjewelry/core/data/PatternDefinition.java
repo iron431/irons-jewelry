@@ -15,15 +15,11 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * A pattern represents a piece of jewelry that can be crafted, and contains data for what components are required to craft it and what the resulting item can do
  *
- * @param jewelryType
- * @param partTemplate
- * @param bonuses
- * @param unlockedByDefault
- * @param qualityMultiplier
  */
 public record PatternDefinition(String descriptionId,
                                 JewelryType jewelryType,
@@ -51,19 +47,16 @@ public record PatternDefinition(String descriptionId,
         this.qualityMultiplier = qualityMultiplier;
     }
 
-    public List<Tuple<PartIngredient, Bonus>> bonuses(){
-        return partTemplate.stream().flatMap(part->part.bonuses().stream().map(bonus->(Tuple<PartIngredient, Bonus>)new Tuple(part,bonus))).toList();
+    public List<Tuple<PartIngredient, Bonus>> bonuses() {
+        return partTemplate.stream().flatMap(part -> part.bonuses().stream().map(bonus -> (Tuple<PartIngredient, Bonus>) new Tuple(part, bonus))).toList();
     }
 
-    public List<Component> getFullPatternTooltip() {
-        var titleStyle = Style.EMPTY.applyFormats(ChatFormatting.GOLD, ChatFormatting.UNDERLINE);
-        var headerStyle = Style.EMPTY.applyFormats(ChatFormatting.YELLOW, ChatFormatting.UNDERLINE);
-        var infoStyle = ChatFormatting.GRAY;
-        Component title = Component.translatable(this.descriptionId()).withStyle(titleStyle);
-        Component partHeader = Component.translatable("tooltip.irons_jewelry.parts_header").withStyle(headerStyle);
-        var parts = this.partTemplate.stream().map(part -> Component.translatable(part.part().value().descriptionId()).withStyle(infoStyle)).toList();
+    private static final Style TITLE_STYLE = Style.EMPTY.applyFormats(ChatFormatting.GOLD, ChatFormatting.UNDERLINE);
+    private static final Style HEADER_STYLE = Style.EMPTY.applyFormats(ChatFormatting.YELLOW, ChatFormatting.UNDERLINE);
+    private static final ChatFormatting INFO_STYLE = ChatFormatting.GRAY;
 
-        Component bonusHeader = Component.translatable(this.bonuses().size() > 1 ? "tooltip.irons_jewelry.bonus_header_plural" : "tooltip.irons_jewelry.bonus_header").withStyle(headerStyle);
+    public List<MutableComponent> getPatternBonusesTooltip() {
+        MutableComponent bonusHeader = Component.translatable(this.bonuses().size() > 1 ? "tooltip.irons_jewelry.bonus_header_plural" : "tooltip.irons_jewelry.bonus_header").withStyle(HEADER_STYLE);
         var bonuses = this.bonuses().stream().map(tuple -> {
             MutableComponent component = null;
             if (!tuple.getB().parameterValue().containsKey(tuple.getB().bonusType().getParameterType())) {
@@ -87,15 +80,28 @@ public record PatternDefinition(String descriptionId,
             if (component == null) {
                 component = Component.translatable(tuple.getB().bonusType().getDescriptionId());
             }
-            return component.withStyle(infoStyle);
-        }).toList();
+            return component.withStyle(INFO_STYLE);
+        }).collect(Collectors.toList());
+        if (bonuses.isEmpty()) {
+            return List.of();
+        } else {
+            bonuses.add(0, bonusHeader);
+            return bonuses;
+        }
+    }
+
+    public List<Component> getFullPatternTooltip() {
+        Component title = Component.translatable(this.descriptionId()).withStyle(TITLE_STYLE);
+        Component partHeader = Component.translatable("tooltip.irons_jewelry.parts_header").withStyle(HEADER_STYLE);
+        var parts = this.partTemplate.stream().map(part -> Component.translatable(part.part().value().descriptionId()).withStyle(INFO_STYLE)).toList();
+
+        var bonuses = getPatternBonusesTooltip();
         var tooltip = new ArrayList<Component>();
         tooltip.add(title);
         tooltip.add(partHeader);
         tooltip.addAll(parts);
         if (!bonuses.isEmpty()) {
             tooltip.add(Component.empty());
-            tooltip.add(bonusHeader);
             tooltip.addAll(bonuses);
         }
         return tooltip;

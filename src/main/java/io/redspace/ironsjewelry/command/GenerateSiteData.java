@@ -2,7 +2,9 @@ package io.redspace.ironsjewelry.command;
 
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import io.redspace.ironsjewelry.IronsJewelry;
+import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
 import io.redspace.ironsjewelry.registry.ItemRegistry;
+import io.redspace.ironsspellbooks.api.registry.SpellRegistry;
 import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -81,10 +83,27 @@ public class GenerateSiteData {
               
                     """;
 
+    private static final String PATTERN_DATA_TEMPLATE = """
+            - name: "%s"
+              icon: "/img/patterns/%s.png"
+              locked: "%s by Default"
+              part_for_quality: "%s"
+              quality: %s
+              part1: "%s"
+              part2: "%s"
+              part3: "%s"
+              part4: "%s"
+              bonus1: "%s"
+              bonus2: "%s"
+              bonus3: "%s"
+              bonus4: "%s"
+              
+            """;
+
     protected static int generateSiteData(CommandSourceStack source) {
         generateRecipeData(source);
 
-//        generateSpellData();
+        generatePatternData(source);
 
         return 1;
     }
@@ -319,50 +338,73 @@ public class GenerateSiteData {
     private record RecipeIngredientData(String id, String name, String path, Item item) {
         public static RecipeIngredientData EMPTY = new RecipeIngredientData("", "", "", null);
     }
-//
-//    private static void generateSpellData() {
-//        try {
-//            var sb = new StringBuilder();
-//
-//            SpellRegistry.REGISTRY.stream()
+
+    private static String rasterizeTranslation(String descriptionId) {
+        return handleCapitalization(Component.translatable(descriptionId).getString());
+    }
+
+    /**
+     * ["A", "B", "C"] -> "A, B, C"
+     */
+    private static String listListElements(List<?> list) {
+        StringBuilder builder = new StringBuilder();
+        list.forEach(obj -> builder.append(obj.toString()).append(", "));
+        return builder.substring(0, builder.length() - 2);
+    }
+
+    private static void generatePatternData(CommandSourceStack source) {
+        try {
+            var registry = IronsJewelryRegistries.patternRegistry(source.registryAccess());
+            var sb = new StringBuilder();
+
+            registry.stream()
 //                    .filter(st -> (st.isEnabled() && st != SpellRegistry.none()))
-//                    .forEach(spellType -> {
-//                        var spellMin = spellType.getMinLevel();
-//                        var spellMax = spellType.getMaxLevel();
-//
-//                        var uniqueInfo = processUniqueInfo(spellType);
-//                        var u1 = uniqueInfo.size() >= 1 ? uniqueInfo.get(0) : "";
-//                        var u2 = uniqueInfo.size() >= 2 ? uniqueInfo.get(1) : "";
-//                        var u3 = uniqueInfo.size() >= 3 ? uniqueInfo.get(2) : "";
-//                        var u4 = uniqueInfo.size() >= 4 ? uniqueInfo.get(3) : "";
-//
-//                        sb.append(String.format(SPELL_DATA_TEMPLATE,
-//                                handleCapitalization(spellType.getSpellName()),
-//                                handleCapitalization(spellType.getSchoolType().getDisplayName().getString()),
-//                                String.format("/img/spells/%s.png", spellType.getSpellName()),
-//                                spellType.getMinLevel(),
-//                                spellType.getMaxLevel(),
-//                                spellType.getManaCost(spellMin),
-//                                spellType.getManaCost(spellMax),
-//                                spellType.getSpellCooldown(),
-//                                handleCapitalization(spellType.getCastType().name()),
-//                                handleCapitalization(spellType.getRarity(spellMin).name()),
-//                                handleCapitalization(spellType.getRarity(spellMax).name()),
-//                                Component.translatable(String.format("%s.guide", spellType.getComponentId())).getString(),
-//                                u1,
-//                                u2,
-//                                u3,
-//                                u4)
-//                        );
-//                    });
-//
-//            var file = new BufferedWriter(new FileWriter("spell_data.yml"));
-//            file.write(sb.toString());
-//            file.close();
-//        } catch (Exception e) {
-//            IronsSpellbooks.LOGGER.debug(e.getMessage());
-//        }
-//    }
+                    .forEach(pattern -> {
+                        var name = rasterizeTranslation(pattern.descriptionId());
+                        var imgid = registry.wrapAsHolder(pattern).getKey().location().getPath();
+                        var locked = pattern.unlockedByDefault() ? "Unlocked" : "Locked";
+                        var partForQuality = pattern.partForQuality().map(part -> rasterizeTranslation(part.value().descriptionId())).orElse("None");
+                        var quality = pattern.qualityMultiplier();
+                        var parts = pattern.partTemplate().stream().map(part -> String.format("%s (%s)",
+                                rasterizeTranslation(part.part().value().descriptionId()),
+                                handleCapitalization(listListElements(part.part().value().allowedMaterials())))).toList();
+                        var part1 = parts.size() >= 1 ? parts.get(0) : "";
+                        var part2 = parts.size() >= 2 ? parts.get(1) : "";
+                        var part3 = parts.size() >= 3 ? parts.get(2) : "";
+                        var part4 = parts.size() >= 4 ? parts.get(3) : "";
+                        var bonuses = pattern.getPatternBonusesTooltip();
+                        if (!bonuses.isEmpty()) {
+                            bonuses.removeFirst(); // remove header
+                        }
+                        var bonus1 = bonuses.size() >= 1 ? bonuses.get(0).getString() : "";
+                        var bonus2 = bonuses.size() >= 2 ? bonuses.get(1).getString() : "";
+                        var bonus3 = bonuses.size() >= 3 ? bonuses.get(2).getString() : "";
+                        var bonus4 = bonuses.size() >= 4 ? bonuses.get(3).getString() : "";
+
+                        sb.append(String.format(PATTERN_DATA_TEMPLATE,
+                                name,
+                                imgid,
+                                locked,
+                                partForQuality,
+                                quality,
+                                part1,
+                                part2,
+                                part3,
+                                part4,
+                                bonus1,
+                                bonus2,
+                                bonus3,
+                                bonus4)
+                        );
+                    });
+
+            var file = new BufferedWriter(new FileWriter("site_data/pattern_data.yml"));
+            file.write(sb.toString());
+            file.close();
+        } catch (Exception e) {
+            IronsJewelry.LOGGER.debug(e.getMessage());
+        }
+    }
 
     private static List<String> processUniqueInfo(AbstractSpell spell) {
         List<String> text = new ArrayList<>();
