@@ -366,6 +366,9 @@ public class GenerateSiteData {
     private static void generatePatternData(CommandSourceStack source) {
         try {
             var registry = IronsJewelryRegistries.patternRegistry(source.registryAccess());
+            var materialRegistry = IronsJewelryRegistries.materialRegistry(source.registryAccess());
+            var metal = materialRegistry.getHolder(IronsJewelry.id("gold")).get();
+            var gem = materialRegistry.getHolder(IronsJewelry.id("ruby")).get();
             var sb = new StringBuilder();
 
             registry.stream()
@@ -410,23 +413,23 @@ public class GenerateSiteData {
                         try {
                             NativeImage image = new NativeImage(16, 16, false);
                             pattern.partTemplate().stream().map(PartIngredient::part).forEach(part -> {
-                                var sprite = AssetHandlerRegistry.JEWELRY_HANDLER.get().getSprite(AssetHandlerRegistry.JEWELRY_HANDLER.get().getMenuSpriteLocation(part, true));
+                                var sprite = AssetHandlerRegistry.JEWELRY_HANDLER.get().getSprite(AssetHandlerRegistry.JEWELRY_HANDLER.get().getSpriteLocation(part, part.value().canUseMaterial("gem") ? gem : metal));
                                 var layer = sprite.contents().getOriginalImage();
                                 var pixels = layer.getPixelsRGBA();
-                                for(int x = 0; x < 16;x++){
-                                    for(int y = 0; y < 16;y++){
+                                for (int x = 0; x < 16; x++) {
+                                    for (int y = 0; y < 16; y++) {
                                         int i = y * 16 + x;
                                         int rgba = pixels[i];
                                         int alpha = (rgba >> 24) & 0xFF;
-                                        if(alpha != 0){
-                                            image.setPixelRGBA(x,y,rgba);
+                                        if (alpha != 0) {
+                                            image.setPixelRGBA(x, y, rgba);
                                         }
                                     }
                                 }
                             });
-                            exportNativeImage(image,IronsJewelry.id(imgid),"");
+                            exportNativeImage(image, imgid);
                         } catch (Exception e) {
-                            IronsJewelry.LOGGER.debug("Failed to make image file: {}");
+                            IronsJewelry.LOGGER.debug("Failed to make image file: {} {}", pattern.descriptionId(), e.getMessage());
                         }
                     });
 
@@ -439,15 +442,14 @@ public class GenerateSiteData {
         }
     }
 
-    public static void exportNativeImage(NativeImage image, ResourceLocation name, String prefix) throws IOException {
-        String texPath = name.getPath();
-        String fileName = prefix + "_" + name.getNamespace() + "_" + texPath;
+    public static void exportNativeImage(NativeImage image, String name) throws IOException {
+        String fileName = name;
         if (!fileName.endsWith(".png")) //Texture atlas name already ends with .png
         {
             fileName += ".png";
         }
 
-        Path filePath = Path.of("site_data").resolve(fileName);
+        Path filePath = Path.of("site_data/img").resolve(fileName);
         if (Files.notExists(filePath, LinkOption.NOFOLLOW_LINKS)) {
             Files.createFile(filePath);
         }
