@@ -1,7 +1,12 @@
 package io.redspace.ironsjewelry.command;
 
+import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
+import io.redspace.atlasapi.AtlasApi;
+import io.redspace.atlasapi.api.AtlasApiHelper;
 import io.redspace.ironsjewelry.IronsJewelry;
+import io.redspace.ironsjewelry.core.data.PartIngredient;
+import io.redspace.ironsjewelry.registry.AssetHandlerRegistry;
 import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
 import io.redspace.ironsjewelry.registry.ItemRegistry;
 import io.redspace.ironsspellbooks.api.registry.SpellRegistry;
@@ -21,8 +26,14 @@ import org.jetbrains.annotations.NotNull;
 import javax.annotation.Nullable;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
+import java.io.IOException;
+import java.lang.annotation.Native;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class GenerateSiteData {
 
@@ -396,14 +407,51 @@ public class GenerateSiteData {
                                 bonus3,
                                 bonus4)
                         );
+                        try {
+                            NativeImage image = new NativeImage(16, 16, false);
+                            pattern.partTemplate().stream().map(PartIngredient::part).forEach(part -> {
+                                var sprite = AssetHandlerRegistry.JEWELRY_HANDLER.get().getSprite(AssetHandlerRegistry.JEWELRY_HANDLER.get().getMenuSpriteLocation(part, true));
+                                var layer = sprite.contents().getOriginalImage();
+                                var pixels = layer.getPixelsRGBA();
+                                for(int x = 0; x < 16;x++){
+                                    for(int y = 0; y < 16;y++){
+                                        int i = y * 16 + x;
+                                        int rgba = pixels[i];
+                                        int alpha = (rgba >> 24) & 0xFF;
+                                        if(alpha != 0){
+                                            image.setPixelRGBA(x,y,rgba);
+                                        }
+                                    }
+                                }
+                            });
+                            exportNativeImage(image,IronsJewelry.id(imgid),"");
+                        } catch (Exception e) {
+                            IronsJewelry.LOGGER.debug("Failed to make image file: {}");
+                        }
                     });
 
             var file = new BufferedWriter(new FileWriter("site_data/pattern_data.yml"));
             file.write(sb.toString());
             file.close();
+
         } catch (Exception e) {
             IronsJewelry.LOGGER.debug(e.getMessage());
         }
+    }
+
+    public static void exportNativeImage(NativeImage image, ResourceLocation name, String prefix) throws IOException {
+        String texPath = name.getPath();
+        String fileName = prefix + "_" + name.getNamespace() + "_" + texPath;
+        if (!fileName.endsWith(".png")) //Texture atlas name already ends with .png
+        {
+            fileName += ".png";
+        }
+
+        Path filePath = Path.of("site_data").resolve(fileName);
+        if (Files.notExists(filePath, LinkOption.NOFOLLOW_LINKS)) {
+            Files.createFile(filePath);
+        }
+        image.writeToFile(filePath);
     }
 
     private static List<String> processUniqueInfo(AbstractSpell spell) {
