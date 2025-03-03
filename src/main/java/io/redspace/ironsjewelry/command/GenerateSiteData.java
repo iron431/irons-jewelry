@@ -379,8 +379,9 @@ public class GenerateSiteData {
                         var locked = pattern.unlockedByDefault() ? "Unlocked" : "Locked";
                         var partForQuality = pattern.partForQuality().map(part -> rasterizeTranslation(part.value().descriptionId())).orElse("None");
                         var quality = pattern.qualityMultiplier();
-                        var parts = pattern.partTemplate().stream().map(part -> String.format("%s (%s)",
+                        var parts = pattern.partTemplate().stream().map(part -> String.format("%s (%s - %s)",
                                 rasterizeTranslation(part.part().value().descriptionId()),
+                                part.materialCost(),
                                 handleCapitalization(listListElements(part.part().value().allowedMaterials())))).toList();
                         var part1 = parts.size() >= 1 ? parts.get(0) : "";
                         var part2 = parts.size() >= 2 ? parts.get(1) : "";
