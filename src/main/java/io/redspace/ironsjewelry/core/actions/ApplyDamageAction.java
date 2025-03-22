@@ -35,8 +35,12 @@ public record ApplyDamageAction(Holder<DamageType> damageType, QualityScalar amo
         var damageSource = new DamageSource(this.damageType, null, wearer, wearer.position());
         var damage = getDamage(quality);
         var target = applyToSelf ? wearer : entity;
+
         if (applyToSelf) {
             DamageHelper.ignoreNextKnockback(wearer);
+        } else if (wearer.getUUID().equals(target.getUUID())) {
+            // prevent self-inflicted damage if not explicitly allowed
+            return;
         }
         target.hurt(damageSource, damage);
         this.soundEvent.ifPresent(sound -> target.playSound(sound.value()));
