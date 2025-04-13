@@ -4,6 +4,7 @@
     "tag": "c:gems/emerald"
   },
   "materialType": [
+    "emerald",
     "gem"
   ],
   "paletteLocation": "irons_jewelry:palettes/emerald",

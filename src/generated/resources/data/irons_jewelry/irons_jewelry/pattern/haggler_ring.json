@@ -1,0 +1,24 @@
+{
+  "type": "irons_jewelry:ring",
+  "descriptionId": "pattern.irons_jewelry.haggler_ring",
+  "partForQuality": "irons_jewelry:band_gem",
+  "parts": [
+    {
+      "drawOrder": 0,
+      "id": "irons_jewelry:band_gem",
+      "materialCost": 4
+    },
+    {
+      "bonuses": [
+        {
+          "bonusType": "irons_jewelry:trade_discount_bonus"
+        }
+      ],
+      "drawOrder": 1,
+      "id": "irons_jewelry:haggler_stone",
+      "materialCost": 4
+    }
+  ],
+  "qualityMultiplier": 2.0,
+  "unlockedByDefault": false
+}

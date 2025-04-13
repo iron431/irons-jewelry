@@ -7,6 +7,7 @@ import io.redspace.ironsjewelry.core.IBonusParameterType;
 import io.redspace.ironsjewelry.core.MaterialModifierDataHandler;
 import io.redspace.ironsjewelry.registry.ComponentRegistry;
 import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
+import io.redspace.ironsjewelry.registry.ParameterTypeRegistry;
 import net.minecraft.core.Holder;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -145,7 +146,7 @@ public class JewelryData {
         if (!valid) {
             return List.of();
         }
-        return pattern.value().bonuses().stream().map(this::getBonusFor).filter(inst -> !inst.parameter().isEmpty()).toList();
+        return pattern.value().bonuses().stream().map(this::getBonusFor).filter(inst -> inst.bonusType().getParameterType().equals(ParameterTypeRegistry.EMPTY.get()) || !inst.parameter().isEmpty()).toList();
     }
 
     public BonusInstance getBonusFor(Tuple<PartIngredient, Bonus> tuple) {

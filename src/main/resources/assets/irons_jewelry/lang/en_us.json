@@ -47,6 +47,8 @@
   "pattern.irons_jewelry.barbed_band.item": "%2$s Barbed Band",
   "pattern.irons_jewelry.stonehewn_band": "Stonehewn Band",
   "pattern.irons_jewelry.stonehewn_band.item": "%s Stonehewn Band",
+  "pattern.irons_jewelry.haggler_ring": "Ring of Haggling",
+  "pattern.irons_jewelry.haggler_ring.item": "%2$s Ring of Haggling",
 
   "material.irons_jewelry.iron": "Iron",
   "material.irons_jewelry.gold": "Gold",
@@ -93,6 +95,7 @@
   "part.irons_jewelry.gem_band_barbed": "Gemstone",
   "part.irons_jewelry.band_barbed": "Barbed Band",
   "part.irons_jewelry.stonehewn_band": "Band",
+  "part.irons_jewelry.haggler_stone": "Haggler's Stone",
 
 
   "bonus.irons_jewelry.attribute_bonus": "Attribute",
@@ -110,6 +113,9 @@
   "bonus.irons_jewelry.on_take_damage_bonus.description": "When Attacked, %s",
   "bonus.irons_jewelry.on_attack_bonus": "Action on Attack",
   "bonus.irons_jewelry.on_attack_bonus.description": "On Attack, %s",
+  "bonus.irons_jewelry.trade_discount_bonus": "Trade Discount",
+  "bonus.irons_jewelry.trade_discount_bonus.description": "Discount %s Items when trading",
+  "bonus.irons_jewelry.trade_discount_bonus.description.singular": "Discount %s Item when trading",
 
   "action.irons_jewelry.apply_effect.name": "Apply Effect",
   "action.irons_jewelry.apply_effect.self": "Gain %s%s",

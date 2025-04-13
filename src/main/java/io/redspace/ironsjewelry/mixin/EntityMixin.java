@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(Entity.class)
 public class EntityMixin {
     @Inject(method = "ignoreExplosion", at = @At(value = "RETURN"), cancellable = true)
-    void cancelExplosion(Explosion pExplosion, CallbackInfoReturnable<Boolean> cir) {
+    void irons_jewelry$cancelExplosion(Explosion pExplosion, CallbackInfoReturnable<Boolean> cir) {
         if (pExplosion instanceof IgnorableExplosion ignorableExplosion) {
             if (ignorableExplosion.shouldIgnore((Entity) (Object) this)) {
                 cir.setReturnValue(true);

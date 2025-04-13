@@ -118,6 +118,7 @@ public class IronsJewelryRegistries {
     public static Holder<PartDefinition> GEM_TEARSTONE;
     public static Holder<PartDefinition> GEMS_SIDE;
     public static Holder<PartDefinition> PIGLIN_SIGNET;
+    public static Holder<PartDefinition> HAGGLER_STONE;
 
     public static Holder<PatternDefinition> GEMSET_RING;
     public static Holder<PatternDefinition> SIMPLE_BAND;
@@ -131,6 +132,7 @@ public class IronsJewelryRegistries {
     public static Holder<PatternDefinition> SIMPLE_AMULET;
     public static Holder<PatternDefinition> SIMPLE_CHAIN;
     public static Holder<PatternDefinition> TEARSTONE_RING;
+    public static Holder<PatternDefinition> HAGGLER_RING;
 
     public static final RegistrySetBuilder builder = new RegistrySetBuilder()
             .add(IronsJewelryRegistries.Keys.PART_REGISTRY_KEY, bootstrap -> {
@@ -171,6 +173,12 @@ public class IronsJewelryRegistries {
                         IronsJewelry.id("palettes/gold"),
                         List.of("gold"),
                         IronsJewelry.id("item/base/piglin_signet")
+                ));
+                HAGGLER_STONE = bootstrap.register(prk(IronsJewelry.id("haggler_stone")), new PartDefinition(
+                        "part.irons_jewelry.haggler_stone",
+                        IronsJewelry.id("palettes/diamond"),
+                        List.of("emerald"),
+                        IronsJewelry.id("item/base/gem_round_large")
                 ));
             })
             .add(IronsJewelryRegistries.Keys.PATTERN_REGISTRY_KEY, bootstrap -> {
@@ -332,6 +340,18 @@ public class IronsJewelryRegistries {
                         Optional.empty(),
                         false,
                         1.5
+                ));
+                HAGGLER_RING = bootstrap.register(pnk(IronsJewelry.id("haggler_ring")), new PatternDefinition(
+                        "pattern.irons_jewelry.haggler_ring",
+                        JewelryTypeRegistry.RING.get(),
+                        List.of(
+                                new PartIngredient(BAND_GEM, 4, 0, List.of()),
+                                new PartIngredient(HAGGLER_STONE, 4, 1, List.of(
+                                        new Bonus(BonusTypeRegistry.TRADE_DISCOUNT_BONUS.get(), 1)
+                                ))
+                        ),
+                        Optional.of(BAND_GEM),
+                        false, 2
                 ));
             });
 }

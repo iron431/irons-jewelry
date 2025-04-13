@@ -20,6 +20,7 @@ public class BonusTypeRegistry {
     public static final Supplier<BonusType> EFFECT_IMMUNITY_BONUS = BONUSES.register("effect_immunity_bonus", EffectImmunityBonusType::new);
     public static final Supplier<OnShieldBlockBonusType> ON_SHIELD_BLOCK_BONUS = BONUSES.register("on_shield_block_bonus", OnShieldBlockBonusType::new);
     public static final Supplier<OnTakeDamageBonusType> ON_TAKE_DAMAGE_BONUS = BONUSES.register("on_take_damage_bonus", OnTakeDamageBonusType::new);
+    public static final Supplier<TradeDiscountBonusType> TRADE_DISCOUNT_BONUS = BONUSES.register("trade_discount_bonus", TradeDiscountBonusType::new);
 
     public static void register(IEventBus eventBus){
         BONUSES.register(eventBus);
