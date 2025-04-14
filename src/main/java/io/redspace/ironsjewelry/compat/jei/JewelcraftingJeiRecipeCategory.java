@@ -72,7 +72,7 @@ public class JewelcraftingJeiRecipeCategory implements IRecipeCategory<PatternDe
     public void setRecipe(IRecipeLayoutBuilder builder, PatternDefinition recipe, IFocusGroup focuses) {
         var materialRegistry = IronsJewelryRegistries.materialRegistry(Minecraft.getInstance().level.registryAccess());
         ItemStack output = new ItemStack(recipe.jewelryType().item());
-        Holder<MaterialDefinition> iron = materialRegistry.getHolder(IronsJewelry.id("platinum")).get();
+        Holder<MaterialDefinition> iron = materialRegistry.getHolder(IronsJewelry.id("example")).get();
         var parts = recipe.partTemplate().stream().map(PartIngredient::part).collect(Collectors.toMap(Function.identity(),
                 (p) -> iron));
         JewelryData jewelryData = JewelryData.renderable(IronsJewelryRegistries.patternRegistry(Minecraft.getInstance().level.registryAccess()).wrapAsHolder(recipe), parts);

@@ -52,6 +52,11 @@ public class JeiPlugin implements IModPlugin {
         registration.addRecipeCatalyst(new ItemStack(BlockRegistry.JEWELCRAFTING_STATION_BLOCK.get()), JewelcraftingJeiRecipeCategory.RECIPE_TYPE);
     }
 
+    @Override
+    public void registerAdvanced(IAdvancedRegistration registration) {
+        registration.addTypedRecipeManagerPlugin(JewelcraftingJeiRecipeCategory.RECIPE_TYPE, new AdvancedPatternJeiHandler());
+    }
+
     public static final ISubtypeInterpreter<ItemStack> JEWELRY_INTERPRETER = new ISubtypeInterpreter<ItemStack>() {
         @Override
         public @Nullable String getSubtypeData(ItemStack ingredient, UidContext context) {
