@@ -22,8 +22,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.TooltipRenderUtil;
 import net.minecraft.core.Holder;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.ItemLore;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
@@ -77,9 +79,17 @@ public class JewelcraftingJeiRecipeCategory implements IRecipeCategory<PatternDe
                 (p) -> iron));
         JewelryData jewelryData = JewelryData.renderable(IronsJewelryRegistries.patternRegistry(Minecraft.getInstance().level.registryAccess()).wrapAsHolder(recipe), parts);
         output.set(ComponentRegistry.JEWELRY_COMPONENT, jewelryData);
+        var bonuses = recipe.getPatternBonusesTooltip();
+        if (!bonuses.isEmpty()) {
+            bonuses.set(0, Component.translatable("tooltip.irons_jewelry.bonus_crafted_header").withStyle(ChatFormatting.YELLOW, ChatFormatting.UNDERLINE)); // replace header
+            bonuses.add(0, Component.empty());
+            output.set(DataComponents.LORE, new ItemLore(bonuses.stream().map(component -> (Component) component.withStyle(component.getStyle().withItalic(false))).toList()));
+        }
         IRecipeSlotBuilder outputSlot = builder.addSlot(RecipeIngredientRole.OUTPUT, buffer + 105, 22)
                 .addItemStacks(List.of(output))
                 .setSlotName("output");
+
+
         int totalWidth = 95;
         int count = parts.size();
         int widthPer = 20;

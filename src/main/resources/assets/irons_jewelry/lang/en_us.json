@@ -152,6 +152,7 @@
   "tooltip.irons_jewelry.parts_header" : "Parts:",
   "tooltip.irons_jewelry.bonus_header" : "Bonus:",
   "tooltip.irons_jewelry.bonus_header_plural" : "Bonuses:",
+  "tooltip.irons_jewelry.bonus_crafted_header" : "Bonuses when Crafted:",
   "tooltip.irons_jewelry.bonus_with_source": "%s (From %s)",
   "tooltip.irons_jewelry.bonus_with_direct_source": "%s (%s)",
   "tooltip.irons_jewelry.bonus_to_source": "%s: %s",
