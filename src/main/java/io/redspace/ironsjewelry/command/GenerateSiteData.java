@@ -5,13 +5,16 @@ import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import io.redspace.atlasapi.AtlasApi;
 import io.redspace.atlasapi.api.AtlasApiHelper;
 import io.redspace.ironsjewelry.IronsJewelry;
+import io.redspace.ironsjewelry.core.data.MaterialDefinition;
 import io.redspace.ironsjewelry.core.data.PartIngredient;
 import io.redspace.ironsjewelry.registry.AssetHandlerRegistry;
 import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
 import io.redspace.ironsjewelry.registry.ItemRegistry;
 import io.redspace.ironsspellbooks.api.registry.SpellRegistry;
 import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
+import net.minecraft.client.Minecraft;
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
@@ -367,8 +370,7 @@ public class GenerateSiteData {
         try {
             var registry = IronsJewelryRegistries.patternRegistry(source.registryAccess());
             var materialRegistry = IronsJewelryRegistries.materialRegistry(source.registryAccess());
-            var metal = materialRegistry.getHolder(IronsJewelry.id("gold")).get();
-            var gem = materialRegistry.getHolder(IronsJewelry.id("ruby")).get();
+
             var sb = new StringBuilder();
 
             registry.stream()
@@ -414,7 +416,23 @@ public class GenerateSiteData {
                         try {
                             NativeImage image = new NativeImage(16, 16, false);
                             pattern.partTemplate().stream().map(PartIngredient::part).forEach(part -> {
-                                var sprite = AssetHandlerRegistry.JEWELRY_HANDLER.get().getSprite(AssetHandlerRegistry.JEWELRY_HANDLER.get().getSpriteLocation(part, part.value().canUseMaterial("gem") ? gem : metal));
+                                var metal = materialRegistry.getHolder(IronsJewelry.id("gold")).get();
+                                var gem = materialRegistry.getHolder(IronsJewelry.id("ruby")).get();
+                                Holder<MaterialDefinition> renderMaterial = null;
+                                if (part.value().canUseMaterial("gem")) {
+                                    renderMaterial = gem;
+                                } else if (part.value().canUseMaterial("metal")) {
+                                    renderMaterial = metal;
+                                } else {
+                                    for (MaterialDefinition materialDefinition : IronsJewelryRegistries.materialRegistry(source.registryAccess())) {
+                                        if (part.value().canUseMaterial(materialDefinition.materialType())) {
+                                            renderMaterial = IronsJewelryRegistries.materialRegistry(source.registryAccess()).wrapAsHolder(materialDefinition);
+                                            break;
+                                        }
+                                    }
+                                    Objects.requireNonNull(renderMaterial);
+                                }
+                                var sprite = AssetHandlerRegistry.JEWELRY_HANDLER.get().getSprite(AssetHandlerRegistry.JEWELRY_HANDLER.get().getSpriteLocation(part, renderMaterial));
                                 var layer = sprite.contents().getOriginalImage();
                                 var pixels = layer.getPixelsRGBA();
                                 for (int x = 0; x < 16; x++) {
