@@ -100,7 +100,7 @@ public class GenerateSiteData {
     private static final String PATTERN_DATA_TEMPLATE = """
             - name: "%s"
               icon: "/img/patterns/%s.png"
-              locked: "%s by Default"
+              locked: "%s"
               part_for_quality: "%s"
               quality: %s
               part1: "%s"
@@ -379,10 +379,10 @@ public class GenerateSiteData {
                     .forEach(pattern -> {
                         var name = rasterizeTranslation(pattern.descriptionId());
                         var imgid = registry.wrapAsHolder(pattern).getKey().location().getPath();
-                        var locked = pattern.unlockedByDefault() ? "Unlocked" : "Locked";
+                        var locked = pattern.unlockedByDefault() ? "Yes" : "No";
                         var partForQuality = pattern.partForQuality().map(part -> rasterizeTranslation(part.value().descriptionId())).orElse("None");
                         var quality = pattern.qualityMultiplier();
-                        var parts = pattern.partTemplate().stream().map(part -> String.format("%s (%s - %s)",
+                        var parts = pattern.partTemplate().stream().map(part -> String.format("%s (%s - %s)", // appears as "Band (6 - Metal, Other Tag)"
                                 rasterizeTranslation(part.part().value().descriptionId()),
                                 part.materialCost(),
                                 handleCapitalization(listListElements(part.part().value().allowedMaterials())))).toList();
