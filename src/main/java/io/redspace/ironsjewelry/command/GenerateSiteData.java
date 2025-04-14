@@ -372,7 +372,8 @@ public class GenerateSiteData {
             var materialRegistry = IronsJewelryRegistries.materialRegistry(source.registryAccess());
 
             var sb = new StringBuilder();
-
+            var metal = materialRegistry.getHolder(IronsJewelry.id("gold")).get();
+            var gem = materialRegistry.getHolder(IronsJewelry.id("ruby")).get();
             registry.stream()
 //                    .filter(st -> (st.isEnabled() && st != SpellRegistry.none()))
                     .forEach(pattern -> {
@@ -416,17 +417,15 @@ public class GenerateSiteData {
                         try {
                             NativeImage image = new NativeImage(16, 16, false);
                             pattern.partTemplate().stream().map(PartIngredient::part).forEach(part -> {
-                                var metal = materialRegistry.getHolder(IronsJewelry.id("gold")).get();
-                                var gem = materialRegistry.getHolder(IronsJewelry.id("ruby")).get();
                                 Holder<MaterialDefinition> renderMaterial = null;
                                 if (part.value().canUseMaterial("gem")) {
                                     renderMaterial = gem;
                                 } else if (part.value().canUseMaterial("metal")) {
                                     renderMaterial = metal;
                                 } else {
-                                    for (MaterialDefinition materialDefinition : IronsJewelryRegistries.materialRegistry(source.registryAccess())) {
+                                    for (MaterialDefinition materialDefinition : materialRegistry) {
                                         if (part.value().canUseMaterial(materialDefinition.materialType())) {
-                                            renderMaterial = IronsJewelryRegistries.materialRegistry(source.registryAccess()).wrapAsHolder(materialDefinition);
+                                            renderMaterial = materialRegistry.wrapAsHolder(materialDefinition);
                                             break;
                                         }
                                     }
