@@ -10,6 +10,7 @@ import io.redspace.ironsjewelry.registry.LootRegistry;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.RegistryCodecs;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunction;
@@ -76,5 +77,36 @@ public record GenerateJewelryLootFunction(
             }
         }
         return ItemStack.EMPTY;
+    }
+
+    public static class Builder implements LootItemFunction.Builder {
+        List<Holder<PatternDefinition>> patterns = new ArrayList<>();
+        Map<String, HolderSet<MaterialDefinition>> materials = new HashMap<>();
+        HolderSet<PatternDefinition> holderSet = null;
+
+        public GenerateJewelryLootFunction.Builder withMaterial(String name, HolderSet<MaterialDefinition> materials) {
+            this.materials.put(name, materials);
+            return this;
+        }
+
+        public GenerateJewelryLootFunction.Builder withPatterns(HolderSet<PatternDefinition> patterns) {
+            this.holderSet = patterns;
+            return this;
+        }
+
+        public GenerateJewelryLootFunction.Builder withPattern(Holder<PatternDefinition> pattern) {
+            this.patterns.add(pattern);
+            return this;
+        }
+
+        @Override
+        public LootItemFunction build() {
+            Optional<Map<String, HolderSet<MaterialDefinition>>> materialOpt = materials.isEmpty() ? Optional.empty() : Optional.of(materials);
+            if (holderSet != null) {
+                return new GenerateJewelryLootFunction(holderSet, materialOpt);
+            } else {
+                return new GenerateJewelryLootFunction(new HolderSet.Direct<>(patterns), materialOpt);
+            }
+        }
     }
 }
