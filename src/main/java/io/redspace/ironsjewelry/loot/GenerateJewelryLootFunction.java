@@ -11,6 +11,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.RegistryCodecs;
 import net.minecraft.tags.TagKey;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunction;
@@ -66,7 +67,7 @@ public record GenerateJewelryLootFunction(
                                                     material.materialType().stream().anyMatch(type -> !materialFilter.get().containsKey(type) || materialFilter.get().get(type).contains(registry.wrapAsHolder(material))))
                     ).toList();
                     if (!applicableMaterials.isEmpty()) {
-                        materials.put(part.part(), registry.wrapAsHolder(applicableMaterials.get(lootContext.getRandom().nextInt(applicableMaterials.size()))));
+                        materials.put(part.part(), registry.wrapAsHolder(getRandomWeightedMaterial(applicableMaterials, lootContext.getRandom())));
                     }
                 }
                 var jewelryData = new JewelryData(pattern, materials);
@@ -77,6 +78,16 @@ public record GenerateJewelryLootFunction(
             }
         }
         return ItemStack.EMPTY;
+    }
+
+    private static MaterialDefinition getRandomWeightedMaterial(List<MaterialDefinition> applicableMaterials, RandomSource randomSource) {
+        TreeMap<Integer, MaterialDefinition> weightedMaterials = new TreeMap<>();
+        int total = 0;
+        for (MaterialDefinition material : applicableMaterials) {
+            weightedMaterials.put(total, material);
+            total += (int) (100 / (1 + material.quality()));
+        }
+        return weightedMaterials.lowerEntry(randomSource.nextInt(total) + 1).getValue();
     }
 
     public static class Builder implements LootItemFunction.Builder {

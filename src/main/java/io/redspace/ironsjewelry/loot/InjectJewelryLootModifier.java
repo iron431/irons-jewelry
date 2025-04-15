@@ -32,7 +32,7 @@ public class InjectJewelryLootModifier extends LootModifier {
     protected @NotNull ObjectArrayList<ItemStack> doApply(ObjectArrayList<ItemStack> generatedLoot, LootContext context) {
         if (LootInjectionHandler.TRACKED_LOOT_TABLES.containsKey(context.getQueriedLootTableId())) {
             float chance = LootInjectionHandler.TRACKED_LOOT_TABLES.get(context.getQueriedLootTableId());
-            if (context.getRandom().nextFloat() <= chance || true) {
+            if (context.getRandom().nextFloat() <= chance) {
                 var lootTable = context.getLevel().getServer().reloadableRegistries().getLootTable(ResourceKey.create(Registries.LOOT_TABLE, IronsJewelry.id("modifiers/inject_jewelry")));
                 ObjectArrayList<ItemStack> objectarraylist = new ObjectArrayList<>();
                 //use raw to avoid recursively adding all global loot modifiers again
