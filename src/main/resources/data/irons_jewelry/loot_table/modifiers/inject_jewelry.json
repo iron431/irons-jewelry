@@ -1,0 +1,31 @@
+{
+  "pools": [
+    {
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "irons_jewelry:ring",
+          "weight": 3,
+          "functions": [
+            {
+              "function": "irons_jewelry:generate_jewelry",
+              "patterns": "#irons_jewelry:all_lootable"
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "irons_jewelry:necklace",
+          "weight": 1,
+          "functions": [
+            {
+              "function": "irons_jewelry:generate_jewelry",
+              "patterns": "#irons_jewelry:all_lootable"
+            }
+          ]
+        }
+      ],
+      "rolls": 1
+    }
+  ]
+}
