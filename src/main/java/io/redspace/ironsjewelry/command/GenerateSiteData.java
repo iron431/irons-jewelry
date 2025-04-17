@@ -5,24 +5,38 @@ import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import io.redspace.atlasapi.AtlasApi;
 import io.redspace.atlasapi.api.AtlasApiHelper;
 import io.redspace.ironsjewelry.IronsJewelry;
-import io.redspace.ironsjewelry.core.data.MaterialDefinition;
-import io.redspace.ironsjewelry.core.data.PartIngredient;
+import io.redspace.ironsjewelry.core.IBonusParameterType;
+import io.redspace.ironsjewelry.core.data.*;
+import io.redspace.ironsjewelry.core.parameters.ActionParameter;
+import io.redspace.ironsjewelry.core.parameters.AttributeParameter;
+import io.redspace.ironsjewelry.core.parameters.EffectParameter;
 import io.redspace.ironsjewelry.registry.AssetHandlerRegistry;
 import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
 import io.redspace.ironsjewelry.registry.ItemRegistry;
+import io.redspace.ironsjewelry.registry.ParameterTypeRegistry;
 import io.redspace.ironsspellbooks.api.registry.SpellRegistry;
 import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.*;
+import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.item.crafting.*;
 import org.jetbrains.annotations.NotNull;
 
@@ -35,6 +49,8 @@ import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -80,23 +96,6 @@ public class GenerateSiteData {
               
                     """;
 
-    private static final String SPELL_DATA_TEMPLATE = """
-            - name: "%s"
-              school: "%s"
-              icon: "%s"
-              level: "%d to %d"
-              mana: "%d to %d"
-              cooldown: "%ds"
-              cast_type: "%s"
-              rarity: "%s to %s"
-              description: "%s"
-              u1: "%s"
-              u2: "%s"
-              u3: "%s"
-              u4: "%s"
-              
-                    """;
-
     private static final String PATTERN_DATA_TEMPLATE = """
             - name: "%s"
               icon: "/img/patterns/%s.png"
@@ -113,11 +112,24 @@ public class GenerateSiteData {
               bonus4: "%s"
               
             """;
+    private static final String MATERIAL_DATA_TEMPLATE = """
+            - name: "%s"
+              icon: "/img/materials/%s.png"
+              source: "%s"
+              quality: %s
+              types: "%s"
+              bonus_types: "%s"
+              bonus_values: "%s"
+              sort: "%s"
+              
+            """;
 
     protected static int generateSiteData(CommandSourceStack source) {
         generateRecipeData(source);
 
         generatePatternData(source);
+
+        generateMaterialData(source);
 
         return 1;
     }
@@ -366,14 +378,91 @@ public class GenerateSiteData {
         return builder.substring(0, builder.length() - 2);
     }
 
+    private static String handleMaterialBonusDescription(IBonusParameterType<?> type, Object value) {
+        //ATTRIBUTE_PARAMETER
+        //POSITIVE_EFFECT_PARAMETER
+        //NEGATIVE_EFFECT_PARAMETER
+        //ACTION_PARAMETER
+        if (type.equals(ParameterTypeRegistry.ACTION_PARAMETER.get())) {
+            ActionParameter.ActionRunnable action = (ActionParameter.ActionRunnable) value;
+            var resource = IronsJewelryRegistries.ACTION_REGISTRY.getKey(action.action().codec());
+            return Component.translatable(String.format("action.%s.%s.name", resource.getNamespace(), resource.getPath())).getString();
+        } else if (type.equals(ParameterTypeRegistry.POSITIVE_EFFECT_PARAMETER.get())) {
+            return Component.translatable(((Holder<MobEffect>) value).value().getDescriptionId()).getString();
+        } else if (type.equals(ParameterTypeRegistry.NEGATIVE_EFFECT_PARAMETER.get())) {
+            return Component.translatable(((Holder<MobEffect>) value).value().getDescriptionId()).getString();
+        } else if (type.equals(ParameterTypeRegistry.ATTRIBUTE_PARAMETER.get())) {
+            var attribute = (AttributeInstance) value;
+            return createAttributeModifierText(attribute.attribute(), new AttributeModifier(IronsJewelry.id("noop"), attribute.amount(), attribute.operation()));
+        }
+        return "";
+    }
+
+    private static void generateMaterialData(CommandSourceStack source) {
+        try {
+            var registry = IronsJewelryRegistries.materialRegistry(source.registryAccess());
+
+            var sb = new StringBuilder();
+
+            for (MaterialDefinition material : registry) {
+                var name = rasterizeTranslation(material.descriptionId());
+                var id = registry.wrapAsHolder(material).getKey().location();
+                if (id.equals(IronsJewelry.id("example"))) {
+                    continue;
+                }
+                var imgid = registry.wrapAsHolder(material).getKey().location().getPath();
+                if (material.ingredient().hasNoItems()) {
+                    IronsJewelry.LOGGER.error("Cannot generate material {}, no valid ingredients present!", id);
+                    continue;
+                }
+                ItemStack representativeStack = material.ingredient().getItems()[0];
+                var ingrId = BuiltInRegistries.ITEM.getKey(representativeStack.getItem());
+                var sortOrder = (int) name.charAt(0);
+                var modsource = "Vanilla";
+                if (ingrId.getNamespace().equals("irons_jewelry")) {
+                    modsource = "Gems 'n Jewelry";
+                    sortOrder += 100;
+                } else if (!ingrId.getNamespace().equals("minecraft")) {
+                    modsource = "Requires Addon";
+                    sortOrder += 1000;
+                }
+                var quality = material.quality();
+                var types = material.materialType().stream().filter(string -> !id.toString().contains(string)).map(GenerateSiteData::handleCapitalization).collect(Collectors.joining(", "));
+                var bonusTypes = material.bonusParameters().keySet().stream().map(param -> handleCapitalization(IronsJewelryRegistries.PARAMETER_TYPE_REGISTRY.getKey(param).getPath().replace("_", " "))).collect(Collectors.joining(","));
+                var bonusValues = material.bonusParameters().entrySet().stream().map(entry -> handleCapitalization(handleMaterialBonusDescription(entry.getKey(), entry.getValue()))).collect(Collectors.joining(","));
+                sb.append(String.format(MATERIAL_DATA_TEMPLATE,
+                        name,
+                        imgid,
+                        modsource,
+                        quality,
+                        types,
+                        bonusTypes,
+                        bonusValues,
+                        sortOrder)
+                );
+                try {
+                    NativeImage image = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(ingrId.withPrefix("item/")).contents().getOriginalImage();
+                    exportNativeImage(image, "ingredient/" + ingrId.getPath());
+                } catch (Exception exception) {
+                    IronsJewelry.LOGGER.debug("Failed to make image file: {} {}", ingrId, exception.getMessage());
+                }
+            }
+
+            var file = new BufferedWriter(new FileWriter("site_data/material_data.yml"));
+            file.write(sb.toString());
+            file.close();
+
+        } catch (Exception e) {
+            IronsJewelry.LOGGER.debug(e.getMessage());
+        }
+    }
+
     private static void generatePatternData(CommandSourceStack source) {
         try {
             var registry = IronsJewelryRegistries.patternRegistry(source.registryAccess());
-            var materialRegistry = IronsJewelryRegistries.materialRegistry(source.registryAccess());
 
             var sb = new StringBuilder();
-            var metal = materialRegistry.getHolder(IronsJewelry.id("gold")).get();
-            var gem = materialRegistry.getHolder(IronsJewelry.id("ruby")).get();
+
             registry.stream()
 //                    .filter(st -> (st.isEnabled() && st != SpellRegistry.none()))
                     .forEach(pattern -> {
@@ -414,41 +503,7 @@ public class GenerateSiteData {
                                 bonus3,
                                 bonus4)
                         );
-                        try {
-                            NativeImage image = new NativeImage(16, 16, false);
-                            pattern.partTemplate().stream().map(PartIngredient::part).forEach(part -> {
-                                Holder<MaterialDefinition> renderMaterial = null;
-                                if (part.value().canUseMaterial("gem")) {
-                                    renderMaterial = gem;
-                                } else if (part.value().canUseMaterial("metal")) {
-                                    renderMaterial = metal;
-                                } else {
-                                    for (MaterialDefinition materialDefinition : materialRegistry) {
-                                        if (part.value().canUseMaterial(materialDefinition.materialType())) {
-                                            renderMaterial = materialRegistry.wrapAsHolder(materialDefinition);
-                                            break;
-                                        }
-                                    }
-                                    Objects.requireNonNull(renderMaterial);
-                                }
-                                var sprite = AssetHandlerRegistry.JEWELRY_HANDLER.get().getSprite(AssetHandlerRegistry.JEWELRY_HANDLER.get().getSpriteLocation(part, renderMaterial));
-                                var layer = sprite.contents().getOriginalImage();
-                                var pixels = layer.getPixelsRGBA();
-                                for (int x = 0; x < 16; x++) {
-                                    for (int y = 0; y < 16; y++) {
-                                        int i = y * 16 + x;
-                                        int rgba = pixels[i];
-                                        int alpha = (rgba >> 24) & 0xFF;
-                                        if (alpha != 0) {
-                                            image.setPixelRGBA(x, y, rgba);
-                                        }
-                                    }
-                                }
-                            });
-                            exportNativeImage(image, imgid);
-                        } catch (Exception e) {
-                            IronsJewelry.LOGGER.debug("Failed to make image file: {} {}", pattern.descriptionId(), e.getMessage());
-                        }
+                        tryGeneratePatternImage(source, pattern, imgid);
                     });
 
             var file = new BufferedWriter(new FileWriter("site_data/pattern_data.yml"));
@@ -457,6 +512,47 @@ public class GenerateSiteData {
 
         } catch (Exception e) {
             IronsJewelry.LOGGER.debug(e.getMessage());
+        }
+    }
+
+    private static void tryGeneratePatternImage(CommandSourceStack source, PatternDefinition pattern, String imgid) {
+        try {
+            var materialRegistry = IronsJewelryRegistries.materialRegistry(source.registryAccess());
+            var metal = materialRegistry.getHolder(IronsJewelry.id("gold")).get();
+            var gem = materialRegistry.getHolder(IronsJewelry.id("ruby")).get();
+            NativeImage image = new NativeImage(16, 16, false);
+            pattern.partTemplate().stream().map(PartIngredient::part).forEach(part -> {
+                Holder<MaterialDefinition> renderMaterial = null;
+                if (part.value().canUseMaterial("gem")) {
+                    renderMaterial = gem;
+                } else if (part.value().canUseMaterial("metal")) {
+                    renderMaterial = metal;
+                } else {
+                    for (MaterialDefinition materialDefinition : materialRegistry) {
+                        if (part.value().canUseMaterial(materialDefinition.materialType())) {
+                            renderMaterial = materialRegistry.wrapAsHolder(materialDefinition);
+                            break;
+                        }
+                    }
+                    Objects.requireNonNull(renderMaterial);
+                }
+                var sprite = AssetHandlerRegistry.JEWELRY_HANDLER.get().getSprite(AssetHandlerRegistry.JEWELRY_HANDLER.get().getSpriteLocation(part, renderMaterial));
+                var layer = sprite.contents().getOriginalImage();
+                var pixels = layer.getPixelsRGBA();
+                for (int x = 0; x < 16; x++) {
+                    for (int y = 0; y < 16; y++) {
+                        int i = y * 16 + x;
+                        int rgba = pixels[i];
+                        int alpha = (rgba >> 24) & 0xFF;
+                        if (alpha != 0) {
+                            image.setPixelRGBA(x, y, rgba);
+                        }
+                    }
+                }
+            });
+            exportNativeImage(image, imgid);
+        } catch (Exception e) {
+            IronsJewelry.LOGGER.debug("Failed to make image file: {} {}", pattern.descriptionId(), e.getMessage());
         }
     }
 
@@ -510,6 +606,42 @@ public class GenerateSiteData {
                 })
                 .collect(Collectors.joining(" "))
                 .trim();
+    }
+
+    /**
+     * Adapted {@link ItemStack#addModifierTooltip}
+     */
+    private static String createAttributeModifierText(Holder<Attribute> attribute, AttributeModifier modifier) {
+        double d0 = modifier.amount();
+        double d1;
+        if (modifier.operation() == AttributeModifier.Operation.ADD_MULTIPLIED_BASE
+                || modifier.operation() == AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL) {
+            d1 = d0 * 100.0;
+        } else if (attribute.is(Attributes.KNOCKBACK_RESISTANCE)) {
+            d1 = d0 * 10.0;
+        } else {
+            d1 = d0;
+        }
+
+        if (d0 >= 0.0) {
+            return (
+                    Component.translatable(
+                                    "attribute.modifier.plus." + modifier.operation().id(),
+                                    ItemAttributeModifiers.ATTRIBUTE_MODIFIER_FORMAT.format(d1),
+                                    Component.translatable(attribute.value().getDescriptionId())
+                            )
+                            .withStyle(attribute.value().getStyle(true))
+            ).getString();
+        } else {
+            return (
+                    Component.translatable(
+                                    "attribute.modifier.take." + modifier.operation().id(),
+                                    ItemAttributeModifiers.ATTRIBUTE_MODIFIER_FORMAT.format(-d1),
+                                    Component.translatable(attribute.value().getDescriptionId())
+                            )
+                            .withStyle(attribute.value().getStyle(false))
+            ).getString();
+        }
     }
 
     private enum CraftingType {
