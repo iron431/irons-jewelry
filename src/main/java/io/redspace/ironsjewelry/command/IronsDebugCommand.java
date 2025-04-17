@@ -1,28 +1,32 @@
 package io.redspace.ironsjewelry.command;
 
+import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import io.redspace.ironsjewelry.IronsJewelry;
+import io.redspace.ironsjewelry.core.data.JewelryData;
 import io.redspace.ironsjewelry.core.data.MaterialDefinition;
 import io.redspace.ironsjewelry.core.data.PartIngredient;
 import io.redspace.ironsjewelry.core.data.PatternDefinition;
-import io.redspace.ironsjewelry.registry.ComponentRegistry;
-import io.redspace.ironsjewelry.registry.DataAttachmentRegistry;
-import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
-import io.redspace.ironsjewelry.registry.ItemRegistry;
+import io.redspace.ironsjewelry.registry.*;
+import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.fml.loading.FMLLoader;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -52,6 +56,8 @@ public class IronsDebugCommand {
                 return enumerateCombos(commandContext.getSource());
             })).then(Commands.literal("generateSiteData").executes((commandContext) -> {
                 return GenerateSiteData.generateSiteData(commandContext.getSource());
+            })).then(Commands.literal("exportHeldItem").executes((commandContext) -> {
+                return exportHeldItem(commandContext.getSource());
             }));
         }
         pDispatcher.register(
@@ -143,6 +149,55 @@ public class IronsDebugCommand {
             data.getLearnedPatterns().clear();
             data.sync(serverPlayer);
             return 1;
+        }
+
+        throw ERROR_FAILED.create();
+    }
+
+    private static int exportHeldItem(CommandSourceStack source) throws CommandSyntaxException {
+        var serverPlayer = source.getPlayer();
+        if (serverPlayer != null) {
+            var jewelry = JewelryData.get(serverPlayer.getMainHandItem());
+            if (jewelry.isValid()) {
+                try {
+                    NativeImage image = new NativeImage(16, 16, false);
+                    jewelry.pattern().value().partTemplate().stream().map(PartIngredient::part).forEach(part -> {
+                        var material = jewelry.parts().get(part);
+                        var sprite = AssetHandlerRegistry.JEWELRY_HANDLER.get().getSprite(AssetHandlerRegistry.JEWELRY_HANDLER.get().getSpriteLocation(part, material));
+                        var layer = sprite.contents().getOriginalImage();
+                        var pixels = layer.getPixelsRGBA();
+                        for (int x = 0; x < 16; x++) {
+                            for (int y = 0; y < 16; y++) {
+                                int i = y * 16 + x;
+                                int rgba = pixels[i];
+                                int alpha = (rgba >> 24) & 0xFF;
+                                if (alpha != 0) {
+                                    image.setPixelRGBA(x, y, rgba);
+                                }
+                            }
+                        }
+                    });
+
+                    var fileName = serverPlayer.getMainHandItem().getHoverName().getString().toLowerCase(Locale.ENGLISH).chars().mapToObj(i -> ResourceLocation.isAllowedInResourceLocation((char) i) ? String.valueOf((char) i) : "_").collect(Collectors.joining()) + ".png";
+                    Path dirPath = Path.of("screenshots/irons_jewelry");
+                    Path filePath = dirPath.resolve(fileName);
+                    if (Files.notExists(dirPath)) {
+                        Files.createDirectories(dirPath);  // creates all nonexistent parent directories
+                    }
+                    if (Files.notExists(filePath)) {
+                        Files.createFile(filePath);  // creates the actual file
+                    }
+                    image.writeToFile(filePath);
+                    Component component = Component.literal("Exported " + fileName)
+                            .withStyle(ChatFormatting.UNDERLINE)
+                            .withStyle(p_168608_ -> p_168608_.withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, filePath.toString())));
+                    serverPlayer.sendSystemMessage(component);
+
+                } catch (Exception e) {
+                    serverPlayer.sendSystemMessage(Component.literal("Failed to make image file: " + e.getMessage()));
+                }
+                return 1;
+            }
         }
 
         throw ERROR_FAILED.create();
