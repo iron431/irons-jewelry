@@ -426,6 +426,20 @@ public class GenerateSiteData {
         return "";
     }
 
+    private static int sortIngredientStack(ItemStack a, ItemStack b) {
+        return prioritizeCompare(BuiltInRegistries.ITEM.getKey(a.getItem()).getNamespace(), BuiltInRegistries.ITEM.getKey(a.getItem()).getNamespace(), "irons_jewelry");
+    }
+
+    private static int prioritizeCompare(String a, String b, String priority) {
+        if (a.equals(priority)) {
+            return -1;
+        } else if (b.equals(priority)) {
+            return 1;
+        } else {
+            return a.compareTo(b);
+        }
+    }
+
     private static void generateMaterialData(CommandSourceStack source) {
         try {
             var registry = IronsJewelryRegistries.materialRegistry(source.registryAccess());
@@ -442,7 +456,7 @@ public class GenerateSiteData {
                     IronsJewelry.LOGGER.error("Cannot generate material {}, no valid ingredients present!", id);
                     continue;
                 }
-                ItemStack representativeStack = material.ingredient().getItems()[0];
+                ItemStack representativeStack = Arrays.stream(material.ingredient().getItems()).sorted(GenerateSiteData::sortIngredientStack).findFirst().get();
                 var ingrId = BuiltInRegistries.ITEM.getKey(representativeStack.getItem());
                 var imgid = ingrId.getPath();
                 var sortOrder = (int) name.charAt(0);
