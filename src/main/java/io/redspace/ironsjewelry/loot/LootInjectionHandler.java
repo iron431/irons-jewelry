@@ -33,6 +33,7 @@ public class LootInjectionHandler {
     private static final int GEARSCORE_THRESHOLD = 30;
     private static final Map<Predicate<Item>, Integer> ITEM_GEARSCORES = createGearscoreMap();
     public static final HashMap<ResourceLocation, Float> TRACKED_LOOT_TABLES = new HashMap<>();
+    private static boolean built;
 
     private static Map<Predicate<Item>, Integer> createGearscoreMap() {
         Map<Predicate<Item>, Integer> map = new HashMap<>();
@@ -60,15 +61,13 @@ public class LootInjectionHandler {
     @SubscribeEvent
     public static void cacheTrackedLootTables(OnDatapackSyncEvent event) {
         // if never built, or the world data is reloading (player is null) then do work
-        if (!ServerConfig.ENABLE_DYNAMIC_JEWELRY_LOOT.get()) {
-            return;
-        }
-        if (event.getPlayer() == null) {
+        if (!built || event.getPlayer() == null) {
             var lootTables = event.getPlayerList().getServer().reloadableRegistries().get().registryOrThrow(Registries.LOOT_TABLE);
             TRACKED_LOOT_TABLES.clear();
             for (Map.Entry<ResourceKey<LootTable>, LootTable> registryEntry : lootTables.entrySet()) {
                 handleLootTable(registryEntry.getKey().location(), registryEntry.getValue());
             }
+            built = true;
         }
     }
 

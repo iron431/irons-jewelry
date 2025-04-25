@@ -16,7 +16,7 @@ public class ServerConfig {
     static {
         {
             BUILDER.push("Worldgen");
-            ENABLE_DYNAMIC_JEWELRY_LOOT = BUILDER.worldRestart()
+            ENABLE_DYNAMIC_JEWELRY_LOOT = BUILDER
                     .comment("Whether to include dynamically inserted jewelry items into loot tables based on the loot tables contents.")
                     .comment("(i.e. loot tables with gems and equipment can automatically generate jewelry items) (Default: true)")
                     .define("enableDynamicJewelryLoot", true);
