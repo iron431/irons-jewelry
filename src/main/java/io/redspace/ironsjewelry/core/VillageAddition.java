@@ -1,6 +1,7 @@
 package io.redspace.ironsjewelry.core;
 
 import com.mojang.datafixers.util.Pair;
+import io.redspace.ironsjewelry.ServerConfig;
 import io.redspace.ironsjewelry.IronsJewelry;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
@@ -68,8 +69,7 @@ public class VillageAddition {
         Registry<StructureTemplatePool> templatePoolRegistry = event.getServer().registryAccess().registry(Registries.TEMPLATE_POOL).orElseThrow();
         Registry<StructureProcessorList> processorListRegistry = event.getServer().registryAccess().registry(Registries.PROCESSOR_LIST).orElseThrow();
 
-        //TODO: configurable weight?
-        int weight = 2; // two is common weight for artisan building
+        int weight = ServerConfig.JEWELER_HOUSE_WEIGHT.get();
 
         addBuildingToPool(templatePoolRegistry, processorListRegistry,
                 ProcessorLists.MOSSIFY_70_PERCENT,

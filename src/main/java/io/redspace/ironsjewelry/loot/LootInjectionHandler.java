@@ -1,5 +1,6 @@
 package io.redspace.ironsjewelry.loot;
 
+import io.redspace.ironsjewelry.ServerConfig;
 import io.redspace.ironsjewelry.IronsJewelry;
 import io.redspace.ironsjewelry.item.CurioBaseItem;
 import io.redspace.ironsjewelry.utils.JewelryModTags;
@@ -32,7 +33,6 @@ public class LootInjectionHandler {
     private static final int GEARSCORE_THRESHOLD = 30;
     private static final Map<Predicate<Item>, Integer> ITEM_GEARSCORES = createGearscoreMap();
     public static final HashMap<ResourceLocation, Float> TRACKED_LOOT_TABLES = new HashMap<>();
-    private static boolean built;
 
     private static Map<Predicate<Item>, Integer> createGearscoreMap() {
         Map<Predicate<Item>, Integer> map = new HashMap<>();
@@ -60,13 +60,15 @@ public class LootInjectionHandler {
     @SubscribeEvent
     public static void cacheTrackedLootTables(OnDatapackSyncEvent event) {
         // if never built, or the world data is reloading (player is null) then do work
-        if (!built || event.getPlayer() == null) {
+        if (!ServerConfig.ENABLE_DYNAMIC_JEWELRY_LOOT.get()) {
+            return;
+        }
+        if (event.getPlayer() == null) {
             var lootTables = event.getPlayerList().getServer().reloadableRegistries().get().registryOrThrow(Registries.LOOT_TABLE);
             TRACKED_LOOT_TABLES.clear();
             for (Map.Entry<ResourceKey<LootTable>, LootTable> registryEntry : lootTables.entrySet()) {
                 handleLootTable(registryEntry.getKey().location(), registryEntry.getValue());
             }
-            built = true;
         }
     }
 
@@ -97,7 +99,7 @@ public class LootInjectionHandler {
             }
         }
         if (gearscore >= GEARSCORE_THRESHOLD) {
-            float chance = Mth.clampedLerp(0.05f, 0.75f, (gearscore - GEARSCORE_THRESHOLD) / 750f);
+            float chance = Mth.clampedLerp(0.025f, 0.5f, (gearscore - GEARSCORE_THRESHOLD) / 750f);
             TRACKED_LOOT_TABLES.put(id, chance);
         }
     }
