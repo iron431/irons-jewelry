@@ -72,34 +72,38 @@ public class LootInjectionHandler {
     }
 
     private static void handleLootTable(ResourceLocation id, LootTable table) {
-        // assume our loot tables do not need any edits
-        if (id.getNamespace().equals(IronsJewelry.MODID)) {
-            return;
-        }
-        // skip tons of trivial tables
-        if (id.getPath().startsWith("blocks") || id.getPath().startsWith("entities") || id.getPath().startsWith("equipment")) {
-            return;
-        }
-        // some special loot tables, like bartering, pot drops, or archeology, can only give 1 item at a time and cant support injections in this style
-        if (table.pools.size() == 1 && table.pools.getFirst().getRolls() instanceof ConstantValue cv && cv.value() == 1) {
-            return;
-        }
-        int gearscore = 0;
-        for (LootPool pool : table.pools) {
-            for (LootPoolEntryContainer entry : pool.entries) {
-                if (entry instanceof LootItem itemHolder) {
-                    var item = itemHolder.item;
-                    if (item.value() instanceof CurioBaseItem) {
-                        // loot table already handles jewelry, skip it
-                        return;
+        try {
+            // assume our loot tables do not need any edits
+            if (id.getNamespace().equals(IronsJewelry.MODID)) {
+                return;
+            }
+            // skip tons of trivial tables
+            if (id.getPath().startsWith("blocks") || id.getPath().startsWith("entities") || id.getPath().startsWith("equipment")) {
+                return;
+            }
+            // some special loot tables, like bartering, pot drops, or archeology, can only give 1 item at a time and cant support injections in this style
+            if (table.pools.size() == 1 && table.pools.getFirst().getRolls() instanceof ConstantValue cv && cv.value() == 1) {
+                return;
+            }
+            int gearscore = 0;
+            for (LootPool pool : table.pools) {
+                for (LootPoolEntryContainer entry : pool.entries) {
+                    if (entry instanceof LootItem itemHolder) {
+                        var item = itemHolder.item;
+                        if (item.value() instanceof CurioBaseItem) {
+                            // loot table already handles jewelry, skip it
+                            return;
+                        }
+                        gearscore += gearscoreFor(item.value());
                     }
-                    gearscore += gearscoreFor(item.value());
                 }
             }
-        }
-        if (gearscore >= GEARSCORE_THRESHOLD) {
-            float chance = Mth.clampedLerp(0.025f, 0.5f, (gearscore - GEARSCORE_THRESHOLD) / 750f);
-            TRACKED_LOOT_TABLES.put(id, chance);
+            if (gearscore >= GEARSCORE_THRESHOLD) {
+                float chance = Mth.clampedLerp(0.025f, 0.5f, (gearscore - GEARSCORE_THRESHOLD) / 750f);
+                TRACKED_LOOT_TABLES.put(id, chance);
+            }
+        } catch (Exception e) {
+            IronsJewelry.LOGGER.error("Failed to parse loot table \"{}\", skipping: {}", id, e.getMessage());
         }
     }
 }
