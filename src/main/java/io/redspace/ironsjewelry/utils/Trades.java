@@ -1,4 +1,4 @@
-package io.redspace.ironsjewelry.core;
+package io.redspace.ironsjewelry.utils;
 
 import io.redspace.ironsjewelry.core.data.MaterialDefinition;
 import io.redspace.ironsjewelry.registry.ComponentRegistry;

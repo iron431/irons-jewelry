@@ -1,4 +1,4 @@
-package io.redspace.ironsjewelry.core;
+package io.redspace.ironsjewelry.utils;
 
 import com.mojang.datafixers.util.Pair;
 import io.redspace.ironsjewelry.ServerConfig;

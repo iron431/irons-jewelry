@@ -1,7 +1,7 @@
 package io.redspace.ironsjewelry.core.data;
 
 import io.redspace.ironsjewelry.IronsJewelry;
-import io.redspace.ironsjewelry.core.BonusType;
+import io.redspace.ironsjewelry.core.bonuses.BonusType;
 import io.redspace.ironsjewelry.network.packets.SyncPlayerDataPacket;
 import io.redspace.ironsjewelry.registry.DataAttachmentRegistry;
 import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;

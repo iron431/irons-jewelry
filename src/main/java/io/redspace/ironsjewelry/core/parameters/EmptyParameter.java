@@ -1,7 +1,6 @@
 package io.redspace.ironsjewelry.core.parameters;
 
 import com.mojang.serialization.Codec;
-import io.redspace.ironsjewelry.core.IBonusParameterType;
 
 import java.util.Optional;
 

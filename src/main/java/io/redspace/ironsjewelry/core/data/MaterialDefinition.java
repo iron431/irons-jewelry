@@ -2,7 +2,7 @@ package io.redspace.ironsjewelry.core.data;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import io.redspace.ironsjewelry.core.IBonusParameterType;
+import io.redspace.ironsjewelry.core.parameters.IBonusParameterType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.Ingredient;
 

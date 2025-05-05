@@ -1,7 +1,8 @@
-package io.redspace.ironsjewelry.core;
+package io.redspace.ironsjewelry.core.actions;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
+import io.redspace.ironsjewelry.core.CooldownHandler;
 import io.redspace.ironsjewelry.core.data.BonusInstance;
 import io.redspace.ironsjewelry.core.data.PlayerData;
 import io.redspace.ironsjewelry.core.data.QualityScalar;

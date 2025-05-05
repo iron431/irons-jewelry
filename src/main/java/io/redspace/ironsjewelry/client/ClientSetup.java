@@ -2,8 +2,8 @@ package io.redspace.ironsjewelry.client;
 
 import io.redspace.ironsjewelry.IronsJewelry;
 import io.redspace.ironsjewelry.block.jewelcrafting_station.JewelcraftingStationScreen;
-import io.redspace.ironsjewelry.core.IMinecraftInstanceHelper;
-import io.redspace.ironsjewelry.core.MinecraftInstanceHelper;
+import io.redspace.ironsjewelry.utils.IMinecraftInstanceHelper;
+import io.redspace.ironsjewelry.utils.MinecraftInstanceHelper;
 import io.redspace.ironsjewelry.registry.MenuRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Player;

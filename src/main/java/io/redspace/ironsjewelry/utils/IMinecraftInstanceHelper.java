@@ -1,4 +1,4 @@
-package io.redspace.ironsjewelry.core;
+package io.redspace.ironsjewelry.utils;
 
 import net.minecraft.world.entity.player.Player;
 

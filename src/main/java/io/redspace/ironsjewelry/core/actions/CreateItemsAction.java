@@ -2,7 +2,6 @@ package io.redspace.ironsjewelry.core.actions;
 
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import io.redspace.ironsjewelry.core.IAction;
 import io.redspace.ironsjewelry.core.data.BonusInstance;
 import io.redspace.ironsjewelry.core.data.QualityScalar;
 import net.minecraft.ChatFormatting;

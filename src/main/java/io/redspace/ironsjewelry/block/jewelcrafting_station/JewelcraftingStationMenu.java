@@ -1,6 +1,6 @@
 package io.redspace.ironsjewelry.block.jewelcrafting_station;
 
-import io.redspace.ironsjewelry.core.Utils;
+import io.redspace.ironsjewelry.utils.Utils;
 import io.redspace.ironsjewelry.core.data.*;
 import io.redspace.ironsjewelry.event.SetupJewelcraftingResultEvent;
 import io.redspace.ironsjewelry.network.packets.SyncJewelcraftingSlotStates;

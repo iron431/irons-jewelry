@@ -1,6 +1,6 @@
 package io.redspace.ironsjewelry.event;
 
-import io.redspace.ironsjewelry.core.Utils;
+import io.redspace.ironsjewelry.utils.Utils;
 import io.redspace.ironsjewelry.core.bonuses.EffectOnHitBonusType;
 import io.redspace.ironsjewelry.core.data.BonusInstance;
 import io.redspace.ironsjewelry.core.data.JewelryData;

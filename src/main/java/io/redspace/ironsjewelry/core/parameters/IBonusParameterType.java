@@ -1,4 +1,4 @@
-package io.redspace.ironsjewelry.core;
+package io.redspace.ironsjewelry.core.parameters;
 
 import com.mojang.serialization.Codec;
 import io.redspace.ironsjewelry.IronsJewelry;

@@ -1,4 +1,4 @@
-package io.redspace.ironsjewelry.core;
+package io.redspace.ironsjewelry.utils;
 
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
