@@ -26,14 +26,14 @@ public class SetupEvents {
             /*
             Novice
              */
-            novice.add(new Trades.BuyItem(Items.GOLD_INGOT, 6, 1, 12, 1, 0.05F));
-            novice.add(new Trades.BuyItem(Items.COPPER_INGOT, 9, 1, 12, 1, 0.05F));
-            novice.add(new Trades.SellLootTable(ResourceKey.create(Registries.LOOT_TABLE, IronsJewelry.id("trades/sell_default_jewelry")), 2, 8, 0.05f, Trades::calculateJewelryPrice));
+            novice.add(new Trades.BuyItem(Items.GOLD_INGOT, 6, 1, 12, 2, 0.05F));
+            novice.add(new Trades.BuyItem(Items.COPPER_INGOT, 9, 1, 12, 2, 0.05F));
+            novice.add(new Trades.SellLootTable(ResourceKey.create(Registries.LOOT_TABLE, IronsJewelry.id("trades/sell_default_jewelry")), 2, 15, 0.05f, Trades::calculateJewelryPrice));
             /*
             Apprentice
              */
-            apprentice.add(new Trades.BuyItemTag(TagKey.create(Registries.ITEM, IronsJewelry.id("jeweler_buyable_gems")), 6, 1, 12, 8, 0.05F));
-            apprentice.add(new Trades.SellItemTag(TagKey.create(Registries.ITEM, IronsJewelry.id("jeweler_sellable_gems")), 4, 15, 0.05f, 8));
+            apprentice.add(new Trades.BuyItemTag(TagKey.create(Registries.ITEM, IronsJewelry.id("jeweler_buyable_gems")), 6, 1, 12, 10, 0.05F));
+            apprentice.add(new Trades.SellItemTag(TagKey.create(Registries.ITEM, IronsJewelry.id("jeweler_sellable_gems")), 4, 15, 0.05f, 10));
 
             /*
             Journeyman
