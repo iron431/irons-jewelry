@@ -1,6 +1,6 @@
 package io.redspace.ironsjewelry.item;
 
-import io.redspace.ironsjewelry.core.MinecraftInstanceHelper;
+import io.redspace.ironsjewelry.utils.MinecraftInstanceHelper;
 import io.redspace.ironsjewelry.core.data.PatternDefinition;
 import io.redspace.ironsjewelry.core.data.PlayerData;
 import io.redspace.ironsjewelry.registry.ComponentRegistry;

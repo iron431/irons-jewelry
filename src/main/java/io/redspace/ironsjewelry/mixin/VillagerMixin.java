@@ -1,6 +1,6 @@
 package io.redspace.ironsjewelry.mixin;
 
-import io.redspace.ironsjewelry.core.Utils;
+import io.redspace.ironsjewelry.utils.Utils;
 import io.redspace.ironsjewelry.core.bonuses.TradeDiscountBonusType;
 import io.redspace.ironsjewelry.registry.BonusTypeRegistry;
 import net.minecraft.world.entity.npc.Villager;

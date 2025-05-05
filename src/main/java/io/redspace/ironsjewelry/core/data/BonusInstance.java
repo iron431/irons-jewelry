@@ -1,7 +1,7 @@
 package io.redspace.ironsjewelry.core.data;
 
-import io.redspace.ironsjewelry.core.BonusType;
-import io.redspace.ironsjewelry.core.IBonusParameterType;
+import io.redspace.ironsjewelry.core.bonuses.BonusType;
+import io.redspace.ironsjewelry.core.parameters.IBonusParameterType;
 import net.minecraft.network.chat.Component;
 
 import java.util.List;

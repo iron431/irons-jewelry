@@ -2,7 +2,7 @@ package io.redspace.ironsjewelry.registry;
 
 import com.mojang.serialization.MapCodec;
 import io.redspace.ironsjewelry.IronsJewelry;
-import io.redspace.ironsjewelry.core.IAction;
+import io.redspace.ironsjewelry.core.actions.IAction;
 import io.redspace.ironsjewelry.core.actions.*;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredRegister;

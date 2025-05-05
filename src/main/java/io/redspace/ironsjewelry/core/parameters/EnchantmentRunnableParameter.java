@@ -2,7 +2,6 @@ package io.redspace.ironsjewelry.core.parameters;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import io.redspace.ironsjewelry.core.IBonusParameterType;
 import net.minecraft.world.item.enchantment.effects.EnchantmentEntityEffect;
 
 import java.util.Optional;

@@ -1,7 +1,7 @@
 package io.redspace.ironsjewelry.mixin;
 
 import io.redspace.ironsjewelry.IronsJewelry;
-import io.redspace.ironsjewelry.core.Trades;
+import io.redspace.ironsjewelry.utils.Trades;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.npc.WanderingTrader;

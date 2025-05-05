@@ -1,6 +1,5 @@
 package io.redspace.ironsjewelry.core.bonuses;
 
-import io.redspace.ironsjewelry.core.BonusType;
 import io.redspace.ironsjewelry.core.data.BonusInstance;
 import io.redspace.ironsjewelry.core.parameters.EffectParameter;
 import io.redspace.ironsjewelry.registry.ParameterTypeRegistry;
