@@ -24,7 +24,7 @@
       "targetSelf": true,
       "action": {
         "type": "irons_jewelry:apply_effect",
-        "duration": 120,
+        "duration": 60,
         "amplifier": {
           "base": 0,
           "scalar": 1,
