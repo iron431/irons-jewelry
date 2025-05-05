@@ -26,8 +26,8 @@ public class SetupEvents {
             /*
             Novice
              */
-            novice.add(new Trades.BuyItem(Items.GOLD_INGOT, 6, 1, 12, 2, 0.05F));
-            novice.add(new Trades.BuyItem(Items.COPPER_INGOT, 9, 1, 12, 2, 0.05F));
+            novice.add(new Trades.BuyItem(Items.GOLD_INGOT, 6, 1, 12, 3, 0.05F));
+            novice.add(new Trades.BuyItem(Items.COPPER_INGOT, 9, 1, 12, 3, 0.05F));
             novice.add(new Trades.SellLootTable(ResourceKey.create(Registries.LOOT_TABLE, IronsJewelry.id("trades/sell_default_jewelry")), 2, 15, 0.05f, Trades::calculateJewelryPrice));
             /*
             Apprentice
