@@ -1,0 +1,9 @@
+{
+  "allowedMaterialTypes": [
+    "metal",
+    "gem"
+  ],
+  "baseTextureLocation": "irons_jewelry:item/base/skull_bane_ring",
+  "descriptionId": "part.irons_jewelry.skull_bane_ring",
+  "paletteKey": "irons_jewelry:palettes/gold"
+}

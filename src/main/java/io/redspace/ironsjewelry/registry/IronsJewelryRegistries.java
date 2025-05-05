@@ -119,6 +119,8 @@ public class IronsJewelryRegistries {
     public static Holder<PartDefinition> GEMS_SIDE;
     public static Holder<PartDefinition> PIGLIN_SIGNET;
     public static Holder<PartDefinition> HAGGLER_STONE;
+    public static Holder<PartDefinition> BAND_BANE_RING;
+    public static Holder<PartDefinition> SKULL_BANE_RING;
 
     public static Holder<PatternDefinition> GEMSET_RING;
     public static Holder<PatternDefinition> SIMPLE_BAND;
@@ -133,6 +135,7 @@ public class IronsJewelryRegistries {
     public static Holder<PatternDefinition> SIMPLE_CHAIN;
     public static Holder<PatternDefinition> TEARSTONE_RING;
     public static Holder<PatternDefinition> HAGGLER_RING;
+    public static Holder<PatternDefinition> BANE_RING;
 
     public static final RegistrySetBuilder builder = new RegistrySetBuilder()
             .add(IronsJewelryRegistries.Keys.PART_REGISTRY_KEY, bootstrap -> {
@@ -179,6 +182,13 @@ public class IronsJewelryRegistries {
                         IronsJewelry.id("palettes/diamond"),
                         List.of("emerald"),
                         IronsJewelry.id("item/base/gem_round_large")
+                ));
+                BAND_BANE_RING = bootstrap.register(prk(IronsJewelry.id("band_bane_ring")), PartDefinition.simpleMetalPart(IronsJewelry.MODID, "band_bane_ring"));
+                SKULL_BANE_RING = bootstrap.register(prk(IronsJewelry.id("skull_bane_ring")), new PartDefinition(
+                        "part.irons_jewelry.skull_bane_ring",
+                        IronsJewelry.id("palettes/gold"),
+                        List.of("metal", "gem"),
+                        IronsJewelry.id("item/base/skull_bane_ring")
                 ));
             })
             .add(IronsJewelryRegistries.Keys.PATTERN_REGISTRY_KEY, bootstrap -> {
@@ -235,7 +245,7 @@ public class IronsJewelryRegistries {
                         ),
                         Optional.of(GEM_BAND_BARBED),
                         false,
-                        3
+                        2.5
                 ));
                 IMRPOVED_GEMSET_RING = bootstrap.register(pnk(IronsJewelry.id("improved_gemset_ring")), new PatternDefinition(
                         "pattern.irons_jewelry.improved_gemset_ring",
@@ -262,7 +272,7 @@ public class IronsJewelryRegistries {
                                 ))
                         ),
                         Optional.of(BAND_GEM_SUPERIOR),
-                        false, 1.75
+                        false, 1.5
                 ));
                 PIGLIN_SIGNET_RING = bootstrap.register(pnk(IronsJewelry.id("piglin_signet_ring")), new PatternDefinition(
                         "pattern.irons_jewelry.piglin_signet_ring",
@@ -283,7 +293,7 @@ public class IronsJewelryRegistries {
                                 new PartIngredient(BAND_GEM_THIN, 6, 0, List.of(
                                 )),
                                 new PartIngredient(GEM_POINTY, 2, 1, List.of(
-                                        new Bonus(BonusTypeRegistry.ON_PROJECTILE_HIT_BONUS.get(), 1, Optional.of(new QualityScalar(100, -20)),Map.of())
+                                        new Bonus(BonusTypeRegistry.ON_PROJECTILE_HIT_BONUS.get(), 1, Optional.of(new QualityScalar(100, -20)), Map.of())
                                 ))
                         ),
                         Optional.of(BAND_GEM_THIN),
@@ -320,7 +330,7 @@ public class IronsJewelryRegistries {
                         JewelryTypeRegistry.RING.get(),
                         List.of(
                                 new PartIngredient(BAND_STALWART, 6, 0, List.of(
-                                        new Bonus(BonusTypeRegistry.ON_SHIELD_BLOCK_BONUS.get(), 1, Optional.of(new QualityScalar(80)),Map.of())
+                                        new Bonus(BonusTypeRegistry.ON_SHIELD_BLOCK_BONUS.get(), 1, Optional.of(new QualityScalar(80)), Map.of())
                                 ))
                         ),
                         Optional.empty(),
@@ -352,6 +362,20 @@ public class IronsJewelryRegistries {
                         ),
                         Optional.of(BAND_GEM),
                         false, 2
+                ));
+                BANE_RING = bootstrap.register(pnk(IronsJewelry.id("bane_ring")), new PatternDefinition(
+                        "pattern.irons_jewelry.bane_ring",
+                        JewelryTypeRegistry.RING.get(),
+                        List.of(
+                                new PartIngredient(BAND_BANE_RING, 6, 0, List.of(
+                                )),
+                                new PartIngredient(SKULL_BANE_RING, 4, 1, List.of(
+                                        new Bonus(BonusTypeRegistry.ON_ATTACK_BONUS.get(), 0.25, Optional.of(new QualityScalar(160)), Map.of())
+                                ))
+                        ),
+                        Optional.of(BAND_BANE_RING),
+                        false,
+                        4
                 ));
             });
 }

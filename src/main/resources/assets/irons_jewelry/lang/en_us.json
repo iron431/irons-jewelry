@@ -49,6 +49,8 @@
   "pattern.irons_jewelry.stonehewn_band.item": "%s Stonehewn Band",
   "pattern.irons_jewelry.haggler_ring": "Ring of Haggling",
   "pattern.irons_jewelry.haggler_ring.item": "%2$s Ring of Haggling",
+  "pattern.irons_jewelry.bane_ring": "Bane Ring",
+  "pattern.irons_jewelry.bane_ring.item": "%1$s Bane Ring",
 
   "material.irons_jewelry.iron": "Iron",
   "material.irons_jewelry.gold": "Gold",
@@ -97,6 +99,8 @@
   "part.irons_jewelry.band_barbed": "Barbed Band",
   "part.irons_jewelry.stonehewn_band": "Band",
   "part.irons_jewelry.haggler_stone": "Haggler's Stone",
+  "part.irons_jewelry.band_bane_ring": "Band",
+  "part.irons_jewelry.skull_bane_ring": "Skull",
 
 
   "bonus.irons_jewelry.attribute_bonus": "Attribute",

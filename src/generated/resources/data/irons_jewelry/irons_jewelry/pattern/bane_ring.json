@@ -1,0 +1,29 @@
+{
+  "type": "irons_jewelry:ring",
+  "descriptionId": "pattern.irons_jewelry.bane_ring",
+  "partForQuality": "irons_jewelry:band_bane_ring",
+  "parts": [
+    {
+      "drawOrder": 0,
+      "id": "irons_jewelry:band_bane_ring",
+      "materialCost": 6
+    },
+    {
+      "bonuses": [
+        {
+          "bonusType": "irons_jewelry:on_attack_bonus",
+          "cooldown": {
+            "base": 160.0,
+            "scalar": 0.0
+          },
+          "qualityMultiplier": 0.25
+        }
+      ],
+      "drawOrder": 1,
+      "id": "irons_jewelry:skull_bane_ring",
+      "materialCost": 4
+    }
+  ],
+  "qualityMultiplier": 4.0,
+  "unlockedByDefault": false
+}
