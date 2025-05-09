@@ -1,11 +1,11 @@
 package io.redspace.ironsjewelry.item;
 
-import io.redspace.ironsjewelry.utils.MinecraftInstanceHelper;
 import io.redspace.ironsjewelry.core.data.PatternDefinition;
 import io.redspace.ironsjewelry.core.data.PlayerData;
 import io.redspace.ironsjewelry.registry.ComponentRegistry;
 import io.redspace.ironsjewelry.registry.DataAttachmentRegistry;
 import io.redspace.ironsjewelry.registry.ItemRegistry;
+import io.redspace.ironsjewelry.utils.MinecraftInstanceHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;

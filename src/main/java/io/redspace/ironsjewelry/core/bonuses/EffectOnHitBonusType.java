@@ -1,9 +1,9 @@
 package io.redspace.ironsjewelry.core.bonuses;
 
-import io.redspace.ironsjewelry.utils.Utils;
 import io.redspace.ironsjewelry.core.data.BonusInstance;
 import io.redspace.ironsjewelry.core.parameters.EffectParameter;
 import io.redspace.ironsjewelry.registry.ParameterTypeRegistry;
+import io.redspace.ironsjewelry.utils.Utils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;

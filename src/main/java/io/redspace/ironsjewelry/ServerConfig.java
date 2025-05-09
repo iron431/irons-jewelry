@@ -1,6 +1,5 @@
 package io.redspace.ironsjewelry;
 
-import io.redspace.ironsjewelry.loot.LootInjectionHandler;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.config.ModConfigEvent;

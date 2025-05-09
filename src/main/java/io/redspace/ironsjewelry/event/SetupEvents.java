@@ -1,8 +1,8 @@
 package io.redspace.ironsjewelry.event;
 
 import io.redspace.ironsjewelry.IronsJewelry;
-import io.redspace.ironsjewelry.utils.Trades;
 import io.redspace.ironsjewelry.registry.VillagerRegistry;
+import io.redspace.ironsjewelry.utils.Trades;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;

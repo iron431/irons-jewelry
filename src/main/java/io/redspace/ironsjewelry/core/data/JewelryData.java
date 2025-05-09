@@ -2,9 +2,9 @@ package io.redspace.ironsjewelry.core.data;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import io.redspace.ironsjewelry.core.MaterialModifierDataHandler;
 import io.redspace.ironsjewelry.core.bonuses.BonusType;
 import io.redspace.ironsjewelry.core.parameters.IBonusParameterType;
-import io.redspace.ironsjewelry.core.MaterialModifierDataHandler;
 import io.redspace.ironsjewelry.registry.ComponentRegistry;
 import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
 import io.redspace.ironsjewelry.registry.ParameterTypeRegistry;

@@ -1,8 +1,8 @@
 package io.redspace.ironsjewelry.network.packets;
 
 import io.redspace.ironsjewelry.IronsJewelry;
-import io.redspace.ironsjewelry.core.data.PatternDefinition;
 import io.redspace.ironsjewelry.block.jewelcrafting_station.JewelcraftingStationMenu;
+import io.redspace.ironsjewelry.core.data.PatternDefinition;
 import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
 import net.minecraft.core.Holder;
 import net.minecraft.network.RegistryFriendlyByteBuf;

@@ -1,7 +1,7 @@
 package io.redspace.ironsjewelry.core.bonuses;
 
-import io.redspace.ironsjewelry.core.parameters.IBonusParameterType;
 import io.redspace.ironsjewelry.core.data.BonusInstance;
+import io.redspace.ironsjewelry.core.parameters.IBonusParameterType;
 import io.redspace.ironsjewelry.registry.ParameterTypeRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;

@@ -1,8 +1,8 @@
 package io.redspace.ironsjewelry.utils;
 
 import com.mojang.datafixers.util.Pair;
-import io.redspace.ironsjewelry.ServerConfig;
 import io.redspace.ironsjewelry.IronsJewelry;
+import io.redspace.ironsjewelry.ServerConfig;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;

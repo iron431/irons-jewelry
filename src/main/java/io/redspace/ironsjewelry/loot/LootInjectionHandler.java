@@ -1,6 +1,5 @@
 package io.redspace.ironsjewelry.loot;
 
-import io.redspace.ironsjewelry.ServerConfig;
 import io.redspace.ironsjewelry.IronsJewelry;
 import io.redspace.ironsjewelry.item.CurioBaseItem;
 import io.redspace.ironsjewelry.utils.JewelryModTags;

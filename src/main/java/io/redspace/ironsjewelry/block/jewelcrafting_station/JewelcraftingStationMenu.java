@@ -1,12 +1,12 @@
 package io.redspace.ironsjewelry.block.jewelcrafting_station;
 
-import io.redspace.ironsjewelry.utils.Utils;
 import io.redspace.ironsjewelry.core.data.*;
 import io.redspace.ironsjewelry.event.SetupJewelcraftingResultEvent;
 import io.redspace.ironsjewelry.network.packets.SyncJewelcraftingSlotStates;
 import io.redspace.ironsjewelry.registry.BlockRegistry;
 import io.redspace.ironsjewelry.registry.ComponentRegistry;
 import io.redspace.ironsjewelry.registry.MenuRegistry;
+import io.redspace.ironsjewelry.utils.Utils;
 import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;

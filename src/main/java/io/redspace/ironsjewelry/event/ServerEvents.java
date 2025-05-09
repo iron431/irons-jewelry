@@ -1,6 +1,5 @@
 package io.redspace.ironsjewelry.event;
 
-import io.redspace.ironsjewelry.utils.Utils;
 import io.redspace.ironsjewelry.core.bonuses.EffectOnHitBonusType;
 import io.redspace.ironsjewelry.core.data.BonusInstance;
 import io.redspace.ironsjewelry.core.data.JewelryData;
@@ -8,6 +7,7 @@ import io.redspace.ironsjewelry.core.parameters.ActionParameter;
 import io.redspace.ironsjewelry.network.packets.SyncPlayerDataPacket;
 import io.redspace.ironsjewelry.registry.BonusTypeRegistry;
 import io.redspace.ironsjewelry.registry.DataAttachmentRegistry;
+import io.redspace.ironsjewelry.utils.Utils;
 import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
