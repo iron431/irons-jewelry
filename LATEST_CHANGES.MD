@@ -1,18 +1,27 @@
 ### Additions
-- Added Dynamic Loot Injections for Jewelry items
-  - Dynamically inserts jewelry items into loot tables based on the loot table's contents above some threshold
-  - Loot tables with more gems, equipment, or other tagged items have a higher change to generate jewelry
-  - Added corresponding item tags: `loot_handler/low_gearscore`,`loot_handler/medium_gearscore`,`loot_handler/high_gearscore`,`loot_handler/very_high_gearscore`
-- Added Serverconfig file, with options for disabling loot injections and changing jeweler house weight
-- Added Japanese localization, thanks to Mohuzato
-- Added Russian localization, thanks to Heimdallr
+- Added Bane Ring pattern
+  - Grants action on melee hit
 
 ### Changes
-- Adjusted Barbed Band texture
+- Restyled Onyx textures to be brown instead of dark blue
+- Increased rate at which Jeweler trades give Villager Xp
+- Adjust scaling of attribute based rings
+  - Superior Ring now no longer gives an inherit bonus over Improved Gemset Ring
+- Tweaked Material Bonuses, reducing duplicate bonuses
+  - Netherite
+    - Reduced Action (gain strength) effect duration from 6s -> 3s
+  - Moonstone
+    - Negative Effect: Blindness -> Weaving (no longer duplicates Onyx)
+  - Lapis
+    - Added Glowing as Negative Effect (previously nothing)
+  - Garnet
+    - Added Wither as Negative Effect (previously nothing)
+    - Action: Heal -> Grant Self Resistance (no longer duplicates Onyx)
+  - Emerald
+    - Added Infested as Negative Effect (previously nothing)
 
 ### Fixes
 - 
 
 ### API
-- Now requires Atlas API v1.1.0, and cannot exceed v1.2.0 (exclusive)
-
+- 
