@@ -30,6 +30,11 @@ public class ClientSetup {
                 public Player player() {
                     return Minecraft.getInstance().player;
                 }
+
+                @Override
+                public boolean isLocalInstance() {
+                    return true;
+                }
             };
         });
     }

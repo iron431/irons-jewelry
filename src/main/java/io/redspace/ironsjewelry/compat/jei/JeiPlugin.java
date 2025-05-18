@@ -60,11 +60,13 @@ public class JeiPlugin implements IModPlugin {
     public static final ISubtypeInterpreter<ItemStack> JEWELRY_INTERPRETER = new ISubtypeInterpreter<ItemStack>() {
         @Override
         public @Nullable String getSubtypeData(ItemStack ingredient, UidContext context) {
-            var pattern = JewelryData.get(ingredient).pattern().getKey();
-            if (pattern != null) {
-                return pattern.location().toString();
+            var data = JewelryData.get(ingredient);
+            if (data.isValid()) {
+                var pattern = data.pattern().getKey();
+                if (pattern != null) {
+                    return pattern.location().toString();
+                }
             }
-
             return null;
         }
 

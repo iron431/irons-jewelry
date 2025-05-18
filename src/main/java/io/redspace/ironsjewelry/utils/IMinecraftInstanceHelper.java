@@ -8,4 +8,8 @@ public interface IMinecraftInstanceHelper {
     @Nullable
     Player player();
 
+    default boolean isLocalInstance() {
+        return false;
+    }
+
 }
