@@ -77,10 +77,10 @@ public class LootInjectionHandler {
                 return;
             }
             // skip tons of trivial tables
-            if (id.getPath().startsWith("blocks") || id.getPath().startsWith("entities") || id.getPath().startsWith("equipment")) {
+            if (!(id.getPath().startsWith("chests") || id.getPath().startsWith("spawners"))) {
                 return;
             }
-            // some special loot tables, like bartering, pot drops, or archeology, can only give 1 item at a time and cant support injections in this style
+            // some special loot tables, like bartering, pot drops, or archeology, can only give 1 item at a time, so do not append more rolls
             if (table.pools.size() == 1 && table.pools.getFirst().getRolls() instanceof ConstantValue cv && cv.value() == 1) {
                 return;
             }
