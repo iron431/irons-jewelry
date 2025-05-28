@@ -1,5 +1,6 @@
 {
 "_comment": "Переведено на русский язык Heimdallr-1",
+"_comment": "Дата обновления: 28.05.2025 в 12:47",
 "_comment": "Не редактируйте мой перевод. Если вы заметили ошибку, буду благодарен, если сообщите о ней через Telegram.",
 "_comment": "Поддержать мои переводы здесь: https://boosty.to/heimdallr-1",
 "_comment": "Контакты: heimdallr196@gmail.com или Telegram — ссылка в профиле.",
@@ -8,18 +9,16 @@
 "item.irons_jewelry.necklace": "Ожерелье",
 "item.irons_jewelry.invalid_jewelry": "Непригодное ювелирное изделие",
 "item.irons_jewelry.recipe": "Свиток ремесленника",
-"item.irons_jewelry.ruby": "рубинов.",
-"item.irons_jewelry.sapphire": "сапфиров.",
-"item.irons_jewelry.topaz": "топазов.",
-"item.irons_jewelry.moonstone": "адулярн.",
-"item.irons_jewelry.peridot": "оливин.",
-"item.irons_jewelry.onyx": "онихионов.",
-"item.irons_jewelry.garnet": "гранатов.",
+"item.irons_jewelry.ruby": "Рубин",
+"item.irons_jewelry.sapphire": "Сапфир",
+"item.irons_jewelry.topaz": "Топаз",
+"item.irons_jewelry.moonstone": "Адуляр",
+"item.irons_jewelry.peridot": "Оливин",
+"item.irons_jewelry.onyx": "Онихион",
+"item.irons_jewelry.garnet": "Гранат",
 
 "block.irons_jewelry.jewelcrafting_station": "Ювелирная станция",
-
 "container.irons_jewelry.jewelcrafting_station": "Ювелирная станция",
-
 "entity.minecraft.villager.irons_jewelry.jeweler": "Ювелир",
 
 "pattern.irons_jewelry.simple_band": "Простое кольцо",
@@ -48,8 +47,8 @@
 "pattern.irons_jewelry.simple_amulet.item": "Амулет %s",
 "pattern.irons_jewelry.amulet_of_protection": "Амулет защиты",
 "pattern.irons_jewelry.amulet_of_protection.item": "Амулет защиты %s",
-"pattern.irons_jewelry.barbed_band": "Шипастое кольцо-пестень",
-"pattern.irons_jewelry.barbed_band.item": "%2$s кольцо-пестень",
+"pattern.irons_jewelry.barbed_band": "Шипастое кольцо-перстень",
+"pattern.irons_jewelry.barbed_band.item": "%2$s кольцо-перстень",
 "pattern.irons_jewelry.stonehewn_band": "Высеченное кольцо",
 "pattern.irons_jewelry.stonehewn_band.item": "Высеченное кольцо %s",
 "pattern.irons_jewelry.haggler_ring": "Перстень торгаша",
@@ -223,5 +222,5 @@
 "damage_type.apothic_attributes.cold_damage": "Холод",
 "damage_type.apothic_attributes.fire_damage": "Огонь",
 "damage_type.apothic_attributes.detonation": "Взрывание",
-"damage_type.apothic_attributes.current_hp_damage": "Теущее здоровье"
+"damage_type.apothic_attributes.current_hp_damage": "Текущее здоровье"
 }
