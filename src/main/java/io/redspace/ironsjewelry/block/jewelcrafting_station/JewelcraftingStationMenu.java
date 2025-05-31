@@ -230,6 +230,8 @@ public class JewelcraftingStationMenu extends AbstractContainerMenu {
         //Reset Workspace
         this.clearContainer(player, workspaceContainer);
         this.workspaceSlots.forEach(slot -> slot.setup(-20, -20, false));
+        setupResult(); // reevaluate result. should basically always just reset it
+        // Setup new slots
         if (validateAvailablePattern(patternDefinition)) {
             this.currentPattern = patternDefinition;
             int ingredientCount = Math.min(10, currentPattern.value().partTemplate().size());
