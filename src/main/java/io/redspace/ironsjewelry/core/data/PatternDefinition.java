@@ -1,6 +1,7 @@
 package io.redspace.ironsjewelry.core.data;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.redspace.ironsjewelry.core.parameters.IBonusParameterType;
 import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
@@ -19,7 +20,6 @@ import java.util.stream.Collectors;
 
 /**
  * A pattern represents a piece of jewelry that can be crafted, and contains data for what components are required to craft it and what the resulting item can do
- *
  */
 public record PatternDefinition(String descriptionId,
                                 JewelryType jewelryType,
@@ -27,7 +27,7 @@ public record PatternDefinition(String descriptionId,
                                 Optional<Holder<PartDefinition>> partForQuality,
                                 boolean unlockedByDefault,
                                 double qualityMultiplier) {
-    public static final Codec<PatternDefinition> CODEC = RecordCodecBuilder.create(builder -> builder.group(
+    private static final Codec<PatternDefinition> CODEC_RAW = RecordCodecBuilder.create(builder -> builder.group(
             Codec.STRING.fieldOf("descriptionId").forGetter(PatternDefinition::descriptionId),
             IronsJewelryRegistries.JEWELRY_TYPE_REGISTRY.byNameCodec().fieldOf("type").forGetter(PatternDefinition::jewelryType),
             Codec.list(PartIngredient.CODEC).fieldOf("parts").forGetter(PatternDefinition::partTemplate),
@@ -35,6 +35,20 @@ public record PatternDefinition(String descriptionId,
             Codec.BOOL.optionalFieldOf("unlockedByDefault", true).forGetter(PatternDefinition::unlockedByDefault),
             Codec.DOUBLE.optionalFieldOf("qualityMultiplier", 1d).forGetter(PatternDefinition::qualityMultiplier)
     ).apply(builder, PatternDefinition::new));
+    public static final Codec<PatternDefinition> CODEC = CODEC_RAW.validate(PatternDefinition::validate);
+
+    public static DataResult<PatternDefinition> validate(PatternDefinition patternDefinition) {
+//        Check if partForQuality is present and exists in the part list
+        var pattern = (PatternDefinition) patternDefinition;
+        if (pattern.partForQuality().isPresent()) {
+            var part = pattern.partForQuality().get();
+            if (pattern.partTemplate().stream()
+                    .noneMatch(ingredient -> ingredient.part().equals(part))) {
+                return DataResult.error(() -> "partForQuality \"" + part.getKey().location() + "\" is not found in the parts list");
+            }
+        }
+        return DataResult.success(pattern);
+    }
 
     public PatternDefinition(String descriptionId, JewelryType jewelryType, List<PartIngredient> partTemplate, Optional<Holder<PartDefinition>> partForQuality,
                              boolean unlockedByDefault,
