@@ -1,0 +1,47 @@
+{
+  "type": "irons_jewelry:necklace",
+  "descriptionId": "pattern.irons_jewelry.rhinestone_amulet",
+  "partForQuality": "irons_jewelry:chain_rhinestone",
+  "parts": [
+    {
+      "drawOrder": 0,
+      "id": "irons_jewelry:chain_rhinestone",
+      "materialCost": 6
+    },
+    {
+      "bonuses": [
+        {
+          "bonusType": "irons_jewelry:attribute_bonus",
+          "qualityMultiplier": 0.5
+        }
+      ],
+      "drawOrder": 1,
+      "id": "irons_jewelry:gem_rhinestone_a",
+      "materialCost": 1
+    },
+    {
+      "bonuses": [
+        {
+          "bonusType": "irons_jewelry:attribute_bonus",
+          "qualityMultiplier": 0.5
+        }
+      ],
+      "drawOrder": 2,
+      "id": "irons_jewelry:gem_rhinestone_b",
+      "materialCost": 1
+    },
+    {
+      "bonuses": [
+        {
+          "bonusType": "irons_jewelry:attribute_bonus",
+          "qualityMultiplier": 0.5
+        }
+      ],
+      "drawOrder": 3,
+      "id": "irons_jewelry:gem_rhinestone_c",
+      "materialCost": 1
+    }
+  ],
+  "qualityMultiplier": 1.25,
+  "unlockedByDefault": false
+}

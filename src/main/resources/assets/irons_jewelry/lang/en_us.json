@@ -51,6 +51,8 @@
   "pattern.irons_jewelry.haggler_ring.item": "%2$s Ring of Haggling",
   "pattern.irons_jewelry.bane_ring": "Bane Ring",
   "pattern.irons_jewelry.bane_ring.item": "%1$s Bane Ring",
+  "pattern.irons_jewelry.rhinestone_amulet": "Rhinestone Amulet",
+  "pattern.irons_jewelry.rhinestone_amulet.item": "%1$s-%2$s-%3$s Rhinestone Amulet",
 
   "material.irons_jewelry.iron": "Iron",
   "material.irons_jewelry.gold": "Gold",
@@ -101,7 +103,10 @@
   "part.irons_jewelry.haggler_stone": "Haggler's Stone",
   "part.irons_jewelry.band_bane_ring": "Band",
   "part.irons_jewelry.skull_bane_ring": "Skull",
-
+  "part.irons_jewelry.chain_rhinestone": "Chain",
+  "part.irons_jewelry.gem_rhinestone_a": "Rhinestone",
+  "part.irons_jewelry.gem_rhinestone_b": "Rhinestone",
+  "part.irons_jewelry.gem_rhinestone_c": "Rhinestone",
 
   "bonus.irons_jewelry.attribute_bonus": "Attribute",
   "bonus.irons_jewelry.effect_on_hit_bonus": "Effect on Hit",

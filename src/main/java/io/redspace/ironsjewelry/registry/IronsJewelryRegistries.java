@@ -121,6 +121,10 @@ public class IronsJewelryRegistries {
     public static Holder<PartDefinition> HAGGLER_STONE;
     public static Holder<PartDefinition> BAND_BANE_RING;
     public static Holder<PartDefinition> SKULL_BANE_RING;
+    public static Holder<PartDefinition> CHAIN_RHINESTONE;
+    public static Holder<PartDefinition> GEM_RHINESTONE_A;
+    public static Holder<PartDefinition> GEM_RHINESTONE_B;
+    public static Holder<PartDefinition> GEM_RHINESTONE_C;
 
     public static Holder<PatternDefinition> GEMSET_RING;
     public static Holder<PatternDefinition> SIMPLE_BAND;
@@ -136,6 +140,7 @@ public class IronsJewelryRegistries {
     public static Holder<PatternDefinition> TEARSTONE_RING;
     public static Holder<PatternDefinition> HAGGLER_RING;
     public static Holder<PatternDefinition> BANE_RING;
+    public static Holder<PatternDefinition> RHINESTONE_AMULET;
 
     public static final RegistrySetBuilder builder = new RegistrySetBuilder()
             .add(IronsJewelryRegistries.Keys.PART_REGISTRY_KEY, bootstrap -> {
@@ -190,6 +195,11 @@ public class IronsJewelryRegistries {
                         List.of("metal", "gem"),
                         IronsJewelry.id("item/base/skull_bane_ring")
                 ));
+                CHAIN_RHINESTONE = bootstrap.register(prk(IronsJewelry.id("chain_rhinestone")), PartDefinition.simpleMetalPart(IronsJewelry.MODID, "chain_rhinestone"));
+                GEM_RHINESTONE_A = bootstrap.register(prk(IronsJewelry.id("gem_rhinestone_a")), PartDefinition.simpleGemPart(IronsJewelry.MODID, "gem_rhinestone_a"));
+                GEM_RHINESTONE_B = bootstrap.register(prk(IronsJewelry.id("gem_rhinestone_b")), PartDefinition.simpleGemPart(IronsJewelry.MODID, "gem_rhinestone_b"));
+                GEM_RHINESTONE_C = bootstrap.register(prk(IronsJewelry.id("gem_rhinestone_c")), PartDefinition.simpleGemPart(IronsJewelry.MODID, "gem_rhinestone_c"));
+
             })
             .add(IronsJewelryRegistries.Keys.PATTERN_REGISTRY_KEY, bootstrap -> {
                 HolderGetter<DamageType> damageGetter = bootstrap.lookup(Registries.DAMAGE_TYPE);
@@ -376,6 +386,25 @@ public class IronsJewelryRegistries {
                         Optional.of(BAND_BANE_RING),
                         false,
                         4
+                ));
+                RHINESTONE_AMULET = bootstrap.register(pnk(IronsJewelry.id("rhinestone_amulet")), new PatternDefinition(
+                        "pattern.irons_jewelry.rhinestone_amulet",
+                        JewelryTypeRegistry.NECKLACE.get(),
+                        List.of(
+                                new PartIngredient(CHAIN_RHINESTONE, 6, 0, List.of()),
+                                new PartIngredient(GEM_RHINESTONE_A, 1, 1, List.of(
+                                        new Bonus(BonusTypeRegistry.ATTRIBUTE_BONUS.get(), 0.5)
+                                )),
+                                new PartIngredient(GEM_RHINESTONE_B, 1, 2, List.of(
+                                        new Bonus(BonusTypeRegistry.ATTRIBUTE_BONUS.get(), 0.5)
+                                )),
+
+                                new PartIngredient(GEM_RHINESTONE_C, 1, 3, List.of(
+                                        new Bonus(BonusTypeRegistry.ATTRIBUTE_BONUS.get(), 0.5)
+                                ))
+                        ),
+                        Optional.of(CHAIN_RHINESTONE),
+                        false, 1.25
                 ));
             });
 }

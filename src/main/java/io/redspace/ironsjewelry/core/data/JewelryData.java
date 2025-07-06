@@ -11,6 +11,7 @@ import io.redspace.ironsjewelry.registry.ParameterTypeRegistry;
 import net.minecraft.core.Holder;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.Tuple;
@@ -191,7 +192,32 @@ public class JewelryData {
             ids[parts.size() - 1 - i] = Component.translatable(this.parts.get(parts.get(i).part()).value().descriptionId());
         }
         var descriptionId = this.pattern.value().descriptionId();
-        return Component.translatable(descriptionId + ".item", ids);
+        Map<Holder<MaterialDefinition>, Integer> duplicates = new HashMap<>();
+        this.parts.forEach((part, material) -> {
+            if (!pattern.value().partForQuality().map(ignore -> ignore.value().equals(part.value())).orElse(false)) {
+                var count = duplicates.getOrDefault(material, 0);
+                count++;
+                duplicates.put(material, count);
+            }
+        });
+        boolean dirty = false;
+        MutableComponent directTranslation = Component.translatable(descriptionId + ".item", ids);
+        String rasterizedTranslation = directTranslation.getString();
+        for (var entry : duplicates.entrySet()) {
+            var material = entry.getKey();
+            var count = entry.getValue();
+            if (count > 1) {
+                for (int i = 0; i < count - 1; i++) {
+                    rasterizedTranslation = rasterizedTranslation.replace(String.format("%s-", Component.translatable(material.value().descriptionId()).getString()), "");
+                    dirty = true;
+                }
+            }
+        }
+        if (dirty) {
+            return Component.literal(rasterizedTranslation);
+        } else {
+            return directTranslation;
+        }
     }
 
     public List<BonusInstance> getBonuses() {
