@@ -27,10 +27,10 @@ public class InjectJewelryLootModifier extends LootModifier {
 
     @Override
     protected @NotNull ObjectArrayList<ItemStack> doApply(ObjectArrayList<ItemStack> generatedLoot, LootContext context) {
-        ObjectArrayList<ItemStack> objectarraylist = new ObjectArrayList<>();
         if (!ServerConfig.ENABLE_DYNAMIC_JEWELRY_LOOT.get()) {
-            return objectarraylist;
+            return generatedLoot;
         }
+        ObjectArrayList<ItemStack> objectarraylist = new ObjectArrayList<>();
         if (LootInjectionHandler.TRACKED_LOOT_TABLES.containsKey(context.getQueriedLootTableId())) {
             float chance = LootInjectionHandler.TRACKED_LOOT_TABLES.get(context.getQueriedLootTableId());
             if (context.getRandom().nextFloat() <= chance) {

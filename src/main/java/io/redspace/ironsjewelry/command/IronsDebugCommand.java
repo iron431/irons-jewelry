@@ -10,7 +10,9 @@ import io.redspace.ironsjewelry.core.data.JewelryData;
 import io.redspace.ironsjewelry.core.data.MaterialDefinition;
 import io.redspace.ironsjewelry.core.data.PartIngredient;
 import io.redspace.ironsjewelry.core.data.PatternDefinition;
+import io.redspace.ironsjewelry.loot.LootInjectionHandler;
 import io.redspace.ironsjewelry.registry.*;
+import joptsimple.internal.Strings;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -52,13 +54,12 @@ public class IronsDebugCommand {
                 );
 
         if (!FMLLoader.isProduction()) {
-            command.then(Commands.literal("countCombos").executes((commandContext) -> {
-                return enumerateCombos(commandContext.getSource());
-            })).then(Commands.literal("generateSiteData").executes((commandContext) -> {
-                return GenerateSiteData.generateSiteData(commandContext.getSource());
-            })).then(Commands.literal("exportHeldItem").executes((commandContext) -> {
-                return exportHeldItem(commandContext.getSource());
-            }));
+            command.then(Commands.literal("debug")
+                    .then(Commands.literal("countCombos").executes((commandContext) -> enumerateCombos(commandContext.getSource())))
+                    .then(Commands.literal("generateSiteData").executes((commandContext) -> GenerateSiteData.generateSiteData(commandContext.getSource())))
+                    .then(Commands.literal("exportHeldItem").executes((commandContext) -> exportHeldItem(commandContext.getSource())))
+                    .then(Commands.literal("lootTracker").executes((commandContext) -> dumpLootInfo(commandContext.getSource())))
+            );
         }
         pDispatcher.register(
                 command
@@ -148,6 +149,28 @@ public class IronsDebugCommand {
             var data = serverPlayer.getData(DataAttachmentRegistry.PLAYER_DATA);
             data.getLearnedPatterns().clear();
             data.sync(serverPlayer);
+            return 1;
+        }
+
+        throw ERROR_FAILED.create();
+    }
+
+    private static int dumpLootInfo(CommandSourceStack source) throws CommandSyntaxException {
+        var serverPlayer = source.getPlayer();
+        if (serverPlayer != null) {
+            int maxLength = 0;
+            var entries = LootInjectionHandler.TRACKED_LOOT_TABLES.entrySet();
+            for (var entry : entries) {
+                if (entry.getKey().toString().length() > maxLength) {
+                    maxLength = entry.getKey().toString().length();
+                }
+            }
+            for (var entry : entries) {
+                String message = entry.getKey().toString();
+                message = message + Strings.repeat('.', maxLength + 3 - message.length()) + String.valueOf(entry.getValue());
+                serverPlayer.sendSystemMessage(Component.literal(message));
+            }
+
             return 1;
         }
 
