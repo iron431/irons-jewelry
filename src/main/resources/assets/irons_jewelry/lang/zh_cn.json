@@ -109,8 +109,8 @@
   "part.irons_jewelry.gem_rhinestone_c": "莱茵石",
 
   "bonus.irons_jewelry.attribute_bonus": "属性",
-  "bonus.irons_jewelry.effect_on_hit_bonus": "受击效果",
-  "bonus.irons_jewelry.effect_on_hit_bonus.description": "遭受攻击后，获得%s，持续%s秒。",
+  "bonus.irons_jewelry.effect_on_hit_bonus": "命中效果",
+  "bonus.irons_jewelry.effect_on_hit_bonus.description": "攻击命中时，获得%s，持续%s秒。",
   "bonus.irons_jewelry.effect_immunity_bonus": "效果免疫",
   "bonus.irons_jewelry.effect_immunity_bonus.description": "免疫%s状态效果。",
   "bonus.irons_jewelry.piglin_neutral_bonus": "猪灵中立化",
