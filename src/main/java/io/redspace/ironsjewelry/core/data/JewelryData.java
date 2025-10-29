@@ -18,13 +18,10 @@ import net.minecraft.util.Tuple;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 /**
  * Primary Data Object for the Jewelry Data Component
@@ -61,11 +58,12 @@ public class JewelryData {
         this.parts = parts;
         this.valid = validate();
         this.bonuses = cacheBonuses();
+        AtomicInteger i = new AtomicInteger(1);
         this.hashCode =
-                pattern.getKey().location().hashCode() * 31 +
-                        parts.entrySet().stream().collect(
-                                Collectors.toMap(entry -> entry.getKey().getKey().location(), entry -> entry.getValue().getKey().location())
-                        ).hashCode();
+                pattern.getKey().location().hashCode() +
+                        parts.entrySet().stream().mapToInt(entry ->
+                                (Objects.hashCode(entry.getKey()) ^ Objects.hashCode(entry.getValue())) * ((int) Math.pow(31, i.getAndIncrement()))
+                        ).sum();
     }
 
     private JewelryData(Holder<PatternDefinition> pattern, Map<Holder<PartDefinition>, Holder<MaterialDefinition>> parts, boolean valid, List<BonusInstance> bonuses) {
