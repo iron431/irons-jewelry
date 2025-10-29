@@ -127,6 +127,12 @@
   "bonus.irons_jewelry.trade_discount_bonus.description": "Discount %s Items when trading",
   "bonus.irons_jewelry.trade_discount_bonus.description.singular": "Discount %s Item when trading",
 
+  "bonus_parameter.irons_jewelry.action": "Action",
+  "bonus_parameter.irons_jewelry.positive_effect": "Positive Effect",
+  "bonus_parameter.irons_jewelry.negative_effect": "Negative Effect",
+  "bonus_parameter.irons_jewelry.attribute": "Attribute",
+  "bonus_parameter.irons_jewelry.empty": "Empty",
+
   "action.irons_jewelry.apply_effect.name": "Apply Effect",
   "action.irons_jewelry.apply_effect.self": "Gain %s%s",
   "action.irons_jewelry.apply_effect.entity": "Inflict %s%s",
@@ -169,6 +175,7 @@
   "tooltip.irons_jewelry.part_header_with_counter": "%s (%s/%s):",
   "tooltip.irons_jewelry.empty": "Empty",
   "tooltip.irons_jewelry.applicable_materials": "Applicable Materials:",
+  "tooltip.irons_jewelry.material_tags": "Material Tags:",
   "tooltip.irons_jewelry.self": "Self",
   "tooltip.irons_jewelry.attacker": "Attacker",
   "tooltip.irons_jewelry.stored_pattern": "Pattern: %s",

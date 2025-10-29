@@ -3,15 +3,13 @@ package io.redspace.ironsjewelry.command;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import io.redspace.ironsjewelry.IronsJewelry;
-import io.redspace.ironsjewelry.core.actions.*;
-import io.redspace.ironsjewelry.core.data.*;
-import io.redspace.ironsjewelry.core.parameters.ActionParameter;
-import io.redspace.ironsjewelry.core.parameters.IBonusParameterType;
+import io.redspace.ironsjewelry.core.data.MaterialDefinition;
+import io.redspace.ironsjewelry.core.data.PartIngredient;
+import io.redspace.ironsjewelry.core.data.PatternDefinition;
+import io.redspace.ironsjewelry.item.book.GuideBookScreen;
 import io.redspace.ironsjewelry.registry.AssetHandlerRegistry;
 import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
 import io.redspace.ironsjewelry.registry.ItemRegistry;
-import io.redspace.ironsjewelry.registry.ParameterTypeRegistry;
-import io.redspace.ironsjewelry.utils.Utils;
 import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
@@ -27,12 +25,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.FastColor;
-import net.minecraft.world.effect.MobEffect;
-import net.minecraft.world.entity.ai.attributes.Attribute;
-import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.*;
-import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
@@ -375,48 +368,6 @@ public class GenerateSiteData {
         return builder.substring(0, builder.length() - 2);
     }
 
-    private static String handleMaterialBonusDescription(IBonusParameterType<?> type, Object value) {
-        //ATTRIBUTE_PARAMETER
-        //POSITIVE_EFFECT_PARAMETER
-        //NEGATIVE_EFFECT_PARAMETER
-        //ACTION_PARAMETER
-        if (type.equals(ParameterTypeRegistry.ACTION_PARAMETER.get())) {
-            ActionParameter.ActionRunnable action = (ActionParameter.ActionRunnable) value;
-            var resource = IronsJewelryRegistries.ACTION_REGISTRY.getKey(action.action().codec());
-            return Component.translatable(String.format("action.%s.%s.name", resource.getNamespace(), resource.getPath())).getString() + handleExtraActionInformation(action);
-        } else if (type.equals(ParameterTypeRegistry.POSITIVE_EFFECT_PARAMETER.get())) {
-            return Component.translatable(((Holder<MobEffect>) value).value().getDescriptionId()).getString();
-        } else if (type.equals(ParameterTypeRegistry.NEGATIVE_EFFECT_PARAMETER.get())) {
-            return Component.translatable(((Holder<MobEffect>) value).value().getDescriptionId()).getString();
-        } else if (type.equals(ParameterTypeRegistry.ATTRIBUTE_PARAMETER.get())) {
-            var attribute = (AttributeInstance) value;
-            return createAttributeModifierText(attribute.attribute(), new AttributeModifier(IronsJewelry.id("noop"), attribute.amount(), attribute.operation()));
-        }
-        return "";
-    }
-
-    private static String handleExtraActionInformation(ActionParameter.ActionRunnable action) {
-        if (action.action() instanceof ApplyDamageAction damageAction) {
-            var location = damageAction.damageType().getKey().location();
-            var typeComponent = Component.translatable(String.format("damage_type.%s.%s", location.getNamespace(), location.getPath()));
-            return String.format(" (%s %s Damage)", damageAction.getDamage(1), typeComponent.getString());
-        } else if (action.action() instanceof ApplyEffectAction effectAction) {
-            String[] amp = {"I", "II", "III", "IV", "V"};
-            if (effectAction.effect().value().isInstantenous()) {
-                return String.format(" (%s %s)", Component.translatable(effectAction.effect().value().getDescriptionId()).getString(), amp[(int) effectAction.amplifier().sample(1)]);
-            } else {
-                return String.format(" (%s %s, %s)", Component.translatable(effectAction.effect().value().getDescriptionId()).getString(), amp[(int) effectAction.amplifier().sample(1)], Utils.digitalTimeFromTicks((int) effectAction.duration().sample(1), true));
-            }
-        } else if (action.action() instanceof HealAction healAction) {
-            return String.format(" (%s Base Healing)", healAction.amount().sample(1));
-        } else if (action.action() instanceof CreateItemsAction itemsAction) {
-            return String.format(" (%s)", itemsAction.formatTooltip(new BonusInstance(null, 1, null, null), false).getString());
-        } else if (action.action() instanceof ExplodeAction explodeAction) {
-            return String.format(" (%s)", explodeAction.formatTooltip(new BonusInstance(null, 1, null, null), false).getString().replace(" (", ", ").replace(")", ""));
-        }
-        return "";
-    }
-
     private static int sortIngredientStack(ItemStack a, ItemStack b) {
         return prioritizeCompare(BuiltInRegistries.ITEM.getKey(a.getItem()).getNamespace(), BuiltInRegistries.ITEM.getKey(a.getItem()).getNamespace(), "irons_jewelry");
     }
@@ -462,7 +413,7 @@ public class GenerateSiteData {
                 var quality = material.quality();
                 var types = material.materialType().stream().filter(string -> !id.toString().contains(string)).map(GenerateSiteData::handleCapitalization).collect(Collectors.joining(", "));
                 var bonusTypes = material.bonusParameters().keySet().stream().map(param -> handleCapitalization(IronsJewelryRegistries.PARAMETER_TYPE_REGISTRY.getKey(param).getPath().replace("_", " "))).collect(Collectors.joining(";"));
-                var bonusValues = material.bonusParameters().entrySet().stream().map(entry -> (handleMaterialBonusDescription(entry.getKey(), entry.getValue()))).collect(Collectors.joining(";"));
+                var bonusValues = material.bonusParameters().entrySet().stream().map(entry -> (GuideBookScreen.handleMaterialBonusDescription(entry.getKey(), entry.getValue()))).collect(Collectors.joining(";"));
                 sb.append(String.format(MATERIAL_DATA_TEMPLATE,
                         name,
                         imgid,
@@ -649,42 +600,6 @@ public class GenerateSiteData {
                 })
                 .collect(Collectors.joining(" "))
                 .trim();
-    }
-
-    /**
-     * Adapted {@link ItemStack#addModifierTooltip}
-     */
-    private static String createAttributeModifierText(Holder<Attribute> attribute, AttributeModifier modifier) {
-        double d0 = modifier.amount();
-        double d1;
-        if (modifier.operation() == AttributeModifier.Operation.ADD_MULTIPLIED_BASE
-                || modifier.operation() == AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL) {
-            d1 = d0 * 100.0;
-        } else if (attribute.is(Attributes.KNOCKBACK_RESISTANCE)) {
-            d1 = d0 * 10.0;
-        } else {
-            d1 = d0;
-        }
-
-        if (d0 >= 0.0) {
-            return (
-                    Component.translatable(
-                                    "attribute.modifier.plus." + modifier.operation().id(),
-                                    ItemAttributeModifiers.ATTRIBUTE_MODIFIER_FORMAT.format(d1),
-                                    Component.translatable(attribute.value().getDescriptionId())
-                            )
-                            .withStyle(attribute.value().getStyle(true))
-            ).getString();
-        } else {
-            return (
-                    Component.translatable(
-                                    "attribute.modifier.take." + modifier.operation().id(),
-                                    ItemAttributeModifiers.ATTRIBUTE_MODIFIER_FORMAT.format(-d1),
-                                    Component.translatable(attribute.value().getDescriptionId())
-                            )
-                            .withStyle(attribute.value().getStyle(false))
-            ).getString();
-        }
     }
 
     private static IntUnaryOperator createPaletteMapping(int[] p_266839_, int[] p_266776_) {

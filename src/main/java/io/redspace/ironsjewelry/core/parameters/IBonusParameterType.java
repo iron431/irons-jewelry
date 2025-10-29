@@ -37,6 +37,11 @@ public interface IBonusParameterType<T> {
         }
     }
 
+    default String getDescriptionId() {
+        var id = IronsJewelryRegistries.PARAMETER_TYPE_REGISTRY.getKey(this);
+        return String.format("bonus_parameter.%s.%s", id.getNamespace(), id.getPath());
+    }
+
     default Optional<T> resolve(BonusInstance bonusInstance) {
         return resolve(bonusInstance.parameter());
     }
