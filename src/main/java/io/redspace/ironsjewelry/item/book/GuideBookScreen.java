@@ -1,21 +1,16 @@
 package io.redspace.ironsjewelry.item.book;
 
 import com.mojang.blaze3d.platform.NativeImage;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import io.redspace.ironsjewelry.IronsJewelry;
-import io.redspace.ironsjewelry.core.actions.*;
-import io.redspace.ironsjewelry.core.bonuses.BonusType;
-import io.redspace.ironsjewelry.core.data.AttributeInstance;
-import io.redspace.ironsjewelry.core.data.BonusInstance;
 import io.redspace.ironsjewelry.core.data.MaterialDefinition;
-import io.redspace.ironsjewelry.core.parameters.ActionParameter;
 import io.redspace.ironsjewelry.core.parameters.IBonusParameterType;
 import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
-import io.redspace.ironsjewelry.registry.ParameterTypeRegistry;
-import io.redspace.ironsjewelry.utils.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.PageButton;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.atlas.SpriteSource;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
@@ -23,16 +18,11 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
-import net.minecraft.world.effect.MobEffect;
-import net.minecraft.world.entity.ai.attributes.Attribute;
-import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.component.ItemAttributeModifiers;
-import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.phys.Vec3;
+import org.joml.Matrix4f;
 
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -46,12 +36,18 @@ public class GuideBookScreen extends Screen {
 
     static final int IMAGE_WIDTH = 256;
     static final int IMAGE_HEIGHT = 180;
-    static final int TICKS_PER_ITEM = 40;
+    static final int MILIS_PER_ITEM = 2000;
     static final int XM = 15;
     static final int YM = 15;
     protected int leftPos;
     protected int topPos;
     protected int ingredientIndex;
+
+    long lastItemDisplayMilis = 0;
+    MaterialPage currentMaterial;
+
+    record MaterialPage(Holder<MaterialDefinition> material, int cachedTextColor, List<ItemStack> cachedIngredients) {
+    }
 
     public GuideBookScreen(Component title) {
         super(title);
@@ -62,6 +58,13 @@ public class GuideBookScreen extends Screen {
     protected void init() {
         this.leftPos = (this.width - IMAGE_WIDTH) / 2;
         this.topPos = (this.height - IMAGE_HEIGHT) / 2;
+        chooseMaterial(IronsJewelryRegistries.materialRegistry(Minecraft.getInstance().level.registryAccess())
+                .getHolderOrThrow(ResourceKey.create(IronsJewelryRegistries.Keys.MATERIAL_REGISTRY_KEY, IronsJewelry.id("ruby"))));
+    }
+
+    protected void chooseMaterial(Holder<MaterialDefinition> materialDefinitionHolder) {
+        this.currentMaterial = new MaterialPage(materialDefinitionHolder, generateTextColor(materialDefinitionHolder.value().paletteLocation()), List.of(materialDefinitionHolder.value().ingredient().getItems()));
+        this.ingredientIndex = 0;
     }
 
     @Override
@@ -73,55 +76,58 @@ public class GuideBookScreen extends Screen {
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
-        Holder<MaterialDefinition> materialHolder = IronsJewelryRegistries.materialRegistry(Minecraft.getInstance().level.registryAccess())
-                .getHolderOrThrow(ResourceKey.create(IronsJewelryRegistries.Keys.MATERIAL_REGISTRY_KEY, IronsJewelry.id("ruby")));
-        MaterialDefinition material = materialHolder.value();
-        Component name = Component.translatable(material.descriptionId());
-        Ingredient ingredient = material.ingredient();
-        if (ingredient.isEmpty()) {
+        if (currentMaterial == null) {
             return;
         }
-        var items = ingredient.getItems();
-        int tickCount = Minecraft.getInstance().player.tickCount;
-        if (tickCount % TICKS_PER_ITEM == 0) {
-            ingredientIndex = (ingredientIndex + 1) % items.length;
+        var materialHolder = currentMaterial.material();
+
+        MaterialDefinition material = materialHolder.value();
+        Component name = Component.translatable(material.descriptionId());
+        var currentIngredients = currentMaterial.cachedIngredients();
+        if (currentIngredients.isEmpty()) {
+            return;
         }
-        if (ingredientIndex >= items.length) {
-            ingredientIndex = 0;
+        if (System.currentTimeMillis() > lastItemDisplayMilis + MILIS_PER_ITEM) {
+            ingredientIndex = (ingredientIndex + 1) % currentIngredients.size();
+            lastItemDisplayMilis = System.currentTimeMillis();
+            if (Math.random() < .5) {
+                chooseMaterial(IronsJewelryRegistries.materialRegistry(Minecraft.getInstance().level.registryAccess())
+                        .getHolderOrThrow(ResourceKey.create(IronsJewelryRegistries.Keys.MATERIAL_REGISTRY_KEY, IronsJewelry.id("ruby"))));
+            } else {
+                chooseMaterial(IronsJewelryRegistries.materialRegistry(Minecraft.getInstance().level.registryAccess())
+                        .getHolderOrThrow(ResourceKey.create(IronsJewelryRegistries.Keys.MATERIAL_REGISTRY_KEY, IronsJewelry.id("netherite"))));
+            }
         }
         var poseStack = guiGraphics.pose();
-//        poseStack.pushPose();
-//        poseStack.mulPose(Axis.YP.rotationDegrees(tickCount + partialTick));
-//        poseStack.translate(leftPos + XM, (topPos + YM), 100);
-        ItemStack item = items[ingredientIndex];
+
+        /*
+        Draw Page Title: Ingredient Icon and Material Name
+         */
+        float itemScale = 2;
+        int titleX = leftPos + XM - 5;
+        int titleBottomY = topPos + YM / 2 + (int) (16 * itemScale);
+        ItemStack item = currentIngredients.get(ingredientIndex);
         guiGraphics.pose().pushPose();
-        guiGraphics.pose().scale(2, 2, 2);
-        guiGraphics.renderItem(item, (leftPos + XM - 5) / 2, (topPos + YM / 2) / 2);
+        guiGraphics.pose().scale(itemScale, itemScale, itemScale);
+        guiGraphics.renderItem(/*Items.IRON_SWORD.getDefaultInstance()*/item, (int) (titleX / itemScale), (int) (titleBottomY / itemScale - 16));
         guiGraphics.pose().popPose();
-//        Minecraft.getInstance().getItemRenderer().renderStatic(item, ItemDisplayContext.GUI, LightTexture.FULL_BLOCK, OverlayTexture.NO_OVERLAY, poseStack, guiGraphics.bufferSource(), Minecraft.getInstance().level, 0);
-//        poseStack.popPose();
+
         var font = Minecraft.getInstance().font;
         float textScale = 2;
-        int textcolor = getTextColor(material.paletteLocation());
+        int textcolor = generateTextColor(material.paletteLocation());
         poseStack.pushPose();
         poseStack.scale(textScale, textScale, textScale);
-        guiGraphics.drawString(font, name, (int) ((leftPos + XM + 32 - 5) / textScale), (int) ((topPos + YM) / textScale), textcolor, true);
+        guiGraphics.drawString(font, name, (int) ((titleX + 17 * itemScale) / textScale), (int) ((titleBottomY - (2 * itemScale)) / textScale) - font.lineHeight, textcolor, true);
         poseStack.popPose();
 
+        int lineLength = (int) (16 * itemScale + (font.width(name) + 32) * textScale);
+        int lineThickness = 2;
+        drawLine(guiGraphics, lineThickness, titleX, titleBottomY, titleX + lineLength, titleBottomY, textcolor, textcolor & 0x00FFFFFF);
+
         Component quality = Component.translatable("tooltip.irons_jewelry.quality_multiplier", material.quality());
-//        List<MutableComponent> bonusTypes = material.bonusParameters().keySet().stream().map(param -> Component.translatable(param.getDescriptionId())).toList();
-//        List<String> bonusValues = material.bonusParameters().entrySet().stream().map(entry ->
-//                (handleMaterialBonusDescription(entry.getKey(), entry.getValue()))).toList();
-        List<MutableComponent> bonusTypes = new ArrayList<>();
-        List<String> bonusValues = new ArrayList<>();
-        for(BonusType bonus : IronsJewelryRegistries.BONUS_TYPE_REGISTRY){
-            var param = bonus.getParameterType();
-            if(!material.bonusParameters().containsKey(param)){
-                continue;
-            }
-            bonusTypes.add(Component.translatable(bonus.getDescriptionId()));
-            bonusValues.add(handleMaterialBonusDescription(param, material.bonusParameters().get(param)));
-        }
+        List<MutableComponent> bonusTypes = material.bonusParameters().keySet().stream().map(param -> Component.translatable(param.getDescriptionId())).toList();
+        List<Component> bonusValues = material.bonusParameters().entrySet().stream().map(entry ->
+                ((IBonusParameterType) entry.getKey()).getSimpleDescription(entry.getValue())).filter(Optional::isPresent).map(opt -> (Component) opt.get()).toList();
 
         int ypos = (int) (topPos + YM + font.lineHeight * (1 + textScale));
         guiGraphics.drawString(font, quality, leftPos + XM, ypos, 0x0, false);
@@ -134,93 +140,51 @@ public class GuideBookScreen extends Screen {
             }
         }
         for (int i = 0; i < bonusTypes.size(); i++) {
-            var type = bonusTypes.get(i);
+            var type = bonusTypes.get(i)/*.withStyle(ChatFormatting.UNDERLINE)*//*.withColor(currentMaterial.cachedTextColor())*/;
             var value = bonusValues.get(i);
-            guiGraphics.drawString(font, type, leftPos + XM, ypos, 0x0, false);
-            guiGraphics.drawString(font, value, leftPos + XM + maxWidth + 4, ypos, 0x0, false);
-            ypos += font.lineHeight;
-        }
-    }
-
-    public static String handleMaterialBonusDescription(IBonusParameterType<?> type, Object value) {
-        //ATTRIBUTE_PARAMETER
-        //POSITIVE_EFFECT_PARAMETER
-        //NEGATIVE_EFFECT_PARAMETER
-        //ACTION_PARAMETER
-        if (type.equals(ParameterTypeRegistry.ACTION_PARAMETER.get())) {
-            ActionParameter.ActionRunnable action = (ActionParameter.ActionRunnable) value;
-            var resource = IronsJewelryRegistries.ACTION_REGISTRY.getKey(action.action().codec());
-            return Component.translatable(String.format("action.%s.%s.name", resource.getNamespace(), resource.getPath())).getString() + handleExtraActionInformation(action);
-        } else if (type.equals(ParameterTypeRegistry.POSITIVE_EFFECT_PARAMETER.get())) {
-            return Component.translatable(((Holder<MobEffect>) value).value().getDescriptionId()).getString();
-        } else if (type.equals(ParameterTypeRegistry.NEGATIVE_EFFECT_PARAMETER.get())) {
-            return Component.translatable(((Holder<MobEffect>) value).value().getDescriptionId()).getString();
-        } else if (type.equals(ParameterTypeRegistry.ATTRIBUTE_PARAMETER.get())) {
-            var attribute = (AttributeInstance) value;
-            return createAttributeModifierText(attribute.attribute(), new AttributeModifier(IronsJewelry.id("noop"), attribute.amount(), attribute.operation()));
-        }
-        return "";
-    }
-
-    public static String handleExtraActionInformation(ActionParameter.ActionRunnable action) {
-        if (action.action() instanceof ApplyDamageAction damageAction) {
-            var location = damageAction.damageType().getKey().location();
-            var typeComponent = Component.translatable(String.format("damage_type.%s.%s", location.getNamespace(), location.getPath()));
-            return String.format(" (%s %s Damage)", damageAction.getDamage(1), typeComponent.getString());
-        } else if (action.action() instanceof ApplyEffectAction effectAction) {
-            String[] amp = {"I", "II", "III", "IV", "V"};
-            if (effectAction.effect().value().isInstantenous()) {
-                return String.format(" (%s %s)", Component.translatable(effectAction.effect().value().getDescriptionId()).getString(), amp[(int) effectAction.amplifier().sample(1)]);
-            } else {
-                return String.format(" (%s %s, %s)", Component.translatable(effectAction.effect().value().getDescriptionId()).getString(), amp[(int) effectAction.amplifier().sample(1)], Utils.digitalTimeFromTicks((int) effectAction.duration().sample(1), true));
+            int lightColor = scaleColor(currentMaterial.cachedTextColor(), 1.75f);
+            int darkColor = scaleColor(currentMaterial.cachedTextColor(), 0.25f);
+            for (int x = -1; x <= 1; x++) {
+                for (int y = -1; y <= 1; y++) {
+                    guiGraphics.drawString(font, type, leftPos + XM + x, ypos + y, darkColor, false);
+                }
             }
-        } else if (action.action() instanceof HealAction healAction) {
-            return String.format(" (%s Base Healing)", healAction.amount().sample(1));
-        } else if (action.action() instanceof CreateItemsAction itemsAction) {
-            return String.format(" (%s)", itemsAction.formatTooltip(new BonusInstance(null, 1, null, null), false).getString());
-        } else if (action.action() instanceof ExplodeAction explodeAction) {
-            return String.format(" (%s)", explodeAction.formatTooltip(new BonusInstance(null, 1, null, null), false).getString().replace(" (", ", ").replace(")", ""));
-        }
-        return "";
-    }
+            guiGraphics.drawString(font, type, leftPos + XM, ypos, lightColor, false);
 
-    /**
-     * Adapted {@link ItemStack#addModifierTooltip}
-     */
-    public static String createAttributeModifierText(Holder<Attribute> attribute, AttributeModifier modifier) {
-        double d0 = modifier.amount();
-        double d1;
-        if (modifier.operation() == AttributeModifier.Operation.ADD_MULTIPLIED_BASE
-                || modifier.operation() == AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL) {
-            d1 = d0 * 100.0;
-        } else if (attribute.is(Attributes.KNOCKBACK_RESISTANCE)) {
-            d1 = d0 * 10.0;
-        } else {
-            d1 = d0;
-        }
 
-        if (d0 >= 0.0) {
-            return (
-                    Component.translatable(
-                                    "attribute.modifier.plus." + modifier.operation().id(),
-                                    ItemAttributeModifiers.ATTRIBUTE_MODIFIER_FORMAT.format(d1),
-                                    Component.translatable(attribute.value().getDescriptionId())
-                            )
-                            .withStyle(attribute.value().getStyle(true))
-            ).getString();
-        } else {
-            return (
-                    Component.translatable(
-                                    "attribute.modifier.take." + modifier.operation().id(),
-                                    ItemAttributeModifiers.ATTRIBUTE_MODIFIER_FORMAT.format(-d1),
-                                    Component.translatable(attribute.value().getDescriptionId())
-                            )
-                            .withStyle(attribute.value().getStyle(false))
-            ).getString();
+            guiGraphics.drawString(font, value, leftPos + XM + maxWidth + 8, ypos, 0x0, false);
+//            guiGraphics.drawString(font, type, leftPos + XM, ypos, 0x0, false);
+//            ypos += font.lineHeight;
+//            guiGraphics.drawString(font, Component.literal(" ")/*.withStyle(ChatFormatting.DARK_GRAY)*/.append(value.copy().withStyle(ChatFormatting.BLACK)), leftPos + XM, ypos, 0x0, false);
+            ypos += font.lineHeight + 1;
         }
     }
 
-    private int getTextColor(ResourceLocation palette) {
+    private int scaleColor(int color, float scalar) {
+        var r = (int) Math.clamp((color >> 16 & 0xFF) * scalar, 0, 255);
+        var g = (int) Math.clamp((color >> 8 & 0xFF) * scalar, 0, 255);
+        var b = (int) Math.clamp((color & 0xFF) * scalar, 0, 255);
+        return (r << 16) | (g << 8) | b;
+    }
+
+    private void drawLine(GuiGraphics graphics, int thickness, int startX, int startY, int endX, int endY, int startColor, int endColor) {
+        graphics.drawManaged(() -> {
+            VertexConsumer consumer = graphics.bufferSource().getBuffer(RenderType.gui());
+            Vec3 startV = new Vec3(startX, startY, 0);
+            Vec3 endV = new Vec3(endX, endY, 0);
+            Vec3 line = endV.subtract(startV);
+            Vec3 volume = line.normalize().cross(new Vec3(0, 0, 1)).scale(thickness / 2.0);
+
+            Vec3[] corners = {startV.add(volume), startV.subtract(volume), endV.subtract(volume), endV.add(volume)};
+            Matrix4f matrix4f = graphics.pose().last().pose();
+            consumer.addVertex(matrix4f, (float) corners[0].x, (float) corners[0].y, 0).setColor(startColor);
+            consumer.addVertex(matrix4f, (float) corners[1].x, (float) corners[1].y, 0).setColor(startColor);
+            consumer.addVertex(matrix4f, (float) corners[2].x, (float) corners[2].y, 0).setColor(endColor);
+            consumer.addVertex(matrix4f, (float) corners[3].x, (float) corners[3].y, 0).setColor(endColor);
+        });
+    }
+
+    private int generateTextColor(ResourceLocation palette) {
         try {
             Optional<Resource> resource = Minecraft.getInstance().getResourceManager().getResource(SpriteSource.TEXTURE_ID_CONVERTER.idToFile(palette));
             if (resource.isPresent()) {
@@ -236,10 +200,18 @@ public class GuideBookScreen extends Screen {
                 int r = Arrays.stream(aint).map(i -> i & 0xFF).sum() / aint.length;
                 int g = Arrays.stream(aint).map(i -> i >> 8 & 0xFF).sum() / aint.length;
                 int b = Arrays.stream(aint).map(i -> i >> 16 & 0xFF).sum() / aint.length;
-                int color = (r << 16) + (g << 8) + b;
-                return color;
+                int max = Math.max(Math.max(r, g), b);
+                if (max < 128) {
+                    // ensure darker palettes still create bright, legible text colors
+                    int factor = 128 / max;
+                    r *= factor;
+                    b *= factor;
+                    g *= factor;
+                }
+                return 0xFF000000 + (r << 16) + (g << 8) + b;
             }
         } catch (Exception exception) {
+            IronsJewelry.LOGGER.error("Failed to generate guidebook coloration for material palette: \"{}\"", palette);
         }
         return 0xFFFFFF;
     }

@@ -4,6 +4,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.effect.MobEffect;
 
 import java.util.Optional;
@@ -23,5 +24,10 @@ public class EffectParameter implements IBonusParameterType<Holder<MobEffect>> {
     @Override
     public Optional<String> getValueDescriptionId(Holder<MobEffect> value) {
         return Optional.of(value.value().getDescriptionId());
+    }
+
+    @Override
+    public Optional<Component> getSimpleDescription(Holder<MobEffect> value) {
+        return getValueDescriptionId(value).map(Component::translatable);
     }
 }

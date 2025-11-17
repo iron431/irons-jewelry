@@ -6,7 +6,7 @@ import io.redspace.ironsjewelry.IronsJewelry;
 import io.redspace.ironsjewelry.core.data.MaterialDefinition;
 import io.redspace.ironsjewelry.core.data.PartIngredient;
 import io.redspace.ironsjewelry.core.data.PatternDefinition;
-import io.redspace.ironsjewelry.item.book.GuideBookScreen;
+import io.redspace.ironsjewelry.core.parameters.IBonusParameterType;
 import io.redspace.ironsjewelry.registry.AssetHandlerRegistry;
 import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
 import io.redspace.ironsjewelry.registry.ItemRegistry;
@@ -83,8 +83,8 @@ public class GenerateSiteData {
               item8Path: "%s"
               tooltip: "%s"
               description: ""
-              
-                    """;
+            
+            """;
 
     private static final String PATTERN_DATA_TEMPLATE = """
             - name: "%s"
@@ -100,7 +100,7 @@ public class GenerateSiteData {
               bonus2: "%s"
               bonus3: "%s"
               bonus4: "%s"
-              
+            
             """;
     private static final String MATERIAL_DATA_TEMPLATE = """
             - name: "%s"
@@ -111,7 +111,7 @@ public class GenerateSiteData {
               bonus_types: "%s"
               bonus_values: "%s"
               sort: "%s"
-              
+            
             """;
 
     protected static int generateSiteData(CommandSourceStack source) {
@@ -413,7 +413,9 @@ public class GenerateSiteData {
                 var quality = material.quality();
                 var types = material.materialType().stream().filter(string -> !id.toString().contains(string)).map(GenerateSiteData::handleCapitalization).collect(Collectors.joining(", "));
                 var bonusTypes = material.bonusParameters().keySet().stream().map(param -> handleCapitalization(IronsJewelryRegistries.PARAMETER_TYPE_REGISTRY.getKey(param).getPath().replace("_", " "))).collect(Collectors.joining(";"));
-                var bonusValues = material.bonusParameters().entrySet().stream().map(entry -> (GuideBookScreen.handleMaterialBonusDescription(entry.getKey(), entry.getValue()))).collect(Collectors.joining(";"));
+                var bonusValues = material.bonusParameters().entrySet().stream().map(entry ->
+                        ((IBonusParameterType) entry.getKey()).getSimpleDescription(entry.getValue())).filter(Optional::isPresent).map(opt -> ((Component) opt.get()).getString()).collect(Collectors.joining(";"));
+
                 sb.append(String.format(MATERIAL_DATA_TEMPLATE,
                         name,
                         imgid,

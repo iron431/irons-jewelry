@@ -8,6 +8,7 @@ import io.redspace.ironsjewelry.core.data.QualityScalar;
 import io.redspace.ironsjewelry.utils.Utils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -38,6 +39,11 @@ public record ApplyFreezeAction(QualityScalar amount,
         translation += instaFreeze ? ".freeze" : ".add";
         translation += applyToSelf ? ".self" : ".entity";
         return Component.translatable(translation, Component.literal(Utils.timeFromTicks(getFreezeTicks(bonusInstance.quality()), 0)).withStyle(applyToSelf ? ChatFormatting.RED : ChatFormatting.GREEN));
+    }
+
+    @Override
+    public Component simpleDescription(MutableComponent actionName) {
+        return actionName;
     }
 
     @Override

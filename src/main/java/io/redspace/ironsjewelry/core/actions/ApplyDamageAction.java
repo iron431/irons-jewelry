@@ -10,6 +10,7 @@ import io.redspace.ironsjewelry.utils.Utils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
@@ -59,6 +60,16 @@ public record ApplyDamageAction(Holder<DamageType> damageType, QualityScalar amo
             typeComponent = Component.translatable(String.format("damage_type.%s.%s", location.getNamespace(), location.getPath()));
         }
         return Component.translatable((applyToSelf ? "action.irons_jewelry.apply_damage.self" : "action.irons_jewelry.apply_damage.entity"), Component.literal(damage).withStyle(ChatFormatting.RED), typeComponent);
+    }
+
+    @Override
+    public Component simpleDescription(MutableComponent actionName) {
+        if (damageType().getKey() == null) {
+            return Component.empty();
+        }
+        var location = damageType().getKey().location();
+        var typeComponent = Component.translatable(String.format("damage_type.%s.%s", location.getNamespace(), location.getPath()));
+        return actionName.append(" ").append(Component.translatable("action.irons_jewelry.apply_damage.description", getDamage(1), typeComponent));
     }
 
     @Override

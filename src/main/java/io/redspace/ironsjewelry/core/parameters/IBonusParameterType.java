@@ -5,6 +5,7 @@ import io.redspace.ironsjewelry.IronsJewelry;
 import io.redspace.ironsjewelry.core.data.BonusInstance;
 import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
 import io.redspace.ironsjewelry.registry.ParameterTypeRegistry;
+import net.minecraft.network.chat.Component;
 
 import java.util.Map;
 import java.util.Optional;
@@ -22,6 +23,7 @@ public interface IBonusParameterType<T> {
     Codec<T> codec();
 
     Optional<String> getValueDescriptionId(T value);
+    Optional<Component> getSimpleDescription(T value);
 
     default boolean isEmpty() {
         return this == ParameterTypeRegistry.EMPTY.get();

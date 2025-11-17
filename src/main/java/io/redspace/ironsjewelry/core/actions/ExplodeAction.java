@@ -14,6 +14,7 @@ import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.protocol.game.ClientboundExplodePacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -129,6 +130,11 @@ public record ExplodeAction(
     public Component formatTooltip(BonusInstance bonusInstance, boolean applyToSelf) {
         String string = applyToSelf ? "action.irons_jewelry.explode.self" : "action.irons_jewelry.explode";
         return Component.translatable(string, Component.translatable(this.translation).withStyle(ChatFormatting.RED), Utils.stringTruncation(radius.sample(bonusInstance.quality()), 1));
+    }
+
+    @Override
+    public Component simpleDescription(MutableComponent actionName) {
+        return formatTooltip(new BonusInstance(null, 1, null, null), false);
     }
 
     @Override
