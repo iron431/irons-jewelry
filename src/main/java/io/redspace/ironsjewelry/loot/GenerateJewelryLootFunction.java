@@ -7,6 +7,7 @@ import io.redspace.ironsjewelry.core.data.*;
 import io.redspace.ironsjewelry.registry.ComponentRegistry;
 import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
 import io.redspace.ironsjewelry.registry.LootRegistry;
+import io.redspace.ironsjewelry.utils.JewelryModTags;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.RegistryCodecs;
@@ -53,17 +54,19 @@ public record GenerateJewelryLootFunction(
                 var pattern = weightedPatterns.lowerEntry(lootContext.getRandom().nextInt(total) + 1).getValue();
                 HashMap<Holder<PartDefinition>, Holder<MaterialDefinition>> materials = new HashMap<>();
                 var registry = IronsJewelryRegistries.materialRegistry(lootContext.getLevel().registryAccess());
+                // Precompute all potential materials by excluding all blacklisted materials, unless a material filter is set which will override the blacklist
+                List<MaterialDefinition> allMaterials = registry.stream().filter(material ->
+                        !material.ingredient().hasNoItems() && (!registry.wrapAsHolder(material).is(JewelryModTags.JEWELRY_LOOT_MATERIAL_BLACKLIST) || !materialFilter.isEmpty())
+                ).toList();
+
                 for (PartIngredient part : pattern.value().partTemplate()) {
                     // Find applicable materials by
-                    // a): the material exists in this world
+                    // a): the material exists in this world (allMaterials)
                     // b): the material can be used for this part
                     // c): the material filter is empty, or the material filter does not specify this material type, or this material is specified by type in the material filter
-                    List<MaterialDefinition> applicableMaterials = registry.stream().filter(
-                            (material) ->
-                                    !material.ingredient().hasNoItems() &&
-                                            part.part().value().canUseMaterial(material.materialType()) &&
-                                            (materialFilter.isEmpty() ||
-                                                    material.materialType().stream().anyMatch(type -> !materialFilter.get().containsKey(type) || materialFilter.get().get(type).contains(registry.wrapAsHolder(material))))
+                    List<MaterialDefinition> applicableMaterials = allMaterials.stream().filter(
+                            (material) -> part.part().value().canUseMaterial(material.materialType()) &&
+                                            (materialFilter.isEmpty() || material.materialType().stream().anyMatch(type -> !materialFilter.get().containsKey(type) || materialFilter.get().get(type).contains(registry.wrapAsHolder(material))))
                     ).toList();
                     if (!applicableMaterials.isEmpty()) {
                         materials.put(part.part(), registry.wrapAsHolder(getRandomWeightedMaterial(applicableMaterials, lootContext.getRandom())));

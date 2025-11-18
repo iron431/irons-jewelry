@@ -1,6 +1,7 @@
 package io.redspace.ironsjewelry.utils;
 
 import io.redspace.ironsjewelry.IronsJewelry;
+import io.redspace.ironsjewelry.core.data.MaterialDefinition;
 import io.redspace.ironsjewelry.core.data.PatternDefinition;
 import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
 import net.minecraft.core.registries.Registries;
@@ -16,6 +17,9 @@ public class JewelryModTags {
             = TagKey.create(Registries.ITEM, IronsJewelry.id("loot_handler/high_gearscore"));
     public static final TagKey<Item> LOOT_HANDLER_VERY_HIGH_GEARSCORE
             = TagKey.create(Registries.ITEM, IronsJewelry.id("loot_handler/very_high_gearscore"));
+
+    public static final TagKey<MaterialDefinition> JEWELRY_LOOT_MATERIAL_BLACKLIST
+            = TagKey.create(IronsJewelryRegistries.Keys.MATERIAL_REGISTRY_KEY, IronsJewelry.id("jewelry_loot_blacklist"));
 
     public static final TagKey<PatternDefinition> GENERIC_LOOTABLE
             = TagKey.create(IronsJewelryRegistries.Keys.PATTERN_REGISTRY_KEY, IronsJewelry.id("generic_lootable"));
