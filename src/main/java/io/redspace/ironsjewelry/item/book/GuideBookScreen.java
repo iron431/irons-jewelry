@@ -28,14 +28,14 @@ import java.util.List;
 import java.util.Optional;
 
 public class GuideBookScreen extends Screen {
-    public static final ResourceLocation BOOK_LOCATION = IronsJewelry.id("textures/gui/double_book.png");
+    public static final ResourceLocation BOOK_LOCATION = IronsJewelry.id("textures/gui/jewelcrafting_guide.png");
 
     private PageButton forwardButton;
     private PageButton backButton;
     private PageButton homeButton;
 
-    static final int IMAGE_WIDTH = 256;
-    static final int IMAGE_HEIGHT = 180;
+    static final int IMAGE_WIDTH = 267;
+    static final int IMAGE_HEIGHT = 210;
     static final int MILIS_PER_ITEM = 2000;
     static final int XM = 15;
     static final int YM = 15;
@@ -70,7 +70,14 @@ public class GuideBookScreen extends Screen {
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.renderBackground(guiGraphics, mouseX, mouseY, partialTick);
-        guiGraphics.blit(BOOK_LOCATION, leftPos, topPos, 0, 0, IMAGE_WIDTH, IMAGE_HEIGHT);
+        guiGraphics.blit(BOOK_LOCATION, leftPos, topPos, 0, 0, IMAGE_WIDTH, IMAGE_HEIGHT, 512, 256);
+    }
+
+    private int getMaxTitleWidth() {
+        // could calculate this based on image width, but I like this stylistically
+        int averageCharSize = 5;
+        int maxCharCount = 15;
+        return averageCharSize * maxCharCount;
     }
 
     @Override
@@ -90,13 +97,14 @@ public class GuideBookScreen extends Screen {
         if (System.currentTimeMillis() > lastItemDisplayMilis + MILIS_PER_ITEM) {
             ingredientIndex = (ingredientIndex + 1) % currentIngredients.size();
             lastItemDisplayMilis = System.currentTimeMillis();
-            if (Math.random() < .5) {
-                chooseMaterial(IronsJewelryRegistries.materialRegistry(Minecraft.getInstance().level.registryAccess())
-                        .getHolderOrThrow(ResourceKey.create(IronsJewelryRegistries.Keys.MATERIAL_REGISTRY_KEY, IronsJewelry.id("ruby"))));
-            } else {
-                chooseMaterial(IronsJewelryRegistries.materialRegistry(Minecraft.getInstance().level.registryAccess())
-                        .getHolderOrThrow(ResourceKey.create(IronsJewelryRegistries.Keys.MATERIAL_REGISTRY_KEY, IronsJewelry.id("netherite"))));
-            }
+            chooseMaterial(List.of(
+                    IronsJewelryRegistries.materialRegistry(Minecraft.getInstance().level.registryAccess())
+                            .getHolderOrThrow(ResourceKey.create(IronsJewelryRegistries.Keys.MATERIAL_REGISTRY_KEY, IronsJewelry.id("ruby"))),
+                    IronsJewelryRegistries.materialRegistry(Minecraft.getInstance().level.registryAccess())
+                            .getHolderOrThrow(ResourceKey.create(IronsJewelryRegistries.Keys.MATERIAL_REGISTRY_KEY, IronsJewelry.id("netherite"))),
+                    IronsJewelryRegistries.materialRegistry(Minecraft.getInstance().level.registryAccess())
+                            .getHolderOrThrow(ResourceKey.create(IronsJewelryRegistries.Keys.MATERIAL_REGISTRY_KEY, IronsJewelry.id("sapphire")))
+            ).get((int)(Math.random() * 3)));
         }
         var poseStack = guiGraphics.pose();
 
@@ -114,8 +122,9 @@ public class GuideBookScreen extends Screen {
 
         var font = Minecraft.getInstance().font;
         float textScale = 2;
-        int textcolor = generateTextColor(material.paletteLocation());
+        int textcolor = currentMaterial.cachedTextColor();
         poseStack.pushPose();
+        textScale *= Math.clamp(getMaxTitleWidth() / (float) font.width(name), 0, 1);
         poseStack.scale(textScale, textScale, textScale);
         guiGraphics.drawString(font, name, (int) ((titleX + 17 * itemScale) / textScale), (int) ((titleBottomY - (2 * itemScale)) / textScale) - font.lineHeight, textcolor, true);
         poseStack.popPose();
@@ -129,16 +138,17 @@ public class GuideBookScreen extends Screen {
         List<Component> bonusValues = material.bonusParameters().entrySet().stream().map(entry ->
                 ((IBonusParameterType) entry.getKey()).getSimpleDescription(entry.getValue())).filter(Optional::isPresent).map(opt -> (Component) opt.get()).toList();
 
-        int ypos = (int) (topPos + YM + font.lineHeight * (1 + textScale));
+        int ypos = (int) (topPos + YM + font.lineHeight * (1 + itemScale));
         guiGraphics.drawString(font, quality, leftPos + XM, ypos, 0x0, false);
         ypos += font.lineHeight * 2;
-        int maxWidth = 0;
+        int bonusTypeMaxWidth = 0;
         for (var t : bonusTypes) {
             var w = font.width(t);
-            if (w > maxWidth) {
-                maxWidth = w;
+            if (w > bonusTypeMaxWidth) {
+                bonusTypeMaxWidth = w;
             }
         }
+        int valueColumMargin = bonusTypeMaxWidth + 8;
         for (int i = 0; i < bonusTypes.size(); i++) {
             var type = bonusTypes.get(i)/*.withStyle(ChatFormatting.UNDERLINE)*//*.withColor(currentMaterial.cachedTextColor())*/;
             var value = bonusValues.get(i);
@@ -150,13 +160,15 @@ public class GuideBookScreen extends Screen {
                 }
             }
             guiGraphics.drawString(font, type, leftPos + XM, ypos, lightColor, false);
-
-
-            guiGraphics.drawString(font, value, leftPos + XM + maxWidth + 8, ypos, 0x0, false);
+            int availableInfoWidth = IMAGE_WIDTH - XM - valueColumMargin;
+            for (var line : font.split(value, availableInfoWidth)) {
+                guiGraphics.drawString(font, line, leftPos + XM + valueColumMargin, ypos, 0x0, false);
+                ypos += font.lineHeight;
+            }
+            ypos += 1;
 //            guiGraphics.drawString(font, type, leftPos + XM, ypos, 0x0, false);
 //            ypos += font.lineHeight;
 //            guiGraphics.drawString(font, Component.literal(" ")/*.withStyle(ChatFormatting.DARK_GRAY)*/.append(value.copy().withStyle(ChatFormatting.BLACK)), leftPos + XM, ypos, 0x0, false);
-            ypos += font.lineHeight + 1;
         }
     }
 
