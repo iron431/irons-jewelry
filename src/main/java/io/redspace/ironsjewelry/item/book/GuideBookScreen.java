@@ -20,8 +20,10 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 
+import java.awt.print.Book;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
@@ -34,6 +36,8 @@ public class GuideBookScreen extends Screen {
     private PageButton backButton;
     private PageButton homeButton;
 
+    static final BookSection GUIDEBOOK = new BookSection(null, List.of());
+
     static final int IMAGE_WIDTH = 267;
     static final int IMAGE_HEIGHT = 210;
     static final int MILIS_PER_ITEM = 2000;
@@ -43,10 +47,85 @@ public class GuideBookScreen extends Screen {
     protected int topPos;
     protected int ingredientIndex;
 
-    long lastItemDisplayMilis = 0;
-    MaterialPage currentMaterial;
+    long lastItemDisplayMilis = 0; //todo: likely should not be stored here
+    MaterialPage currentMaterial; // todo: temporary
+    BookSection currentSection = GUIDEBOOK; //todo: bookmark would be cool
+    @Nullable Page currentPage;
 
-    record MaterialPage(Holder<MaterialDefinition> material, int cachedTextColor, List<ItemStack> cachedIngredients) {
+    interface Page {
+    }
+
+    static class Guidebook {
+        List<BookSection> sections;
+        int sectionIndex;
+        int localPageIndex;
+
+        public Page getCurrentPage() {
+            return sections.get(sectionIndex).pages.get(localPageIndex);
+        }
+
+        /**
+         * @return Whether page successfully turned
+         */
+        public boolean incrementPage() {
+            BookSection currentSection = sections.get(sectionIndex);
+            localPageIndex++;
+            if (localPageIndex >= currentSection.pages.size()) {
+                // finished all current pages, try to advance to next section
+                if (sectionIndex < sections.size() - 1) {
+                    localPageIndex = 0;
+                    sectionIndex++;
+                    return true; // we successfully advanced section and reset page counter
+                }
+                return false; // unable to advance, no sections remaining
+            } else {
+                return true; // we have more pages remaining
+            }
+        }
+
+        /**
+         * @return Whether page successfully turned
+         */
+        public boolean decrementPage() {
+            localPageIndex--;
+            if (localPageIndex == -1) {
+                // finished with  current section, try to go back to previous section
+                if (sectionIndex > 0) {
+                    sectionIndex--;
+                    localPageIndex = sections.get(sectionIndex).pages.size() - 1;
+                    return true; // we successfully went to previous section and set page counter to final page
+                }
+                localPageIndex = 0;
+                return false; // we have no more sections to go back to, clamp page index back to 0
+            } else {
+                return true; // we have pages to fall back to
+            }
+        }
+
+        public int getGlobalPageNumber() {
+            int page = 0;
+            for (int i = 0; i < sectionIndex; i++) {
+                page += sections.get(i).pages.size();
+            }
+            page += localPageIndex + 1;
+            return page;
+        }
+
+        public int getMaxPageCount() {
+            int pages = 0;
+            for (int i = 0; i < sections.size(); i++) {
+                pages += sections.get(i).pages.size();
+            }
+            return pages;
+        }
+
+    }
+
+    record BookSection(@Nullable BookSection parent, List<Page> pages) {
+    }
+
+    record MaterialPage(Holder<MaterialDefinition> material, int cachedTextColor,
+                        List<ItemStack> cachedIngredients) implements Page {
     }
 
     public GuideBookScreen(Component title) {
