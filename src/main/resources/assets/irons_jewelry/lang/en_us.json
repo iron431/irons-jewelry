@@ -238,5 +238,7 @@
   "damage_type.apothic_attributes.cold_damage": "Cold",
   "damage_type.apothic_attributes.fire_damage": "Fire",
   "damage_type.apothic_attributes.detonation": "Detonating",
-  "damage_type.apothic_attributes.current_hp_damage": "Current Hp"
+  "damage_type.apothic_attributes.current_hp_damage": "Current Hp",
+
+  "ui.irons_jewelry.guide_book.table_of_contents" : "Table of Contents"
 }

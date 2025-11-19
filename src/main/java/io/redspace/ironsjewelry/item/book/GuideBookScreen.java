@@ -5,26 +5,26 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import io.redspace.ironsjewelry.IronsJewelry;
 import io.redspace.ironsjewelry.core.data.MaterialDefinition;
 import io.redspace.ironsjewelry.core.parameters.IBonusParameterType;
+import io.redspace.ironsjewelry.item.book.buttons.GuideBookButton;
+import io.redspace.ironsjewelry.item.book.buttons.PageButton;
 import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.inventory.PageButton;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.atlas.SpriteSource;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 
-import java.awt.print.Book;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -35,115 +35,81 @@ public class GuideBookScreen extends Screen {
     private PageButton forwardButton;
     private PageButton backButton;
     private PageButton homeButton;
-
-    static final BookSection GUIDEBOOK = new BookSection(null, List.of());
+    private final List<PageButton> pageButtons = new ArrayList<>();
 
     static final int IMAGE_WIDTH = 267;
     static final int IMAGE_HEIGHT = 210;
-    static final int MILIS_PER_ITEM = 2000;
     static final int XM = 15;
     static final int YM = 15;
     protected int leftPos;
     protected int topPos;
-    protected int ingredientIndex;
 
-    long lastItemDisplayMilis = 0; //todo: likely should not be stored here
-    MaterialPage currentMaterial; // todo: temporary
-    BookSection currentSection = GUIDEBOOK; //todo: bookmark would be cool
-    @Nullable Page currentPage;
+    float itemScale = 2f;
+    float titleScale = 2f;
 
-    interface Page {
+    GuideBookState bookState = new GuideBookState(
+            List.of(new GuideBookState.BookSection(null, List.of(
+                    new TableOfContentsPage(),
+                    new MaterialPage(
+                            IronsJewelryRegistries.materialRegistry(Minecraft.getInstance().level.registryAccess())
+                                    .getHolderOrThrow(ResourceKey.create(IronsJewelryRegistries.Keys.MATERIAL_REGISTRY_KEY, IronsJewelry.id("ruby")))
+                    ),
+                    new MaterialPage(
+                            IronsJewelryRegistries.materialRegistry(Minecraft.getInstance().level.registryAccess())
+                                    .getHolderOrThrow(ResourceKey.create(IronsJewelryRegistries.Keys.MATERIAL_REGISTRY_KEY, IronsJewelry.id("sapphire")))
+                    ),
+                    new MaterialPage(
+                            IronsJewelryRegistries.materialRegistry(Minecraft.getInstance().level.registryAccess())
+                                    .getHolderOrThrow(ResourceKey.create(IronsJewelryRegistries.Keys.MATERIAL_REGISTRY_KEY, IronsJewelry.id("netherite")))
+                    )
+            )))
+    );
+    int lastPageNumber;
+    Page cachedPage;
+
+    public interface Page {
+        void render(GuiGraphics guiGraphics, int titleX, int titleBottomY, int mouseX, int mouseY, float partialTick);
+
+        default List<GuideBookButton> extraButtons() {
+            return List.of();
+        }
     }
 
-    static class Guidebook {
-        List<BookSection> sections;
-        int sectionIndex;
-        int localPageIndex;
-
-        public Page getCurrentPage() {
-            return sections.get(sectionIndex).pages.get(localPageIndex);
-        }
-
-        /**
-         * @return Whether page successfully turned
-         */
-        public boolean incrementPage() {
-            BookSection currentSection = sections.get(sectionIndex);
-            localPageIndex++;
-            if (localPageIndex >= currentSection.pages.size()) {
-                // finished all current pages, try to advance to next section
-                if (sectionIndex < sections.size() - 1) {
-                    localPageIndex = 0;
-                    sectionIndex++;
-                    return true; // we successfully advanced section and reset page counter
-                }
-                return false; // unable to advance, no sections remaining
-            } else {
-                return true; // we have more pages remaining
-            }
-        }
-
-        /**
-         * @return Whether page successfully turned
-         */
-        public boolean decrementPage() {
-            localPageIndex--;
-            if (localPageIndex == -1) {
-                // finished with  current section, try to go back to previous section
-                if (sectionIndex > 0) {
-                    sectionIndex--;
-                    localPageIndex = sections.get(sectionIndex).pages.size() - 1;
-                    return true; // we successfully went to previous section and set page counter to final page
-                }
-                localPageIndex = 0;
-                return false; // we have no more sections to go back to, clamp page index back to 0
-            } else {
-                return true; // we have pages to fall back to
-            }
-        }
-
-        public int getGlobalPageNumber() {
-            int page = 0;
-            for (int i = 0; i < sectionIndex; i++) {
-                page += sections.get(i).pages.size();
-            }
-            page += localPageIndex + 1;
-            return page;
-        }
-
-        public int getMaxPageCount() {
-            int pages = 0;
-            for (int i = 0; i < sections.size(); i++) {
-                pages += sections.get(i).pages.size();
-            }
-            return pages;
-        }
-
-    }
-
-    record BookSection(@Nullable BookSection parent, List<Page> pages) {
-    }
-
-    record MaterialPage(Holder<MaterialDefinition> material, int cachedTextColor,
-                        List<ItemStack> cachedIngredients) implements Page {
-    }
 
     public GuideBookScreen(Component title) {
         super(title);
         this.minecraft = Minecraft.getInstance();
+        this.font = minecraft.font;
+        initPageButtons();
+    }
+
+    private void initPageButtons() {
+        pageButtons.clear();
+        int travWidth = 23;
+        int travHeight = 13;
+        this.forwardButton = new PageButton(leftPos + IMAGE_WIDTH - 10 - travWidth, topPos + IMAGE_HEIGHT - 13 - travHeight, travWidth, travHeight,
+                ResourceLocation.withDefaultNamespace("widget/page_forward"), ResourceLocation.withDefaultNamespace("widget/page_forward_highlighted"), GuideBookState::incrementPage);
+        this.backButton = new PageButton(leftPos + IMAGE_WIDTH - 10 - travWidth - travWidth - 2, topPos + IMAGE_HEIGHT - 13 - travHeight, travWidth, travHeight,
+                ResourceLocation.withDefaultNamespace("widget/page_backward"), ResourceLocation.withDefaultNamespace("widget/page_backward_highlighted"), GuideBookState::decrementPage);
+        this.homeButton = new PageButton(leftPos + 10, topPos + IMAGE_HEIGHT - 13 - travHeight, travWidth, travHeight,
+                ResourceLocation.withDefaultNamespace("widget/page_backward"), ResourceLocation.withDefaultNamespace("widget/page_backward_highlighted"), GuideBookState::returnSection);
+        pageButtons.add(forwardButton);
+        pageButtons.add(backButton);
+        pageButtons.add(homeButton);
     }
 
     @Override
     protected void init() {
         this.leftPos = (this.width - IMAGE_WIDTH) / 2;
         this.topPos = (this.height - IMAGE_HEIGHT) / 2;
-        chooseMaterial(IronsJewelryRegistries.materialRegistry(Minecraft.getInstance().level.registryAccess())
-                .getHolderOrThrow(ResourceKey.create(IronsJewelryRegistries.Keys.MATERIAL_REGISTRY_KEY, IronsJewelry.id("ruby"))));
+        initPageButtons();
+        this.lastPageNumber = -1;
+//        chooseMaterial(IronsJewelryRegistries.materialRegistry(Minecraft.getInstance().level.registryAccess())
+//                .getHolderOrThrow(ResourceKey.create(IronsJewelryRegistries.Keys.MATERIAL_REGISTRY_KEY, IronsJewelry.id("topaz"))));
     }
 
     protected void chooseMaterial(Holder<MaterialDefinition> materialDefinitionHolder) {
-        this.currentMaterial = new MaterialPage(materialDefinitionHolder, generateTextColor(materialDefinitionHolder.value().paletteLocation()), List.of(materialDefinitionHolder.value().ingredient().getItems()));
-        this.ingredientIndex = 0;
+        this.cachedPage = new MaterialPage(materialDefinitionHolder);
     }
 
     @Override
@@ -153,7 +119,6 @@ public class GuideBookScreen extends Screen {
     }
 
     private int getMaxTitleWidth() {
-        // could calculate this based on image width, but I like this stylistically
         int averageCharSize = 5;
         int maxCharCount = 15;
         return averageCharSize * maxCharCount;
@@ -162,93 +127,35 @@ public class GuideBookScreen extends Screen {
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
-        if (currentMaterial == null) {
-            return;
+        int currentPageNumber = bookState.getGlobalPageNumber();
+        if (lastPageNumber != currentPageNumber) {
+            lastPageNumber = currentPageNumber;
+            cachedPage = bookState.getCurrentPage();
         }
-        var materialHolder = currentMaterial.material();
-
-        MaterialDefinition material = materialHolder.value();
-        Component name = Component.translatable(material.descriptionId());
-        var currentIngredients = currentMaterial.cachedIngredients();
-        if (currentIngredients.isEmpty()) {
-            return;
-        }
-        if (System.currentTimeMillis() > lastItemDisplayMilis + MILIS_PER_ITEM) {
-            ingredientIndex = (ingredientIndex + 1) % currentIngredients.size();
-            lastItemDisplayMilis = System.currentTimeMillis();
-            chooseMaterial(List.of(
-                    IronsJewelryRegistries.materialRegistry(Minecraft.getInstance().level.registryAccess())
-                            .getHolderOrThrow(ResourceKey.create(IronsJewelryRegistries.Keys.MATERIAL_REGISTRY_KEY, IronsJewelry.id("ruby"))),
-                    IronsJewelryRegistries.materialRegistry(Minecraft.getInstance().level.registryAccess())
-                            .getHolderOrThrow(ResourceKey.create(IronsJewelryRegistries.Keys.MATERIAL_REGISTRY_KEY, IronsJewelry.id("netherite"))),
-                    IronsJewelryRegistries.materialRegistry(Minecraft.getInstance().level.registryAccess())
-                            .getHolderOrThrow(ResourceKey.create(IronsJewelryRegistries.Keys.MATERIAL_REGISTRY_KEY, IronsJewelry.id("sapphire")))
-            ).get((int)(Math.random() * 3)));
-        }
-        var poseStack = guiGraphics.pose();
-
-        /*
-        Draw Page Title: Ingredient Icon and Material Name
-         */
-        float itemScale = 2;
         int titleX = leftPos + XM - 5;
         int titleBottomY = topPos + YM / 2 + (int) (16 * itemScale);
-        ItemStack item = currentIngredients.get(ingredientIndex);
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().scale(itemScale, itemScale, itemScale);
-        guiGraphics.renderItem(/*Items.IRON_SWORD.getDefaultInstance()*/item, (int) (titleX / itemScale), (int) (titleBottomY / itemScale - 16));
-        guiGraphics.pose().popPose();
+        cachedPage.render(guiGraphics, titleX, titleBottomY, mouseX, mouseY, partialTick);
+        for (GuideBookButton button : pageButtons) {
+            button.render(guiGraphics, button.boundingBox().containsPoint(mouseX, mouseY), partialTick);
+        }
+        for (GuideBookButton button : cachedPage.extraButtons()) {
+            button.render(guiGraphics, button.boundingBox().containsPoint(mouseX, mouseY), partialTick);
+        }
+    }
 
-        var font = Minecraft.getInstance().font;
-        float textScale = 2;
-        int textcolor = currentMaterial.cachedTextColor();
-        poseStack.pushPose();
-        textScale *= Math.clamp(getMaxTitleWidth() / (float) font.width(name), 0, 1);
-        poseStack.scale(textScale, textScale, textScale);
-        guiGraphics.drawString(font, name, (int) ((titleX + 17 * itemScale) / textScale), (int) ((titleBottomY - (2 * itemScale)) / textScale) - font.lineHeight, textcolor, true);
-        poseStack.popPose();
-
-        int lineLength = (int) (16 * itemScale + (font.width(name) + 32) * textScale);
-        int lineThickness = 2;
-        drawLine(guiGraphics, lineThickness, titleX, titleBottomY, titleX + lineLength, titleBottomY, textcolor, textcolor & 0x00FFFFFF);
-
-        Component quality = Component.translatable("tooltip.irons_jewelry.quality_multiplier", material.quality());
-        List<MutableComponent> bonusTypes = material.bonusParameters().keySet().stream().map(param -> Component.translatable(param.getDescriptionId())).toList();
-        List<Component> bonusValues = material.bonusParameters().entrySet().stream().map(entry ->
-                ((IBonusParameterType) entry.getKey()).getSimpleDescription(entry.getValue())).filter(Optional::isPresent).map(opt -> (Component) opt.get()).toList();
-
-        int ypos = (int) (topPos + YM + font.lineHeight * (1 + itemScale));
-        guiGraphics.drawString(font, quality, leftPos + XM, ypos, 0x0, false);
-        ypos += font.lineHeight * 2;
-        int bonusTypeMaxWidth = 0;
-        for (var t : bonusTypes) {
-            var w = font.width(t);
-            if (w > bonusTypeMaxWidth) {
-                bonusTypeMaxWidth = w;
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int mouseAction) {
+        for (GuideBookButton button : pageButtons) {
+            if (button.boundingBox().containsPoint((int) mouseX, (int) mouseY) && button.onClick(this.bookState)) {
+                return true;
             }
         }
-        int valueColumMargin = bonusTypeMaxWidth + 8;
-        for (int i = 0; i < bonusTypes.size(); i++) {
-            var type = bonusTypes.get(i)/*.withStyle(ChatFormatting.UNDERLINE)*//*.withColor(currentMaterial.cachedTextColor())*/;
-            var value = bonusValues.get(i);
-            int lightColor = scaleColor(currentMaterial.cachedTextColor(), 1.75f);
-            int darkColor = scaleColor(currentMaterial.cachedTextColor(), 0.25f);
-            for (int x = -1; x <= 1; x++) {
-                for (int y = -1; y <= 1; y++) {
-                    guiGraphics.drawString(font, type, leftPos + XM + x, ypos + y, darkColor, false);
-                }
+        for (GuideBookButton button : cachedPage.extraButtons()) {
+            if (button.boundingBox().containsPoint((int) mouseX, (int) mouseY) && button.onClick(this.bookState)) {
+                return true;
             }
-            guiGraphics.drawString(font, type, leftPos + XM, ypos, lightColor, false);
-            int availableInfoWidth = IMAGE_WIDTH - XM - valueColumMargin;
-            for (var line : font.split(value, availableInfoWidth)) {
-                guiGraphics.drawString(font, line, leftPos + XM + valueColumMargin, ypos, 0x0, false);
-                ypos += font.lineHeight;
-            }
-            ypos += 1;
-//            guiGraphics.drawString(font, type, leftPos + XM, ypos, 0x0, false);
-//            ypos += font.lineHeight;
-//            guiGraphics.drawString(font, Component.literal(" ")/*.withStyle(ChatFormatting.DARK_GRAY)*/.append(value.copy().withStyle(ChatFormatting.BLACK)), leftPos + XM, ypos, 0x0, false);
         }
+        return super.mouseClicked(mouseX, mouseY, mouseAction);
     }
 
     private int scaleColor(int color, float scalar) {
@@ -309,5 +216,92 @@ public class GuideBookScreen extends Screen {
 
     public boolean isPauseScreen() {
         return false;
+    }
+
+    public class TableOfContentsPage implements Page {
+        @Override
+        public void render(GuiGraphics guiGraphics, int titleX, int titleBottomY, int mouseX, int mouseY, float partialTick) {
+            var poseStack = guiGraphics.pose();
+            int color = 0xFF808080;
+            float textScale = titleScale;
+            Component title = Component.translatable("ui.irons_jewelry.guide_book.table_of_contents").withColor(color);
+            poseStack.pushPose();
+            textScale *= Math.clamp(getMaxTitleWidth() / (float) font.width(title), 0, 1);
+            poseStack.scale(textScale, textScale, textScale);
+            guiGraphics.drawString(font, title, (int) (titleX / textScale), (int) ((titleBottomY - (2 * itemScale)) / textScale) - font.lineHeight, color, true);
+            poseStack.popPose();
+            int lineLength = (int) ((font.width(title) + 32) * textScale);
+            int lineThickness = 2;
+            drawLine(guiGraphics, lineThickness, titleX, titleBottomY, titleX + lineLength, titleBottomY, color, color & 0x00FFFFFF);
+        }
+    }
+
+    public class MaterialPage implements Page {
+        final Holder<MaterialDefinition> material;
+        final int cachedTextColor;
+        final CyclicItemRenderer itemRenderer;
+
+        public MaterialPage(Holder<MaterialDefinition> material) {
+            this.material = material;
+            this.cachedTextColor = generateTextColor(material.value().paletteLocation());
+            this.itemRenderer = new CyclicItemRenderer(List.of(material.value().ingredient().getItems()));
+        }
+
+        @Override
+        public void render(GuiGraphics guiGraphics, int titleX, int titleBottomY, int mouseX, int mouseY, float partialTick) {
+            MaterialDefinition material = this.material.value();
+            Component name = Component.translatable(material.descriptionId());
+            var poseStack = guiGraphics.pose();
+            /*
+            Draw Page Title: Ingredient Icon and Material Name
+             */
+            this.itemRenderer.renderBottomLeft(guiGraphics, titleX, titleBottomY, itemScale);
+            var font = Minecraft.getInstance().font;
+            float textScale = titleScale;
+            poseStack.pushPose();
+            textScale *= Math.clamp(getMaxTitleWidth() / (float) font.width(name), 0, 1);
+            poseStack.scale(textScale, textScale, textScale);
+            guiGraphics.drawString(font, name, (int) ((titleX + 17 * itemScale) / textScale), (int) ((titleBottomY - (2 * itemScale)) / textScale) - font.lineHeight, cachedTextColor, true);
+            poseStack.popPose();
+            int lineLength = (int) (16 * itemScale + (font.width(name) + 32) * textScale);
+            int lineThickness = 2;
+            drawLine(guiGraphics, lineThickness, titleX, titleBottomY, titleX + lineLength, titleBottomY, cachedTextColor, cachedTextColor & 0x00FFFFFF);
+
+            Component quality = Component.translatable("tooltip.irons_jewelry.quality_multiplier", material.quality());
+            List<MutableComponent> bonusTypes = material.bonusParameters().keySet().stream().map(param -> Component.translatable(param.getDescriptionId())).toList();
+            List<MutableComponent> bonusValues = material.bonusParameters().entrySet().stream().map(entry ->
+                    ((IBonusParameterType) entry.getKey()).getSimpleDescription(entry.getValue())).filter(Optional::isPresent).map(opt -> ((Component) opt.get()).copy()).toList();
+
+            int ypos = (int) (topPos + YM + font.lineHeight * (1 + itemScale));
+            guiGraphics.drawString(font, quality, leftPos + XM, ypos, 0x0, false);
+            ypos += font.lineHeight * 2;
+            int bonusTypeMaxWidth = 0;
+            for (var t : bonusTypes) {
+                var w = font.width(t);
+                if (w > bonusTypeMaxWidth) {
+                    bonusTypeMaxWidth = w;
+                }
+            }
+            int valueColumMargin = bonusTypeMaxWidth + 8;
+            for (int i = 0; i < bonusTypes.size(); i++) {
+                //fixme: this fails to wipe formatting from embedded components
+                var type = bonusTypes.get(i).setStyle(Style.EMPTY);
+                var value = bonusValues.get(i).setStyle(Style.EMPTY);
+                int lightColor = scaleColor(cachedTextColor, 1.75f);
+                int darkColor = scaleColor(cachedTextColor, 0.25f);
+                for (int x = -1; x <= 1; x++) {
+                    for (int y = -1; y <= 1; y++) {
+                        guiGraphics.drawString(font, type, leftPos + XM + x, ypos + y, darkColor, false);
+                    }
+                }
+                guiGraphics.drawString(font, type, leftPos + XM, ypos, lightColor, false);
+                int availableInfoWidth = IMAGE_WIDTH - XM - valueColumMargin;
+                for (var line : font.split(value, availableInfoWidth)) {
+                    guiGraphics.drawString(font, line, leftPos + XM + valueColumMargin, ypos, 0x0, false);
+                    ypos += font.lineHeight;
+                }
+                ypos += 1;
+            }
+        }
     }
 }
