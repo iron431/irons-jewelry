@@ -3,17 +3,24 @@ package io.redspace.ironsjewelry.item.book;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import io.redspace.ironsjewelry.IronsJewelry;
+import io.redspace.ironsjewelry.core.data.JewelryData;
 import io.redspace.ironsjewelry.core.data.MaterialDefinition;
+import io.redspace.ironsjewelry.core.data.PartDefinition;
+import io.redspace.ironsjewelry.core.data.PatternDefinition;
 import io.redspace.ironsjewelry.core.parameters.IBonusParameterType;
 import io.redspace.ironsjewelry.item.book.buttons.GuideBookButton;
 import io.redspace.ironsjewelry.item.book.buttons.PageButton;
 import io.redspace.ironsjewelry.item.book.buttons.TextButton;
+import io.redspace.ironsjewelry.registry.AssetHandlerRegistry;
 import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
+import io.redspace.ironsjewelry.registry.ItemRegistry;
+import io.redspace.ironsjewelry.utils.Utils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.atlas.SpriteSource;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
@@ -21,14 +28,16 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
+import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.common.Tags;
+import net.neoforged.neoforge.registries.DeferredHolder;
 import org.joml.Matrix4f;
 
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 
 public class GuideBookScreen extends Screen {
@@ -56,34 +65,46 @@ public class GuideBookScreen extends Screen {
     public GuideBookState createGuidebookState() {
 //        GuideBookState.BookSection tableOfContents = new GuideBookState.BookSection(new TableOfContentsPage(Component.translatable("ui.irons_jewelry.guide_book.table_of_contents")));
         var materialRegistry = IronsJewelryRegistries.materialRegistry(Minecraft.getInstance().level.registryAccess());
+        var patternRegistry = IronsJewelryRegistries.patternRegistry(Minecraft.getInstance().level.registryAccess());
         List<Page> materialPages = new ArrayList<>();
         materialRegistry.holders().filter(holder -> !holder.value().ingredient().hasNoItems()).forEach(holder -> materialPages.add(new MaterialPage(holder)));
-        List<Function<TableOfContentsPage.EntryPreparation, GuideBookButton>> contentEntries = new ArrayList<>();
+        List<Function<TableOfContentsPage.EntryPreparation, GuideBookButton>> materialTableOfContentsEntries = new ArrayList<>();
         for (int i = 0; i < materialPages.size(); i++) {
             var materialPage = ((MaterialPage) materialPages.get(i));
             var material = materialPage.material;
-            contentEntries.add(preparation ->
+            materialTableOfContentsEntries.add(preparation ->
                     new TextButton(preparation.x(), preparation.y(), preparation.width(), preparation.height(), Component.translatable(material.value().descriptionId()), 0xFFFFFFFF, ChatFormatting.YELLOW.getColor(),
                             List.of(material.value().ingredient().getItems()), guidebook -> guidebook.navigateToPage(materialPage)));
         }
-        materialPages.addAll(0, createTableOfContentsPages(Component.translatable("ui.irons_jewelry.guide_book.table_of_contents_materials"), contentEntries));
-        GuideBookState.BookSection materials = new GuideBookState.BookSection(materialPages);
+        materialPages.addAll(0, createTableOfContentsPages(Component.translatable("ui.irons_jewelry.guide_book.table_of_contents_materials"), materialTableOfContentsEntries, 75));
+
+        List<Page> patternPages = new ArrayList<>();
+        patternRegistry.holders().forEach(holder -> patternPages.add(new PatternPage(holder)));
+        List<Function<TableOfContentsPage.EntryPreparation, GuideBookButton>> patternTableOfContentsEntries = new ArrayList<>();
+        for (int i = 0; i < patternPages.size(); i++) {
+            var patternPage = ((PatternPage) patternPages.get(i));
+            var pattern = patternPage.pattern;
+            patternTableOfContentsEntries.add(preparation ->
+                    new TextButton(preparation.x(), preparation.y(), preparation.width(), preparation.height(), Component.translatable(pattern.value().descriptionId()), 0xFFFFFFFF, ChatFormatting.YELLOW.getColor(),
+                            List.of(patternPage.itemIcon), guidebook -> guidebook.navigateToPage(patternPage)));
+        }
+        patternPages.addAll(0, createTableOfContentsPages(Component.translatable("ui.irons_jewelry.guide_book.table_of_contents_patterns"), patternTableOfContentsEntries, 75));
+
+        List<Page> tableOfContentsPages = new ArrayList<>();
+        tableOfContentsPages.addAll(createTableOfContentsPages(Component.translatable("ui.irons_jewelry.guide_book.table_of_contents"),
+                List.of(
+                        // Materials
+                        preparation -> new TextButton(preparation.x(), preparation.y(), preparation.width(), preparation.height(),
+                                Component.translatable("ui.irons_jewelry.guide_book.table_of_contents_materials"), 0xFFFFFFFF, ChatFormatting.YELLOW.getColor(),
+                                ItemRegistry.items().stream().filter(holder -> holder.is(Tags.Items.GEMS)).map(DeferredHolder::get).map(Item::getDefaultInstance).toList(), guidebook -> guidebook.navigateToPage(materialPages.get(0))),
+                        // Patterns
+                        preparation -> new TextButton(preparation.x(), preparation.y(), preparation.width(), preparation.height(),
+                                Component.translatable("ui.irons_jewelry.guide_book.table_of_contents_patterns"), 0xFFFFFFFF, ChatFormatting.YELLOW.getColor(),
+                                List.of(ItemRegistry.RECIPE.get().getDefaultInstance()), guidebook -> guidebook.navigateToPage(patternPages.get(0)))
+                ), 75));
+
         return new GuideBookState(
-                List.of(materials/*new GuideBookState.BookSection(List.of(
-                        new TableOfContentsPage(),
-                        new MaterialPage(
-                                IronsJewelryRegistries.materialRegistry(Minecraft.getInstance().level.registryAccess())
-                                        .getHolderOrThrow(ResourceKey.create(IronsJewelryRegistries.Keys.MATERIAL_REGISTRY_KEY, IronsJewelry.id("ruby")))
-                        ),
-                        new MaterialPage(
-                                IronsJewelryRegistries.materialRegistry(Minecraft.getInstance().level.registryAccess())
-                                        .getHolderOrThrow(ResourceKey.create(IronsJewelryRegistries.Keys.MATERIAL_REGISTRY_KEY, IronsJewelry.id("sapphire")))
-                        ),
-                        new MaterialPage(
-                                IronsJewelryRegistries.materialRegistry(Minecraft.getInstance().level.registryAccess())
-                                        .getHolderOrThrow(ResourceKey.create(IronsJewelryRegistries.Keys.MATERIAL_REGISTRY_KEY, IronsJewelry.id("netherite")))
-                        )
-                ))*/)
+                List.of(new GuideBookState.BookSection(tableOfContentsPages), new GuideBookState.BookSection(materialPages), new GuideBookState.BookSection(patternPages))
         );
     }
 
@@ -240,12 +261,12 @@ public class GuideBookScreen extends Screen {
         return false;
     }
 
-    private List<TableOfContentsPage> createTableOfContentsPages(Component title, List<Function<TableOfContentsPage.EntryPreparation, GuideBookButton>> entries) {
+    private List<TableOfContentsPage> createTableOfContentsPages(Component title, List<Function<TableOfContentsPage.EntryPreparation, GuideBookButton>> entries, int width) {
         int startingX = XM;
         int availableWidth = IMAGE_WIDTH - startingX - XM;
         int startingY = YM / 2 + (int) (16 * itemScale) + 10; // todo: not hardcode this? (copy of bottomTitleY)
         int availableHeight = IMAGE_HEIGHT - startingY - YM * 2;
-        int entryWidth = 75;
+        int entryWidth = width;
         int entryHeight = 16;
         int xMargin = Math.max(3, (availableWidth - entryWidth * 3) / 2 - 1);
         int yMargin = 1;
@@ -375,6 +396,121 @@ public class GuideBookScreen extends Screen {
                     ypos += font.lineHeight;
                 }
                 ypos += 1;
+            }
+        }
+    }
+
+    public class PatternPage implements Page {
+        /*
+                                    List<Component> tooltip = new ArrayList<>();
+                            tooltip.add(Component.translatable(part.part().value().descriptionId()).withStyle(ChatFormatting.YELLOW, ChatFormatting.UNDERLINE));
+                            tooltip.add(Component.literal(String.format(" (0/%s)", part.materialCost())).withStyle(ChatFormatting.RED));
+                            tooltip.add(Component.translatable("tooltip.irons_jewelry.applicable_materials").withStyle(ChatFormatting.YELLOW, ChatFormatting.UNDERLINE));
+                            IronsJewelryRegistries.materialRegistry(Minecraft.getInstance().level.registryAccess()).stream().filter(materialDefinition -> !materialDefinition.ingredient().hasNoItems() && part.part().value().canUseMaterial(materialDefinition.materialType()))
+                                    .forEach(material -> tooltip.add(Component.literal(" ").append(Component.translatable(material.descriptionId())).withStyle(ChatFormatting.GRAY)));
+                            pGuiGraphics.renderTooltip(this.font, Utils.rasterizeComponentList(tooltip), mouseX, mouseY);
+         */
+        record PartInfo(TextureAtlasSprite sprite,/*ItemStack preview,*//* Component name,*/
+                        List<? extends FormattedCharSequence> tooltip) {
+            private static final ResourceLocation INPUT_SLOT = IronsJewelry.id("jewelcrafting_station/guidebook_part_frame");
+
+            void render(GuiGraphics guiGraphics, int x, int y, int mouseX, int mouseY, float partialTick) {
+                int slotMargin = 4;
+                int size = 24;
+                guiGraphics.blitSprite(INPUT_SLOT, x, y, 200, size, size);
+                guiGraphics.blit(x + slotMargin, y + slotMargin, 200, 16, 16, sprite);
+                if (mouseX >= x && mouseX <= x + size && mouseY >= y && mouseY <= y + size) {
+                    guiGraphics.renderTooltip(Minecraft.getInstance().font, tooltip, mouseX, mouseY);
+                }
+            }
+        }
+
+        final Holder<PatternDefinition> pattern;
+        final ItemStack itemIcon;
+        final CyclicItemRenderer itemRenderer;
+        final List<PartInfo> partInfo;
+
+
+        public PatternPage(Holder<PatternDefinition> pattern) {
+            this.pattern = pattern;
+            this.itemIcon = createPatternItem(pattern);
+            this.itemRenderer = new CyclicItemRenderer(List.of(itemIcon));
+            this.partInfo = new ArrayList<>(pattern.value().partTemplate().size());
+            JewelryData data = JewelryData.get(itemIcon);
+            var handler = AssetHandlerRegistry.JEWELRY_HANDLER.get();
+            for (var entry : data.parts().entrySet()) {
+                List<Component> tooltip = new ArrayList<>();
+                var part = entry.getKey();
+                tooltip.add(Component.translatable(part.value().descriptionId()).withStyle(ChatFormatting.UNDERLINE).withColor(generateTextColor(entry.getValue().value().paletteLocation())));
+                tooltip.add(Component.translatable("tooltip.irons_jewelry.applicable_materials").withStyle(ChatFormatting.YELLOW, ChatFormatting.UNDERLINE));
+                IronsJewelryRegistries.materialRegistry(Minecraft.getInstance().level.registryAccess()).stream().filter(materialDefinition -> !materialDefinition.ingredient().hasNoItems() && part.value().canUseMaterial(materialDefinition.materialType()))
+                        .forEach(material -> tooltip.add(Component.literal(" ").append(Component.translatable(material.descriptionId())).withStyle(ChatFormatting.GRAY)));
+                partInfo.add(new PartInfo(handler.getSprite(handler.getSpriteLocation(entry.getKey(), entry.getValue())), Utils.rasterizeComponentList(tooltip)));
+            }
+        }
+
+        @Override
+        public void render(GuiGraphics guiGraphics, int titleX, int titleBottomY, int mouseX, int mouseY, float partialTick) {
+            PatternDefinition pattern = this.pattern.value();
+            Component name = Component.translatable(pattern.descriptionId());
+            var poseStack = guiGraphics.pose();
+            /*
+            Draw Page Title: Icon and Name
+             */
+            this.itemRenderer.renderBottomLeft(guiGraphics, titleX, titleBottomY, itemScale);
+            var font = Minecraft.getInstance().font;
+            float textScale = titleScale;
+            int textColor = 0xFFA0A0A0;
+            poseStack.pushPose();
+            textScale *= Math.clamp(getMaxTitleWidth() / (float) font.width(name), 0, 1);
+            poseStack.scale(textScale, textScale, textScale);
+            guiGraphics.drawString(font, name, (int) ((titleX + 17 * itemScale) / textScale), (int) ((titleBottomY - (2 * itemScale)) / textScale) - font.lineHeight, textColor, true);
+            poseStack.popPose();
+            int lineLength = (int) (16 * itemScale + (font.width(name) + 32) * textScale);
+            int lineThickness = 2;
+            drawLine(guiGraphics, lineThickness, titleX, titleBottomY, titleX + lineLength, titleBottomY, textColor, textColor & 0x00FFFFFF);
+            /*
+            Draw Part Info
+             */
+            //todo: "parts" title
+            int partSectionX = titleX;
+            int partSectionY = titleBottomY + 10;
+            for (int i = 0; i < partInfo.size(); i++) {
+                partInfo.get(i).render(guiGraphics, partSectionX, partSectionY + i * 25, mouseX, mouseY, partialTick);
+            }
+        }
+
+        private static ItemStack createPatternItem(Holder<PatternDefinition> pattern) {
+            try {
+                ItemStack item = new ItemStack(pattern.value().jewelryType().item());
+                Holder<MaterialDefinition> renderMaterial = null;
+                var materialRegistry = IronsJewelryRegistries.materialRegistry(Minecraft.getInstance().level.registryAccess());
+                var metal = materialRegistry.getHolder(IronsJewelry.id("gold")).get();
+                var gem = materialRegistry.getHolder(IronsJewelry.id("sapphire")).get();
+                Map<Holder<PartDefinition>, Holder<MaterialDefinition>> parts = new HashMap<>();
+                for (var partIngredient : pattern.value().partTemplate()) {
+                    var part = partIngredient.part();
+                    if (part.value().canUseMaterial("metal")) {
+                        renderMaterial = metal;
+                    } else if (part.value().canUseMaterial("gem")) {
+                        renderMaterial = gem;
+                    } else {
+                        for (MaterialDefinition materialDefinition : materialRegistry) {
+                            if (part.value().canUseMaterial(materialDefinition.materialType())) {
+                                renderMaterial = materialRegistry.wrapAsHolder(materialDefinition);
+                                break;
+                            }
+                        }
+                        Objects.requireNonNull(renderMaterial, "No valid material found for part \"" + part.getKey() + "\"");
+                    }
+                    parts.put(part, renderMaterial);
+                }
+                JewelryData data = JewelryData.renderable(pattern, parts);
+                JewelryData.set(item, data);
+                return item;
+            } catch (Exception e) {
+                IronsJewelry.LOGGER.error("Failed to generate guidebook pattern preview: {}", e.getMessage());
+                return ItemStack.EMPTY;
             }
         }
     }

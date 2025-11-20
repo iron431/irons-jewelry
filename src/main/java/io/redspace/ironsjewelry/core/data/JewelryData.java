@@ -100,6 +100,10 @@ public class JewelryData {
         return itemStack.getOrDefault(ComponentRegistry.JEWELRY_COMPONENT, NONE);
     }
 
+    public static void set(ItemStack itemStack, JewelryData data) {
+        itemStack.set(ComponentRegistry.JEWELRY_COMPONENT, data);
+    }
+
     public static void ifPresent(ItemStack itemStack, Consumer<JewelryData> consumer) {
         var data = itemStack.get(ComponentRegistry.JEWELRY_COMPONENT);
         if (data != null) {

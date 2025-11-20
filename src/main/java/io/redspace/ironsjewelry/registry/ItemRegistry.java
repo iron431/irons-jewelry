@@ -13,6 +13,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
+import java.util.Collection;
 import java.util.function.Supplier;
 
 public class ItemRegistry {
@@ -41,5 +42,9 @@ public class ItemRegistry {
         var s = ITEMS.register(name, supplier);
         ItemModelDataGenerator.toRegister.add(generator -> generator.simpleItem(s));
         return s;
+    }
+
+    public static Collection<DeferredHolder<Item, ? extends Item>> items() {
+        return ITEMS.getEntries();
     }
 }

@@ -76,14 +76,16 @@ public class GuideBookState {
     }
 
     public boolean navigateToPage(GuideBookScreen.Page page) {
-        var section = getCurrentSection();
-        int i = section.pages.indexOf(page);
-        if (i < 0) {
-            return false;
-        } else {
-            localPageIndex = i;
-            return true;
+        for (int j = 0; j < sections.size(); j++) {
+            var section = sections.get(j);
+            int i = section.pages.indexOf(page);
+            if (i >= 0) {
+                localPageIndex = i;
+                sectionIndex = j;
+                return true;
+            }
         }
+        return false;
     }
 
     public boolean returnSection() {
