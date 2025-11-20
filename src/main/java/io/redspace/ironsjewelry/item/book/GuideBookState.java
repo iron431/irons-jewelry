@@ -1,7 +1,5 @@
 package io.redspace.ironsjewelry.item.book;
 
-import org.jetbrains.annotations.Nullable;
-
 import java.util.List;
 
 public class GuideBookState {
@@ -9,18 +7,22 @@ public class GuideBookState {
         this.sections = sections;
     }
 
-    public record BookSection(@Nullable BookSection parent, List<GuideBookScreen.Page> pages) {
+    public record BookSection(List<GuideBookScreen.Page> pages) {
     }
 
     final List<BookSection> sections;
     int sectionIndex;
     int localPageIndex;
 
-    public GuideBookScreen.Page getCurrentPage() {
+    public BookSection getCurrentSection() {
         if (sections.isEmpty()) {
             throw new IllegalArgumentException("Cannot have empty book state!");
         }
-        var section = sections.get(sectionIndex);
+        return sections.get(sectionIndex);
+    }
+
+    public GuideBookScreen.Page getCurrentPage() {
+        var section = getCurrentSection();
         if (section.pages.isEmpty()) {
             throw new IllegalArgumentException("Cannot have empty book section!");
         }
@@ -65,22 +67,35 @@ public class GuideBookState {
         }
     }
 
+    public boolean setLocalPage(int page) {
+        if (page >= 0 && page < sections.get(sectionIndex).pages.size()) {
+            localPageIndex = page;
+            return true;
+        }
+        return false;
+    }
+
+    public boolean navigateToPage(GuideBookScreen.Page page) {
+        var section = getCurrentSection();
+        int i = section.pages.indexOf(page);
+        if (i < 0) {
+            return false;
+        } else {
+            localPageIndex = i;
+            return true;
+        }
+    }
+
     public boolean returnSection() {
         if (localPageIndex == 0) {
-            BookSection currentSection = sections.get(sectionIndex);
-            if (currentSection.parent != null) {
-                int i = sections.indexOf(currentSection.parent);
-                if (i >= 0) {
-                    sectionIndex = i;
-                    localPageIndex = 0;
-                    return true;
-                }
+            if (sectionIndex != 0) {
+                sectionIndex = 0;
+                return true;
             }
         } else {
             localPageIndex = 0;
             return true;
         }
-
         return false;
     }
 

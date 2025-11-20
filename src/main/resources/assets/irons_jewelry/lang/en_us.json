@@ -240,5 +240,7 @@
   "damage_type.apothic_attributes.detonation": "Detonating",
   "damage_type.apothic_attributes.current_hp_damage": "Current Hp",
 
-  "ui.irons_jewelry.guide_book.table_of_contents" : "Table of Contents"
+  "ui.irons_jewelry.guide_book.table_of_contents" : "Table of Contents",
+  "ui.irons_jewelry.guide_book.table_of_contents_materials" : "Materials",
+  "ui.irons_jewelry.guide_book.table_of_contents_patterns" : "Patterns"
 }

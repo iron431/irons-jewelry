@@ -1,8 +1,6 @@
 {
   "descriptionId": "material.irons_jewelry.example",
-  "ingredient": {
-    "item": "minecraft:barrier"
-  },
+  "ingredient": [],
   "materialType": [
   ],
   "paletteLocation": "irons_jewelry:palettes/platinum",
