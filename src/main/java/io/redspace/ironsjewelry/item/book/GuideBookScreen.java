@@ -31,6 +31,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.registries.DeferredHolder;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 
 import java.io.InputStream;
@@ -105,10 +106,33 @@ public class GuideBookScreen extends Screen {
         );
     }
 
-    public interface Page {
-        void render(GuiGraphics guiGraphics, int titleX, int titleBottomY, int mouseX, int mouseY, float partialTick);
+    abstract class Page {
+        abstract void render(GuiGraphics guiGraphics, int titleX, int titleBottomY, int mouseX, int mouseY, float partialTick);
 
-        default List<GuideBookButton> extraButtons() {
+        void drawTitle(GuiGraphics guiGraphics, Component text, int titleX, int titleBottomY, int color, @Nullable CyclicItemRenderer itemRenderer) {
+            var poseStack = guiGraphics.pose();
+            poseStack.pushPose();
+            float textScale = titleScale;
+            int xOffset;
+            if (itemRenderer == null) {
+                xOffset = 3;
+            } else {
+                xOffset = (int) (18 * itemScale);
+                itemRenderer.renderBottomLeft(guiGraphics, titleX, titleBottomY, itemScale);
+            }
+            textScale *= Math.clamp(getMaxTitleWidth() / (float) font.width(text), 0, 1);
+            poseStack.scale(textScale, textScale, textScale);
+            guiGraphics.drawString(font, text, (int) ((titleX + xOffset) / textScale), (int) ((titleBottomY - (2 * itemScale)) / textScale) - font.lineHeight, color, true);
+            poseStack.popPose();
+            int lineLength = Math.min((int) (xOffset + (font.width(text) + 24) * textScale), IMAGE_WIDTH - XM * 2);
+            int lineThickness = 2;
+            int split = 15;
+            int color2 = color & 0x00FFFFFF;
+            drawLine(guiGraphics, lineThickness, titleX - 3, titleBottomY, titleX + split, titleBottomY, color2, color);
+            drawLine(guiGraphics, lineThickness, titleX + split, titleBottomY, titleX + lineLength, titleBottomY, color, color2);
+        }
+
+        List<GuideBookButton> extraButtons() {
             return List.of();
         }
     }
@@ -157,7 +181,7 @@ public class GuideBookScreen extends Screen {
 
     private int getMaxTitleWidth() {
         int averageCharSize = 5;
-        int maxCharCount = 19;
+        int maxCharCount = 16;
         return averageCharSize * maxCharCount;
     }
 
@@ -292,7 +316,7 @@ public class GuideBookScreen extends Screen {
         return pages;
     }
 
-    public class TableOfContentsPage implements Page {
+    public class TableOfContentsPage extends Page {
         public record EntryPreparation(int x, int y, int width, int height) {
         }
 
@@ -308,18 +332,9 @@ public class GuideBookScreen extends Screen {
 
         @Override
         public void render(GuiGraphics guiGraphics, int titleX, int titleBottomY, int mouseX, int mouseY, float partialTick) {
-            var poseStack = guiGraphics.pose();
             int color = 0xFF808080;
             var text = title.copy().withColor(color);
-            float textScale = titleScale;
-            poseStack.pushPose();
-            textScale *= Math.clamp(getMaxTitleWidth() / (float) font.width(text), 0, 1);
-            poseStack.scale(textScale, textScale, textScale);
-            guiGraphics.drawString(font, text, (int) ((titleX + 3) / textScale), (int) ((titleBottomY - (2 * itemScale)) / textScale) - font.lineHeight, color, true);
-            poseStack.popPose();
-            int lineLength = (int) ((font.width(text) + 32) * textScale);
-            int lineThickness = 2;
-            drawLine(guiGraphics, lineThickness, titleX, titleBottomY, titleX + lineLength, titleBottomY, color, color & 0x00FFFFFF);
+            drawTitle(guiGraphics, text, titleX, titleBottomY, color, null);
         }
 
         @Override
@@ -328,7 +343,7 @@ public class GuideBookScreen extends Screen {
         }
     }
 
-    public class MaterialPage implements Page {
+    public class MaterialPage extends Page {
         final Holder<MaterialDefinition> material;
         final int cachedTextColor;
         final CyclicItemRenderer itemRenderer;
@@ -347,17 +362,7 @@ public class GuideBookScreen extends Screen {
             /*
             Draw Page Title: Ingredient Icon and Material Name
              */
-            this.itemRenderer.renderBottomLeft(guiGraphics, titleX, titleBottomY, itemScale);
-            var font = Minecraft.getInstance().font;
-            float textScale = titleScale;
-            poseStack.pushPose();
-            textScale *= Math.clamp(getMaxTitleWidth() / (float) font.width(name), 0, 1);
-            poseStack.scale(textScale, textScale, textScale);
-            guiGraphics.drawString(font, name, (int) ((titleX + 18 * itemScale) / textScale), (int) ((titleBottomY - (2 * itemScale)) / textScale) - font.lineHeight, cachedTextColor, true);
-            poseStack.popPose();
-            int lineLength = (int) (16 * itemScale + (font.width(name) + 32) * textScale);
-            int lineThickness = 2;
-            drawLine(guiGraphics, lineThickness, titleX, titleBottomY, titleX + lineLength, titleBottomY, cachedTextColor, cachedTextColor & 0x00FFFFFF);
+            drawTitle(guiGraphics, name, titleX, titleBottomY, cachedTextColor, itemRenderer);
             /*
             Draw Page Body
              */
@@ -399,7 +404,7 @@ public class GuideBookScreen extends Screen {
         }
     }
 
-    public class PatternPage implements Page {
+    public class PatternPage extends Page {
         record PartInfo(TextureAtlasSprite sprite,/*ItemStack preview,*//* Component name,*/
                         List<? extends FormattedCharSequence> tooltip) {
             private static final ResourceLocation INPUT_SLOT = IronsJewelry.id("jewelcrafting_station/guidebook_part_frame");
@@ -420,7 +425,6 @@ public class GuideBookScreen extends Screen {
         final CyclicItemRenderer itemRenderer;
         final List<PartInfo> partInfo;
         final List<MutableComponent> bonusInfo;
-
 
         public PatternPage(Holder<PatternDefinition> pattern) {
             this.pattern = pattern;
@@ -456,18 +460,8 @@ public class GuideBookScreen extends Screen {
             /*
             Draw Page Title: Icon and Name
              */
-            this.itemRenderer.renderBottomLeft(guiGraphics, titleX, titleBottomY, itemScale);
-            var font = Minecraft.getInstance().font;
-            float textScale = titleScale;
             int textColor = 0xFFA0A0A0;
-            poseStack.pushPose();
-            textScale *= Math.clamp(getMaxTitleWidth() / (float) font.width(name), 0, 1);
-            poseStack.scale(textScale, textScale, textScale);
-            guiGraphics.drawString(font, name, (int) ((titleX + 18 * itemScale) / textScale), (int) ((titleBottomY - (2 * itemScale)) / textScale) - font.lineHeight, textColor, true);
-            poseStack.popPose();
-            int lineLength = (int) (16 * itemScale + (font.width(name) + 32) * textScale);
-            int lineThickness = 2;
-            drawLine(guiGraphics, lineThickness, titleX, titleBottomY, titleX + lineLength, titleBottomY, textColor, textColor & 0x00FFFFFF);
+            drawTitle(guiGraphics, name, titleX, titleBottomY, textColor, itemRenderer);
             /*
             Draw Part Info
              */
