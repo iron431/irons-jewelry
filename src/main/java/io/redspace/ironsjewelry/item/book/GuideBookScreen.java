@@ -164,10 +164,7 @@ public class GuideBookScreen extends Screen {
     protected void init() {
         this.leftPos = (this.width - IMAGE_WIDTH) / 2;
         this.topPos = (this.height - IMAGE_HEIGHT) / 2;
-//        initPageButtons();
         this.lastPageNumber = -1;
-//        chooseMaterial(IronsJewelryRegistries.materialRegistry(Minecraft.getInstance().level.registryAccess())
-//                .getHolderOrThrow(ResourceKey.create(IronsJewelryRegistries.Keys.MATERIAL_REGISTRY_KEY, IronsJewelry.id("topaz"))));
     }
 
     protected void chooseMaterial(Holder<MaterialDefinition> materialDefinitionHolder) {
@@ -363,7 +360,9 @@ public class GuideBookScreen extends Screen {
             this.bonusTooltip = new ArrayList<>();
             bonusTypes.add(Component.translatable("ui.irons_jewelry.quality"));
             bonusValues.add(Component.literal("x").append(String.valueOf(material.value().quality())));
-            bonusTooltip.add(Component.translatable("ui.irons_jewelry.quality.description"));
+            bonusTooltip.add(Component.translatable("ui.irons_jewelry.quality.description",
+                    Component.translatable(material.value().descriptionId()).withColor(cachedTextColor),
+                    Component.literal(String.valueOf(material.value().quality())).withColor(cachedTextColor)).withStyle(ChatFormatting.GRAY));
             for (var entry : material.value().bonusParameters().entrySet()) {
                 IBonusParameterType param = entry.getKey();
                 Object value = entry.getValue();
@@ -373,14 +372,11 @@ public class GuideBookScreen extends Screen {
                     bonusTypes.add(typeName);
                     bonusValues.add(opt.get().copy());
                     bonusTooltip.add(Component.translatable("ui.irons_jewelry.bonus_type.description",
-                            typeName.copy().withStyle(ChatFormatting.WHITE),
-                            Component.translatable(material.value().descriptionId()).withStyle(ChatFormatting.WHITE),
-                            opt.get().copy().withStyle(ChatFormatting.WHITE)).withStyle(ChatFormatting.GRAY));
+                            typeName.copy().withColor(cachedTextColor),
+                            Component.translatable(material.value().descriptionId()).withColor(cachedTextColor),
+                            Component.literal(opt.get().copy().getString()).withColor(cachedTextColor)).withStyle(ChatFormatting.GRAY));
                 }
             }
-//            material.value().bonusParameters().keySet().stream().map(param -> Component.translatable(param.getDescriptionId())).forEach(bonusTypes::add);
-//            material.value().bonusParameters().entrySet().stream().map(entry ->
-//                    ((IBonusParameterType) entry.getKey()).getSimpleDescription(entry.getValue())).filter(Optional::isPresent).map(opt -> ((Component) opt.get()).plainCopy()).forEach(bonusValues::add);
         }
 
         @Override
@@ -396,38 +392,37 @@ public class GuideBookScreen extends Screen {
             Draw Page Body
              */
             int ypos = (int) (topPos + YM + font.lineHeight * (1 + itemScale) + font.lineHeight / 2f);
-            int bonusTypeMaxWidth = 0;
-            for (var t : bonusTypes) {
-                var w = font.width(t);
-                if (w > bonusTypeMaxWidth) {
-                    bonusTypeMaxWidth = w;
-                }
-            }
+            int bonusTypeMaxWidth = bonusTypes.stream().mapToInt(font::width).max().orElse(0);
             int valueColumMargin = bonusTypeMaxWidth + 8;
             int tooltipIndex = -1;
+            int lightColor = scaleColor(cachedTextColor, 1.75f);
+            int darkColor = scaleColor(cachedTextColor, 0.2f);
             for (int i = 0; i < bonusTypes.size(); i++) {
                 var type = bonusTypes.get(i);
                 var value = Component.literal(bonusValues.get(i).getString());
-                int lightColor = scaleColor(cachedTextColor, 1.75f);
-                int darkColor = scaleColor(cachedTextColor, 0.2f);
+                int xpos = leftPos + XM;
                 for (int x = -1; x <= 1; x++) {
                     for (int y = -1; y <= 1; y++) {
-                        guiGraphics.drawString(font, type, leftPos + XM + x, ypos + y, darkColor, false);
+                        guiGraphics.drawString(font, type, xpos + x, ypos + y, darkColor, false);
                     }
                 }
-                guiGraphics.drawString(font, type, leftPos + XM, ypos, lightColor, false);
-                if (mouseX >= leftPos + XM && mouseX <= leftPos + XM + font.width(type) && mouseY >= ypos && mouseY <= ypos + font.lineHeight) {
+                guiGraphics.drawString(font, type, xpos, ypos, lightColor, false);
+                if (mouseY >= ypos && mouseY <= ypos + font.lineHeight && mouseX >= xpos && mouseX <= xpos + font.width(type)) {
                     tooltipIndex = i;
                 }
                 int availableInfoWidth = IMAGE_WIDTH - XM * 2 - valueColumMargin;
                 for (var line : font.split(value, availableInfoWidth)) {
-                    guiGraphics.drawString(font, line, leftPos + XM + valueColumMargin, ypos, 0x0, false);
+                    guiGraphics.drawString(font, line, xpos + valueColumMargin, ypos, 0x0, false);
+                    if (mouseY >= ypos && mouseY <= ypos + font.lineHeight &&
+                            mouseX >= xpos + valueColumMargin && mouseX <= xpos + valueColumMargin + font.width(line)) {
+                        tooltipIndex = i;
+                    }
                     ypos += font.lineHeight;
                 }
                 ypos += 1;
             }
             if (tooltipIndex >= 0) {
-                guiGraphics.renderTooltip(font, font.split(bonusTooltip.get(tooltipIndex), 150), mouseX, mouseY);
+                guiGraphics.renderTooltip(font, font.split(bonusTooltip.get(tooltipIndex), 250), mouseX, mouseY);
             }
         }
     }

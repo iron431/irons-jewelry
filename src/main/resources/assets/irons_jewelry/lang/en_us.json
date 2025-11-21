@@ -245,6 +245,6 @@
   "ui.irons_jewelry.guide_book.table_of_contents_materials" : "Materials",
   "ui.irons_jewelry.guide_book.table_of_contents_patterns" : "Patterns",
   "ui.irons_jewelry.quality" : "Quality",
-  "ui.irons_jewelry.quality.description" : "When this material is used as the primary part in a jewelry item, the potency of all bonuses are scaled by this number.",
+  "ui.irons_jewelry.quality.description" : "When %s is used as the primary part in a jewelry item, the potency of all bonuses are scaled by %s",
   "ui.irons_jewelry.bonus_type.description" : "When a part gives the %s bonus, using %s grants the effect: %s."
 }
