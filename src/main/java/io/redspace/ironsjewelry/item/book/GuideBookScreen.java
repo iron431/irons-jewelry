@@ -19,12 +19,13 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.atlas.SpriteSource;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -211,11 +212,13 @@ public class GuideBookScreen extends Screen {
     public boolean mouseClicked(double mouseX, double mouseY, int mouseAction) {
         for (GuideBookButton button : pageButtons) {
             if (button.boundingBox(leftPos, topPos).containsPoint((int) mouseX, (int) mouseY) && button.onClick(this.bookState)) {
+                Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.BOOK_PAGE_TURN, 1f));
                 return true;
             }
         }
         for (GuideBookButton button : cachedPage.extraButtons()) {
             if (button.boundingBox(leftPos, topPos).containsPoint((int) mouseX, (int) mouseY) && button.onClick(this.bookState)) {
+                Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.BOOK_PAGE_TURN, 1f));
                 return true;
             }
         }
@@ -347,11 +350,37 @@ public class GuideBookScreen extends Screen {
         final Holder<MaterialDefinition> material;
         final int cachedTextColor;
         final CyclicItemRenderer itemRenderer;
+        final List<MutableComponent> bonusTypes;
+        final List<MutableComponent> bonusValues;
+        final List<MutableComponent> bonusTooltip;
 
         public MaterialPage(Holder<MaterialDefinition> material) {
             this.material = material;
             this.cachedTextColor = generateTextColor(material.value().paletteLocation());
             this.itemRenderer = new CyclicItemRenderer(List.of(material.value().ingredient().getItems()));
+            this.bonusTypes = new ArrayList<>();
+            this.bonusValues = new ArrayList<>();
+            this.bonusTooltip = new ArrayList<>();
+            bonusTypes.add(Component.translatable("ui.irons_jewelry.quality"));
+            bonusValues.add(Component.literal("x").append(String.valueOf(material.value().quality())));
+            bonusTooltip.add(Component.translatable("ui.irons_jewelry.quality.description"));
+            for (var entry : material.value().bonusParameters().entrySet()) {
+                IBonusParameterType param = entry.getKey();
+                Object value = entry.getValue();
+                Optional<Component> opt = param.getSimpleDescription(value);
+                if (opt.isPresent()) {
+                    var typeName = Component.translatable(param.getDescriptionId());
+                    bonusTypes.add(typeName);
+                    bonusValues.add(opt.get().copy());
+                    bonusTooltip.add(Component.translatable("ui.irons_jewelry.bonus_type.description",
+                            typeName.copy().withStyle(ChatFormatting.WHITE),
+                            Component.translatable(material.value().descriptionId()).withStyle(ChatFormatting.WHITE),
+                            opt.get().copy().withStyle(ChatFormatting.WHITE)).withStyle(ChatFormatting.GRAY));
+                }
+            }
+//            material.value().bonusParameters().keySet().stream().map(param -> Component.translatable(param.getDescriptionId())).forEach(bonusTypes::add);
+//            material.value().bonusParameters().entrySet().stream().map(entry ->
+//                    ((IBonusParameterType) entry.getKey()).getSimpleDescription(entry.getValue())).filter(Optional::isPresent).map(opt -> ((Component) opt.get()).plainCopy()).forEach(bonusValues::add);
         }
 
         @Override
@@ -366,14 +395,7 @@ public class GuideBookScreen extends Screen {
             /*
             Draw Page Body
              */
-            Component quality = Component.translatable("tooltip.irons_jewelry.quality_multiplier", material.quality());
-            List<MutableComponent> bonusTypes = material.bonusParameters().keySet().stream().map(param -> Component.translatable(param.getDescriptionId())).toList();
-            List<MutableComponent> bonusValues = material.bonusParameters().entrySet().stream().map(entry ->
-                    ((IBonusParameterType) entry.getKey()).getSimpleDescription(entry.getValue())).filter(Optional::isPresent).map(opt -> ((Component) opt.get()).copy()).toList();
-
-            int ypos = (int) (topPos + YM + font.lineHeight * (1 + itemScale));
-            guiGraphics.drawString(font, quality, leftPos + XM, ypos, 0x0, false);
-            ypos += font.lineHeight * 2;
+            int ypos = (int) (topPos + YM + font.lineHeight * (1 + itemScale) + font.lineHeight / 2f);
             int bonusTypeMaxWidth = 0;
             for (var t : bonusTypes) {
                 var w = font.width(t);
@@ -382,24 +404,30 @@ public class GuideBookScreen extends Screen {
                 }
             }
             int valueColumMargin = bonusTypeMaxWidth + 8;
+            int tooltipIndex = -1;
             for (int i = 0; i < bonusTypes.size(); i++) {
-                //fixme: this fails to wipe formatting from embedded components
-                var type = bonusTypes.get(i).setStyle(Style.EMPTY);
-                var value = bonusValues.get(i).setStyle(Style.EMPTY);
+                var type = bonusTypes.get(i);
+                var value = Component.literal(bonusValues.get(i).getString());
                 int lightColor = scaleColor(cachedTextColor, 1.75f);
-                int darkColor = scaleColor(cachedTextColor, 0.25f);
+                int darkColor = scaleColor(cachedTextColor, 0.2f);
                 for (int x = -1; x <= 1; x++) {
                     for (int y = -1; y <= 1; y++) {
                         guiGraphics.drawString(font, type, leftPos + XM + x, ypos + y, darkColor, false);
                     }
                 }
                 guiGraphics.drawString(font, type, leftPos + XM, ypos, lightColor, false);
+                if (mouseX >= leftPos + XM && mouseX <= leftPos + XM + font.width(type) && mouseY >= ypos && mouseY <= ypos + font.lineHeight) {
+                    tooltipIndex = i;
+                }
                 int availableInfoWidth = IMAGE_WIDTH - XM * 2 - valueColumMargin;
                 for (var line : font.split(value, availableInfoWidth)) {
                     guiGraphics.drawString(font, line, leftPos + XM + valueColumMargin, ypos, 0x0, false);
                     ypos += font.lineHeight;
                 }
                 ypos += 1;
+            }
+            if (tooltipIndex >= 0) {
+                guiGraphics.renderTooltip(font, font.split(bonusTooltip.get(tooltipIndex), 150), mouseX, mouseY);
             }
         }
     }
@@ -425,6 +453,7 @@ public class GuideBookScreen extends Screen {
         final CyclicItemRenderer itemRenderer;
         final List<PartInfo> partInfo;
         final List<MutableComponent> bonusInfo;
+        final int titleColor;
 
         public PatternPage(Holder<PatternDefinition> pattern) {
             this.pattern = pattern;
@@ -445,6 +474,7 @@ public class GuideBookScreen extends Screen {
                         .forEach(m -> tooltip.add(Component.literal(" ").append(Component.translatable(m.descriptionId())).withStyle(ChatFormatting.GRAY)));
                 partInfo.add(new PartInfo(handler.getSprite(handler.getSpriteLocation(part, material)), Utils.rasterizeComponentList(tooltip)));
             }
+            this.titleColor = generateTextColor(data.parts().get(partKeys.get(0).part()).value().paletteLocation());
             this.bonusInfo = new ArrayList<>();
             for (var component : pattern.value().getPatternBonusesTooltip()) {
                 component = component.withColor(0x0);
@@ -460,12 +490,10 @@ public class GuideBookScreen extends Screen {
             /*
             Draw Page Title: Icon and Name
              */
-            int textColor = 0xFFA0A0A0;
-            drawTitle(guiGraphics, name, titleX, titleBottomY, textColor, itemRenderer);
+            drawTitle(guiGraphics, name, titleX, titleBottomY, titleColor, itemRenderer);
             /*
             Draw Part Info
              */
-            //todo: "parts" title
             int partSectionX = titleX;
             int partSectionY = titleBottomY + 10;
             int partSectionWidth = 48;
