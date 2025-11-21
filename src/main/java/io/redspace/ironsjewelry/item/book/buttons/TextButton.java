@@ -58,7 +58,7 @@ public class TextButton implements GuideBookButton {
         guiGraphics.pose().pushPose();
         guiGraphics.pose().scale(textScale, textScale, textScale);
         float textYBottom = middleY + font.lineHeight / 2f + 2;
-        guiGraphics.drawString(font, text, (int) (textX / textScale), (int) ((textYBottom) / textScale - font.lineHeight), selected ? selectedColor : color, true);
+        guiGraphics.drawString(font, text, (int) (textX / textScale), (int) ((textYBottom) / textScale - font.lineHeight), selected ? selectedColor : color, selected);
         guiGraphics.pose().popPose();
     }
 

@@ -64,7 +64,7 @@ public class Utils {
         return CuriosApi.getCuriosInventory(player).map(inv -> inv.findCurios(stack -> stack.has(ComponentRegistry.JEWELRY_COMPONENT)).stream().map(SlotResult::stack).toList()).orElse(List.of());
     }
 
-    public static List<? extends FormattedCharSequence> rasterizeComponentList(List<Component> components) {
+    public static List<FormattedCharSequence> rasterizeComponentList(List<? extends Component> components) {
         return components.stream().map(component -> FormattedCharSequence.forward(component.getString(), component.getStyle())).toList();
     }
 
