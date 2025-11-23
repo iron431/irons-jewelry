@@ -23,7 +23,16 @@ public interface IBonusParameterType<T> {
     Codec<T> codec();
 
     Optional<String> getValueDescriptionId(T value);
+
     Optional<Component> getSimpleDescription(T value);
+
+    default Optional<Component> getSimpleDescriptionCast(Object o) {
+        try {
+            return getSimpleDescription((T) o);
+        } catch (ClassCastException e) {
+            return Optional.empty();
+        }
+    }
 
     default boolean isEmpty() {
         return this == ParameterTypeRegistry.EMPTY.get();

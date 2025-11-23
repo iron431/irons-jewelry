@@ -34,6 +34,7 @@ import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
+import org.joml.Vector4f;
 
 import java.io.InputStream;
 import java.util.*;
@@ -429,17 +430,52 @@ public class GuideBookScreen extends Screen {
 
     public class PatternPage extends Page {
         record PartInfo(TextureAtlasSprite sprite,/*ItemStack preview,*//* Component name,*/
-                        List<? extends FormattedCharSequence> tooltip) {
+                        List<? extends FormattedCharSequence> tooltip, int materialCost, MutableComponent name,
+                        List<MutableComponent> bonusInfo) {
             private static final ResourceLocation INPUT_SLOT = IronsJewelry.id("jewelcrafting_station/guidebook_part_frame");
 
-            void render(GuiGraphics guiGraphics, int x, int y, int mouseX, int mouseY, float partialTick) {
+            int render(GuiGraphics guiGraphics, int x, int y, int width, int mouseX, int mouseY, float partialTick) {
                 int slotMargin = 4;
                 int size = 24;
-                guiGraphics.blitSprite(INPUT_SLOT, x, y, 200, size, size);
-                guiGraphics.blit(x + slotMargin, y + slotMargin, 200, 16, 16, sprite);
+                var poseStack = guiGraphics.pose();
+                poseStack.pushPose();
+                poseStack.translate(x, y, 0);
+                guiGraphics.blitSprite(INPUT_SLOT, 0, 0, 200, size, size);
+                guiGraphics.blit(slotMargin, slotMargin, 200, 16, 16, sprite);
+                int textMargin = 3;
+                poseStack.translate(size + textMargin, 0, 0);
+                var font = Minecraft.getInstance().font;
+                // Name
+                guiGraphics.drawString(font, name, 0, 0, 0x0, true);
+                poseStack.translate(0, font.lineHeight + 2, 0);
+                // Material Cost
+//                guiGraphics.drawString(font, Component.translatable("tooltip.irons_jewelry.material_cost", materialCost()), 0, 0, 0x0, false);
+//                poseStack.translate(0, font.lineHeight, 0);
+                // Bonus Info
+                if(!bonusInfo.isEmpty()) {
+                    guiGraphics.drawString(font, Component.translatable("tooltip.irons_jewelry.bonus_from_part_header").withStyle(ChatFormatting.UNDERLINE), 0, 0, 0x0, false);
+                    poseStack.translate(0, font.lineHeight + 1, 0);
+                    int indent = 6;
+                    int textWidth = width - textMargin - size - indent;
+                    for (MutableComponent bonus : bonusInfo) {
+                        guiGraphics.drawString(font, "*", 0, 2, 0x0, false);
+                        for (var line : font.split(bonus, textWidth)) {
+                            guiGraphics.drawString(font, line, indent, 0, 0x0, false);
+                            poseStack.translate(0, font.lineHeight, 0);
+                        }
+                    }
+                }
+                //fixme: neat but just doesnt work, cant use posestack
+                poseStack.pushPose();
+                int height = Math.max((int) poseStack.last().pose().transform(new Vector4f(0, 1, 0, 1)).y - y,28);
+                poseStack.popPose();
+                poseStack.popPose();
+
+
                 if (mouseX >= x && mouseX <= x + size && mouseY >= y && mouseY <= y + size) {
                     guiGraphics.renderTooltip(Minecraft.getInstance().font, tooltip, mouseX, mouseY);
                 }
+                return height;
             }
         }
 
@@ -462,19 +498,29 @@ public class GuideBookScreen extends Screen {
                 var part = partIngredient.part();
                 List<Component> tooltip = new ArrayList<>();
                 var material = data.parts().get(part);
-                tooltip.add(Component.translatable(part.value().descriptionId()).withStyle(ChatFormatting.UNDERLINE).withColor(generateTextColor(material.value().paletteLocation())));
+                MutableComponent name = Component.translatable(part.value().descriptionId()).withStyle(ChatFormatting.UNDERLINE).withColor(generateTextColor(material.value().paletteLocation()));
+                tooltip.add(name);
                 tooltip.add(Component.literal(" ").append(Component.translatable("tooltip.irons_jewelry.material_cost", Component.literal(String.valueOf(partIngredient.materialCost())).withStyle(ChatFormatting.WHITE))).withStyle(ChatFormatting.GRAY));
                 tooltip.add(Component.translatable("tooltip.irons_jewelry.applicable_materials").withStyle(ChatFormatting.YELLOW, ChatFormatting.UNDERLINE));
                 IronsJewelryRegistries.materialRegistry(Minecraft.getInstance().level.registryAccess()).stream().filter(materialDefinition -> !materialDefinition.ingredient().hasNoItems() && part.value().canUseMaterial(materialDefinition.materialType()))
                         .forEach(m -> tooltip.add(Component.literal(" ").append(Component.translatable(m.descriptionId())).withStyle(ChatFormatting.GRAY)));
-                partInfo.add(new PartInfo(handler.getSprite(handler.getSpriteLocation(part, material)), Utils.rasterizeComponentList(tooltip)));
+                var bonusInfo = partIngredient.bonuses().stream().map(bonus -> {
+                    if (bonus.parameterValue().containsKey(bonus.bonusType().getParameterType())) {
+                        // hardcoded bonus
+                        var bonusType = bonus.bonusType();
+                        return Component.translatable("tooltip.irons_jewelry.bonus_with_direct_source", Component.translatable(bonusType.getDescriptionId()),
+                                bonusType.getParameterType().getSimpleDescriptionCast(bonus.parameterValue().get(bonusType.getParameterType())).orElse(Component.empty()));
+                    }
+                    return Component.translatable(bonus.bonusType().getDescriptionId());
+                }).toList();
+                partInfo.add(new PartInfo(handler.getSprite(handler.getSpriteLocation(part, material)), Utils.rasterizeComponentList(tooltip), partIngredient.materialCost(), name, bonusInfo));
             }
             this.titleColor = generateTextColor(data.parts().get(partKeys.get(0).part()).value().paletteLocation());
             this.bonusInfo = new ArrayList<>();
-            for (var component : pattern.value().getPatternBonusesTooltip()) {
-                component = component.withColor(0x0);
-                this.bonusInfo.add(component);
-            }
+//            for (var component : pattern.value().getPatternBonusesTooltip()) {
+//                component = component.withColor(0x0);
+//                this.bonusInfo.add(component);
+//            }
         }
 
         @Override
@@ -491,18 +537,18 @@ public class GuideBookScreen extends Screen {
              */
             int partSectionX = titleX;
             int partSectionY = titleBottomY + 10;
-            int partSectionWidth = 48;
+            int partSectionWidth = 144;
             int titleSpacer = font.lineHeight * 3 / 2;
             guiGraphics.drawString(font, Component.translatable("tooltip.irons_jewelry.parts_header").withStyle(ChatFormatting.UNDERLINE), partSectionX, partSectionY, 0x0, false);
+            int yoff = 0;
             for (int i = 0; i < partInfo.size(); i++) {
                 int x = partSectionX;
-                int y = partSectionY + titleSpacer + i * 26;
-                if (i >= 4) {
-                    x += 26;
-                    y -= 26 * 4;
-                    partSectionWidth = 72;
-                }
-                partInfo.get(i).render(guiGraphics, x, y, mouseX, mouseY, partialTick);
+                int y = partSectionY + titleSpacer + yoff;
+//                if (y > IMAGE_HEIGHT - YM - (partSectionY - topPos)) {
+//                    partSectionX += partSectionWidth;
+//                    yoff = 0;
+//                }
+                yoff += partInfo.get(i).render(guiGraphics, x, y, partSectionWidth, mouseX, mouseY, partialTick);
             }
             /*
             Draw Bonus Info

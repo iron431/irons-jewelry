@@ -9,6 +9,13 @@ import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * The template bonus that a {@link PartIngredient} holds as a member of a pattern's part template
+ * @param bonusType Type of bonus granted
+ * @param qualityMultiplier Inherent quality factor from this part
+ * @param cooldown
+ * @param parameterValue Optional predefined and fixed bonus parameter
+ */
 public record Bonus(BonusType bonusType,
                     double qualityMultiplier,
                     Optional<QualityScalar> cooldown,
