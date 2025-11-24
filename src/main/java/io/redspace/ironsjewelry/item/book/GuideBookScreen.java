@@ -16,6 +16,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.tooltip.TooltipRenderUtil;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.atlas.SpriteSource;
@@ -452,22 +453,22 @@ public class GuideBookScreen extends Screen {
 //                guiGraphics.drawString(font, Component.translatable("tooltip.irons_jewelry.material_cost", materialCost()), 0, 0, 0x0, false);
 //                poseStack.translate(0, font.lineHeight, 0);
                 // Bonus Info
-                if(!bonusInfo.isEmpty()) {
-                    guiGraphics.drawString(font, Component.translatable("tooltip.irons_jewelry.bonus_from_part_header").withStyle(ChatFormatting.UNDERLINE), 0, 0, 0x0, false);
-                    poseStack.translate(0, font.lineHeight + 1, 0);
-                    int indent = 6;
-                    int textWidth = width - textMargin - size - indent;
-                    for (MutableComponent bonus : bonusInfo) {
-                        guiGraphics.drawString(font, "*", 0, 2, 0x0, false);
-                        for (var line : font.split(bonus, textWidth)) {
-                            guiGraphics.drawString(font, line, indent, 0, 0x0, false);
-                            poseStack.translate(0, font.lineHeight, 0);
-                        }
-                    }
-                }
+//                if (!bonusInfo.isEmpty()) {
+//                    guiGraphics.drawString(font, Component.translatable("tooltip.irons_jewelry.bonus_from_part_header").withStyle(ChatFormatting.UNDERLINE), 0, 0, 0x0, false);
+//                    poseStack.translate(0, font.lineHeight + 1, 0);
+//                    int indent = 6;
+//                    int textWidth = width - textMargin - size - indent;
+//                    for (MutableComponent bonus : bonusInfo) {
+//                        guiGraphics.drawString(font, "*", 0, 2, 0x0, false);
+//                        for (var line : font.split(bonus, textWidth)) {
+//                            guiGraphics.drawString(font, line, indent, 0, 0x0, false);
+//                            poseStack.translate(0, font.lineHeight, 0);
+//                        }
+//                    }
+//                }
                 //fixme: neat but just doesnt work, cant use posestack
                 poseStack.pushPose();
-                int height = Math.max((int) poseStack.last().pose().transform(new Vector4f(0, 1, 0, 1)).y - y,28);
+                int height = Math.max((int) poseStack.last().pose().transform(new Vector4f(0, 1, 0, 1)).y - y, 28);
                 poseStack.popPose();
                 poseStack.popPose();
 
@@ -483,7 +484,8 @@ public class GuideBookScreen extends Screen {
         final ItemStack itemIcon;
         final CyclicItemRenderer itemRenderer;
         final List<PartInfo> partInfo;
-        final List<MutableComponent> bonusInfo;
+        //        final List<MutableComponent> bonusInfo;
+        final List<MutableComponent> overviewInfo;
         final int titleColor;
 
         public PatternPage(Holder<PatternDefinition> pattern) {
@@ -516,7 +518,17 @@ public class GuideBookScreen extends Screen {
                 partInfo.add(new PartInfo(handler.getSprite(handler.getSpriteLocation(part, material)), Utils.rasterizeComponentList(tooltip), partIngredient.materialCost(), name, bonusInfo));
             }
             this.titleColor = generateTextColor(data.parts().get(partKeys.get(0).part()).value().paletteLocation());
-            this.bonusInfo = new ArrayList<>();
+            this.overviewInfo = new ArrayList<>();
+            this.overviewInfo.add(Component.translatable("tooltip.irons_jewelry.overview_header").withStyle(ChatFormatting.UNDERLINE, ChatFormatting.WHITE));
+            var bonusTooltip = this.pattern.value().getPatternBonusesTooltip();
+            bonusTooltip.set(0, Component.translatable("tooltip.irons_jewelry.bonus_crafted_header").withStyle(ChatFormatting.YELLOW, ChatFormatting.UNDERLINE)); // replace header
+            this.overviewInfo.add(Component.empty());
+            this.overviewInfo.add(Component.translatable("tooltip.irons_jewelry.jewelry_type_header").withStyle(ChatFormatting.YELLOW, ChatFormatting.UNDERLINE));
+            this.overviewInfo.add(Component.translatable(pattern.value().jewelryType().getCuriosSlotIdentifier().map(s -> String.format("curios.identifier.%s", s)).orElse("Unknown")).withStyle(ChatFormatting.GRAY));
+            this.overviewInfo.add(Component.empty());
+            this.overviewInfo.addAll(bonusTooltip);
+
+//            this.bonusInfo = new ArrayList<>();
 //            for (var component : pattern.value().getPatternBonusesTooltip()) {
 //                component = component.withColor(0x0);
 //                this.bonusInfo.add(component);
@@ -527,7 +539,6 @@ public class GuideBookScreen extends Screen {
         public void render(GuiGraphics guiGraphics, int titleX, int titleBottomY, int mouseX, int mouseY, float partialTick) {
             PatternDefinition pattern = this.pattern.value();
             Component name = Component.translatable(pattern.descriptionId());
-            var poseStack = guiGraphics.pose();
             /*
             Draw Page Title: Icon and Name
              */
@@ -537,7 +548,7 @@ public class GuideBookScreen extends Screen {
              */
             int partSectionX = titleX;
             int partSectionY = titleBottomY + 10;
-            int partSectionWidth = 144;
+            int partSectionWidth = 100;
             int titleSpacer = font.lineHeight * 3 / 2;
             guiGraphics.drawString(font, Component.translatable("tooltip.irons_jewelry.parts_header").withStyle(ChatFormatting.UNDERLINE), partSectionX, partSectionY, 0x0, false);
             int yoff = 0;
@@ -553,18 +564,24 @@ public class GuideBookScreen extends Screen {
             /*
             Draw Bonus Info
              */
-            int bonusSectionX = titleX + partSectionWidth;
-            int bonusSectionY = partSectionY;
-            int bonusSectionWidth = 120;
-            guiGraphics.drawString(font, Component.translatable("tooltip.irons_jewelry.bonus_crafted_header").withStyle(ChatFormatting.UNDERLINE), bonusSectionX, bonusSectionY, 0x0, false);
-            int yOffset = 0;
-            for (int i = 1; i < bonusInfo.size(); i++) {
-                var lines = font.split(bonusInfo.get(i), bonusSectionWidth);
-                boolean indent = false;
-                for (var line : lines) {
-                    guiGraphics.drawString(font, line, bonusSectionX + (indent ? 5 : 0), bonusSectionY + yOffset + titleSpacer, 0x0, false);
-                    yOffset += font.lineHeight;
-                    indent = true;
+            int infoSectionX = titleX + partSectionWidth;
+            int infoSectionY = partSectionY;
+            int infoSectionWidth = IMAGE_WIDTH - XM - (infoSectionX - leftPos);
+            // copied from jewelcrafting screen info colors. tehee
+            var bgstart = 0xFF260f0c;
+            var bgend = bgstart;
+            var borderstart = 0xFFe0ca9f;
+            var borderend = 0xFFa09172;
+            guiGraphics.drawManaged(() -> TooltipRenderUtil.renderTooltipBackground(guiGraphics, infoSectionX, infoSectionY, infoSectionWidth, IMAGE_HEIGHT - YM * 2 - (infoSectionY - topPos), 0, bgstart, bgend, borderstart, borderend));
+            int y = infoSectionY;
+            for (var component : overviewInfo) {
+                if (component.toFlatList().isEmpty()) {
+                    y += 4;
+                } else {
+                    for (var line : font.split(component, infoSectionWidth)) {
+                        guiGraphics.drawString(font, line, infoSectionX, y, -1, true);
+                        y += font.lineHeight + 1;
+                    }
                 }
             }
         }

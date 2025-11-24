@@ -188,6 +188,8 @@
   "tooltip.irons_jewelry.already_learned": "Already Learned",
   "tooltip.irons_jewelry.pattern_already_learned": "%s is Already Learned",
   "tooltip.irons_jewelry.cooldown": "Cooldown: %s",
+  "tooltip.irons_jewelry.overview_header": "Overview:",
+  "tooltip.irons_jewelry.jewelry_type_header": "Type:",
 
   "damage_type.minecraft.in_fire": "Fire",
   "damage_type.minecraft.campfire": "Campfire",
