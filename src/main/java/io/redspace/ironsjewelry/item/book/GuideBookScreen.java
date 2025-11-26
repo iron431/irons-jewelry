@@ -66,11 +66,16 @@ public class GuideBookScreen extends Screen {
     Page cachedPage;
 
     public GuideBookState createGuidebookState() {
-//        GuideBookState.BookSection tableOfContents = new GuideBookState.BookSection(new TableOfContentsPage(Component.translatable("ui.irons_jewelry.guide_book.table_of_contents")));
+        /* Guidebook is made of 3 sections:
+            - Table of contents, listing all other sections
+            - Materials, listing all registered and non-empty materials loaded into the world
+            - Patterns, listing all registered patterns in the world */
         var materialRegistry = IronsJewelryRegistries.materialRegistry(Minecraft.getInstance().level.registryAccess());
         var patternRegistry = IronsJewelryRegistries.patternRegistry(Minecraft.getInstance().level.registryAccess());
         List<Page> materialPages = new ArrayList<>();
+        // Construct a material page if the material exists and has valid items to be crafted from
         materialRegistry.holders().filter(holder -> !holder.value().ingredient().hasNoItems()).forEach(holder -> materialPages.add(new MaterialPage(holder)));
+        // Effectively curry buttons by using preparation structure. Allows all information to be created now, and the button can be positioned and fit onto the screen later, because it is difficult to position all elements without knowing how many there are
         List<Function<TableOfContentsPage.EntryPreparation, GuideBookButton>> materialTableOfContentsEntries = new ArrayList<>();
         for (int i = 0; i < materialPages.size(); i++) {
             var materialPage = ((MaterialPage) materialPages.get(i));
@@ -82,6 +87,7 @@ public class GuideBookScreen extends Screen {
         materialPages.addAll(0, createTableOfContentsPages(Component.translatable("ui.irons_jewelry.guide_book.table_of_contents_materials"), materialTableOfContentsEntries, 75));
 
         List<Page> patternPages = new ArrayList<>();
+        // Construct a pattern page for all patterns that exist
         patternRegistry.holders().forEach(holder -> patternPages.add(new PatternPage(holder)));
         List<Function<TableOfContentsPage.EntryPreparation, GuideBookButton>> patternTableOfContentsEntries = new ArrayList<>();
         for (int i = 0; i < patternPages.size(); i++) {
@@ -93,8 +99,9 @@ public class GuideBookScreen extends Screen {
         }
         patternPages.addAll(0, createTableOfContentsPages(Component.translatable("ui.irons_jewelry.guide_book.table_of_contents_patterns"), patternTableOfContentsEntries, 75));
 
-        List<Page> tableOfContentsPages = new ArrayList<>();
-        tableOfContentsPages.addAll(createTableOfContentsPages(Component.translatable("ui.irons_jewelry.guide_book.table_of_contents"),
+        List<Page> masterTableOfContentsPages = new ArrayList<>();
+        // Create master table of content page set which directly links to material and pattern sections
+        masterTableOfContentsPages.addAll(createTableOfContentsPages(Component.translatable("ui.irons_jewelry.guide_book.table_of_contents"),
                 List.of(
                         // Materials
                         preparation -> new TextButton(preparation.x(), preparation.y(), preparation.width(), preparation.height(),
@@ -107,7 +114,7 @@ public class GuideBookScreen extends Screen {
                 ), 75));
 
         return new GuideBookState(
-                List.of(new GuideBookState.BookSection(tableOfContentsPages), new GuideBookState.BookSection(materialPages), new GuideBookState.BookSection(patternPages))
+                List.of(new GuideBookState.BookSection(masterTableOfContentsPages), new GuideBookState.BookSection(materialPages), new GuideBookState.BookSection(patternPages))
         );
     }
 
@@ -160,11 +167,11 @@ public class GuideBookScreen extends Screen {
         int travWidth = 23;
         int travHeight = 13;
         this.forwardButton = new PageButton(IMAGE_WIDTH - 10 - travWidth, IMAGE_HEIGHT - 13 - travHeight, travWidth, travHeight,
-                ResourceLocation.withDefaultNamespace("widget/page_forward"), ResourceLocation.withDefaultNamespace("widget/page_forward_highlighted"), GuideBookState::incrementPage);
+                IronsJewelry.id("guidebook/page_forward"), IronsJewelry.id("guidebook/page_forward_highlighted"), GuideBookState::incrementPage);
         this.backButton = new PageButton(IMAGE_WIDTH - 10 - travWidth - travWidth - 2, IMAGE_HEIGHT - 13 - travHeight, travWidth, travHeight,
-                ResourceLocation.withDefaultNamespace("widget/page_backward"), ResourceLocation.withDefaultNamespace("widget/page_backward_highlighted"), GuideBookState::decrementPage);
-        this.homeButton = new PageButton(10, IMAGE_HEIGHT - 13 - travHeight, travWidth, travHeight,
-                ResourceLocation.withDefaultNamespace("widget/page_backward"), ResourceLocation.withDefaultNamespace("widget/page_backward_highlighted"), GuideBookState::returnSection);
+                IronsJewelry.id("guidebook/page_backward"), IronsJewelry.id("guidebook/page_backward_highlighted"), GuideBookState::decrementPage);
+        this.homeButton = new PageButton(IMAGE_WIDTH - 10 - travWidth - travWidth - travWidth  - 8 - 2, IMAGE_HEIGHT - 13 - travHeight, travWidth, travHeight,
+                IronsJewelry.id("guidebook/page_return"), IronsJewelry.id("guidebook/page_return_highlighted"), GuideBookState::returnSection);
         pageButtons.add(forwardButton);
         pageButtons.add(backButton);
         pageButtons.add(homeButton);
@@ -330,6 +337,7 @@ public class GuideBookScreen extends Screen {
     }
 
     public class TableOfContentsPage extends Page {
+        // fixme: yeah cool and all. get rid of this slop. half these are hardcoded and the other half shouldnt be final
         public record EntryPreparation(int x, int y, int width, int height) {
         }
 
@@ -360,34 +368,37 @@ public class GuideBookScreen extends Screen {
         final Holder<MaterialDefinition> material;
         final int cachedTextColor;
         final CyclicItemRenderer itemRenderer;
-        final List<MutableComponent> bonusTypes;
-        final List<MutableComponent> bonusValues;
-        final List<MutableComponent> bonusTooltip;
+        final List<TableEntry> bonusTable;
+
+        record TableEntry(MutableComponent type, MutableComponent value, MutableComponent tooltip) {
+        }
 
         public MaterialPage(Holder<MaterialDefinition> material) {
             this.material = material;
             this.cachedTextColor = generateTextColor(material.value().paletteLocation());
             this.itemRenderer = new CyclicItemRenderer(List.of(material.value().ingredient().getItems()));
-            this.bonusTypes = new ArrayList<>();
-            this.bonusValues = new ArrayList<>();
-            this.bonusTooltip = new ArrayList<>();
-            bonusTypes.add(Component.translatable("ui.irons_jewelry.quality"));
-            bonusValues.add(Component.literal("x").append(String.valueOf(material.value().quality())));
-            bonusTooltip.add(Component.translatable("ui.irons_jewelry.quality.description",
-                    Component.translatable(material.value().descriptionId()).withColor(cachedTextColor),
-                    Component.literal(String.valueOf(material.value().quality())).withColor(cachedTextColor)).withStyle(ChatFormatting.GRAY));
+            this.bonusTable = new ArrayList<>();
+            bonusTable.add(new TableEntry(
+                    Component.translatable("ui.irons_jewelry.quality"),
+                    Component.literal("x").append(String.valueOf(material.value().quality())),
+                    Component.translatable("ui.irons_jewelry.quality.description",
+                            Component.translatable(material.value().descriptionId()).withColor(cachedTextColor),
+                            Component.literal(String.valueOf(material.value().quality())).withColor(cachedTextColor)).withStyle(ChatFormatting.GRAY)
+            ));
             for (var entry : material.value().bonusParameters().entrySet()) {
                 IBonusParameterType param = entry.getKey();
                 Object value = entry.getValue();
                 Optional<Component> opt = param.getSimpleDescription(value);
                 if (opt.isPresent()) {
                     var typeName = Component.translatable(param.getDescriptionId());
-                    bonusTypes.add(typeName);
-                    bonusValues.add(opt.get().copy());
-                    bonusTooltip.add(Component.translatable("ui.irons_jewelry.bonus_type.description",
-                            typeName.copy().withColor(cachedTextColor),
-                            Component.translatable(material.value().descriptionId()).withColor(cachedTextColor),
-                            Component.literal(opt.get().copy().getString()).withColor(cachedTextColor)).withStyle(ChatFormatting.GRAY));
+                    bonusTable.add(new TableEntry(
+                            typeName,
+                            opt.get().copy(),
+                            Component.translatable("ui.irons_jewelry.bonus_type.description",
+                                    typeName.copy().withColor(cachedTextColor),
+                                    Component.translatable(material.value().descriptionId()).withColor(cachedTextColor),
+                                    Component.literal(opt.get().copy().getString()).withColor(cachedTextColor)).withStyle(ChatFormatting.GRAY)
+                    ));
                 }
             }
         }
@@ -405,14 +416,15 @@ public class GuideBookScreen extends Screen {
             Draw Page Body
              */
             int ypos = (int) (topPos + YM + font.lineHeight * (1 + itemScale) + font.lineHeight / 2f);
-            int bonusTypeMaxWidth = bonusTypes.stream().mapToInt(font::width).max().orElse(0);
+            int bonusTypeMaxWidth = bonusTable.stream().map(TableEntry::type).mapToInt(font::width).max().orElse(0);
             int valueColumMargin = bonusTypeMaxWidth + 8;
             int tooltipIndex = -1;
             int lightColor = scaleColor(cachedTextColor, 1.75f);
             int darkColor = scaleColor(cachedTextColor, 0.2f);
-            for (int i = 0; i < bonusTypes.size(); i++) {
-                var type = bonusTypes.get(i);
-                var value = Component.literal(bonusValues.get(i).getString());
+            for (int i = 0; i < bonusTable.size(); i++) {
+                var entry = bonusTable.get(i);
+                var type = entry.type;
+                var value = Component.literal(entry.value.getString());
                 int xpos = leftPos + XM;
                 for (int x = -1; x <= 1; x++) {
                     for (int y = -1; y <= 1; y++) {
@@ -432,10 +444,18 @@ public class GuideBookScreen extends Screen {
                     }
                     ypos += font.lineHeight;
                 }
-                ypos += 1;
+                if (i != bonusTable.size() - 1) {
+                    ypos += 1;
+                    int color = cachedTextColor;
+                    int color2 = color & 0x00FFFFFF;
+                    int split = (xpos + valueColumMargin + xpos) / 2;
+                    drawLine(guiGraphics, 1, xpos - 10, ypos, split, ypos, color2, color);
+                    drawLine(guiGraphics, 1, split, ypos, xpos + valueColumMargin + availableInfoWidth / 2, ypos, color, color2);
+                    ypos += 2;
+                }
             }
             if (tooltipIndex >= 0) {
-                guiGraphics.renderTooltip(font, font.split(bonusTooltip.get(tooltipIndex), 250), mouseX, mouseY);
+                guiGraphics.renderTooltip(font, font.split(bonusTable.get(tooltipIndex).tooltip, 250), mouseX, mouseY);
             }
         }
     }
@@ -475,7 +495,7 @@ public class GuideBookScreen extends Screen {
                         List<FormattedCharSequence> tooltip, MutableComponent name,
                         List<MutableComponent> expandedInfo, boolean primary,
                         PartSelectionButton button) implements GuideBookButton {
-            private static final ResourceLocation INPUT_SLOT = IronsJewelry.id("jewelcrafting_station/guidebook_part_frame");
+            private static final ResourceLocation INPUT_SLOT = IronsJewelry.id("guidebook/guidebook_part_frame");
 
             void render(GuiGraphics guiGraphics, int x, int y, int width, int mouseX, int mouseY, float partialTick) {
                 List<FormattedCharSequence> tooltipToRender = null;
@@ -497,16 +517,11 @@ public class GuideBookScreen extends Screen {
                     ypos += font.lineHeight;
                 }
                 if (primary) {
-                    ypos += 2;
-                    for (var line : font.split(Component.translatable("ui.irons_jewelry.primary_part").withStyle(ChatFormatting.ITALIC).withColor(0xFF333355), textWidth)) {
+                    ypos += 1;
+                    for (var line : font.split(Component.translatable("ui.irons_jewelry.primary_part").withStyle(ChatFormatting.ITALIC).withColor(0xFF222233), textWidth)) {
                         guiGraphics.drawString(font, line, x, ypos, 0x0, false);
-                        // this description is now shown in the expanded view. tooltip is a bit of a clutter
-//                        if (mouseX >= x && mouseX <= x + font.width(line) && mouseY >= ypos && mouseY <= ypos + font.lineHeight) {
-//                            tooltipToRender = List.of(Component.translatable("ui.irons_jewelry.primary_part.description").withStyle(ChatFormatting.WHITE).getVisualOrderText());
-//                        }
                         ypos += font.lineHeight;
                     }
-
                 }
                 if (tooltipToRender != null) {
                     guiGraphics.renderTooltip(Minecraft.getInstance().font, tooltipToRender, mouseX, mouseY);
@@ -530,7 +545,7 @@ public class GuideBookScreen extends Screen {
 
             @Override
             public SoundEvent getSound() {
-                return SoundEvents.NOTE_BLOCK_HARP.value();
+                return SoundEvents.NOTE_BLOCK_HAT.value();
             }
         }
 
@@ -585,7 +600,7 @@ public class GuideBookScreen extends Screen {
                     for (var bonus : partIngredient.bonuses()) {
                         MutableComponent component;
                         if (bonus.parameterValue().containsKey(bonus.bonusType().getParameterType())) {
-                            // hardcoded bonus
+                            // preset bonus
                             var bonusType = bonus.bonusType();
                             component = Component.translatable("tooltip.irons_jewelry.bonus_with_direct_source", net.minecraft.network.chat.Component.translatable(bonusType.getDescriptionId()),
                                     bonusType.getParameterType().getSimpleDescriptionCast(bonus.parameterValue().get(bonusType.getParameterType())).orElse(Component.empty()));
@@ -596,6 +611,10 @@ public class GuideBookScreen extends Screen {
                             component = component.append(Component.literal(String.format(" (x%s)", patternBonus * bonus.qualityMultiplier())));
                         }
                         partExpandedInfo.add(component.withStyle(ChatFormatting.GRAY));
+                        // not applicable to most (3/4) of the parameters. also, needs to be hidden if bonus is preset.
+//                        if(bonus.bonusType().getParameterType() != ParameterTypeRegistry.EMPTY.get()){
+//                            partExpandedInfo.add(Component.literal(" * ").append(Component.translatable("ui.irons_jewelry.bonus_type.parameter_description", Component.translatable(bonus.bonusType().getParameterType().getDescriptionId()))).withStyle(ChatFormatting.GRAY));
+//                        }
                     }
                 }
                 partInfo.add(new PartInfo(
@@ -697,7 +716,7 @@ public class GuideBookScreen extends Screen {
                 if (component.getContents() == PlainTextContents.EMPTY) {
                     y += emptyMargin;
                 } else {
-                    for (var line : font.split(component, (int)(infoSectionWidth / textScale))) {
+                    for (var line : font.split(component, (int) (infoSectionWidth / textScale))) {
                         guiGraphics.drawString(font, line, 0, y, -1, true);
                         y += font.lineHeight + 1;
                     }
