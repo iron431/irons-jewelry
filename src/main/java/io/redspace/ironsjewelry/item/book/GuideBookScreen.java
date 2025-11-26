@@ -121,7 +121,7 @@ public class GuideBookScreen extends Screen {
     abstract class Page {
         abstract void render(GuiGraphics guiGraphics, int titleX, int titleBottomY, int mouseX, int mouseY, float partialTick);
 
-        void drawTitle(GuiGraphics guiGraphics, Component text, int titleX, int titleBottomY, int color, @Nullable CyclicItemRenderer itemRenderer) {
+        void drawTitle(GuiGraphics guiGraphics, Component text, int titleX, int titleBottomY, int color, boolean dropshadow, @Nullable CyclicItemRenderer itemRenderer) {
             var poseStack = guiGraphics.pose();
             poseStack.pushPose();
             float textScale = titleScale;
@@ -134,7 +134,7 @@ public class GuideBookScreen extends Screen {
             }
             textScale *= Math.clamp(getMaxTitleWidth() / (float) font.width(text), 0, 1);
             poseStack.scale(textScale, textScale, textScale);
-            guiGraphics.drawString(font, text, (int) ((titleX + xOffset) / textScale), (int) ((titleBottomY - (2 * itemScale)) / textScale) - font.lineHeight, color, true);
+            guiGraphics.drawString(font, text, (int) ((titleX + xOffset) / textScale), (int) ((titleBottomY - (2 * itemScale)) / textScale) - font.lineHeight, color, dropshadow);
             poseStack.popPose();
             int lineLength = Math.min((int) (xOffset + (font.width(text) + 24) * textScale), IMAGE_WIDTH - XM * 2);
             int lineThickness = 2;
@@ -155,8 +155,8 @@ public class GuideBookScreen extends Screen {
         }
     }
 
-    public GuideBookScreen(Component title) {
-        super(title);
+    public GuideBookScreen() {
+        super(Component.empty());
         this.minecraft = Minecraft.getInstance();
         this.font = minecraft.font;
         initPageButtons();
@@ -170,7 +170,7 @@ public class GuideBookScreen extends Screen {
                 IronsJewelry.id("guidebook/page_forward"), IronsJewelry.id("guidebook/page_forward_highlighted"), GuideBookState::incrementPage);
         this.backButton = new PageButton(IMAGE_WIDTH - 10 - travWidth - travWidth - 2, IMAGE_HEIGHT - 13 - travHeight, travWidth, travHeight,
                 IronsJewelry.id("guidebook/page_backward"), IronsJewelry.id("guidebook/page_backward_highlighted"), GuideBookState::decrementPage);
-        this.homeButton = new PageButton(IMAGE_WIDTH - 10 - travWidth - travWidth - travWidth  - 8 - 2, IMAGE_HEIGHT - 13 - travHeight, travWidth, travHeight,
+        this.homeButton = new PageButton(IMAGE_WIDTH - 10 - travWidth - travWidth - travWidth - 8 - 2, IMAGE_HEIGHT - 13 - travHeight, travWidth, travHeight,
                 IronsJewelry.id("guidebook/page_return"), IronsJewelry.id("guidebook/page_return_highlighted"), GuideBookState::returnSection);
         pageButtons.add(forwardButton);
         pageButtons.add(backButton);
@@ -353,9 +353,9 @@ public class GuideBookScreen extends Screen {
 
         @Override
         public void render(GuiGraphics guiGraphics, int titleX, int titleBottomY, int mouseX, int mouseY, float partialTick) {
-            int color = 0xFF808080;
-            var text = title.copy().withColor(color);
-            drawTitle(guiGraphics, text, titleX, titleBottomY, color, null);
+            // 0xFF8f756b - paper themed color
+            // 0xFF923d34 - book leather themed color
+            drawTitle(guiGraphics, title, titleX, titleBottomY, 0xFF8f756b, true, null);
         }
 
         @Override
@@ -411,7 +411,7 @@ public class GuideBookScreen extends Screen {
             /*
             Draw Page Title: Ingredient Icon and Material Name
              */
-            drawTitle(guiGraphics, name, titleX, titleBottomY, cachedTextColor, itemRenderer);
+            drawTitle(guiGraphics, name, titleX, titleBottomY, cachedTextColor, true, itemRenderer);
             /*
             Draw Page Body
              */
@@ -658,7 +658,7 @@ public class GuideBookScreen extends Screen {
             /*
             Draw Page Title: Icon and Name
              */
-            drawTitle(guiGraphics, name, titleX, titleBottomY, titleColor, itemRenderer);
+            drawTitle(guiGraphics, name, titleX, titleBottomY, titleColor, true, itemRenderer);
             /*
             Draw Part Info
              */

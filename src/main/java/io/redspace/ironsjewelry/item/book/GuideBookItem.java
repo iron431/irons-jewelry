@@ -1,6 +1,8 @@
 package io.redspace.ironsjewelry.item.book;
 
+import io.redspace.ironsjewelry.utils.MinecraftInstanceHelper;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -17,8 +19,9 @@ public class GuideBookItem extends Item {
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand usedHand) {
         var stack = player.getItemInHand(usedHand);
-        Minecraft.getInstance().setScreen(new GuideBookScreen(Component.literal("wip")));
+        if(player instanceof LocalPlayer){
+            MinecraftInstanceHelper.INSTANCE.openGuidebookScreen();
+        }
         return InteractionResultHolder.success(stack);
-//        return super.use(level, player, usedHand);
     }
 }
