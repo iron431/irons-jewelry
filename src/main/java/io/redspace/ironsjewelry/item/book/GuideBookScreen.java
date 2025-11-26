@@ -8,13 +8,14 @@ import io.redspace.ironsjewelry.core.parameters.IBonusParameterType;
 import io.redspace.ironsjewelry.item.book.buttons.GuideBookButton;
 import io.redspace.ironsjewelry.item.book.buttons.PageButton;
 import io.redspace.ironsjewelry.item.book.buttons.TextButton;
-import io.redspace.ironsjewelry.registry.AssetHandlerRegistry;
-import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
-import io.redspace.ironsjewelry.registry.ItemRegistry;
+import io.redspace.ironsjewelry.registry.*;
 import io.redspace.ironsjewelry.utils.Utils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.navigation.ScreenAxis;
+import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.tooltip.TooltipRenderUtil;
 import net.minecraft.client.renderer.RenderType;
@@ -24,8 +25,10 @@ import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.contents.PlainTextContents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.item.Item;
@@ -35,7 +38,6 @@ import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
-import org.joml.Vector4f;
 
 import java.io.InputStream;
 import java.util.*;
@@ -135,7 +137,13 @@ public class GuideBookScreen extends Screen {
             drawLine(guiGraphics, lineThickness, titleX + split, titleBottomY, titleX + lineLength, titleBottomY, color, color2);
         }
 
-        List<GuideBookButton> extraButtons() {
+        void onArrive() {
+        }
+
+        void onDepart() {
+        }
+
+        List<? extends GuideBookButton> extraButtons() {
             return List.of();
         }
     }
@@ -210,14 +218,17 @@ public class GuideBookScreen extends Screen {
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int mouseAction) {
         for (GuideBookButton button : pageButtons) {
+            int prevPage = bookState.getGlobalPageNumber() - 1;
             if (button.boundingBox(leftPos, topPos).containsPoint((int) mouseX, (int) mouseY) && button.onClick(this.bookState)) {
-                Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.BOOK_PAGE_TURN, 1f));
+                Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(button.getSound(), 1f));
+                bookState.getGlobalPage(prevPage).onDepart();
+                bookState.getCurrentPage().onArrive();
                 return true;
             }
         }
         for (GuideBookButton button : cachedPage.extraButtons()) {
             if (button.boundingBox(leftPos, topPos).containsPoint((int) mouseX, (int) mouseY) && button.onClick(this.bookState)) {
-                Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.BOOK_PAGE_TURN, 1f));
+                Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(button.getSound(), 1f));
                 return true;
             }
         }
@@ -340,7 +351,7 @@ public class GuideBookScreen extends Screen {
         }
 
         @Override
-        public List<GuideBookButton> extraButtons() {
+        public List<? extends GuideBookButton> extraButtons() {
             return entries;
         }
     }
@@ -430,53 +441,96 @@ public class GuideBookScreen extends Screen {
     }
 
     public class PatternPage extends Page {
-        record PartInfo(TextureAtlasSprite sprite,/*ItemStack preview,*//* Component name,*/
-                        List<? extends FormattedCharSequence> tooltip, int materialCost, MutableComponent name,
-                        List<MutableComponent> bonusInfo) {
+        class PartSelectionButton implements GuideBookButton {
+            ScreenRectangle rectangle;
+            final int navigateIndex;
+
+            PartSelectionButton(int navigateIndex) {
+                this.navigateIndex = navigateIndex;
+                this.rectangle = ScreenRectangle.of(ScreenAxis.HORIZONTAL, 0, 0, 0, 0);
+            }
+
+            @Override
+            public ScreenRectangle boundingBox() {
+                return rectangle;
+            }
+
+            @Override
+            public void render(GuiGraphics guiGraphics, boolean selected, float partialTick) {
+                return;
+            }
+
+            @Override
+            public boolean onClick(GuideBookState state) {
+                if (selectedPartIndex == this.navigateIndex) {
+                    selectedPartIndex = -1;
+                } else {
+                    selectedPartIndex = this.navigateIndex;
+                }
+                return true;
+            }
+        }
+
+        record PartInfo(TextureAtlasSprite sprite,
+                        List<FormattedCharSequence> tooltip, MutableComponent name,
+                        List<MutableComponent> expandedInfo, boolean primary,
+                        PartSelectionButton button) implements GuideBookButton {
             private static final ResourceLocation INPUT_SLOT = IronsJewelry.id("jewelcrafting_station/guidebook_part_frame");
 
-            int render(GuiGraphics guiGraphics, int x, int y, int width, int mouseX, int mouseY, float partialTick) {
+            void render(GuiGraphics guiGraphics, int x, int y, int width, int mouseX, int mouseY, float partialTick) {
+                List<FormattedCharSequence> tooltipToRender = null;
                 int slotMargin = 4;
                 int size = 24;
-                var poseStack = guiGraphics.pose();
-                poseStack.pushPose();
-                poseStack.translate(x, y, 0);
-                guiGraphics.blitSprite(INPUT_SLOT, 0, 0, 200, size, size);
-                guiGraphics.blit(slotMargin, slotMargin, 200, 16, 16, sprite);
-                int textMargin = 3;
-                poseStack.translate(size + textMargin, 0, 0);
-                var font = Minecraft.getInstance().font;
-                // Name
-                guiGraphics.drawString(font, name, 0, 0, 0x0, true);
-                poseStack.translate(0, font.lineHeight + 2, 0);
-                // Material Cost
-//                guiGraphics.drawString(font, Component.translatable("tooltip.irons_jewelry.material_cost", materialCost()), 0, 0, 0x0, false);
-//                poseStack.translate(0, font.lineHeight, 0);
-                // Bonus Info
-//                if (!bonusInfo.isEmpty()) {
-//                    guiGraphics.drawString(font, Component.translatable("tooltip.irons_jewelry.bonus_from_part_header").withStyle(ChatFormatting.UNDERLINE), 0, 0, 0x0, false);
-//                    poseStack.translate(0, font.lineHeight + 1, 0);
-//                    int indent = 6;
-//                    int textWidth = width - textMargin - size - indent;
-//                    for (MutableComponent bonus : bonusInfo) {
-//                        guiGraphics.drawString(font, "*", 0, 2, 0x0, false);
-//                        for (var line : font.split(bonus, textWidth)) {
-//                            guiGraphics.drawString(font, line, indent, 0, 0x0, false);
-//                            poseStack.translate(0, font.lineHeight, 0);
-//                        }
-//                    }
-//                }
-                //fixme: neat but just doesnt work, cant use posestack
-                poseStack.pushPose();
-                int height = Math.max((int) poseStack.last().pose().transform(new Vector4f(0, 1, 0, 1)).y - y, 28);
-                poseStack.popPose();
-                poseStack.popPose();
-
-
+                guiGraphics.blitSprite(INPUT_SLOT, x, y, 200, size, size);
+                guiGraphics.blit(x + slotMargin, y + slotMargin, 200, 16, 16, sprite);
                 if (mouseX >= x && mouseX <= x + size && mouseY >= y && mouseY <= y + size) {
-                    guiGraphics.renderTooltip(Minecraft.getInstance().font, tooltip, mouseX, mouseY);
+                    tooltipToRender = tooltip;
                 }
-                return height;
+                int textMargin = 3;
+                x += size + textMargin;
+                var font = Minecraft.getInstance().font;
+                int ypos = y;
+                // Name
+                int textWidth = width - size - textMargin;
+                for (var line : font.split(name, textWidth)) {
+                    guiGraphics.drawString(font, line, x, ypos, 0x0, true);
+                    ypos += font.lineHeight;
+                }
+                if (primary) {
+                    ypos += 2;
+                    for (var line : font.split(Component.translatable("ui.irons_jewelry.primary_part").withStyle(ChatFormatting.ITALIC).withColor(0xFF333355), textWidth)) {
+                        guiGraphics.drawString(font, line, x, ypos, 0x0, false);
+                        // this description is now shown in the expanded view. tooltip is a bit of a clutter
+//                        if (mouseX >= x && mouseX <= x + font.width(line) && mouseY >= ypos && mouseY <= ypos + font.lineHeight) {
+//                            tooltipToRender = List.of(Component.translatable("ui.irons_jewelry.primary_part.description").withStyle(ChatFormatting.WHITE).getVisualOrderText());
+//                        }
+                        ypos += font.lineHeight;
+                    }
+
+                }
+                if (tooltipToRender != null) {
+                    guiGraphics.renderTooltip(Minecraft.getInstance().font, tooltipToRender, mouseX, mouseY);
+                }
+            }
+
+            @Override
+            public ScreenRectangle boundingBox() {
+                return button.boundingBox();
+            }
+
+            @Override
+            public void render(GuiGraphics guiGraphics, boolean selected, float partialTick) {
+                button.render(guiGraphics, selected, partialTick);
+            }
+
+            @Override
+            public boolean onClick(GuideBookState state) {
+                return button.onClick(state);
+            }
+
+            @Override
+            public SoundEvent getSound() {
+                return SoundEvents.NOTE_BLOCK_HARP.value();
             }
         }
 
@@ -484,55 +538,98 @@ public class GuideBookScreen extends Screen {
         final ItemStack itemIcon;
         final CyclicItemRenderer itemRenderer;
         final List<PartInfo> partInfo;
-        //        final List<MutableComponent> bonusInfo;
         final List<MutableComponent> overviewInfo;
         final int titleColor;
+        int selectedPartIndex = -1;
 
         public PatternPage(Holder<PatternDefinition> pattern) {
             this.pattern = pattern;
             this.itemIcon = createPatternItem(pattern);
             this.itemRenderer = new CyclicItemRenderer(List.of(itemIcon));
-            this.partInfo = new ArrayList<>(pattern.value().partTemplate().size());
             JewelryData data = JewelryData.get(itemIcon);
-            var handler = AssetHandlerRegistry.JEWELRY_HANDLER.get();
             var partKeys = pattern.value().partTemplate().stream().sorted(Comparator.comparingInt(PartIngredient::drawOrder)).toList();
-            for (var partIngredient : partKeys) {
+            this.titleColor = generateTextColor(data.parts().get(partKeys.get(0).part()).value().paletteLocation());
+            this.partInfo = createPartInfo(data, partKeys);
+            this.overviewInfo = createOverviewInfo(pattern, titleColor);
+        }
+
+        private List<PartInfo> createPartInfo(JewelryData jewelryData, List<PartIngredient> partIngredients) {
+            ArrayList<PartInfo> partInfo = new ArrayList<>(pattern.value().partTemplate().size());
+            var handler = AssetHandlerRegistry.JEWELRY_HANDLER.get();
+            for (int i = 0; i < partIngredients.size(); i++) {
+                var partIngredient = partIngredients.get(i);
                 var part = partIngredient.part();
                 List<Component> tooltip = new ArrayList<>();
-                var material = data.parts().get(part);
+                var material = jewelryData.parts().get(part);
+                boolean isPrimaryPart = pattern.value().partForQuality().map(holder -> holder == part).orElse(false);
                 MutableComponent name = Component.translatable(part.value().descriptionId()).withStyle(ChatFormatting.UNDERLINE).withColor(generateTextColor(material.value().paletteLocation()));
                 tooltip.add(name);
                 tooltip.add(Component.literal(" ").append(Component.translatable("tooltip.irons_jewelry.material_cost", Component.literal(String.valueOf(partIngredient.materialCost())).withStyle(ChatFormatting.WHITE))).withStyle(ChatFormatting.GRAY));
                 tooltip.add(Component.translatable("tooltip.irons_jewelry.applicable_materials").withStyle(ChatFormatting.YELLOW, ChatFormatting.UNDERLINE));
                 IronsJewelryRegistries.materialRegistry(Minecraft.getInstance().level.registryAccess()).stream().filter(materialDefinition -> !materialDefinition.ingredient().hasNoItems() && part.value().canUseMaterial(materialDefinition.materialType()))
                         .forEach(m -> tooltip.add(Component.literal(" ").append(Component.translatable(m.descriptionId())).withStyle(ChatFormatting.GRAY)));
-                var bonusInfo = partIngredient.bonuses().stream().map(bonus -> {
-                    if (bonus.parameterValue().containsKey(bonus.bonusType().getParameterType())) {
-                        // hardcoded bonus
-                        var bonusType = bonus.bonusType();
-                        return Component.translatable("tooltip.irons_jewelry.bonus_with_direct_source", Component.translatable(bonusType.getDescriptionId()),
-                                bonusType.getParameterType().getSimpleDescriptionCast(bonus.parameterValue().get(bonusType.getParameterType())).orElse(Component.empty()));
+                List<MutableComponent> partExpandedInfo = new ArrayList<>();
+                partExpandedInfo.add(name);
+                if (isPrimaryPart) {
+                    partExpandedInfo.add(Component.empty());
+                    partExpandedInfo.add(Component.translatable("ui.irons_jewelry.primary_part_header").withStyle(ChatFormatting.YELLOW, ChatFormatting.UNDERLINE));
+                    partExpandedInfo.add(Component.translatable("ui.irons_jewelry.primary_part.description").withStyle(ChatFormatting.GRAY));
+                }
+                partExpandedInfo.add(Component.empty());
+                partExpandedInfo.add(Component.translatable("tooltip.irons_jewelry.material_cost_header").withStyle(ChatFormatting.YELLOW, ChatFormatting.UNDERLINE));
+                partExpandedInfo.add(Component.translatable("tooltip.irons_jewelry.material_cost", partIngredient.materialCost()).withStyle(ChatFormatting.GRAY));
+                double patternBonus = pattern.value().qualityMultiplier();
+                if (!partIngredient.bonuses().isEmpty()) {
+                    partExpandedInfo.add(Component.empty());
+                    partExpandedInfo.add(Component.translatable("tooltip.irons_jewelry.bonus_from_part_header").withStyle(ChatFormatting.YELLOW, ChatFormatting.UNDERLINE));
+                    for (var bonus : partIngredient.bonuses()) {
+                        MutableComponent component;
+                        if (bonus.parameterValue().containsKey(bonus.bonusType().getParameterType())) {
+                            // hardcoded bonus
+                            var bonusType = bonus.bonusType();
+                            component = Component.translatable("tooltip.irons_jewelry.bonus_with_direct_source", net.minecraft.network.chat.Component.translatable(bonusType.getDescriptionId()),
+                                    bonusType.getParameterType().getSimpleDescriptionCast(bonus.parameterValue().get(bonusType.getParameterType())).orElse(Component.empty()));
+                        } else {
+                            component = Component.translatable(bonus.bonusType().getDescriptionId());
+                        }
+                        if (patternBonus * bonus.qualityMultiplier() != 1.0 && bonus.bonusType().getParameterType() != ParameterTypeRegistry.EMPTY.get()) {
+                            component = component.append(Component.literal(String.format(" (x%s)", patternBonus * bonus.qualityMultiplier())));
+                        }
+                        partExpandedInfo.add(component.withStyle(ChatFormatting.GRAY));
                     }
-                    return Component.translatable(bonus.bonusType().getDescriptionId());
-                }).toList();
-                partInfo.add(new PartInfo(handler.getSprite(handler.getSpriteLocation(part, material)), Utils.rasterizeComponentList(tooltip), partIngredient.materialCost(), name, bonusInfo));
+                }
+                partInfo.add(new PartInfo(
+                        handler.getSprite(handler.getSpriteLocation(part, material)),
+                        Utils.rasterizeComponentList(tooltip),
+                        name,
+                        partExpandedInfo,
+                        isPrimaryPart,
+                        new PartSelectionButton(i))
+                );
             }
-            this.titleColor = generateTextColor(data.parts().get(partKeys.get(0).part()).value().paletteLocation());
-            this.overviewInfo = new ArrayList<>();
-            this.overviewInfo.add(Component.translatable("tooltip.irons_jewelry.overview_header").withStyle(ChatFormatting.UNDERLINE, ChatFormatting.WHITE));
+            return partInfo;
+        }
+
+        private List<MutableComponent> createOverviewInfo(Holder<PatternDefinition> pattern, int titleColor) {
+            final List<MutableComponent> overviewInfo;
+            overviewInfo = new ArrayList<>();
+            overviewInfo.add(Component.translatable("tooltip.irons_jewelry.overview_header").withStyle(ChatFormatting.UNDERLINE).withColor(titleColor));
             var bonusTooltip = this.pattern.value().getPatternBonusesTooltip();
             bonusTooltip.set(0, Component.translatable("tooltip.irons_jewelry.bonus_crafted_header").withStyle(ChatFormatting.YELLOW, ChatFormatting.UNDERLINE)); // replace header
-            this.overviewInfo.add(Component.empty());
-            this.overviewInfo.add(Component.translatable("tooltip.irons_jewelry.jewelry_type_header").withStyle(ChatFormatting.YELLOW, ChatFormatting.UNDERLINE));
-            this.overviewInfo.add(Component.translatable(pattern.value().jewelryType().getCuriosSlotIdentifier().map(s -> String.format("curios.identifier.%s", s)).orElse("Unknown")).withStyle(ChatFormatting.GRAY));
-            this.overviewInfo.add(Component.empty());
-            this.overviewInfo.addAll(bonusTooltip);
+            overviewInfo.add(Component.empty());
+            overviewInfo.add(Component.translatable("tooltip.irons_jewelry.jewelry_type_header").withStyle(ChatFormatting.YELLOW, ChatFormatting.UNDERLINE));
+            overviewInfo.add(Component.translatable(pattern.value().jewelryType().getCuriosSlotIdentifier().map(s -> String.format("curios.identifier.%s", s)).orElse("Unknown")).withStyle(ChatFormatting.GRAY));
+            overviewInfo.add(Component.empty());
+            overviewInfo.addAll(bonusTooltip);
+            overviewInfo.add(Component.empty());
+            overviewInfo.add(Component.empty());
+            overviewInfo.add(Component.translatable("ui.irons_jewelry.guide_book.pattern_select_hint").withStyle(ChatFormatting.ITALIC).withColor(titleColor));
+            return overviewInfo;
+        }
 
-//            this.bonusInfo = new ArrayList<>();
-//            for (var component : pattern.value().getPatternBonusesTooltip()) {
-//                component = component.withColor(0x0);
-//                this.bonusInfo.add(component);
-//            }
+        @Override
+        void onDepart() {
+            selectedPartIndex = -1;
         }
 
         @Override
@@ -553,35 +650,109 @@ public class GuideBookScreen extends Screen {
             guiGraphics.drawString(font, Component.translatable("tooltip.irons_jewelry.parts_header").withStyle(ChatFormatting.UNDERLINE), partSectionX, partSectionY, 0x0, false);
             int yoff = 0;
             for (int i = 0; i < partInfo.size(); i++) {
+                //fixme: this has no y bounding condition
                 int x = partSectionX;
                 int y = partSectionY + titleSpacer + yoff;
-//                if (y > IMAGE_HEIGHT - YM - (partSectionY - topPos)) {
-//                    partSectionX += partSectionWidth;
-//                    yoff = 0;
-//                }
-                yoff += partInfo.get(i).render(guiGraphics, x, y, partSectionWidth, mouseX, mouseY, partialTick);
+                var info = partInfo.get(i);
+                info.button.rectangle = ScreenRectangle.of(ScreenAxis.HORIZONTAL, x - leftPos, y - topPos, partSectionWidth, 24);
+                if (i == selectedPartIndex) {
+                    var bgstart = 0xBB260f0c;
+                    var bgend = bgstart;
+                    var borderstart = 0xDDe0ca9f;
+                    var borderend = 0xEEa09172;
+                    guiGraphics.drawManaged(() -> TooltipRenderUtil.renderTooltipBackground(guiGraphics, x, y, partSectionWidth - 5, 24, 0, bgstart, bgend, borderstart, borderend));
+                }
+                info.render(guiGraphics, x, y, partSectionWidth, mouseX, mouseY, partialTick);
+                yoff += 32;
             }
             /*
             Draw Bonus Info
              */
-            int infoSectionX = titleX + partSectionWidth;
+            int infoSectionX = titleX + partSectionWidth + 1;
             int infoSectionY = partSectionY;
             int infoSectionWidth = IMAGE_WIDTH - XM - (infoSectionX - leftPos);
+            int infoSectionHeight = IMAGE_HEIGHT - YM * 2 - (infoSectionY - topPos);
             // copied from jewelcrafting screen info colors. tehee
-            var bgstart = 0xFF260f0c;
+            var bgstart = 0xDD260f0c;
             var bgend = bgstart;
             var borderstart = 0xFFe0ca9f;
             var borderend = 0xFFa09172;
-            guiGraphics.drawManaged(() -> TooltipRenderUtil.renderTooltipBackground(guiGraphics, infoSectionX, infoSectionY, infoSectionWidth, IMAGE_HEIGHT - YM * 2 - (infoSectionY - topPos), 0, bgstart, bgend, borderstart, borderend));
-            int y = infoSectionY;
-            for (var component : overviewInfo) {
-                if (component.toFlatList().isEmpty()) {
-                    y += 4;
+            guiGraphics.drawManaged(() -> TooltipRenderUtil.renderTooltipBackground(guiGraphics, infoSectionX, infoSectionY, infoSectionWidth, infoSectionHeight, 0, bgstart, bgend, borderstart, borderend));
+            List<MutableComponent> infoPage = overviewInfo;
+            if (selectedPartIndex >= 0 && selectedPartIndex < partInfo.size()) {
+                infoPage = partInfo.get(selectedPartIndex).expandedInfo;
+            }
+            int emptyMargin = 4;
+            TextStack stack = TextStack.textStack(new LinkedList<>(infoPage), emptyMargin);
+            float textScale = 1;
+            while (textScale > 0.1 && stack.getTotalHeight(font, (int) (infoSectionWidth / textScale)) * textScale > infoSectionHeight - font.lineHeight) {
+                textScale -= .1f;
+            }
+            var poseStack = guiGraphics.pose();
+            poseStack.pushPose();
+            poseStack.translate(infoSectionX, infoSectionY, 0);
+            poseStack.scale(textScale, textScale, textScale);
+            int y = 0;
+            for (var component : infoPage) {
+                if (component.getContents() == PlainTextContents.EMPTY) {
+                    y += emptyMargin;
                 } else {
-                    for (var line : font.split(component, infoSectionWidth)) {
-                        guiGraphics.drawString(font, line, infoSectionX, y, -1, true);
+                    for (var line : font.split(component, (int)(infoSectionWidth / textScale))) {
+                        guiGraphics.drawString(font, line, 0, y, -1, true);
                         y += font.lineHeight + 1;
                     }
+                }
+            }
+            poseStack.popPose();
+        }
+
+        static abstract class TextStack {
+            private static TextStack textStack(Queue<? extends net.minecraft.network.chat.Component> lines, int space) {
+                if (lines.isEmpty()) {
+                    return null;
+                }
+                var component = lines.poll();
+                TextStack textStack;
+                if (component.getContents() == PlainTextContents.EMPTY) {
+                    textStack = new Space(space);
+                } else {
+                    textStack = new Component(component);
+                }
+                textStack.child = textStack(lines, space);
+                return textStack;
+            }
+
+            @Nullable TextStack child;
+
+            abstract int getHeight(Font font, int width);
+
+            int getTotalHeight(Font font, int width) {
+                return getHeight(font, width) + (child == null ? 0 : child.getTotalHeight(font, width));
+            }
+
+            static class Space extends TextStack {
+                final int space;
+
+                Space(int space) {
+                    this.space = space;
+                }
+
+                @Override
+                int getHeight(Font font, int width) {
+                    return space;
+                }
+            }
+
+            static class Component extends TextStack {
+                final net.minecraft.network.chat.Component component;
+
+                Component(net.minecraft.network.chat.Component component) {
+                    this.component = component;
+                }
+
+                @Override
+                int getHeight(Font font, int width) {
+                    return font.split(component, width).size() * font.lineHeight;
                 }
             }
         }
@@ -618,6 +789,11 @@ public class GuideBookScreen extends Screen {
                 IronsJewelry.LOGGER.error("Failed to generate guidebook pattern preview: {}", e.getMessage());
                 return ItemStack.EMPTY;
             }
+        }
+
+        @Override
+        List<? extends GuideBookButton> extraButtons() {
+            return (List) partInfo;
         }
     }
 }

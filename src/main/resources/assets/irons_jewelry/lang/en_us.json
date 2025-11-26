@@ -180,6 +180,7 @@
   "tooltip.irons_jewelry.empty": "Empty",
   "tooltip.irons_jewelry.applicable_materials": "Applicable Materials:",
   "tooltip.irons_jewelry.material_cost": "Material Cost: %s",
+  "tooltip.irons_jewelry.material_cost_header": "Material Cost:",
   "tooltip.irons_jewelry.material_tags": "Material Tags:",
   "tooltip.irons_jewelry.self": "Self",
   "tooltip.irons_jewelry.attacker": "Attacker",
@@ -247,7 +248,12 @@
   "ui.irons_jewelry.guide_book.table_of_contents" : "Table of Contents",
   "ui.irons_jewelry.guide_book.table_of_contents_materials" : "Materials",
   "ui.irons_jewelry.guide_book.table_of_contents_patterns" : "Patterns",
+  "ui.irons_jewelry.guide_book.pattern_select_hint" : "Select a part for more info",
   "ui.irons_jewelry.quality" : "Quality",
+  "ui.irons_jewelry.primary_part" : "Primary Part",
+  "ui.irons_jewelry.primary_part_header" : "Primary Part:",
+  "ui.irons_jewelry.primary_part.description" : "This part is used to determine the quality of the entire piece of jewelry",
+  "ui.irons_jewelry.primary_part.innate" : "This pattern has an innate quality multiplier of x%s",
   "ui.irons_jewelry.quality.description" : "When %s is used as the primary part in a jewelry item, the potency of all bonuses are scaled by %s",
   "ui.irons_jewelry.bonus_type.description" : "When a part gives the %s bonus, using %s grants the effect: %s."
 }

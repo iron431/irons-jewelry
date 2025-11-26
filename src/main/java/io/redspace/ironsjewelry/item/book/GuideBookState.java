@@ -29,6 +29,19 @@ public class GuideBookState {
         return section.pages.get(localPageIndex);
     }
 
+    public GuideBookScreen.Page getGlobalPage(int globalIndex) {
+        int pageIndex = globalIndex;
+        int i = 0;
+        while (pageIndex >= sections.get(i).pages.size()) {
+            pageIndex -= sections.get(i).pages.size();
+            i++;
+        }
+        if (i >= sections.size()) {
+            throw new IllegalArgumentException("Accessing invalid page index: " + globalIndex);
+        }
+        return sections.get(i).pages().get(pageIndex);
+    }
+
     /**
      * @return Whether page successfully turned
      */

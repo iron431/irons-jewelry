@@ -4,6 +4,8 @@ import io.redspace.ironsjewelry.item.book.GuideBookState;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.navigation.ScreenPosition;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
 
 public interface GuideBookButton {
     ScreenRectangle boundingBox();
@@ -19,4 +21,8 @@ public interface GuideBookButton {
      * whether state was changed
      */
     boolean onClick(GuideBookState state);
+
+    default SoundEvent getSound() {
+        return SoundEvents.BOOK_PAGE_TURN;
+    }
 }
