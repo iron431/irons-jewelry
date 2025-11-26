@@ -206,7 +206,7 @@ public class JewelryData {
             var count = entry.getValue();
             if (count > 1) {
                 for (int i = 0; i < count - 1; i++) {
-                    rasterizedTranslation = rasterizedTranslation.replace(String.format("%s-", Component.translatable(material.value().descriptionId()).getString()), "");
+                    rasterizedTranslation = rasterizedTranslation.replaceFirst(String.format("%s-", Component.translatable(material.value().descriptionId()).getString()), "");
                     dirty = true;
                 }
             }
