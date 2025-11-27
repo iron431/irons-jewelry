@@ -8,6 +8,7 @@ import io.redspace.ironsjewelry.core.parameters.IBonusParameterType;
 import io.redspace.ironsjewelry.item.book.buttons.GuideBookButton;
 import io.redspace.ironsjewelry.item.book.buttons.PageButton;
 import io.redspace.ironsjewelry.item.book.buttons.TextButton;
+import io.redspace.ironsjewelry.network.packets.ServerboundSetBookmarkPacket;
 import io.redspace.ironsjewelry.registry.*;
 import io.redspace.ironsjewelry.utils.Utils;
 import net.minecraft.ChatFormatting;
@@ -35,6 +36,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.Tags;
+import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
@@ -44,12 +46,56 @@ import java.util.*;
 import java.util.function.Function;
 
 public class GuideBookScreen extends Screen {
+    class BookmarkButton implements GuideBookButton {
+        final int x, y, width, height;
+        final ResourceLocation sprite, spriteActive;
+        int bookmark;
+
+        public BookmarkButton(int x, int y, int width, int height, ResourceLocation sprite, ResourceLocation spriteActive) {
+            this.x = x;
+            this.y = y;
+            this.width = width;
+            this.height = height;
+            this.sprite = sprite;
+            this.spriteActive = spriteActive;
+            this.bookmark = PlayerData.get(Minecraft.getInstance().player).getBookmarkIndex();
+        }
+
+        @Override
+        public ScreenRectangle boundingBox() {
+            return ScreenRectangle.of(ScreenAxis.HORIZONTAL, x, y, width, height);
+        }
+
+        @Override
+        public void render(GuiGraphics guiGraphics, boolean selected, float partialTick) {
+            boolean active = bookmark >= 0 && bookmark == bookState.getGlobalPageNumber() - 1;
+            ResourceLocation sprite = active ? this.spriteActive : this.sprite;
+            guiGraphics.blitSprite(sprite, x, y, width, height);
+        }
+
+        @Override
+        public boolean onClick(GuideBookState state) {
+            PlayerData data = PlayerData.get(Minecraft.getInstance().player);
+            int currentPageIndex = state.getGlobalPageNumber() - 1;
+            int bookmarkedIndex = data.getBookmarkIndex();
+            if (currentPageIndex != bookmarkedIndex) {
+                setBookmark(currentPageIndex);
+                bookmark = currentPageIndex;
+            } else {
+                setBookmark(-1);
+                bookmark = -1;
+            }
+            return true;
+        }
+    }
+
     public static final ResourceLocation BOOK_LOCATION = IronsJewelry.id("textures/gui/jewelcrafting_guide.png");
 
     private PageButton forwardButton;
     private PageButton backButton;
     private PageButton homeButton;
-    private final List<PageButton> pageButtons = new ArrayList<>();
+    private BookmarkButton bookmarkButton;
+    private final List<GuideBookButton> nativeButtons = new ArrayList<>();
 
     static final int IMAGE_WIDTH = 267;
     static final int IMAGE_HEIGHT = 210;
@@ -163,7 +209,7 @@ public class GuideBookScreen extends Screen {
     }
 
     private void initPageButtons() {
-        pageButtons.clear();
+        nativeButtons.clear();
         int travWidth = 23;
         int travHeight = 13;
         this.forwardButton = new PageButton(IMAGE_WIDTH - 10 - travWidth, IMAGE_HEIGHT - 13 - travHeight, travWidth, travHeight,
@@ -172,9 +218,11 @@ public class GuideBookScreen extends Screen {
                 IronsJewelry.id("guidebook/page_backward"), IronsJewelry.id("guidebook/page_backward_highlighted"), GuideBookState::decrementPage);
         this.homeButton = new PageButton(IMAGE_WIDTH - 10 - travWidth - travWidth - travWidth - 8 - 2, IMAGE_HEIGHT - 13 - travHeight, travWidth, travHeight,
                 IronsJewelry.id("guidebook/page_return"), IronsJewelry.id("guidebook/page_return_highlighted"), GuideBookState::returnSection);
-        pageButtons.add(forwardButton);
-        pageButtons.add(backButton);
-        pageButtons.add(homeButton);
+        this.bookmarkButton = new BookmarkButton(-10, YM, 9, 48, IronsJewelry.id("guidebook/bookmark"), IronsJewelry.id("guidebook/bookmark_active"));
+        nativeButtons.add(forwardButton);
+        nativeButtons.add(backButton);
+        nativeButtons.add(homeButton);
+        nativeButtons.add(bookmarkButton);
     }
 
     @Override
@@ -182,6 +230,23 @@ public class GuideBookScreen extends Screen {
         this.leftPos = (this.width - IMAGE_WIDTH) / 2;
         this.topPos = (this.height - IMAGE_HEIGHT) / 2;
         this.lastPageNumber = -1;
+        if (cachedPage == null) {
+            // if no cached page exists, we are opening the book for the first time
+            // we don't want to navigate to the bookmark whenever the screen is resized
+            var playerdata = PlayerData.get(minecraft.player);
+            try {
+                if (playerdata.hasBookmark()) {
+                    this.bookState.navigateToPage(bookState.getGlobalPage(playerdata.getBookmarkIndex()));
+                }
+            } catch (Exception e) {
+                setBookmark(-1);
+            }
+        }
+    }
+
+    public void setBookmark(int index) {
+        PlayerData.get(minecraft.player).setBookmarkIndex(index);
+        PacketDistributor.sendToServer(new ServerboundSetBookmarkPacket(index));
     }
 
     protected void chooseMaterial(Holder<MaterialDefinition> materialDefinitionHolder) {
@@ -213,7 +278,7 @@ public class GuideBookScreen extends Screen {
         cachedPage.render(guiGraphics, titleX, titleBottomY, mouseX, mouseY, partialTick);
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(leftPos, topPos, 0);
-        for (GuideBookButton button : pageButtons) {
+        for (GuideBookButton button : nativeButtons) {
             button.render(guiGraphics, button.boundingBox(leftPos, topPos).containsPoint(mouseX, mouseY), partialTick);
         }
         for (GuideBookButton button : cachedPage.extraButtons()) {
@@ -224,7 +289,7 @@ public class GuideBookScreen extends Screen {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int mouseAction) {
-        for (GuideBookButton button : pageButtons) {
+        for (GuideBookButton button : nativeButtons) {
             int prevPage = bookState.getGlobalPageNumber() - 1;
             if (button.boundingBox(leftPos, topPos).containsPoint((int) mouseX, (int) mouseY) && button.onClick(this.bookState)) {
                 Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(button.getSound(), 1f));
