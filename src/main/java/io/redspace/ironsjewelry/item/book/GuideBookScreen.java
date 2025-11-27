@@ -49,48 +49,6 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 public class GuideBookScreen extends Screen {
-    class BookmarkButton implements GuideBookButton {
-        final int x, y, width, height;
-        final ResourceLocation sprite, spriteActive;
-        int bookmark;
-
-        public BookmarkButton(int x, int y, int width, int height, ResourceLocation sprite, ResourceLocation spriteActive) {
-            this.x = x;
-            this.y = y;
-            this.width = width;
-            this.height = height;
-            this.sprite = sprite;
-            this.spriteActive = spriteActive;
-            this.bookmark = PlayerData.get(Minecraft.getInstance().player).getBookmarkIndex();
-        }
-
-        @Override
-        public ScreenRectangle boundingBox() {
-            return ScreenRectangle.of(ScreenAxis.HORIZONTAL, x, y, width, height);
-        }
-
-        @Override
-        public void render(GuiGraphics guiGraphics, boolean selected, float partialTick) {
-            boolean active = bookmark >= 0 && bookmark == bookState.getGlobalPageNumber() - 1;
-            ResourceLocation sprite = active ? this.spriteActive : this.sprite;
-            guiGraphics.blitSprite(sprite, x, y, width, height);
-        }
-
-        @Override
-        public boolean onClick(GuideBookState state) {
-            PlayerData data = PlayerData.get(Minecraft.getInstance().player);
-            int currentPageIndex = state.getGlobalPageNumber() - 1;
-            int bookmarkedIndex = data.getBookmarkIndex();
-            if (currentPageIndex != bookmarkedIndex) {
-                setBookmark(currentPageIndex);
-                bookmark = currentPageIndex;
-            } else {
-                setBookmark(-1);
-                bookmark = -1;
-            }
-            return true;
-        }
-    }
 
     public static final ResourceLocation BOOK_LOCATION = IronsJewelry.id("textures/gui/jewelcrafting_guide.png");
 
@@ -113,96 +71,6 @@ public class GuideBookScreen extends Screen {
     GuideBookState bookState = createGuidebookState();
     int lastPageNumber;
     Page cachedPage;
-
-    public GuideBookState createGuidebookState() {
-        /* Guidebook is made of 3 sections:
-            - Table of contents, listing all other sections
-            - Materials, listing all registered and non-empty materials loaded into the world
-            - Patterns, listing all registered patterns in the world */
-        var materialRegistry = IronsJewelryRegistries.materialRegistry(Minecraft.getInstance().level.registryAccess());
-        var patternRegistry = IronsJewelryRegistries.patternRegistry(Minecraft.getInstance().level.registryAccess());
-        List<Page> materialPages = new ArrayList<>();
-        // Construct a material page if the material exists and has valid items to be crafted from
-        materialRegistry.holders().filter(holder -> !holder.value().ingredient().hasNoItems()).forEach(holder -> materialPages.add(new MaterialPage(holder)));
-        // Effectively curry buttons by using preparation structure. Allows all information to be created now, and the button can be positioned and fit onto the screen later, because it is difficult to position all elements without knowing how many there are
-        List<Function<TableOfContentsPage.EntryPreparation, GuideBookButton>> materialTableOfContentsEntries = new ArrayList<>();
-        for (int i = 0; i < materialPages.size(); i++) {
-            var materialPage = ((MaterialPage) materialPages.get(i));
-            var material = materialPage.material;
-            materialTableOfContentsEntries.add(preparation ->
-                    new TextButton(preparation.x(), preparation.y(), preparation.width(), preparation.height(), Component.translatable(material.value().descriptionId()), 0xFF000000, ChatFormatting.YELLOW.getColor(),
-                            List.of(material.value().ingredient().getItems()), guidebook -> guidebook.navigateToPage(materialPage)));
-        }
-        materialPages.addAll(0, createTableOfContentsPages(Component.translatable("ui.irons_jewelry.guide_book.table_of_contents_materials"), materialTableOfContentsEntries, 75));
-
-        List<Page> patternPages = new ArrayList<>();
-        // Construct a pattern page for all patterns that exist
-        patternRegistry.holders().forEach(holder -> patternPages.add(new PatternPage(holder)));
-        List<Function<TableOfContentsPage.EntryPreparation, GuideBookButton>> patternTableOfContentsEntries = new ArrayList<>();
-        for (int i = 0; i < patternPages.size(); i++) {
-            var patternPage = ((PatternPage) patternPages.get(i));
-            var pattern = patternPage.pattern;
-            patternTableOfContentsEntries.add(preparation ->
-                    new TextButton(preparation.x(), preparation.y(), preparation.width(), preparation.height(), Component.translatable(pattern.value().descriptionId()), 0xFF000000, ChatFormatting.YELLOW.getColor(),
-                            List.of(patternPage.itemIcon), guidebook -> guidebook.navigateToPage(patternPage)));
-        }
-        patternPages.addAll(0, createTableOfContentsPages(Component.translatable("ui.irons_jewelry.guide_book.table_of_contents_patterns"), patternTableOfContentsEntries, 75));
-
-        List<Page> masterTableOfContentsPages = new ArrayList<>();
-        // Create master table of content page set which directly links to material and pattern sections
-        masterTableOfContentsPages.addAll(createTableOfContentsPages(Component.translatable("ui.irons_jewelry.guide_book.table_of_contents"),
-                List.of(
-                        // Materials
-                        preparation -> new TextButton(preparation.x(), preparation.y(), preparation.width(), preparation.height(),
-                                Component.translatable("ui.irons_jewelry.guide_book.table_of_contents_materials"), 0xFF000000, ChatFormatting.YELLOW.getColor(),
-                                ItemRegistry.items().stream().filter(holder -> holder.is(Tags.Items.GEMS)).map(DeferredHolder::get).map(Item::getDefaultInstance).toList(), guidebook -> guidebook.navigateToPage(materialPages.get(0))),
-                        // Patterns
-                        preparation -> new TextButton(preparation.x(), preparation.y(), preparation.width(), preparation.height(),
-                                Component.translatable("ui.irons_jewelry.guide_book.table_of_contents_patterns"), 0xFF000000, ChatFormatting.YELLOW.getColor(),
-                                List.of(ItemRegistry.RECIPE.get().getDefaultInstance()), guidebook -> guidebook.navigateToPage(patternPages.get(0)))
-                ), 75));
-
-        return new GuideBookState(
-                List.of(new GuideBookState.BookSection(masterTableOfContentsPages), new GuideBookState.BookSection(materialPages), new GuideBookState.BookSection(patternPages))
-        );
-    }
-
-    abstract class Page {
-        abstract void render(GuiGraphics guiGraphics, int titleX, int titleBottomY, int mouseX, int mouseY, float partialTick);
-
-        void drawTitle(GuiGraphics guiGraphics, Component text, int titleX, int titleBottomY, int color, boolean dropshadow, @Nullable CyclicItemRenderer itemRenderer) {
-            var poseStack = guiGraphics.pose();
-            poseStack.pushPose();
-            float textScale = titleScale;
-            int xOffset;
-            if (itemRenderer == null) {
-                xOffset = 3;
-            } else {
-                xOffset = (int) (18 * itemScale);
-                itemRenderer.renderBottomLeft(guiGraphics, titleX, titleBottomY, itemScale);
-            }
-            textScale *= Math.clamp(getMaxTitleWidth() / (float) font.width(text), 0, 1);
-            poseStack.scale(textScale, textScale, textScale);
-            guiGraphics.drawString(font, text, (int) ((titleX + xOffset) / textScale), (int) ((titleBottomY - (2 * itemScale)) / textScale) - font.lineHeight, color, dropshadow);
-            poseStack.popPose();
-            int lineLength = Math.min((int) (xOffset + (font.width(text) + 24) * textScale), IMAGE_WIDTH - XM * 2);
-            int lineThickness = 2;
-            int split = 15;
-            int color2 = color & 0x00FFFFFF;
-            drawLine(guiGraphics, lineThickness, titleX - 3, titleBottomY, titleX + split, titleBottomY, color2, color);
-            drawLine(guiGraphics, lineThickness, titleX + split, titleBottomY, titleX + lineLength, titleBottomY, color, color2);
-        }
-
-        void onArrive() {
-        }
-
-        void onDepart() {
-        }
-
-        List<? extends GuideBookButton> extraButtons() {
-            return List.of();
-        }
-    }
 
     public GuideBookScreen() {
         super(Component.empty());
@@ -310,6 +178,110 @@ public class GuideBookScreen extends Screen {
         return super.mouseClicked(mouseX, mouseY, mouseAction);
     }
 
+
+    public boolean isPauseScreen() {
+        return false;
+    }
+
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        InputConstants.Key mouseKey = InputConstants.getKey(keyCode, scanCode);
+        if (super.keyPressed(keyCode, scanCode, modifiers)) {
+            return true;
+        } else if (this.minecraft.options.keyInventory.isActiveAndMatches(mouseKey)) {
+            this.onClose();
+            return true;
+        }
+        return false;
+    }
+
+    public GuideBookState createGuidebookState() {
+        /* Guidebook is made of 3 sections:
+            - Table of contents, listing all other sections
+            - Materials, listing all registered and non-empty materials loaded into the world
+            - Patterns, listing all registered patterns in the world */
+        var materialRegistry = IronsJewelryRegistries.materialRegistry(Minecraft.getInstance().level.registryAccess());
+        var patternRegistry = IronsJewelryRegistries.patternRegistry(Minecraft.getInstance().level.registryAccess());
+        List<Page> materialPages = new ArrayList<>();
+        // Construct a material page if the material exists and has valid items to be crafted from
+        materialRegistry.holders().filter(holder -> !holder.value().ingredient().hasNoItems()).forEach(holder -> materialPages.add(new MaterialPage(holder)));
+        // Effectively curry buttons by using preparation structure. Allows all information to be created now, and the button can be positioned and fit onto the screen later, because it is difficult to position all elements without knowing how many there are
+        List<Function<TableOfContentsPage.EntryPreparation, GuideBookButton>> materialTableOfContentsEntries = new ArrayList<>();
+        for (int i = 0; i < materialPages.size(); i++) {
+            var materialPage = ((MaterialPage) materialPages.get(i));
+            var material = materialPage.material;
+            materialTableOfContentsEntries.add(preparation ->
+                    new TextButton(preparation.x(), preparation.y(), preparation.width(), preparation.height(), Component.translatable(material.value().descriptionId()), 0xFF000000, ChatFormatting.YELLOW.getColor(),
+                            List.of(material.value().ingredient().getItems()), guidebook -> guidebook.navigateToPage(materialPage)));
+        }
+        materialPages.addAll(0, createTableOfContentsPages(Component.translatable("ui.irons_jewelry.guide_book.table_of_contents_materials"), materialTableOfContentsEntries, 75));
+
+        List<Page> patternPages = new ArrayList<>();
+        // Construct a pattern page for all patterns that exist
+        patternRegistry.holders().forEach(holder -> patternPages.add(new PatternPage(holder)));
+        List<Function<TableOfContentsPage.EntryPreparation, GuideBookButton>> patternTableOfContentsEntries = new ArrayList<>();
+        for (int i = 0; i < patternPages.size(); i++) {
+            var patternPage = ((PatternPage) patternPages.get(i));
+            var pattern = patternPage.pattern;
+            patternTableOfContentsEntries.add(preparation ->
+                    new TextButton(preparation.x(), preparation.y(), preparation.width(), preparation.height(), Component.translatable(pattern.value().descriptionId()), 0xFF000000, ChatFormatting.YELLOW.getColor(),
+                            List.of(patternPage.itemIcon), guidebook -> guidebook.navigateToPage(patternPage)));
+        }
+        patternPages.addAll(0, createTableOfContentsPages(Component.translatable("ui.irons_jewelry.guide_book.table_of_contents_patterns"), patternTableOfContentsEntries, 75));
+
+        List<Page> masterTableOfContentsPages = new ArrayList<>();
+        // Create master table of content page set which directly links to material and pattern sections
+        masterTableOfContentsPages.addAll(createTableOfContentsPages(Component.translatable("ui.irons_jewelry.guide_book.table_of_contents"),
+                List.of(
+                        // Materials
+                        preparation -> new TextButton(preparation.x(), preparation.y(), preparation.width(), preparation.height(),
+                                Component.translatable("ui.irons_jewelry.guide_book.table_of_contents_materials"), 0xFF000000, ChatFormatting.YELLOW.getColor(),
+                                ItemRegistry.items().stream().filter(holder -> holder.is(Tags.Items.GEMS)).map(DeferredHolder::get).map(Item::getDefaultInstance).toList(), guidebook -> guidebook.navigateToPage(materialPages.get(0))),
+                        // Patterns
+                        preparation -> new TextButton(preparation.x(), preparation.y(), preparation.width(), preparation.height(),
+                                Component.translatable("ui.irons_jewelry.guide_book.table_of_contents_patterns"), 0xFF000000, ChatFormatting.YELLOW.getColor(),
+                                List.of(ItemRegistry.RECIPE.get().getDefaultInstance()), guidebook -> guidebook.navigateToPage(patternPages.get(0)))
+                ), 75));
+
+        return new GuideBookState(
+                List.of(new GuideBookState.BookSection(masterTableOfContentsPages), new GuideBookState.BookSection(materialPages), new GuideBookState.BookSection(patternPages))
+        );
+    }
+
+    private List<TableOfContentsPage> createTableOfContentsPages(Component title, List<Function<TableOfContentsPage.EntryPreparation, GuideBookButton>> entries, int width) {
+        int startingX = XM;
+        int availableWidth = IMAGE_WIDTH - startingX - XM;
+        int startingY = YM / 2 + (int) (16 * itemScale) + 10; // todo: not hardcode this? (copy of bottomTitleY)
+        int availableHeight = IMAGE_HEIGHT - startingY - YM * 2;
+        int entryWidth = width;
+        int entryHeight = 16;
+        int xMargin = Math.max(3, (availableWidth - entryWidth * 3) / 2 - 1);
+        int yMargin = 1;
+        List<TableOfContentsPage> pages = new ArrayList<>();
+        List<GuideBookButton> workingButtons = new ArrayList<>();
+        int workingX = 0, workingY = 0;
+        for (int i = 0; i < entries.size(); i++) {
+            //assume all parameters are valid at the top of the loop
+            workingButtons.add(entries.get(i).apply(new TableOfContentsPage.EntryPreparation(workingX + startingX, workingY + startingY, entryWidth, entryHeight)));
+            workingY += entryHeight + yMargin;
+            if (workingY + entryHeight >= availableHeight) {
+                // try to start next column
+                workingY = 0;
+                workingX += entryWidth + xMargin;
+                if (workingX + entryWidth >= availableWidth) {
+                    workingX = 0;
+                    // no more room for columns, start new page
+                    pages.add(new TableOfContentsPage(title, workingButtons));
+                    workingButtons.clear();
+                }
+            }
+        }
+        if (!workingButtons.isEmpty()) {
+            pages.add(new TableOfContentsPage(title, workingButtons));
+        }
+        return pages;
+    }
+
     private int scaleColor(int color, float scalar) {
         var r = (int) Math.clamp((color >> 16 & 0xFF) * scalar, 0, 255);
         var g = (int) Math.clamp((color >> 8 & 0xFF) * scalar, 0, 255);
@@ -366,54 +338,41 @@ public class GuideBookScreen extends Screen {
         return 0xFFFFFF;
     }
 
-    public boolean isPauseScreen() {
-        return false;
-    }
+    abstract class Page {
+        abstract void render(GuiGraphics guiGraphics, int titleX, int titleBottomY, int mouseX, int mouseY, float partialTick);
 
-    @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        InputConstants.Key mouseKey = InputConstants.getKey(keyCode, scanCode);
-        if (super.keyPressed(keyCode, scanCode, modifiers)) {
-            return true;
-        } else if (this.minecraft.options.keyInventory.isActiveAndMatches(mouseKey)) {
-            this.onClose();
-            return true;
-        }
-        return false;
-    }
-
-    private List<TableOfContentsPage> createTableOfContentsPages(Component title, List<Function<TableOfContentsPage.EntryPreparation, GuideBookButton>> entries, int width) {
-        int startingX = XM;
-        int availableWidth = IMAGE_WIDTH - startingX - XM;
-        int startingY = YM / 2 + (int) (16 * itemScale) + 10; // todo: not hardcode this? (copy of bottomTitleY)
-        int availableHeight = IMAGE_HEIGHT - startingY - YM * 2;
-        int entryWidth = width;
-        int entryHeight = 16;
-        int xMargin = Math.max(3, (availableWidth - entryWidth * 3) / 2 - 1);
-        int yMargin = 1;
-        List<TableOfContentsPage> pages = new ArrayList<>();
-        List<GuideBookButton> workingButtons = new ArrayList<>();
-        int workingX = 0, workingY = 0;
-        for (int i = 0; i < entries.size(); i++) {
-            //assume all parameters are valid at the top of the loop
-            workingButtons.add(entries.get(i).apply(new TableOfContentsPage.EntryPreparation(workingX + startingX, workingY + startingY, entryWidth, entryHeight)));
-            workingY += entryHeight + yMargin;
-            if (workingY + entryHeight >= availableHeight) {
-                // try to start next column
-                workingY = 0;
-                workingX += entryWidth + xMargin;
-                if (workingX + entryWidth >= availableWidth) {
-                    workingX = 0;
-                    // no more room for columns, start new page
-                    pages.add(new TableOfContentsPage(title, workingButtons));
-                    workingButtons.clear();
-                }
+        void drawTitle(GuiGraphics guiGraphics, Component text, int titleX, int titleBottomY, int color, boolean dropshadow, @Nullable CyclicItemRenderer itemRenderer) {
+            var poseStack = guiGraphics.pose();
+            poseStack.pushPose();
+            float textScale = titleScale;
+            int xOffset;
+            if (itemRenderer == null) {
+                xOffset = 3;
+            } else {
+                xOffset = (int) (18 * itemScale);
+                itemRenderer.renderBottomLeft(guiGraphics, titleX, titleBottomY, itemScale);
             }
+            textScale *= Math.clamp(getMaxTitleWidth() / (float) font.width(text), 0, 1);
+            poseStack.scale(textScale, textScale, textScale);
+            guiGraphics.drawString(font, text, (int) ((titleX + xOffset) / textScale), (int) ((titleBottomY - (2 * itemScale)) / textScale) - font.lineHeight, color, dropshadow);
+            poseStack.popPose();
+            int lineLength = Math.min((int) (xOffset + (font.width(text) + 24) * textScale), IMAGE_WIDTH - XM * 2);
+            int lineThickness = 2;
+            int split = 15;
+            int color2 = color & 0x00FFFFFF;
+            drawLine(guiGraphics, lineThickness, titleX - 3, titleBottomY, titleX + split, titleBottomY, color2, color);
+            drawLine(guiGraphics, lineThickness, titleX + split, titleBottomY, titleX + lineLength, titleBottomY, color, color2);
         }
-        if (!workingButtons.isEmpty()) {
-            pages.add(new TableOfContentsPage(title, workingButtons));
+
+        void onArrive() {
         }
-        return pages;
+
+        void onDepart() {
+        }
+
+        List<? extends GuideBookButton> extraButtons() {
+            return List.of();
+        }
     }
 
     public class TableOfContentsPage extends Page {
@@ -926,4 +885,48 @@ public class GuideBookScreen extends Screen {
             return (List) partInfo;
         }
     }
+
+    class BookmarkButton implements GuideBookButton {
+        final int x, y, width, height;
+        final ResourceLocation sprite, spriteActive;
+        int bookmark;
+
+        public BookmarkButton(int x, int y, int width, int height, ResourceLocation sprite, ResourceLocation spriteActive) {
+            this.x = x;
+            this.y = y;
+            this.width = width;
+            this.height = height;
+            this.sprite = sprite;
+            this.spriteActive = spriteActive;
+            this.bookmark = PlayerData.get(Minecraft.getInstance().player).getBookmarkIndex();
+        }
+
+        @Override
+        public ScreenRectangle boundingBox() {
+            return ScreenRectangle.of(ScreenAxis.HORIZONTAL, x, y, width, height);
+        }
+
+        @Override
+        public void render(GuiGraphics guiGraphics, boolean selected, float partialTick) {
+            boolean active = bookmark >= 0 && bookmark == bookState.getGlobalPageNumber() - 1;
+            ResourceLocation sprite = active ? this.spriteActive : this.sprite;
+            guiGraphics.blitSprite(sprite, x, y, width, height);
+        }
+
+        @Override
+        public boolean onClick(GuideBookState state) {
+            PlayerData data = PlayerData.get(Minecraft.getInstance().player);
+            int currentPageIndex = state.getGlobalPageNumber() - 1;
+            int bookmarkedIndex = data.getBookmarkIndex();
+            if (currentPageIndex != bookmarkedIndex) {
+                setBookmark(currentPageIndex);
+                bookmark = currentPageIndex;
+            } else {
+                setBookmark(-1);
+                bookmark = -1;
+            }
+            return true;
+        }
+    }
+
 }
