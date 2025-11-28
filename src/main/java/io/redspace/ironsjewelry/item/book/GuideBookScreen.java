@@ -178,6 +178,19 @@ public class GuideBookScreen extends Screen {
         return super.mouseClicked(mouseX, mouseY, mouseAction);
     }
 
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+        if (super.mouseScrolled(mouseX, mouseY, scrollX, scrollY)) {
+            return true;
+        }
+        if (scrollY < 0) {
+            bookState.incrementPage();
+        } else {
+            bookState.decrementPage();
+        }
+        Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.BOOK_PAGE_TURN, 1f));
+        return true;
+    }
 
     public boolean isPauseScreen() {
         return false;
