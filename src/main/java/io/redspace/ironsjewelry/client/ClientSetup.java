@@ -3,7 +3,9 @@ package io.redspace.ironsjewelry.client;
 import io.redspace.ironsjewelry.IronsJewelry;
 import io.redspace.ironsjewelry.block.jewelcrafting_station.JewelcraftingStationScreen;
 import io.redspace.ironsjewelry.client.jewelry_model.JewelryRenderLayer;
+import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
 import io.redspace.ironsjewelry.registry.ItemRegistry;
+import io.redspace.ironsjewelry.registry.JewelryTypeRegistry;
 import io.redspace.ironsjewelry.registry.MenuRegistry;
 import io.redspace.ironsjewelry.utils.IMinecraftInstanceHelper;
 import io.redspace.ironsjewelry.utils.MinecraftInstanceHelper;
@@ -37,7 +39,7 @@ public class ClientSetup {
 
     @SubscribeEvent
     public static void onRegisterLayers(EntityRenderersEvent.RegisterLayerDefinitions event) {
-        event.registerLayerDefinition(JewelryRenderLayer.LAYER_LOCATION, () -> LayerDefinition.create(HumanoidModel.createMesh(new CubeDeformation(0.125F), 0.0F), 64, 32));
+        event.registerLayerDefinition(JewelryRenderLayer.LAYER_LOCATION, () -> LayerDefinition.create(HumanoidModel.createMesh(new CubeDeformation(0.26F), 0.0F), 64, 32));
     }
 
     @SubscribeEvent
@@ -56,10 +58,9 @@ public class ClientSetup {
                 }
             };
             Supplier<ICurioRenderer> jewelryRenderLayerSupplier = () -> new JewelryRenderLayer(new HumanoidArmorModel<>(Minecraft.getInstance().getEntityModels().bakeLayer(JewelryRenderLayer.LAYER_LOCATION)));
-            //todo: ease of access for other people's render layer?
-            // could make it a generic render layer instead...
-            CuriosRendererRegistry.register(ItemRegistry.RING.get(), jewelryRenderLayerSupplier);
-            CuriosRendererRegistry.register(ItemRegistry.NECKLACE.get(), jewelryRenderLayerSupplier);
+            IronsJewelryRegistries.JEWELRY_TYPE_REGISTRY.forEach(
+                    type -> CuriosRendererRegistry.register(type.item().value(), jewelryRenderLayerSupplier)
+            );
         });
     }
 }

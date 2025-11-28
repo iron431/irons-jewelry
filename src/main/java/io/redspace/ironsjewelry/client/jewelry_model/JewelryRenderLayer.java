@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class JewelryRenderLayer implements ICurioRenderer {
-    private static final RenderType JEWELRY_MODEL_ATLAS_RENDERTYPE = RenderType.createArmorDecalCutoutNoCull(AssetHandlerRegistry.JEWELRY_MODEL_HANDLER.get().getAtlasLocation());
+    private static final RenderType JEWELRY_MODEL_ATLAS_RENDERTYPE = RenderType.entityCutoutNoCull(AssetHandlerRegistry.JEWELRY_MODEL_HANDLER.get().getAtlasLocation());
     public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(IronsJewelry.id("jewelry_humanoid_layer"), "main");
 
     final HumanoidModel<LivingEntity> model;
@@ -41,12 +41,14 @@ public class JewelryRenderLayer implements ICurioRenderer {
         if (modelLayers.isEmpty()) {
             return;
         }
-        ((HumanoidModel<T>)renderLayerParent.getModel()).copyPropertiesTo((HumanoidModel<T>) model);
+        ((HumanoidModel<T>) renderLayerParent.getModel()).copyPropertiesTo((HumanoidModel<T>) model);
         poseStack.pushPose();
+        float initialScale = 1f + slotContext.index() * .001f;
+        poseStack.scale(initialScale, initialScale, initialScale); // prevent z-fighting with other jewelry slots
         for (TextureAtlasSprite sprite : modelLayers) {
-            VertexConsumer consumer = sprite.wrap(renderTypeBuffer.getBuffer(RenderType.entityCutoutNoCull(AssetHandlerRegistry.JEWELRY_MODEL_HANDLER.get().getAtlasLocation())));
+            VertexConsumer consumer = sprite.wrap(renderTypeBuffer.getBuffer(JEWELRY_MODEL_ATLAS_RENDERTYPE));
             model.renderToBuffer(poseStack, consumer, light, OverlayTexture.NO_OVERLAY);
-            poseStack.scale(1.001f, 1.001f, 1.001f); // prevent z-fighting
+            poseStack.scale(1.001f, 1.001f, 1.001f); // prevent z-fighting with self (layers already sorted by draw order)
         }
         poseStack.popPose();
     }

@@ -4,5 +4,6 @@
   ],
   "baseTextureLocation": "irons_jewelry:item/base/chain_simple_amulet",
   "descriptionId": "part.irons_jewelry.chain_simple_amulet",
+  "modelTextureLocation": "irons_jewelry:jewelry_model/simple_chain",
   "paletteKey": "irons_jewelry:palettes/gold"
 }

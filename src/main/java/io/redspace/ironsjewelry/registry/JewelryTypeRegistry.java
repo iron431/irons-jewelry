@@ -5,6 +5,7 @@ import io.redspace.ironsjewelry.core.data.JewelryType;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
+import java.util.Collection;
 import java.util.function.Supplier;
 
 public class JewelryTypeRegistry {
@@ -16,4 +17,5 @@ public class JewelryTypeRegistry {
     public static void register(IEventBus eventBus) {
         JEWELRY_TYPES.register(eventBus);
     }
+
 }

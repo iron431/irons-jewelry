@@ -4,5 +4,6 @@
   ],
   "baseTextureLocation": "irons_jewelry:item/base/chain_amulet_of_protection",
   "descriptionId": "part.irons_jewelry.chain_amulet_of_protection",
+  "modelTextureLocation": "irons_jewelry:jewelry_model/simple_chain",
   "paletteKey": "irons_jewelry:palettes/gold"
 }

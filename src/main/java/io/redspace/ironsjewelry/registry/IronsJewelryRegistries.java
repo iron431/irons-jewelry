@@ -168,13 +168,18 @@ public class IronsJewelryRegistries {
                 BAND_GEM_SUPERIOR = bootstrap.register(prk(IronsJewelry.id("band_gem_superior")), PartDefinition.Builder.simpleMetalPart(IronsJewelry.MODID, "band_gem_superior").build());
                 BAND_GEM_THIN = bootstrap.register(prk(IronsJewelry.id("band_gem_thin")), PartDefinition.Builder.simpleMetalPart(IronsJewelry.MODID, "band_gem_thin").build());
                 BAND_TEARSTONE = bootstrap.register(prk(IronsJewelry.id("band_tearstone")), PartDefinition.Builder.simpleMetalPart(IronsJewelry.MODID, "band_tearstone").build());
-                CHAIN_AMULET_OF_PROTECTION = bootstrap.register(prk(IronsJewelry.id("chain_amulet_of_protection")), PartDefinition.Builder.simpleMetalPart(IronsJewelry.MODID, "chain_amulet_of_protection").build());
-                CHAIN_SIMPLE = bootstrap.register(prk(IronsJewelry.id("chain_simple")), PartDefinition.Builder.simpleMetalPart(IronsJewelry.MODID, "chain_simple").modelTextureLocation(IronsJewelry.id("jewelry_model/simple_chain")).build());
-                CHAIN_SIMPLE_AMULET = bootstrap.register(prk(IronsJewelry.id("chain_simple_amulet")), PartDefinition.Builder.simpleMetalPart(IronsJewelry.MODID, "chain_simple_amulet").build());
-                GEM_AMULET_OF_PROTECTION = bootstrap.register(prk(IronsJewelry.id("gem_amulet_of_protection")), PartDefinition.Builder.simpleGemPart(IronsJewelry.MODID, "gem_amulet_of_protection").build());
+                CHAIN_AMULET_OF_PROTECTION = bootstrap.register(prk(IronsJewelry.id("chain_amulet_of_protection")), PartDefinition.Builder.simpleMetalPart(IronsJewelry.MODID, "chain_amulet_of_protection")
+                        .modelTextureLocation(IronsJewelry.id("jewelry_model/simple_chain")).build());
+                CHAIN_SIMPLE = bootstrap.register(prk(IronsJewelry.id("chain_simple")), PartDefinition.Builder.simpleMetalPart(IronsJewelry.MODID, "chain_simple")
+                        .modelTextureLocation(IronsJewelry.id("jewelry_model/simple_chain")).build());
+                CHAIN_SIMPLE_AMULET = bootstrap.register(prk(IronsJewelry.id("chain_simple_amulet")), PartDefinition.Builder.simpleMetalPart(IronsJewelry.MODID, "chain_simple_amulet")
+                        .modelTextureLocation(IronsJewelry.id("jewelry_model/simple_chain")).build());
+                GEM_AMULET_OF_PROTECTION = bootstrap.register(prk(IronsJewelry.id("gem_amulet_of_protection")), PartDefinition.Builder.simpleGemPart(IronsJewelry.MODID, "gem_amulet_of_protection")
+                        .modelTextureLocation(IronsJewelry.id("jewelry_model/gem_amulet_of_protection")).build());
                 GEM_BAND_BARBED = bootstrap.register(prk(IronsJewelry.id("gem_band_barbed")), PartDefinition.Builder.simpleGemPart(IronsJewelry.MODID, "gem_band_barbed").build());
                 GEM_POINTY = bootstrap.register(prk(IronsJewelry.id("gem_pointy")), PartDefinition.Builder.simpleGemPart(IronsJewelry.MODID, "gem_pointy").build());
-                GEM_SIMPLE_AMULET = bootstrap.register(prk(IronsJewelry.id("gem_simple_amulet")), PartDefinition.Builder.simpleGemPart(IronsJewelry.MODID, "gem_simple_amulet").build());
+                GEM_SIMPLE_AMULET = bootstrap.register(prk(IronsJewelry.id("gem_simple_amulet")), PartDefinition.Builder.simpleGemPart(IronsJewelry.MODID, "gem_simple_amulet")
+                        .modelTextureLocation(IronsJewelry.id("jewelry_model/gem_simple_amulet")).build());
                 GEM_TEARSTONE = bootstrap.register(prk(IronsJewelry.id("gem_tearstone")), PartDefinition.Builder.simpleGemPart(IronsJewelry.MODID, "gem_tearstone").build());
                 GEMS_SIDE = bootstrap.register(prk(IronsJewelry.id("gems_side")), PartDefinition.Builder.simpleGemPart(IronsJewelry.MODID, "gems_side").build());
                 PIGLIN_SIGNET = bootstrap.register(prk(IronsJewelry.id("piglin_signet")), PartDefinition.builder()
