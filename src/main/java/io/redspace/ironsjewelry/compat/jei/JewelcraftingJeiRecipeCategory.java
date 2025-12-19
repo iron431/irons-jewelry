@@ -8,6 +8,7 @@ import io.redspace.ironsjewelry.core.data.PatternDefinition;
 import io.redspace.ironsjewelry.registry.BlockRegistry;
 import io.redspace.ironsjewelry.registry.ComponentRegistry;
 import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
+import io.redspace.ironsjewelry.utils.Utils;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.builder.IRecipeSlotBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
@@ -73,25 +74,13 @@ public class JewelcraftingJeiRecipeCategory implements IRecipeCategory<PatternDe
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, PatternDefinition recipe, IFocusGroup focuses) {
         var materialRegistry = IronsJewelryRegistries.materialRegistry(Minecraft.getInstance().level.registryAccess());
-        ItemStack output = new ItemStack(recipe.jewelryType().item());
-        Holder<MaterialDefinition> iron = materialRegistry.getHolder(IronsJewelry.id("example")).get();
-        var parts = recipe.partTemplate().stream().map(PartIngredient::part).collect(Collectors.toMap(Function.identity(),
-                (p) -> iron));
-        JewelryData jewelryData = JewelryData.renderable(IronsJewelryRegistries.patternRegistry(Minecraft.getInstance().level.registryAccess()).wrapAsHolder(recipe), parts);
-        output.set(ComponentRegistry.JEWELRY_COMPONENT, jewelryData);
-        var bonuses = recipe.getPatternBonusesTooltip();
-        if (!bonuses.isEmpty()) {
-            bonuses.set(0, Component.translatable("tooltip.irons_jewelry.bonus_crafted_header").withStyle(ChatFormatting.YELLOW, ChatFormatting.UNDERLINE)); // replace header
-            bonuses.add(0, Component.empty());
-            output.set(DataComponents.LORE, new ItemLore(bonuses.stream().map(component -> (Component) component.withStyle(component.getStyle().withItalic(false))).toList()));
-        }
+        ItemStack output = Utils.createExampleJewelryItem(Minecraft.getInstance().level.registryAccess(), IronsJewelryRegistries.patternRegistry(Minecraft.getInstance().level.registryAccess()).wrapAsHolder(recipe));
         IRecipeSlotBuilder outputSlot = builder.addSlot(RecipeIngredientRole.OUTPUT, buffer + 105, 22)
                 .addItemStacks(List.of(output))
                 .setSlotName("output");
 
-
         int totalWidth = 95;
-        int count = parts.size();
+        int count = recipe.partTemplate().size();
         int widthPer = 20;
         int leftPos = (totalWidth - count * widthPer) / 2;
         var template = recipe.partTemplate();
