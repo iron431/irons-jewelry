@@ -4,6 +4,7 @@ import io.redspace.ironsjewelry.utils.MinecraftInstanceHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
@@ -38,6 +39,7 @@ public class GuideBookItem extends Item {
         if (player instanceof LocalPlayer) {
             MinecraftInstanceHelper.INSTANCE.openGuidebookScreen();
         }
+        player.playSound(SoundEvents.BOOK_PAGE_TURN);
         return InteractionResultHolder.success(stack);
     }
 }
