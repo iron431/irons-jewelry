@@ -271,6 +271,6 @@
   "ui.irons_jewelry.bonus_type.description" : "When a part gives the %s bonus, using %s grants the effect: %s.",
   "ui.irons_jewelry.bonus_type.parameter_description" : "Uses material's %s.",
   "ui.irons_jewelry.artisan_scroll_description.unlocked" : "The %s pattern is unlocked by default, and can be immediately crafted at a %s",
-  "ui.irons_jewelry.artisan_scroll_description.locked" : "The %s pattern is locked, and requires finding the an %s to learn.",
+  "ui.irons_jewelry.artisan_scroll_description.locked" : "The %s pattern is locked, and requires finding an %s to learn.",
   "ui.irons_jewelry.artisan_scroll_description.unknown" : "There is no additional information for finding this pattern"
 }
