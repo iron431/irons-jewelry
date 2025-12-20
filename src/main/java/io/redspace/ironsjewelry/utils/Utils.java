@@ -4,19 +4,22 @@ import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import io.netty.buffer.ByteBuf;
-import io.redspace.ironsjewelry.core.data.BonusInstance;
-import io.redspace.ironsjewelry.core.data.JewelryData;
-import io.redspace.ironsjewelry.core.data.MaterialDefinition;
+import io.redspace.ironsjewelry.IronsJewelry;
+import io.redspace.ironsjewelry.core.data.*;
 import io.redspace.ironsjewelry.registry.ComponentRegistry;
 import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.ItemLore;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotResult;
 
@@ -24,6 +27,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class Utils {
 
@@ -64,7 +68,7 @@ public class Utils {
         return CuriosApi.getCuriosInventory(player).map(inv -> inv.findCurios(stack -> stack.has(ComponentRegistry.JEWELRY_COMPONENT)).stream().map(SlotResult::stack).toList()).orElse(List.of());
     }
 
-    public static List<? extends FormattedCharSequence> rasterizeComponentList(List<Component> components) {
+    public static List<FormattedCharSequence> rasterizeComponentList(List<? extends Component> components) {
         return components.stream().map(component -> FormattedCharSequence.forward(component.getString(), component.getStyle())).toList();
     }
 
@@ -123,5 +127,22 @@ public class Utils {
         }
         time += seconds % 10;
         return time;
+    }
+
+    public static ItemStack createExampleJewelryItem(RegistryAccess registryAccess, Holder<PatternDefinition> patternHolder) {
+        var pattern = patternHolder.value();
+        ItemStack output = new ItemStack(pattern.jewelryType().item());
+        Holder<MaterialDefinition> iron = IronsJewelryRegistries.materialRegistry(registryAccess).getHolder(IronsJewelry.id("example")).get();
+        var parts = pattern.partTemplate().stream().map(PartIngredient::part).collect(Collectors.toMap(Function.identity(),
+                (p) -> iron));
+        JewelryData jewelryData = JewelryData.renderable(IronsJewelryRegistries.patternRegistry(Minecraft.getInstance().level.registryAccess()).wrapAsHolder(pattern), parts);
+        output.set(ComponentRegistry.JEWELRY_COMPONENT, jewelryData);
+        var bonuses = pattern.getPatternBonusesTooltip();
+        if (!bonuses.isEmpty()) {
+            bonuses.set(0, Component.translatable("tooltip.irons_jewelry.bonus_crafted_header").withStyle(ChatFormatting.YELLOW, ChatFormatting.UNDERLINE)); // replace header
+            bonuses.add(0, Component.empty());
+            output.set(DataComponents.LORE, new ItemLore(bonuses.stream().map(component -> (Component) component.withStyle(component.getStyle().withItalic(false))).toList()));
+        }
+        return output;
     }
 }

@@ -8,7 +8,7 @@
           "functions": [
             {
               "function": "irons_jewelry:set_held_pattern",
-              "patterns": "#irons_jewelry:high_quality_lootable"
+              "patterns": "#irons_jewelry:high_quality_sellable_patterns"
             }
           ]
         }

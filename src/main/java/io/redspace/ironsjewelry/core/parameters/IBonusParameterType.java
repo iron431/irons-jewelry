@@ -5,6 +5,7 @@ import io.redspace.ironsjewelry.IronsJewelry;
 import io.redspace.ironsjewelry.core.data.BonusInstance;
 import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
 import io.redspace.ironsjewelry.registry.ParameterTypeRegistry;
+import net.minecraft.network.chat.Component;
 
 import java.util.Map;
 import java.util.Optional;
@@ -23,6 +24,16 @@ public interface IBonusParameterType<T> {
 
     Optional<String> getValueDescriptionId(T value);
 
+    Optional<Component> getSimpleDescription(T value);
+
+    default Optional<Component> getSimpleDescriptionCast(Object o) {
+        try {
+            return getSimpleDescription((T) o);
+        } catch (ClassCastException e) {
+            return Optional.empty();
+        }
+    }
+
     default boolean isEmpty() {
         return this == ParameterTypeRegistry.EMPTY.get();
     }
@@ -35,6 +46,11 @@ public interface IBonusParameterType<T> {
             IronsJewelry.LOGGER.error("Invalid parameter data association found: {} to {}", this, param);
             return Optional.empty();
         }
+    }
+
+    default String getDescriptionId() {
+        var id = IronsJewelryRegistries.PARAMETER_TYPE_REGISTRY.getKey(this);
+        return String.format("bonus_parameter.%s.%s", id.getNamespace(), id.getPath());
     }
 
     default Optional<T> resolve(BonusInstance bonusInstance) {

@@ -37,6 +37,11 @@ public class ActionParameter implements IBonusParameterType<ActionParameter.Acti
         return Optional.empty();
     }
 
+    @Override
+    public Optional<Component> getSimpleDescription(ActionRunnable value) {
+        return getValueDescriptionId(value).map(id -> value.action.simpleDescription(Component.translatable(id)));
+    }
+
     public List<Component> getActionTooltip(String prefixDescriptionId, ActionParameter.ActionRunnable param, BonusInstance bonusInstance) {
         var desc = Component.literal(" ").append(Component.translatable(prefixDescriptionId, param.action.formatTooltip(bonusInstance, param.targetSelf()))).withStyle(ChatFormatting.YELLOW);
         var cooldown = getCooldownDescriptor(bonusInstance, param);

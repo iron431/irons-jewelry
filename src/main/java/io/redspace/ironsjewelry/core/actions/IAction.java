@@ -8,6 +8,7 @@ import io.redspace.ironsjewelry.core.data.PlayerData;
 import io.redspace.ironsjewelry.core.data.QualityScalar;
 import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -36,6 +37,8 @@ public interface IAction {
     }
 
     Component formatTooltip(BonusInstance bonusInstance, boolean applyToSelf);
+
+    Component simpleDescription(MutableComponent actionName);
 
     MapCodec<? extends IAction> codec();
 }

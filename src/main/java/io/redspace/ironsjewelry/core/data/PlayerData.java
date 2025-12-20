@@ -25,6 +25,23 @@ public class PlayerData {
 
     private final Set<Holder<PatternDefinition>> learnedPatterns = new HashSet<>();
     private final Map<ResourceLocation, CooldownInstance> cooldowns = new HashMap<>();
+    private int bookmarkIndex = -1;
+
+    public int getBookmarkIndex() {
+        return bookmarkIndex;
+    }
+
+    public boolean hasBookmark() {
+        return bookmarkIndex >= 0;
+    }
+
+    public void removeBookmark() {
+        bookmarkIndex = -1;
+    }
+
+    public void setBookmarkIndex(int bookmarkIndex) {
+        this.bookmarkIndex = bookmarkIndex;
+    }
 
     public Set<Holder<PatternDefinition>> getLearnedPatterns() {
         return learnedPatterns;
@@ -121,6 +138,9 @@ public class PlayerData {
                     continue;
                 }
             }
+            if (compoundTag.contains("bookmark")) {
+                data.bookmarkIndex = compoundTag.getInt("bookmark");
+            }
             return data;
         }
 
@@ -141,7 +161,9 @@ public class PlayerData {
                 cooldowns.add(c);
             });
             tag.put(COOLDOWNS, cooldowns);
-
+            if (attachment.hasBookmark()) {
+                tag.putInt("bookmark", attachment.getBookmarkIndex());
+            }
             return tag;
         }
 
@@ -154,6 +176,7 @@ public class PlayerData {
                     buf.writeResourceLocation(IronsJewelry.id("empty"));
                 }
             }
+            buf.writeInt(playerData.getBookmarkIndex());
         }
 
         public static PlayerData networkRead(RegistryFriendlyByteBuf buf) {
@@ -167,6 +190,7 @@ public class PlayerData {
                     continue;
                 }
             }
+            playerData.setBookmarkIndex(buf.readInt());
             return playerData;
         }
     }

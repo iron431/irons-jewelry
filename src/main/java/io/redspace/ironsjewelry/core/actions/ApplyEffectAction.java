@@ -63,6 +63,19 @@ public record ApplyEffectAction(QualityScalar duration, QualityScalar amplifier,
     }
 
     @Override
+    public Component simpleDescription(MutableComponent actionName) {
+        String[] ampStrings = {"I", "II", "III", "IV", "V"};
+        var effect = effect().value();
+        int ampValue = (int) amplifier().sample(1);
+        String ampText = ampValue >= 5 ? String.valueOf(ampValue) : ampStrings[ampValue];
+        var effectName = Component.translatable(effect.getDescriptionId());
+        return actionName.append(" ")
+                .append(effect.isInstantenous() ? Component.translatable("action.irons_jewelry.apply_effect.description_instantaneous", effectName, ampText)
+                        : Component.translatable("action.irons_jewelry.apply_effect.description", effectName, ampText, Utils.digitalTimeFromTicks((int) duration().sample(1), true))
+                );
+    }
+
+    @Override
     public MapCodec<? extends IAction> codec() {
         return CODEC;
     }

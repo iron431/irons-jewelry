@@ -229,7 +229,6 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
             }
             renderTooltipInternal(guiGraphics, this.font, tooltip, leftPos + imageWidth + 4, topPos + topBuffer);
             if (!parts.isEmpty()) {
-
                 JewelryData jewelryData = JewelryData.renderable(holder, parts);
                 ItemStack stack = new ItemStack(pattern.jewelryType().item());
                 stack.set(ComponentRegistry.JEWELRY_COMPONENT, jewelryData);

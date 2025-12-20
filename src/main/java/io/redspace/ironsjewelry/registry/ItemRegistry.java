@@ -4,6 +4,7 @@ import io.redspace.ironsjewelry.IronsJewelry;
 import io.redspace.ironsjewelry.datagen.ItemModelDataGenerator;
 import io.redspace.ironsjewelry.item.CurioBaseItem;
 import io.redspace.ironsjewelry.item.PatternRecipeItem;
+import io.redspace.ironsjewelry.item.book.GuideBookItem;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
@@ -12,6 +13,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
+import java.util.Collection;
 import java.util.function.Supplier;
 
 public class ItemRegistry {
@@ -24,6 +26,7 @@ public class ItemRegistry {
     public static final DeferredHolder<Item, CurioBaseItem> RING = ITEMS.register("ring", () -> new CurioBaseItem(new Item.Properties().stacksTo(1), "ring"));
     public static final DeferredHolder<Item, CurioBaseItem> NECKLACE = ITEMS.register("necklace", () -> new CurioBaseItem(new Item.Properties().stacksTo(1), "necklace"));
     public static final DeferredHolder<Item, PatternRecipeItem> RECIPE = ITEMS.register("recipe", () -> new PatternRecipeItem(new Item.Properties().stacksTo(1).rarity(Rarity.UNCOMMON)));
+    public static final DeferredHolder<Item, GuideBookItem> JEWELCRAFTING_GUIDE = registerSimpleItem("jewelcrafting_guide", () -> new GuideBookItem(new Item.Properties().rarity(Rarity.UNCOMMON)));
 
     public static final DeferredHolder<Item, Item> RUBY = registerSimpleItem("ruby", () -> new Item(new Item.Properties()));
     public static final DeferredHolder<Item, Item> SAPPHIRE = registerSimpleItem("sapphire", () -> new Item(new Item.Properties()));
@@ -39,5 +42,9 @@ public class ItemRegistry {
         var s = ITEMS.register(name, supplier);
         ItemModelDataGenerator.toRegister.add(generator -> generator.simpleItem(s));
         return s;
+    }
+
+    public static Collection<DeferredHolder<Item, ? extends Item>> items() {
+        return ITEMS.getEntries();
     }
 }

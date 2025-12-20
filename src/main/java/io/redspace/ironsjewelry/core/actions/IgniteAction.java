@@ -7,6 +7,7 @@ import io.redspace.ironsjewelry.core.data.QualityScalar;
 import io.redspace.ironsjewelry.utils.Utils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -26,6 +27,11 @@ public record IgniteAction(QualityScalar tickDuration) implements IAction {
     public Component formatTooltip(BonusInstance bonusInstance, boolean applyToSelf) {
         Component target = applyToSelf ? Component.translatable("tooltip.irons_jewelry.self").withStyle(ChatFormatting.RED) : Component.translatable("tooltip.irons_jewelry.attacker").withStyle(ChatFormatting.RED);
         return Component.translatable("action.irons_jewelry.ignite", target, Component.literal(Utils.timeFromTicks((int) tickDuration.sample(bonusInstance.quality()), 1)));
+    }
+
+    @Override
+    public Component simpleDescription(MutableComponent actionName) {
+        return actionName;
     }
 
     @Override

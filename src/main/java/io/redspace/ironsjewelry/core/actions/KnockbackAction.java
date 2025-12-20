@@ -7,6 +7,7 @@ import io.redspace.ironsjewelry.core.data.QualityScalar;
 import io.redspace.ironsjewelry.utils.Utils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
@@ -14,6 +15,9 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.Map;
+import java.util.Optional;
 
 public record KnockbackAction(QualityScalar strength) implements IAction {
     public static final MapCodec<KnockbackAction> CODEC = RecordCodecBuilder.mapCodec(builder -> builder.group(
@@ -44,6 +48,11 @@ public record KnockbackAction(QualityScalar strength) implements IAction {
         var strengthText = Utils.stringTruncation(Math.abs(strength().sample(bonusInstance.quality())), 1);
         boolean push = (applyToSelf && strength.baseAmount() > 0) || (!applyToSelf && strength.baseAmount() > 0);
         return Component.translatable((push ? "action.irons_jewelry.knockback.push" : "action.irons_jewelry.knockback.pull"), target, strengthText);
+    }
+
+    @Override
+    public Component simpleDescription(MutableComponent actionName) {
+        return formatTooltip(new BonusInstance(null, 1.0, Map.of(), Optional.empty()), false);
     }
 
     @Override

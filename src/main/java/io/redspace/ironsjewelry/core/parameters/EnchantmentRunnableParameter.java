@@ -2,6 +2,7 @@ package io.redspace.ironsjewelry.core.parameters;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.enchantment.effects.EnchantmentEntityEffect;
 
 import java.util.Optional;
@@ -24,6 +25,11 @@ public class EnchantmentRunnableParameter implements IBonusParameterType<Enchant
 
     @Override
     public Optional<String> getValueDescriptionId(EnchantmentRunnable value) {
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<Component> getSimpleDescription(EnchantmentRunnable value) {
         return Optional.empty();
     }
 }
