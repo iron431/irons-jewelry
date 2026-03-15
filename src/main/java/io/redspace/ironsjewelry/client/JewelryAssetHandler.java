@@ -27,31 +27,40 @@ import java.util.*;
 
 public class JewelryAssetHandler extends AssetHandler {
 
-    private static PartIngredient get(Holder<PartDefinition> definition, List<PartIngredient> list) {
+    private static int extractDrawOrder(Holder<PartDefinition> definition, List<PartIngredient> list) {
         for (PartIngredient i : list) {
             if (i.part().equals(definition)) {
-                return i;
+                return i.drawOrder();
             }
         }
-        return null;
+        return 0;
     }
 
     @Override
     public @NotNull BakingPreparations makeBakedModelPreparations(ItemStack itemStack, @Nullable ClientLevel clientLevel, @Nullable LivingEntity livingEntity, int seed) {
         JewelryData jewelryData = JewelryData.get(itemStack);
         if (jewelryData.isValid()) {
+            // iterate over the parts and grab sprites based on the material it is made from
             var parts = jewelryData.parts().entrySet();
             if (!parts.isEmpty()) {
                 List<ModelLayer> layers = parts.stream().map(part -> {
                     ResourceLocation sprite = getSpriteLocation(part.getKey(), part.getValue());
-                    return new ModelLayer(sprite, get(part.getKey(), jewelryData.pattern().value().partTemplate()).drawOrder(), Optional.empty());
+                    return new ModelLayer(sprite, extractDrawOrder(part.getKey(), jewelryData.pattern().value().partTemplate()), Optional.empty());
                 }).toList();
 
                 return new BakingPreparations(layers);
             }
+        } else if (jewelryData.pattern() != null) {
+            // iterate over the part template and grab sad menu sprite
+            List<ModelLayer> layers = jewelryData.pattern().value().partTemplate().stream().map(
+                    part -> {
+                        ResourceLocation sprite = getMenuSpriteLocation(part.part(), true);
+                        return new ModelLayer(sprite, extractDrawOrder(part.part(), jewelryData.pattern().value().partTemplate()), Optional.empty());
+                    }
+            ).toList();
+            return new BakingPreparations(layers);
         }
         return new BakingPreparations(List.of());
-
     }
 
     public String getPermutationName(Holder<MaterialDefinition> material) {
