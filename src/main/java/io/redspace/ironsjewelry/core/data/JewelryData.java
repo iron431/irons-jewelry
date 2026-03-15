@@ -47,8 +47,10 @@ public class JewelryData {
             JewelryData::new
     );
 
+    // data
     private final Holder<PatternDefinition> pattern;
     private final Map<Holder<PartDefinition>, Holder<MaterialDefinition>> parts;
+    // cache
     private final boolean valid;
     private final List<BonusInstance> bonuses;
     private final int hashCode;
@@ -58,12 +60,7 @@ public class JewelryData {
         this.parts = parts;
         this.valid = validate();
         this.bonuses = cacheBonuses();
-        AtomicInteger i = new AtomicInteger(1);
-        this.hashCode =
-                pattern.getKey().location().hashCode() +
-                        parts.entrySet().stream().mapToInt(entry ->
-                                (Objects.hashCode(entry.getKey()) ^ Objects.hashCode(entry.getValue())) * ((int) Math.pow(31, i.getAndIncrement()))
-                        ).sum();
+        this.hashCode = Objects.hash(pattern, parts);
     }
 
     private JewelryData(Holder<PatternDefinition> pattern, Map<Holder<PartDefinition>, Holder<MaterialDefinition>> parts, boolean valid, List<BonusInstance> bonuses) {
@@ -71,7 +68,7 @@ public class JewelryData {
         this.parts = parts;
         this.valid = valid;
         this.bonuses = bonuses;
-        this.hashCode = parts.hashCode();
+        this.hashCode = Objects.hash(pattern, parts);
     }
 
     /**
@@ -237,8 +234,8 @@ public class JewelryData {
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof JewelryData other
+        return obj == this || (obj instanceof JewelryData other
                 && this.pattern.equals(other.pattern)
-                && this.parts.equals(other.parts);
+                && this.parts.equals(other.parts));
     }
 }
