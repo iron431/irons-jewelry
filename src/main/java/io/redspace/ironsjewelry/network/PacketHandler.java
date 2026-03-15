@@ -1,6 +1,7 @@
 package io.redspace.ironsjewelry.network;
 
 import io.redspace.ironsjewelry.IronsJewelry;
+import io.redspace.ironsjewelry.network.packets.OpenGuidebookScreenPacket;
 import io.redspace.ironsjewelry.network.packets.ServerboundSetBookmarkPacket;
 import io.redspace.ironsjewelry.network.packets.SetJewelcraftingStationPattern;
 import io.redspace.ironsjewelry.network.packets.SyncJewelcraftingSlotStates;
@@ -19,6 +20,7 @@ public class PacketHandler {
         payloadRegistrar.playToServer(SetJewelcraftingStationPattern.TYPE, SetJewelcraftingStationPattern.STREAM_CODEC, SetJewelcraftingStationPattern::handle);
         payloadRegistrar.playToClient(SyncJewelcraftingSlotStates.TYPE, SyncJewelcraftingSlotStates.STREAM_CODEC, SyncJewelcraftingSlotStates::handle);
         payloadRegistrar.playToClient(SyncPlayerDataPacket.TYPE, SyncPlayerDataPacket.STREAM_CODEC, SyncPlayerDataPacket::handle);
+        payloadRegistrar.playToClient(OpenGuidebookScreenPacket.TYPE, OpenGuidebookScreenPacket.STREAM_CODEC, OpenGuidebookScreenPacket::handle);
 
         payloadRegistrar.playToServer(ServerboundSetBookmarkPacket.TYPE, ServerboundSetBookmarkPacket.STREAM_CODEC, ServerboundSetBookmarkPacket::handle);
 

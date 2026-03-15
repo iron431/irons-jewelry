@@ -8,10 +8,6 @@ public interface IMinecraftInstanceHelper {
     @Nullable
     Player player();
 
-    default void openGuidebookScreen() {
-
-    }
-
     default boolean isLocalInstance() {
         return false;
     }

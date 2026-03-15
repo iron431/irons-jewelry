@@ -2,7 +2,6 @@ package io.redspace.ironsjewelry.client;
 
 import io.redspace.ironsjewelry.IronsJewelry;
 import io.redspace.ironsjewelry.block.jewelcrafting_station.JewelcraftingStationScreen;
-import io.redspace.ironsjewelry.item.book.GuideBookScreen;
 import io.redspace.ironsjewelry.registry.MenuRegistry;
 import io.redspace.ironsjewelry.utils.IMinecraftInstanceHelper;
 import io.redspace.ironsjewelry.utils.MinecraftInstanceHelper;
@@ -30,11 +29,6 @@ public class ClientSetup {
                 @Override
                 public Player player() {
                     return Minecraft.getInstance().player;
-                }
-
-                @Override
-                public void openGuidebookScreen() {
-                    Minecraft.getInstance().setScreen(new GuideBookScreen());
                 }
 
                 @Override
