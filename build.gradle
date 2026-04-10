@@ -119,8 +119,8 @@ dependencies {
 //    localRuntime "curse.maven:playeranimator-658587:6024462"
     // GECKOLIB ***************************************************************************************************
     localRuntime "software.bernie.geckolib:geckolib-neoforge-${minecraft_version}:${geckolib_version}"
-    // PATREON *****************************************************************************************************
-    localRuntime "io.redspace:irons_patreon_lib:${patreon_lib_version}"
+    // IRONSLIB *****************************************************************************************************
+    implementation "io.redspace:irons_lib:${irons_lib_version}"
 }
 
 tasks.withType(ProcessResources).configureEach {
@@ -143,7 +143,7 @@ tasks.withType(ProcessResources).configureEach {
             jei_version            : jei_version,
             curios_version         : curios_version,
             geckolib_version       : geckolib_version,
-            patreon_lib_version    : patreon_lib_version,
+            irons_lib_version      : irons_lib_version,
             mod_logo_file          : mod_logo_file
     ]
     inputs.properties replaceProperties
