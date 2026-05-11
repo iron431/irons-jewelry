@@ -1,7 +1,6 @@
 package io.redspace.ironsjewelry.datagen;
 
 import io.redspace.ironsjewelry.IronsJewelry;
-import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
@@ -28,7 +27,7 @@ public class DataGenerators {
         generator.addProvider(event.includeServer(), (DataProvider.Factory<DatapackBuiltinEntriesProvider>) output -> new DatapackBuiltinEntriesProvider(
                 output,
                 event.getLookupProvider(),
-                IronsJewelryRegistries.builder,
+                JewelryDataRegistryGenerator.builder,
                 Set.of(IronsJewelry.MODID)
         ));
     }
