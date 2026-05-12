@@ -7,6 +7,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
+import com.mojang.serialization.JsonOps;
 import io.redspace.ironsjewelry.IronsJewelry;
 import io.redspace.ironsjewelry.core.data.JewelryData;
 import io.redspace.ironsjewelry.core.data.MaterialDefinition;
@@ -21,6 +22,7 @@ import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -279,8 +281,11 @@ public class IronsDebugCommand {
 
                 var sourceJson = JsonParser.parseString(Files.readString(sourcePath));
                 var generatedJson = JsonParser.parseString(Files.readString(generatedPath));
+                var ops = RegistryOps.create(JsonOps.INSTANCE, source.registryAccess());
+                MaterialDefinition sourceMaterial = MaterialDefinition.CODEC.parse(ops, sourceJson).getOrThrow();
+                MaterialDefinition generatedMaterial = MaterialDefinition.CODEC.parse(ops, generatedJson).getOrThrow();
 
-                if (sourceJson.equals(generatedJson)) {
+                if (sourceMaterial.equals(generatedMaterial)) {
                     matches++;
                 } else {
                     source.sendSystemMessage(Component.literal("  [!=] " + name).withStyle(ChatFormatting.RED));
