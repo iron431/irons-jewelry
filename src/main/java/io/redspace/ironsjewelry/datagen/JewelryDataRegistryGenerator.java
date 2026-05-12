@@ -2,21 +2,48 @@ package io.redspace.ironsjewelry.datagen;
 
 import io.redspace.ironsjewelry.IronsJewelry;
 import io.redspace.ironsjewelry.core.actions.ApplyDamageAction;
-import io.redspace.ironsjewelry.core.data.*;
+import io.redspace.ironsjewelry.core.actions.ApplyEffectAction;
+import io.redspace.ironsjewelry.core.actions.ApplyFreezeAction;
+import io.redspace.ironsjewelry.core.actions.CreateItemsAction;
+import io.redspace.ironsjewelry.core.actions.ExplodeAction;
+import io.redspace.ironsjewelry.core.actions.HealAction;
+import io.redspace.ironsjewelry.core.actions.IgniteAction;
+import io.redspace.ironsjewelry.core.actions.KnockbackAction;
+import io.redspace.ironsjewelry.core.data.AttributeInstance;
+import io.redspace.ironsjewelry.core.data.Bonus;
+import io.redspace.ironsjewelry.core.data.MaterialDefinition;
+import io.redspace.ironsjewelry.core.data.PartDefinition;
+import io.redspace.ironsjewelry.core.data.PartIngredient;
+import io.redspace.ironsjewelry.core.data.PatternDefinition;
+import io.redspace.ironsjewelry.core.data.QualityScalar;
 import io.redspace.ironsjewelry.core.parameters.ActionParameter;
 import io.redspace.ironsjewelry.registry.BonusTypeRegistry;
 import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
 import io.redspace.ironsjewelry.registry.JewelryTypeRegistry;
 import io.redspace.ironsjewelry.registry.ParameterTypeRegistry;
+import io.redspace.ironsjewelry.registry.SoundRegistry;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.core.RegistrySetBuilder;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.damagesource.DamageTypes;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
 import java.util.Map;
@@ -66,6 +93,30 @@ public class JewelryDataRegistryGenerator {
     public static Holder<PatternDefinition> HAGGLER_RING;
     public static Holder<PatternDefinition> BANE_RING;
     public static Holder<PatternDefinition> RHINESTONE_AMULET;
+
+    public static Holder<MaterialDefinition> ALLTHEMODIUM;
+    public static Holder<MaterialDefinition> AMETHYST;
+    public static Holder<MaterialDefinition> BRASS;
+    public static Holder<MaterialDefinition> BRONZE;
+    public static Holder<MaterialDefinition> COPPER;
+    public static Holder<MaterialDefinition> DIAMOND;
+    public static Holder<MaterialDefinition> EMERALD;
+    public static Holder<MaterialDefinition> EXAMPLE;
+    public static Holder<MaterialDefinition> GARNET;
+    public static Holder<MaterialDefinition> GOLD;
+    public static Holder<MaterialDefinition> IRON;
+    public static Holder<MaterialDefinition> LAPIS;
+    public static Holder<MaterialDefinition> MOONSTONE;
+    public static Holder<MaterialDefinition> NETHERITE;
+    public static Holder<MaterialDefinition> ONYX;
+    public static Holder<MaterialDefinition> PERIDOT;
+    public static Holder<MaterialDefinition> PLATINUM;
+    public static Holder<MaterialDefinition> RUBY;
+    public static Holder<MaterialDefinition> SAPPHIRE;
+    public static Holder<MaterialDefinition> SILVER;
+    public static Holder<MaterialDefinition> TOPAZ;
+    public static Holder<MaterialDefinition> UNOBTAINIUM;
+    public static Holder<MaterialDefinition> VIBRANIUM;
 
     private static void bootstrapParts(BootstrapContext<PartDefinition> bootstrap) {
         BAND_SIMPLE = bootstrap.register(partKey(IronsJewelry.id("band_simple")), new PartDefinition(
@@ -333,9 +384,331 @@ public class JewelryDataRegistryGenerator {
         ));
     }
 
+    private static void bootstrapMaterials(BootstrapContext<MaterialDefinition> bootstrap) {
+        HolderGetter<DamageType> damageGetter = bootstrap.lookup(Registries.DAMAGE_TYPE);
+        Holder<SoundEvent> windChargeBurst = BuiltInRegistries.SOUND_EVENT.getHolderOrThrow(
+                ResourceKey.create(Registries.SOUND_EVENT, ResourceLocation.parse("minecraft:entity.wind_charge.wind_burst")));
+
+        ALLTHEMODIUM = bootstrap.register(materialKey(IronsJewelry.id("allthemodium")), new MaterialDefinition(
+                "material.irons_jewelry.allthemodium",
+                Ingredient.of(itemTag("c:ingots/allthemodium")),
+                List.of("metal"),
+                IronsJewelry.id("palettes/allthemodium"),
+                Map.of(
+                        ParameterTypeRegistry.ATTRIBUTE_PARAMETER.get(), new AttributeInstance(Attributes.ARMOR_TOUGHNESS, 2, AttributeModifier.Operation.ADD_VALUE),
+                        ParameterTypeRegistry.POSITIVE_EFFECT_PARAMETER.get(), MobEffects.DAMAGE_RESISTANCE,
+                        ParameterTypeRegistry.NEGATIVE_EFFECT_PARAMETER.get(), MobEffects.MOVEMENT_SLOWDOWN,
+                        ParameterTypeRegistry.ACTION_PARAMETER.get(), new ActionParameter.ActionRunnable(
+                                new ApplyEffectAction(new QualityScalar(120), new QualityScalar(0, 1, 0, Optional.of(2.0)), MobEffects.DAMAGE_BOOST), true)
+                ),
+                3.0
+        ));
+        AMETHYST = bootstrap.register(materialKey(IronsJewelry.id("amethyst")), new MaterialDefinition(
+                "material.irons_jewelry.amethyst",
+                Ingredient.of(itemTag("c:gems/amethyst")),
+                List.of("gem"),
+                IronsJewelry.id("palettes/amethyst"),
+                Map.of(
+                        ParameterTypeRegistry.ATTRIBUTE_PARAMETER.get(), new AttributeInstance(attr("apothic_attributes:armor_pierce"), 1, AttributeModifier.Operation.ADD_VALUE),
+                        ParameterTypeRegistry.POSITIVE_EFFECT_PARAMETER.get(), MobEffects.REGENERATION,
+                        ParameterTypeRegistry.NEGATIVE_EFFECT_PARAMETER.get(), MobEffects.POISON,
+                        ParameterTypeRegistry.ACTION_PARAMETER.get(), new ActionParameter.ActionRunnable(
+                                new ApplyDamageAction(damageGetter.getOrThrow(DamageTypes.THORNS), new QualityScalar(3.0, 1), Optional.empty(), Optional.empty()), false)
+                ),
+                1
+        ));
+        BRASS = bootstrap.register(materialKey(IronsJewelry.id("brass")), new MaterialDefinition(
+                "material.irons_jewelry.brass",
+                Ingredient.of(itemTag("c:ingots/brass")),
+                List.of("metal"),
+                IronsJewelry.id("palettes/brass"),
+                Map.of(
+                        ParameterTypeRegistry.ATTRIBUTE_PARAMETER.get(), new AttributeInstance(Attributes.KNOCKBACK_RESISTANCE, 0.1, AttributeModifier.Operation.ADD_VALUE)
+                ),
+                0.75
+        ));
+        BRONZE = bootstrap.register(materialKey(IronsJewelry.id("bronze")), new MaterialDefinition(
+                "material.irons_jewelry.bronze",
+                Ingredient.of(itemTag("c:ingots/bronze")),
+                List.of("metal"),
+                IronsJewelry.id("palettes/bronze"),
+                Map.of(
+                        ParameterTypeRegistry.ATTRIBUTE_PARAMETER.get(), new AttributeInstance(attr("neoforge:swim_speed"), 0.10, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL)
+                ),
+                1.0
+        ));
+        COPPER = bootstrap.register(materialKey(IronsJewelry.id("copper")), new MaterialDefinition(
+                "material.irons_jewelry.copper",
+                Ingredient.of(itemTag("c:ingots/copper")),
+                List.of("metal"),
+                IronsJewelry.id("palettes/copper"),
+                Map.of(
+                        ParameterTypeRegistry.ATTRIBUTE_PARAMETER.get(), new AttributeInstance(Attributes.ATTACK_SPEED, 0.10, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL),
+                        ParameterTypeRegistry.POSITIVE_EFFECT_PARAMETER.get(), MobEffects.DIG_SPEED,
+                        ParameterTypeRegistry.NEGATIVE_EFFECT_PARAMETER.get(), MobEffects.POISON,
+                        ParameterTypeRegistry.ACTION_PARAMETER.get(), new ActionParameter.ActionRunnable(
+                                new ApplyDamageAction(damageGetter.getOrThrow(DamageTypes.LIGHTNING_BOLT), new QualityScalar(3.0, 1), Optional.empty(), Optional.empty()), false)
+                ),
+                0.5
+        ));
+        DIAMOND = bootstrap.register(materialKey(IronsJewelry.id("diamond")), new MaterialDefinition(
+                "material.irons_jewelry.diamond",
+                Ingredient.of(itemTag("c:gems/diamond")),
+                List.of("gem"),
+                IronsJewelry.id("palettes/diamond"),
+                Map.of(
+                        ParameterTypeRegistry.ATTRIBUTE_PARAMETER.get(), new AttributeInstance(Attributes.ARMOR, 2, AttributeModifier.Operation.ADD_VALUE),
+                        ParameterTypeRegistry.POSITIVE_EFFECT_PARAMETER.get(), MobEffects.DAMAGE_RESISTANCE,
+                        ParameterTypeRegistry.NEGATIVE_EFFECT_PARAMETER.get(), MobEffects.WEAKNESS,
+                        ParameterTypeRegistry.ACTION_PARAMETER.get(), new ActionParameter.ActionRunnable(
+                                new ApplyDamageAction(damageGetter.getOrThrow(DamageTypes.MAGIC), new QualityScalar(1.0, 1), Optional.empty(), Optional.empty()), false)
+                ),
+                2
+        ));
+        EMERALD = bootstrap.register(materialKey(IronsJewelry.id("emerald")), new MaterialDefinition(
+                "material.irons_jewelry.emerald",
+                Ingredient.of(itemTag("c:gems/emerald")),
+                List.of("emerald", "gem"),
+                IronsJewelry.id("palettes/emerald"),
+                Map.of(
+                        ParameterTypeRegistry.ATTRIBUTE_PARAMETER.get(), new AttributeInstance(Attributes.MOVEMENT_SPEED, 0.05, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL),
+                        ParameterTypeRegistry.POSITIVE_EFFECT_PARAMETER.get(), MobEffects.MOVEMENT_SPEED,
+                        ParameterTypeRegistry.NEGATIVE_EFFECT_PARAMETER.get(), MobEffects.INFESTED,
+                        ParameterTypeRegistry.ACTION_PARAMETER.get(), new ActionParameter.ActionRunnable(
+                                new CreateItemsAction(
+                                        Optional.of(new QualityScalar(0.05, 0.05, 0.01, Optional.of(1.0))),
+                                        Items.EMERALD.builtInRegistryHolder(),
+                                        Optional.of(SoundRegistry.EMERALDS),
+                                        new QualityScalar(1),
+                                        new QualityScalar(4, 2)
+                                ), false)
+                ),
+                1.5
+        ));
+        EXAMPLE = bootstrap.register(materialKey(IronsJewelry.id("example")), new MaterialDefinition(
+                "material.irons_jewelry.example",
+                Ingredient.EMPTY,
+                List.of(),
+                IronsJewelry.id("palettes/silver"),
+                Map.of(),
+                1.0
+        ));
+        GARNET = bootstrap.register(materialKey(IronsJewelry.id("garnet")), new MaterialDefinition(
+                "material.irons_jewelry.garnet",
+                Ingredient.of(itemTag("c:gems/garnet")),
+                List.of("gem"),
+                IronsJewelry.id("palettes/garnet"),
+                Map.of(
+                        ParameterTypeRegistry.ATTRIBUTE_PARAMETER.get(), new AttributeInstance(Attributes.ATTACK_DAMAGE, 0.04, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL),
+                        ParameterTypeRegistry.NEGATIVE_EFFECT_PARAMETER.get(), MobEffects.WITHER,
+                        ParameterTypeRegistry.ACTION_PARAMETER.get(), new ActionParameter.ActionRunnable(
+                                new ApplyEffectAction(new QualityScalar(80), new QualityScalar(0, 1, 0, Optional.of(2.0)), MobEffects.DAMAGE_RESISTANCE), true)
+                ),
+                2
+        ));
+        GOLD = bootstrap.register(materialKey(IronsJewelry.id("gold")), new MaterialDefinition(
+                "material.irons_jewelry.gold",
+                Ingredient.of(itemTag("c:ingots/gold")),
+                List.of("metal", "gold"),
+                IronsJewelry.id("palettes/gold"),
+                Map.of(
+                        ParameterTypeRegistry.ATTRIBUTE_PARAMETER.get(), new AttributeInstance(attr("apothic_attributes:mining_speed"), 0.10, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL),
+                        ParameterTypeRegistry.POSITIVE_EFFECT_PARAMETER.get(), MobEffects.FIRE_RESISTANCE,
+                        ParameterTypeRegistry.NEGATIVE_EFFECT_PARAMETER.get(), MobEffects.POISON,
+                        ParameterTypeRegistry.ACTION_PARAMETER.get(), new ActionParameter.ActionRunnable(
+                                new IgniteAction(new QualityScalar(40.0)), false)
+                ),
+                1.5
+        ));
+        IRON = bootstrap.register(materialKey(IronsJewelry.id("iron")), new MaterialDefinition(
+                "material.irons_jewelry.iron",
+                Ingredient.of(itemTag("c:ingots/iron")),
+                List.of("metal"),
+                IronsJewelry.id("palettes/iron"),
+                Map.of(
+                        ParameterTypeRegistry.ATTRIBUTE_PARAMETER.get(), new AttributeInstance(Attributes.ARMOR, 2, AttributeModifier.Operation.ADD_VALUE),
+                        ParameterTypeRegistry.POSITIVE_EFFECT_PARAMETER.get(), MobEffects.DAMAGE_RESISTANCE,
+                        ParameterTypeRegistry.NEGATIVE_EFFECT_PARAMETER.get(), MobEffects.MOVEMENT_SLOWDOWN,
+                        ParameterTypeRegistry.ACTION_PARAMETER.get(), new ActionParameter.ActionRunnable(
+                                new KnockbackAction(new QualityScalar(2.0, 1.0)), false)
+                ),
+                0.75
+        ));
+        LAPIS = bootstrap.register(materialKey(IronsJewelry.id("lapis")), new MaterialDefinition(
+                "material.irons_jewelry.lapis",
+                Ingredient.of(itemTag("c:gems/lapis")),
+                List.of("gem"),
+                IronsJewelry.id("palettes/lapis"),
+                Map.of(
+                        ParameterTypeRegistry.ATTRIBUTE_PARAMETER.get(), new AttributeInstance(attr("apothic_attributes:experience_gained"), 0.10, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL),
+                        ParameterTypeRegistry.NEGATIVE_EFFECT_PARAMETER.get(), MobEffects.GLOWING,
+                        ParameterTypeRegistry.ACTION_PARAMETER.get(), new ActionParameter.ActionRunnable(
+                                new ApplyEffectAction(new QualityScalar(80), new QualityScalar(0, 1, 0, Optional.of(2.0)), MobEffects.MOVEMENT_SLOWDOWN), false)
+                ),
+                1
+        ));
+        MOONSTONE = bootstrap.register(materialKey(IronsJewelry.id("moonstone")), new MaterialDefinition(
+                "material.irons_jewelry.moonstone",
+                Ingredient.of(itemTag("c:gems/moonstone")),
+                List.of("gem"),
+                IronsJewelry.id("palettes/moonstone"),
+                Map.of(
+                        ParameterTypeRegistry.ATTRIBUTE_PARAMETER.get(), new AttributeInstance(attr("apothic_attributes:arrow_damage"), 0.1, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL),
+                        ParameterTypeRegistry.NEGATIVE_EFFECT_PARAMETER.get(), MobEffects.WEAVING,
+                        ParameterTypeRegistry.POSITIVE_EFFECT_PARAMETER.get(), MobEffects.INVISIBILITY,
+                        ParameterTypeRegistry.ACTION_PARAMETER.get(), new ActionParameter.ActionRunnable(
+                                new ExplodeAction(false, false, "action.irons_jewelry.explode.wind_burst",
+                                        Optional.empty(), Optional.of(new QualityScalar(2.5)), Optional.empty(), Vec3.ZERO,
+                                        new QualityScalar(2, 1), false, Level.ExplosionInteraction.NONE,
+                                        ParticleTypes.GUST_EMITTER_SMALL, ParticleTypes.GUST_EMITTER_LARGE, windChargeBurst), false)
+                ),
+                2
+        ));
+        NETHERITE = bootstrap.register(materialKey(IronsJewelry.id("netherite")), new MaterialDefinition(
+                "material.irons_jewelry.netherite",
+                Ingredient.of(itemTag("c:ingots/netherite")),
+                List.of("metal"),
+                IronsJewelry.id("palettes/netherite"),
+                Map.of(
+                        ParameterTypeRegistry.ATTRIBUTE_PARAMETER.get(), new AttributeInstance(Attributes.ATTACK_DAMAGE, 0.05, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL),
+                        ParameterTypeRegistry.POSITIVE_EFFECT_PARAMETER.get(), MobEffects.DAMAGE_BOOST,
+                        ParameterTypeRegistry.NEGATIVE_EFFECT_PARAMETER.get(), MobEffects.WITHER,
+                        ParameterTypeRegistry.ACTION_PARAMETER.get(), new ActionParameter.ActionRunnable(
+                                new ApplyEffectAction(new QualityScalar(60), new QualityScalar(0, 1, 0, Optional.of(2.0)), MobEffects.DAMAGE_BOOST), true)
+                ),
+                2.5
+        ));
+        ONYX = bootstrap.register(materialKey(IronsJewelry.id("onyx")), new MaterialDefinition(
+                "material.irons_jewelry.onyx",
+                Ingredient.of(itemTag("c:gems/onyx")),
+                List.of("gem"),
+                IronsJewelry.id("palettes/onyx"),
+                Map.of(
+                        ParameterTypeRegistry.ATTRIBUTE_PARAMETER.get(), new AttributeInstance(attr("apothic_attributes:crit_damage"), 0.15, AttributeModifier.Operation.ADD_VALUE),
+                        ParameterTypeRegistry.NEGATIVE_EFFECT_PARAMETER.get(), MobEffects.BLINDNESS,
+                        ParameterTypeRegistry.ACTION_PARAMETER.get(), new ActionParameter.ActionRunnable(
+                                new HealAction(new QualityScalar(4.0, 2.0)), true)
+                ),
+                2
+        ));
+        PERIDOT = bootstrap.register(materialKey(IronsJewelry.id("peridot")), new MaterialDefinition(
+                "material.irons_jewelry.peridot",
+                Ingredient.of(itemTag("c:gems/peridot")),
+                List.of("gem"),
+                IronsJewelry.id("palettes/peridot"),
+                Map.of(
+                        ParameterTypeRegistry.ATTRIBUTE_PARAMETER.get(), new AttributeInstance(attr("apothic_attributes:mining_speed"), 0.10, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL),
+                        ParameterTypeRegistry.NEGATIVE_EFFECT_PARAMETER.get(), MobEffects.POISON,
+                        ParameterTypeRegistry.POSITIVE_EFFECT_PARAMETER.get(), MobEffects.DIG_SPEED,
+                        ParameterTypeRegistry.ACTION_PARAMETER.get(), new ActionParameter.ActionRunnable(
+                                new KnockbackAction(new QualityScalar(-2.0, -1.0)), false)
+                ),
+                2
+        ));
+        PLATINUM = bootstrap.register(materialKey(IronsJewelry.id("platinum")), new MaterialDefinition(
+                "material.irons_jewelry.platinum",
+                Ingredient.of(itemTag("c:ingots/platinum")),
+                List.of("metal"),
+                IronsJewelry.id("palettes/platinum"),
+                Map.of(
+                        ParameterTypeRegistry.ATTRIBUTE_PARAMETER.get(), new AttributeInstance(attr("apothic_attributes:armor_pierce"), 1, AttributeModifier.Operation.ADD_VALUE),
+                        ParameterTypeRegistry.POSITIVE_EFFECT_PARAMETER.get(), MobEffects.DAMAGE_RESISTANCE,
+                        ParameterTypeRegistry.NEGATIVE_EFFECT_PARAMETER.get(), MobEffects.WEAKNESS,
+                        ParameterTypeRegistry.ACTION_PARAMETER.get(), new ActionParameter.ActionRunnable(
+                                new KnockbackAction(new QualityScalar(2.0, 1.0)), false)
+                ),
+                2.0
+        ));
+        RUBY = bootstrap.register(materialKey(IronsJewelry.id("ruby")), new MaterialDefinition(
+                "material.irons_jewelry.ruby",
+                Ingredient.of(itemTag("c:gems/ruby")),
+                List.of("gem"),
+                IronsJewelry.id("palettes/ruby"),
+                Map.of(
+                        ParameterTypeRegistry.ATTRIBUTE_PARAMETER.get(), new AttributeInstance(Attributes.MAX_HEALTH, 2, AttributeModifier.Operation.ADD_VALUE),
+                        ParameterTypeRegistry.NEGATIVE_EFFECT_PARAMETER.get(), MobEffects.HUNGER,
+                        ParameterTypeRegistry.ACTION_PARAMETER.get(), new ActionParameter.ActionRunnable(
+                                new IgniteAction(new QualityScalar(40.0)), false)
+                ),
+                2
+        ));
+        SAPPHIRE = bootstrap.register(materialKey(IronsJewelry.id("sapphire")), new MaterialDefinition(
+                "material.irons_jewelry.sapphire",
+                Ingredient.of(itemTag("c:gems/sapphire")),
+                List.of("gem"),
+                IronsJewelry.id("palettes/sapphire"),
+                Map.of(
+                        ParameterTypeRegistry.ATTRIBUTE_PARAMETER.get(), new AttributeInstance(attr("apothic_attributes:dodge_chance"), 0.03, AttributeModifier.Operation.ADD_VALUE),
+                        ParameterTypeRegistry.NEGATIVE_EFFECT_PARAMETER.get(), MobEffects.MOVEMENT_SLOWDOWN,
+                        ParameterTypeRegistry.ACTION_PARAMETER.get(), new ActionParameter.ActionRunnable(
+                                new ApplyFreezeAction(new QualityScalar(40.0), false), false)
+                ),
+                2
+        ));
+        SILVER = bootstrap.register(materialKey(IronsJewelry.id("silver")), new MaterialDefinition(
+                "material.irons_jewelry.silver",
+                Ingredient.of(itemTag("c:ingots/silver")),
+                List.of("metal"),
+                IronsJewelry.id("palettes/silver"),
+                Map.of(
+                        ParameterTypeRegistry.ATTRIBUTE_PARAMETER.get(), new AttributeInstance(Attributes.MOVEMENT_SPEED, 0.05, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL),
+                        ParameterTypeRegistry.POSITIVE_EFFECT_PARAMETER.get(), MobEffects.MOVEMENT_SPEED,
+                        ParameterTypeRegistry.NEGATIVE_EFFECT_PARAMETER.get(), MobEffects.BAD_OMEN,
+                        ParameterTypeRegistry.ACTION_PARAMETER.get(), new ActionParameter.ActionRunnable(
+                                new ExplodeAction(false, false, "action.irons_jewelry.explode.wind_burst",
+                                        Optional.empty(), Optional.of(new QualityScalar(2.5)), Optional.empty(), Vec3.ZERO,
+                                        new QualityScalar(2, 1.5), false, Level.ExplosionInteraction.NONE,
+                                        ParticleTypes.GUST_EMITTER_SMALL, ParticleTypes.GUST_EMITTER_LARGE, windChargeBurst), true)
+                ),
+                1
+        ));
+        TOPAZ = bootstrap.register(materialKey(IronsJewelry.id("topaz")), new MaterialDefinition(
+                "material.irons_jewelry.topaz",
+                Ingredient.of(itemTag("c:gems/topaz")),
+                List.of("gem"),
+                IronsJewelry.id("palettes/topaz"),
+                Map.of(
+                        ParameterTypeRegistry.ATTRIBUTE_PARAMETER.get(), new AttributeInstance(Attributes.ARMOR_TOUGHNESS, 2, AttributeModifier.Operation.ADD_VALUE),
+                        ParameterTypeRegistry.NEGATIVE_EFFECT_PARAMETER.get(), MobEffects.LEVITATION,
+                        ParameterTypeRegistry.ACTION_PARAMETER.get(), new ActionParameter.ActionRunnable(
+                                new KnockbackAction(new QualityScalar(-2.0, -1.0)), true)
+                ),
+                2
+        ));
+        UNOBTAINIUM = bootstrap.register(materialKey(IronsJewelry.id("unobtainium")), new MaterialDefinition(
+                "material.irons_jewelry.unobtainium",
+                Ingredient.of(itemTag("c:ingots/unobtainium")),
+                List.of("metal"),
+                IronsJewelry.id("palettes/unobtainium"),
+                Map.of(
+                        ParameterTypeRegistry.ATTRIBUTE_PARAMETER.get(), new AttributeInstance(Attributes.ARMOR_TOUGHNESS, 2, AttributeModifier.Operation.ADD_VALUE),
+                        ParameterTypeRegistry.POSITIVE_EFFECT_PARAMETER.get(), MobEffects.DAMAGE_RESISTANCE,
+                        ParameterTypeRegistry.NEGATIVE_EFFECT_PARAMETER.get(), MobEffects.MOVEMENT_SLOWDOWN,
+                        ParameterTypeRegistry.ACTION_PARAMETER.get(), new ActionParameter.ActionRunnable(
+                                new ApplyEffectAction(new QualityScalar(120), new QualityScalar(0, 1, 0, Optional.of(2.0)), MobEffects.DAMAGE_BOOST), true)
+                ),
+                4
+        ));
+        VIBRANIUM = bootstrap.register(materialKey(IronsJewelry.id("vibranium")), new MaterialDefinition(
+                "material.irons_jewelry.vibranium",
+                Ingredient.of(itemTag("c:ingots/vibranium")),
+                List.of("metal"),
+                IronsJewelry.id("palettes/vibranium"),
+                Map.of(
+                        ParameterTypeRegistry.ATTRIBUTE_PARAMETER.get(), new AttributeInstance(Attributes.ARMOR_TOUGHNESS, 2, AttributeModifier.Operation.ADD_VALUE),
+                        ParameterTypeRegistry.POSITIVE_EFFECT_PARAMETER.get(), MobEffects.DAMAGE_RESISTANCE,
+                        ParameterTypeRegistry.NEGATIVE_EFFECT_PARAMETER.get(), MobEffects.MOVEMENT_SLOWDOWN,
+                        ParameterTypeRegistry.ACTION_PARAMETER.get(), new ActionParameter.ActionRunnable(
+                                new ApplyEffectAction(new QualityScalar(120), new QualityScalar(0, 1, 0, Optional.of(2.0)), MobEffects.DAMAGE_BOOST), true)
+                ),
+                3.5
+        ));
+    }
+
     public static final RegistrySetBuilder builder = new RegistrySetBuilder()
             .add(IronsJewelryRegistries.Keys.PART_REGISTRY_KEY, JewelryDataRegistryGenerator::bootstrapParts)
-            .add(IronsJewelryRegistries.Keys.PATTERN_REGISTRY_KEY, JewelryDataRegistryGenerator::bootstrapPatterns);
+            .add(IronsJewelryRegistries.Keys.PATTERN_REGISTRY_KEY, JewelryDataRegistryGenerator::bootstrapPatterns)
+            .add(IronsJewelryRegistries.Keys.MATERIAL_REGISTRY_KEY, JewelryDataRegistryGenerator::bootstrapMaterials);
 
     private static ResourceKey<PatternDefinition> patternKey(ResourceLocation location) {
         return ResourceKey.create(IronsJewelryRegistries.Keys.PATTERN_REGISTRY_KEY, location);
@@ -347,5 +720,14 @@ public class JewelryDataRegistryGenerator {
 
     private static ResourceKey<MaterialDefinition> materialKey(ResourceLocation location) {
         return ResourceKey.create(IronsJewelryRegistries.Keys.MATERIAL_REGISTRY_KEY, location);
+    }
+
+    private static Holder<Attribute> attr(String id) {
+        return BuiltInRegistries.ATTRIBUTE.getHolderOrThrow(
+                ResourceKey.create(Registries.ATTRIBUTE, ResourceLocation.parse(id)));
+    }
+
+    private static TagKey<Item> itemTag(String tag) {
+        return TagKey.create(Registries.ITEM, ResourceLocation.parse(tag));
     }
 }

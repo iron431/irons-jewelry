@@ -1,0 +1,31 @@
+{
+  "bonusParameters": {
+    "irons_jewelry:action": {
+      "action": {
+        "type": "irons_jewelry:apply_freeze",
+        "amount": {
+          "base": 40.0,
+          "scalar": 0.0
+        }
+      },
+      "targetSelf": false
+    },
+    "irons_jewelry:attribute": {
+      "amount": 0.03,
+      "attribute": "apothic_attributes:dodge_chance",
+      "operation": "add_value"
+    },
+    "irons_jewelry:negative_effect": {
+      "effect": "minecraft:slowness"
+    }
+  },
+  "descriptionId": "material.irons_jewelry.sapphire",
+  "ingredient": {
+    "tag": "c:gems/sapphire"
+  },
+  "materialType": [
+    "gem"
+  ],
+  "paletteLocation": "irons_jewelry:palettes/sapphire",
+  "quality": 2.0
+}

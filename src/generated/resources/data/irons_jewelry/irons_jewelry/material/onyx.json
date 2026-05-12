@@ -1,0 +1,31 @@
+{
+  "bonusParameters": {
+    "irons_jewelry:action": {
+      "action": {
+        "type": "irons_jewelry:heal",
+        "amount": {
+          "base": 4.0,
+          "scalar": 2.0
+        }
+      },
+      "targetSelf": true
+    },
+    "irons_jewelry:attribute": {
+      "amount": 0.15,
+      "attribute": "apothic_attributes:crit_damage",
+      "operation": "add_value"
+    },
+    "irons_jewelry:negative_effect": {
+      "effect": "minecraft:blindness"
+    }
+  },
+  "descriptionId": "material.irons_jewelry.onyx",
+  "ingredient": {
+    "tag": "c:gems/onyx"
+  },
+  "materialType": [
+    "gem"
+  ],
+  "paletteLocation": "irons_jewelry:palettes/onyx",
+  "quality": 2.0
+}

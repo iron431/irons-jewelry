@@ -1,0 +1,18 @@
+{
+  "bonusParameters": {
+    "irons_jewelry:attribute": {
+      "amount": 0.1,
+      "attribute": "neoforge:swim_speed",
+      "operation": "add_multiplied_total"
+    }
+  },
+  "descriptionId": "material.irons_jewelry.bronze",
+  "ingredient": {
+    "tag": "c:ingots/bronze"
+  },
+  "materialType": [
+    "metal"
+  ],
+  "paletteLocation": "irons_jewelry:palettes/bronze",
+  "quality": 1.0
+}
