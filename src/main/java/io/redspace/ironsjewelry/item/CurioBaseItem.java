@@ -33,7 +33,7 @@ import top.theillusivec4.curios.api.type.capability.ICurioItem;
 import java.util.*;
 
 public class CurioBaseItem extends Item implements ICurioItem {
-    String slotIdentifier = "";
+    String slotIdentifier;
 
     public CurioBaseItem(Item.Properties properties, String slot) {
         super(properties);
@@ -77,11 +77,21 @@ public class CurioBaseItem extends Item implements ICurioItem {
     }
 
     @Override
-    public Component getName(ItemStack itemStack) {
+    public @NotNull Component getName(ItemStack itemStack) {
         if (!itemStack.has(DataComponents.ITEM_NAME)) {
             itemStack.set(DataComponents.ITEM_NAME, JewelryData.get(itemStack).getItemName());
         }
         return Optional.ofNullable(itemStack.get(DataComponents.ITEM_NAME)).orElse(super.getName(itemStack));
+    }
+
+    @Override
+    public void verifyComponentsAfterLoad(@NotNull ItemStack stack) {
+        super.verifyComponentsAfterLoad(stack);
+        if (stack.has(ComponentRegistry.JEWELRY_COMPONENT)) {
+            if (!stack.get(ComponentRegistry.JEWELRY_COMPONENT).isValid()) {
+                stack.remove(DataComponents.ITEM_NAME);
+            }
+        }
     }
 
     public static List<Component> getShiftDescription(PatternDefinition pattern, Map<Holder<PartDefinition>, Holder<MaterialDefinition>> parts, Optional<List<Integer>> materialCost) {
@@ -134,7 +144,7 @@ public class CurioBaseItem extends Item implements ICurioItem {
     }
 
     @Override
-    public boolean makesPiglinsNeutral(ItemStack stack, LivingEntity wearer) {
+    public boolean makesPiglinsNeutral(@NotNull ItemStack stack, @NotNull LivingEntity wearer) {
         return wearer instanceof Player player && Utils.getEquippedBonuses(player).stream().map(BonusInstance::bonusType).anyMatch(bonus -> bonus instanceof PiglinNeutralBonusType);
     }
 

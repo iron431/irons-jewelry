@@ -10,6 +10,7 @@ import io.redspace.ironsjewelry.core.data.JewelryData;
 import io.redspace.ironsjewelry.core.data.MaterialDefinition;
 import io.redspace.ironsjewelry.core.data.PartDefinition;
 import io.redspace.ironsjewelry.core.data.PartIngredient;
+import io.redspace.ironsjewelry.core.data.PatternDefinition;
 import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
 import net.minecraft.ResourceLocationException;
 import net.minecraft.client.Minecraft;
@@ -17,6 +18,7 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.texture.atlas.SpriteSource;
 import net.minecraft.client.renderer.texture.atlas.sources.PalettedPermutations;
 import net.minecraft.core.Holder;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
@@ -50,15 +52,23 @@ public class JewelryAssetHandler extends AssetHandler {
 
                 return new BakingPreparations(layers);
             }
-        } else if (jewelryData.pattern() != null) {
-            // iterate over the part template and grab sad menu sprite
-            List<ModelLayer> layers = jewelryData.pattern().value().partTemplate().stream().map(
-                    part -> {
-                        ResourceLocation sprite = getMenuSpriteLocation(part.part(), true);
-                        return new ModelLayer(sprite, extractDrawOrder(part.part(), jewelryData.pattern().value().partTemplate()), Optional.empty());
-                    }
-            ).toList();
-            return new BakingPreparations(layers);
+        } else {
+            Holder<PatternDefinition> pattern = jewelryData.pattern();
+            if (pattern == null && clientLevel != null) {
+                // replace invalid pattern with simple band so something always renders
+                pattern = IronsJewelryRegistries.patternRegistry(clientLevel.registryAccess()).getHolderOrThrow(ResourceKey.create(IronsJewelryRegistries.Keys.PATTERN_REGISTRY_KEY, IronsJewelry.id("simple_band")));
+            }
+            if (pattern != null) {
+                // iterate over the part template and grab sad menu sprite
+                var patternValue = pattern.value();
+                List<ModelLayer> layers = patternValue.partTemplate().stream().map(
+                        part -> {
+                            ResourceLocation sprite = getMenuSpriteLocation(part.part(), true);
+                            return new ModelLayer(sprite, extractDrawOrder(part.part(), patternValue.partTemplate()), Optional.empty());
+                        }
+                ).toList();
+                return new BakingPreparations(layers);
+            }
         }
         return new BakingPreparations(List.of());
     }
