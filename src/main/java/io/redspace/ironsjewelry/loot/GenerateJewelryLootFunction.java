@@ -16,6 +16,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunction;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
@@ -31,7 +32,7 @@ public record GenerateJewelryLootFunction(
     ).apply(builder, GenerateJewelryLootFunction::new));
 
     @Override
-    public LootItemFunctionType<? extends LootItemFunction> getType() {
+    public @NotNull LootItemFunctionType<? extends LootItemFunction> getType() {
         return LootRegistry.GENERATE_JEWELRY.get();
     }
 
