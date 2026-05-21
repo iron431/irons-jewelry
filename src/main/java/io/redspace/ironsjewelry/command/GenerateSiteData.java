@@ -1,6 +1,5 @@
 package io.redspace.ironsjewelry.command;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -14,6 +13,7 @@ import io.redspace.ironsjewelry.core.parameters.IBonusParameterType;
 import io.redspace.ironsjewelry.registry.AssetHandlerRegistry;
 import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
 import io.redspace.ironsjewelry.registry.ItemRegistry;
+import io.redspace.ironsjewelry.utils.JewelryModTags;
 import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
@@ -41,7 +41,6 @@ import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
@@ -111,26 +110,13 @@ public class GenerateSiteData {
             - name: "%s"
               icon: "/img/materials/%s.png"
               source: "%s"
+              group: "%s"
               quality: %s
-              types: "%s"
               bonus_types: "%s"
               bonus_values: "%s"
               sort: "%s"
             
             """;
-    private static final Path GENERATED_DATA_ROOT = Path.of("src", "generated", "resources", "data", "irons_jewelry");
-    private static final Path GENERATED_MATERIAL_TAGS_PATH = GENERATED_DATA_ROOT.resolve(Path.of("tags", "irons_jewelry", "material"));
-    private static final Path MAIN_MATERIAL_TAGS_PATH = Path.of("src", "main", "resources", "data", "irons_jewelry", "tags", "irons_jewelry", "material");
-    private static final Path PART_DATA_PATH = GENERATED_DATA_ROOT.resolve(Path.of("irons_jewelry", "part"));
-    private static final LinkedHashMap<String, String> MATERIAL_TYPE_LABELS = new LinkedHashMap<>();
-
-    static {
-        MATERIAL_TYPE_LABELS.put("metal", "Metal");
-        MATERIAL_TYPE_LABELS.put("gem", "Gem");
-        MATERIAL_TYPE_LABELS.put("gold", "Gold");
-        MATERIAL_TYPE_LABELS.put("emerald", "Emerald");
-    }
-
     protected static int generateSiteData(CommandSourceStack source) {
         generateRecipeData(source);
 
@@ -150,9 +136,6 @@ public class GenerateSiteData {
     private static void generateRecipeData(CommandSourceStack source) {
         try {
             var itemBuilder = new StringBuilder();
-            var armorBuilder = new StringBuilder();
-            var spellbookBuilder = new StringBuilder();
-            var curioBuilder = new StringBuilder();
             var blockBuilder = new StringBuilder();
             level = source.getLevel();
 
@@ -376,53 +359,13 @@ public class GenerateSiteData {
         return handleCapitalization(Component.translatable(descriptionId).getString());
     }
 
-    private static Map<String, LinkedHashSet<String>> loadMaterialTypeLabels() {
-        Map<String, LinkedHashSet<String>> materialToLabels = new HashMap<>();
-        for (Map.Entry<String, String> entry : MATERIAL_TYPE_LABELS.entrySet()) {
-            Path tagPath = GENERATED_MATERIAL_TAGS_PATH.resolve(entry.getKey() + ".json");
-            if (!Files.exists(tagPath)) {
-                tagPath = MAIN_MATERIAL_TAGS_PATH.resolve(entry.getKey() + ".json");
-            }
-            if (!Files.exists(tagPath)) {
-                continue;
-            }
-            try {
-                JsonObject root = JsonParser.parseString(Files.readString(tagPath, StandardCharsets.UTF_8)).getAsJsonObject();
-                if (!root.has("values")) {
-                    continue;
-                }
-                JsonArray values = root.getAsJsonArray("values");
-                for (JsonElement value : values) {
-                    if (!value.isJsonPrimitive()) {
-                        continue;
-                    }
-                    String id = value.getAsString();
-                    if (id.startsWith("#")) {
-                        continue;
-                    }
-                    materialToLabels.computeIfAbsent(id, key -> new LinkedHashSet<>()).add(entry.getValue());
-                }
-            } catch (Exception e) {
-                IronsJewelry.LOGGER.debug("Failed to parse material tag file {}: {}", tagPath, e.getMessage());
-            }
-        }
-        return materialToLabels;
-    }
-
-    private static String resolveMaterialTypeLabels(ResourceLocation materialId, Map<String, LinkedHashSet<String>> materialTypeMap) {
-        var labels = materialTypeMap.getOrDefault(materialId.toString(), new LinkedHashSet<>());
-        return labels.stream()
-                .filter(label -> !materialId.toString().contains(label.toLowerCase(Locale.ROOT)))
-                .collect(Collectors.joining(", "));
-    }
-
     private static String parseAllowedMaterialsLabel(ResourceLocation partId) {
-        Path partPath = PART_DATA_PATH.resolve(partId.getPath() + ".json");
-        if (!Files.exists(partPath)) {
+        var rootOpt = loadRegistryDataJson(partId, "part");
+        if (rootOpt.isEmpty()) {
             return "Any";
         }
         try {
-            JsonObject root = JsonParser.parseString(Files.readString(partPath, StandardCharsets.UTF_8)).getAsJsonObject();
+            JsonObject root = rootOpt.get();
             if (!root.has("allowedMaterials")) {
                 return "Any";
             }
@@ -430,8 +373,25 @@ public class GenerateSiteData {
             parseHolderSetValues(root.get("allowedMaterials"), labels);
             return labels.isEmpty() ? "Any" : String.join(", ", labels);
         } catch (Exception e) {
-            IronsJewelry.LOGGER.debug("Failed to parse part json {}: {}", partPath, e.getMessage());
+            IronsJewelry.LOGGER.debug("Failed to parse part registry json {}: {}", partId, e.getMessage());
             return "Any";
+        }
+    }
+
+    private static Optional<JsonObject> loadRegistryDataJson(ResourceLocation id, String registryPath) {
+        if (level == null || level.getServer() == null) {
+            return Optional.empty();
+        }
+        ResourceLocation dataPath = ResourceLocation.fromNamespaceAndPath(id.getNamespace(), "irons_jewelry/" + registryPath + "/" + id.getPath() + ".json");
+        var resourceOpt = level.getServer().getResourceManager().getResource(dataPath);
+        if (resourceOpt.isEmpty()) {
+            return Optional.empty();
+        }
+        try (var reader = resourceOpt.get().openAsReader()) {
+            return Optional.of(JsonParser.parseReader(reader).getAsJsonObject());
+        } catch (Exception e) {
+            IronsJewelry.LOGGER.debug("Failed to load data json {}: {}", dataPath, e.getMessage());
+            return Optional.empty();
         }
     }
 
@@ -462,7 +422,7 @@ public class GenerateSiteData {
     private static String holderSetEntryLabel(String entry) {
         if (entry.startsWith("#")) {
             ResourceLocation tagId = ResourceLocation.parse(entry.substring(1));
-            return MATERIAL_TYPE_LABELS.getOrDefault(tagId.getPath(), handleCapitalization(tagId.getPath().replace("_", " ")));
+            return handleCapitalization(tagId.getPath().replace("_", " "));
         }
         ResourceLocation id = ResourceLocation.parse(entry);
         return handleCapitalization(id.getPath().replace("_", " "));
@@ -485,7 +445,6 @@ public class GenerateSiteData {
     private static void generateMaterialData(CommandSourceStack source) {
         try {
             var registry = IronsJewelryRegistries.materialRegistry(source.registryAccess());
-            var materialTypeMap = loadMaterialTypeLabels();
 
             var sb = new StringBuilder();
 
@@ -511,8 +470,14 @@ public class GenerateSiteData {
                     modsource = "Requires Addon";
                     sortOrder += 1000;
                 }
+                var group = "Other";
+                var materialHolder = registry.wrapAsHolder(material);
+                if (materialHolder.is(JewelryModTags.GEM)) {
+                    group = "Gem";
+                } else if (materialHolder.is(JewelryModTags.METAL)) {
+                    group = "Metal";
+                }
                 var quality = material.quality();
-                var types = resolveMaterialTypeLabels(id, materialTypeMap);
                 var bonusTypes = material.bonusParameters().keySet().stream().map(param -> handleCapitalization(IronsJewelryRegistries.PARAMETER_TYPE_REGISTRY.getKey(param).getPath().replace("_", " "))).collect(Collectors.joining(";"));
                 var bonusValues = material.bonusParameters().entrySet().stream().map(entry ->
                         ((IBonusParameterType) entry.getKey()).getSimpleDescription(entry.getValue())).filter(Optional::isPresent).map(opt -> ((Component) opt.get()).getString()).collect(Collectors.joining(";"));
@@ -521,8 +486,8 @@ public class GenerateSiteData {
                         name,
                         imgid,
                         modsource,
+                        group,
                         quality,
-                        types,
                         bonusTypes,
                         bonusValues,
                         sortOrder)
