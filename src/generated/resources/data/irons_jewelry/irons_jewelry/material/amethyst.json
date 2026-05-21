@@ -27,9 +27,6 @@
   "ingredient": {
     "tag": "c:gems/amethyst"
   },
-  "materialType": [
-    "gem"
-  ],
   "paletteLocation": "irons_jewelry:palettes/amethyst",
   "quality": 1.0
 }

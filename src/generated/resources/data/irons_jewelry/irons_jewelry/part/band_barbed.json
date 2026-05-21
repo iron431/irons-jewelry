@@ -1,7 +1,5 @@
 {
-  "allowedMaterialTypes": [
-    "metal"
-  ],
+  "allowedMaterials": "#irons_jewelry:metal",
   "baseTextureLocation": "irons_jewelry:item/base/band_barbed",
   "descriptionId": "part.irons_jewelry.band_barbed",
   "paletteKey": "irons_jewelry:palettes/gold"

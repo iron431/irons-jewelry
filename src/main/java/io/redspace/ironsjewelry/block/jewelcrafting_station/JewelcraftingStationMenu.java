@@ -137,7 +137,7 @@ public class JewelcraftingStationMenu extends AbstractContainerMenu {
                 var ingredient = requiredIngredients.get(i);
                 var input = workspaceSlots.get(i).getItem();
                 var material = Utils.getMaterialForIngredient(this.player.registryAccess(), input);
-                if (material.isPresent() && input.getCount() >= ingredient.materialCost() && ingredient.part().value().canUseMaterial(material.get().value().materialType())) {
+                if (material.isPresent() && input.getCount() >= ingredient.materialCost() && ingredient.part().value().canUseMaterial(material.get())) {
                     parts.put(ingredient.part(), material.get());
                     workspaceSlots.get(i).currentCost = ingredient.materialCost();
                 }

@@ -78,7 +78,7 @@ public class IronsDebugCommand {
             for (PartIngredient part : patternDefinition.partTemplate()) {
                 int option = 0;
                 for (MaterialDefinition materialDefinition : materials) {
-                    if (part.part().value().canUseMaterial(materialDefinition.materialType())) {
+                    if (part.part().value().canUseMaterial(materials.wrapAsHolder(materialDefinition))) {
                         option++;
                     }
                 }

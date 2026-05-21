@@ -105,7 +105,7 @@ public class CurioBaseItem extends Item implements ICurioItem {
             Optional<Component> qualityComponent = Optional.empty();
             int i2 = i;
             Optional<MutableComponent> costComponent = materialCost.map(list -> {
-                var count = list.size() > i2 && parts.containsKey(currentPart) && currentPart.value().canUseMaterial(parts.get(currentPart).value().materialType()) ? list.get(i2) : 0;
+                var count = list.size() > i2 && parts.containsKey(currentPart) && currentPart.value().canUseMaterial(parts.get(currentPart)) ? list.get(i2) : 0;
                 String cost = String.format("(%s/%s)", count, partIngredient.materialCost());
                 return Optional.of(Component.literal("  * ").append(Component.literal(cost).withStyle(count >= partIngredient.materialCost() ? ChatFormatting.GREEN : ChatFormatting.RED)).withStyle(ChatFormatting.DARK_GRAY));
             }).orElse(Optional.empty());

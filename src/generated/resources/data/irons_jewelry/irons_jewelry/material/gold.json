@@ -26,10 +26,6 @@
   "ingredient": {
     "tag": "c:ingots/gold"
   },
-  "materialType": [
-    "metal",
-    "gold"
-  ],
   "paletteLocation": "irons_jewelry:palettes/gold",
   "quality": 1.5
 }

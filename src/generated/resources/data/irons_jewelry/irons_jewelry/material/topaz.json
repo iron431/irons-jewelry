@@ -23,9 +23,6 @@
   "ingredient": {
     "tag": "c:gems/topaz"
   },
-  "materialType": [
-    "gem"
-  ],
   "paletteLocation": "irons_jewelry:palettes/topaz",
   "quality": 2.0
 }

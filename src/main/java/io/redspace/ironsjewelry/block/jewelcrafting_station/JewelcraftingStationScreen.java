@@ -168,8 +168,8 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
                             tooltip.add(Component.translatable(part.part().value().descriptionId()).withStyle(ChatFormatting.YELLOW, ChatFormatting.UNDERLINE));
                             tooltip.add(Component.literal(String.format(" (0/%s)", part.materialCost())).withStyle(ChatFormatting.RED));
                             tooltip.add(Component.translatable("tooltip.irons_jewelry.applicable_materials").withStyle(ChatFormatting.YELLOW, ChatFormatting.UNDERLINE));
-                            IronsJewelryRegistries.materialRegistry(Minecraft.getInstance().level.registryAccess()).stream().filter(materialDefinition -> !materialDefinition.ingredient().hasNoItems() && part.part().value().canUseMaterial(materialDefinition.materialType()))
-                                    .forEach(material -> tooltip.add(Component.literal(" ").append(Component.translatable(material.descriptionId())).withStyle(ChatFormatting.GRAY)));
+                            IronsJewelryRegistries.materialRegistry(Minecraft.getInstance().level.registryAccess()).holders().filter(material -> !material.value().ingredient().hasNoItems() && part.part().value().canUseMaterial(material))
+                                    .forEach(material -> tooltip.add(Component.literal(" ").append(Component.translatable(material.value().descriptionId())).withStyle(ChatFormatting.GRAY)));
                             pGuiGraphics.renderTooltip(this.font, Utils.rasterizeComponentList(tooltip), mouseX, mouseY);
                         }
                     }
@@ -212,7 +212,7 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
                 var ingredient = requiredIngredients.get(i);
                 var input = menu.workspaceSlots.get(i).getItem();
                 var material = Utils.getMaterialForIngredient(Minecraft.getInstance().player.level.registryAccess(), input);
-                if (material.isPresent() && ingredient.part().value().canUseMaterial(material.get().value().materialType())) {
+                if (material.isPresent() && ingredient.part().value().canUseMaterial(material.get())) {
                     parts.put(ingredient.part(), material.get());
                     //var texture = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(DynamicModel.atlasResourceLocaction(ingredient.part(), material.get().value().paletteLocation().getPath()));
                 }
@@ -321,7 +321,7 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
             if (slot.isActive()) {
                 var stack = slot.getItem();
                 var material = Utils.getMaterialForIngredient(Minecraft.getInstance().level.registryAccess(), stack);
-                if (material.isPresent() && forPart.value().canUseMaterial(material.get().value().materialType())) {
+                if (material.isPresent() && forPart.value().canUseMaterial(material.get())) {
                     return stack.getCount();
                 }
             }

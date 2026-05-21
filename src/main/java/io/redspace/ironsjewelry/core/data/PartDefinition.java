@@ -3,42 +3,43 @@ package io.redspace.ironsjewelry.core.data;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.redspace.ironsjewelry.IronsJewelry;
+import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderSet;
+import net.minecraft.core.RegistryCodecs;
 import net.minecraft.resources.ResourceLocation;
 
-import java.util.List;
+import java.util.Optional;
 
 public record PartDefinition(String descriptionId,
                              ResourceLocation paletteKey,
-                             List<String> allowedMaterials,
+                             Optional<HolderSet<MaterialDefinition>> allowedMaterials,
                              ResourceLocation baseTextureLocation) {
     public static final Codec<PartDefinition> CODEC = RecordCodecBuilder.create(builder -> builder.group(
             Codec.STRING.fieldOf("descriptionId").forGetter(PartDefinition::descriptionId),
             ResourceLocation.CODEC.fieldOf("paletteKey").forGetter(PartDefinition::paletteKey),
-            Codec.list(Codec.STRING).optionalFieldOf("allowedMaterialTypes", List.of()).forGetter(PartDefinition::allowedMaterials),
+            RegistryCodecs.homogeneousList(IronsJewelryRegistries.Keys.MATERIAL_REGISTRY_KEY).optionalFieldOf("allowedMaterials").forGetter(PartDefinition::allowedMaterials),
             ResourceLocation.CODEC.fieldOf("baseTextureLocation").forGetter(PartDefinition::baseTextureLocation)
     ).apply(builder, PartDefinition::new));
 
-    public boolean canUseMaterial(String materialType) {
-        return allowedMaterials.isEmpty() || allowedMaterials.contains(materialType);
+    public boolean canUseMaterial(Holder<MaterialDefinition> material) {
+        return allowedMaterials.isEmpty() || allowedMaterials.get().contains(material);
     }
 
-    public boolean canUseMaterial(List<String> materialTypes) {
-        return allowedMaterials.isEmpty() || materialTypes.stream().anyMatch(allowedMaterials::contains);
-    }
-
-    public static PartDefinition simpleMetalPart(String namespace, String name) {
+    public static PartDefinition simpleMetalPart(String namespace, String name, HolderSet<MaterialDefinition> allowedMaterials) {
         return new PartDefinition(
                 String.format("part.%s.%s", namespace, name),
                 IronsJewelry.id("palettes/gold"),
-                List.of("metal"),
+                Optional.of(allowedMaterials),
                 ResourceLocation.fromNamespaceAndPath(namespace, String.format("item/base/%s", name))
         );
     }
-    public static PartDefinition simpleGemPart(String namespace, String name) {
+
+    public static PartDefinition simpleGemPart(String namespace, String name, HolderSet<MaterialDefinition> allowedMaterials) {
         return new PartDefinition(
                 String.format("part.%s.%s", namespace, name),
                 IronsJewelry.id("palettes/diamond"),
-                List.of("gem"),
+                Optional.of(allowedMaterials),
                 ResourceLocation.fromNamespaceAndPath(namespace, String.format("item/base/%s", name))
         );
     }

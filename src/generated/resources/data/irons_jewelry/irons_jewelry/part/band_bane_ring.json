@@ -1,7 +1,5 @@
 {
-  "allowedMaterialTypes": [
-    "metal"
-  ],
+  "allowedMaterials": "#irons_jewelry:metal",
   "baseTextureLocation": "irons_jewelry:item/base/band_bane_ring",
   "descriptionId": "part.irons_jewelry.band_bane_ring",
   "paletteKey": "irons_jewelry:palettes/gold"

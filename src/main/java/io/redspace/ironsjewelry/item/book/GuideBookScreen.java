@@ -654,8 +654,8 @@ public class GuideBookScreen extends Screen {
                 tooltip.add(name);
                 tooltip.add(Component.literal(" ").append(Component.translatable("tooltip.irons_jewelry.material_cost", Component.literal(String.valueOf(partIngredient.materialCost())).withStyle(ChatFormatting.WHITE))).withStyle(ChatFormatting.GRAY));
                 tooltip.add(Component.translatable("tooltip.irons_jewelry.applicable_materials").withStyle(ChatFormatting.YELLOW, ChatFormatting.UNDERLINE));
-                IronsJewelryRegistries.materialRegistry(Minecraft.getInstance().level.registryAccess()).stream().filter(materialDefinition -> !materialDefinition.ingredient().hasNoItems() && part.value().canUseMaterial(materialDefinition.materialType()))
-                        .forEach(m -> tooltip.add(Component.literal(" ").append(Component.translatable(m.descriptionId())).withStyle(ChatFormatting.GRAY)));
+                IronsJewelryRegistries.materialRegistry(Minecraft.getInstance().level.registryAccess()).holders().filter(candidate -> !candidate.value().ingredient().hasNoItems() && part.value().canUseMaterial(candidate))
+                        .forEach(m -> tooltip.add(Component.literal(" ").append(Component.translatable(m.value().descriptionId())).withStyle(ChatFormatting.GRAY)));
                 List<MutableComponent> partExpandedInfo = new ArrayList<>();
                 partExpandedInfo.add(name);
                 if (isPrimaryPart) {
@@ -869,14 +869,14 @@ public class GuideBookScreen extends Screen {
                 Map<Holder<PartDefinition>, Holder<MaterialDefinition>> parts = new HashMap<>();
                 for (var partIngredient : pattern.value().partTemplate()) {
                     var part = partIngredient.part();
-                    if (part.value().canUseMaterial("metal")) {
+                    if (part.value().canUseMaterial(metal)) {
                         renderMaterial = metal;
-                    } else if (part.value().canUseMaterial("gem")) {
+                    } else if (part.value().canUseMaterial(gem)) {
                         renderMaterial = gem;
                     } else {
-                        for (MaterialDefinition materialDefinition : materialRegistry) {
-                            if (part.value().canUseMaterial(materialDefinition.materialType())) {
-                                renderMaterial = materialRegistry.wrapAsHolder(materialDefinition);
+                        for (Holder.Reference<MaterialDefinition> materialDefinition : materialRegistry.holders().toList()) {
+                            if (part.value().canUseMaterial(materialDefinition)) {
+                                renderMaterial = materialDefinition;
                                 break;
                             }
                         }

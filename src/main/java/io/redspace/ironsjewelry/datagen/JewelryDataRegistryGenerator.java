@@ -22,7 +22,9 @@ import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
 import io.redspace.ironsjewelry.registry.JewelryTypeRegistry;
 import io.redspace.ironsjewelry.registry.ParameterTypeRegistry;
 import io.redspace.ironsjewelry.registry.SoundRegistry;
+import io.redspace.ironsjewelry.utils.JewelryModTags;
 import net.minecraft.core.Holder;
+import net.minecraft.core.HolderSet;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.core.particles.ParticleTypes;
@@ -119,61 +121,89 @@ public class JewelryDataRegistryGenerator {
     public static Holder<MaterialDefinition> VIBRANIUM;
 
     private static void bootstrapParts(BootstrapContext<PartDefinition> bootstrap) {
+        HolderGetter<MaterialDefinition> materialGetter = bootstrap.lookup(IronsJewelryRegistries.Keys.MATERIAL_REGISTRY_KEY);
+        HolderSet.Named<MaterialDefinition> metals = materialGetter.getOrThrow(JewelryModTags.METAL);
+        HolderSet.Named<MaterialDefinition> gems = materialGetter.getOrThrow(JewelryModTags.GEM);
+        HolderSet.Named<MaterialDefinition> golds = materialGetter.getOrThrow(JewelryModTags.GOLD);
+        HolderSet.Named<MaterialDefinition> emeralds = materialGetter.getOrThrow(JewelryModTags.EMERALD);
         BAND_SIMPLE = bootstrap.register(partKey(IronsJewelry.id("band_simple")), new PartDefinition(
                 "part.irons_jewelry.band_simple",
                 IronsJewelry.id("palettes/gold"),
-                List.of("metal"),
+                Optional.of(metals),
                 IronsJewelry.id("item/base/gold_ring")
         ));
         GEM_ROUND = bootstrap.register(partKey(IronsJewelry.id("gem_round")), new PartDefinition(
                 "part.irons_jewelry.gem_round",
                 IronsJewelry.id("palettes/diamond"),
-                List.of("gem"),
+                Optional.of(gems),
                 IronsJewelry.id("item/base/gem_round")
         ));
         BAND_GEM = bootstrap.register(partKey(IronsJewelry.id("band_gem")), new PartDefinition(
                 "part.irons_jewelry.band_gem",
                 IronsJewelry.id("palettes/gold"),
-                List.of("metal"),
+                Optional.of(metals),
                 IronsJewelry.id("item/base/gem_band")
         ));
-        BAND_BARBED = bootstrap.register(partKey(IronsJewelry.id("band_barbed")), PartDefinition.simpleMetalPart(IronsJewelry.MODID, "band_barbed"));
-        BAND_STALWART = bootstrap.register(partKey(IronsJewelry.id("band_stalwart")), PartDefinition.simpleMetalPart(IronsJewelry.MODID, "band_stalwart"));
-        BAND_GEM_SUPERIOR = bootstrap.register(partKey(IronsJewelry.id("band_gem_superior")), PartDefinition.simpleMetalPart(IronsJewelry.MODID, "band_gem_superior"));
-        BAND_GEM_THIN = bootstrap.register(partKey(IronsJewelry.id("band_gem_thin")), PartDefinition.simpleMetalPart(IronsJewelry.MODID, "band_gem_thin"));
-        BAND_TEARSTONE = bootstrap.register(partKey(IronsJewelry.id("band_tearstone")), PartDefinition.simpleMetalPart(IronsJewelry.MODID, "band_tearstone"));
-        CHAIN_AMULET_OF_PROTECTION = bootstrap.register(partKey(IronsJewelry.id("chain_amulet_of_protection")), PartDefinition.simpleMetalPart(IronsJewelry.MODID, "chain_amulet_of_protection"));
-        CHAIN_SIMPLE = bootstrap.register(partKey(IronsJewelry.id("chain_simple")), PartDefinition.simpleMetalPart(IronsJewelry.MODID, "chain_simple"));
-        CHAIN_SIMPLE_AMULET = bootstrap.register(partKey(IronsJewelry.id("chain_simple_amulet")), PartDefinition.simpleMetalPart(IronsJewelry.MODID, "chain_simple_amulet"));
-        GEM_AMULET_OF_PROTECTION = bootstrap.register(partKey(IronsJewelry.id("gem_amulet_of_protection")), PartDefinition.simpleGemPart(IronsJewelry.MODID, "gem_amulet_of_protection"));
-        GEM_BAND_BARBED = bootstrap.register(partKey(IronsJewelry.id("gem_band_barbed")), PartDefinition.simpleGemPart(IronsJewelry.MODID, "gem_band_barbed"));
-        GEM_POINTY = bootstrap.register(partKey(IronsJewelry.id("gem_pointy")), PartDefinition.simpleGemPart(IronsJewelry.MODID, "gem_pointy"));
-        GEM_SIMPLE_AMULET = bootstrap.register(partKey(IronsJewelry.id("gem_simple_amulet")), PartDefinition.simpleGemPart(IronsJewelry.MODID, "gem_simple_amulet"));
-        GEM_TEARSTONE = bootstrap.register(partKey(IronsJewelry.id("gem_tearstone")), PartDefinition.simpleGemPart(IronsJewelry.MODID, "gem_tearstone"));
-        GEMS_SIDE = bootstrap.register(partKey(IronsJewelry.id("gems_side")), PartDefinition.simpleGemPart(IronsJewelry.MODID, "gems_side"));
+        BAND_BARBED = bootstrap.register(partKey(IronsJewelry.id("band_barbed")), PartDefinition.simpleMetalPart(IronsJewelry.MODID, "band_barbed", metals));
+        BAND_STALWART = bootstrap.register(partKey(IronsJewelry.id("band_stalwart")), PartDefinition.simpleMetalPart(IronsJewelry.MODID, "band_stalwart", metals));
+        BAND_GEM_SUPERIOR = bootstrap.register(partKey(IronsJewelry.id("band_gem_superior")), PartDefinition.simpleMetalPart(IronsJewelry.MODID, "band_gem_superior", metals));
+        BAND_GEM_THIN = bootstrap.register(partKey(IronsJewelry.id("band_gem_thin")), PartDefinition.simpleMetalPart(IronsJewelry.MODID, "band_gem_thin", metals));
+        BAND_TEARSTONE = bootstrap.register(partKey(IronsJewelry.id("band_tearstone")), PartDefinition.simpleMetalPart(IronsJewelry.MODID, "band_tearstone", metals));
+        CHAIN_AMULET_OF_PROTECTION = bootstrap.register(partKey(IronsJewelry.id("chain_amulet_of_protection")), PartDefinition.simpleMetalPart(IronsJewelry.MODID, "chain_amulet_of_protection", metals));
+        CHAIN_SIMPLE = bootstrap.register(partKey(IronsJewelry.id("chain_simple")), PartDefinition.simpleMetalPart(IronsJewelry.MODID, "chain_simple", metals));
+        CHAIN_SIMPLE_AMULET = bootstrap.register(partKey(IronsJewelry.id("chain_simple_amulet")), PartDefinition.simpleMetalPart(IronsJewelry.MODID, "chain_simple_amulet", metals));
+        GEM_AMULET_OF_PROTECTION = bootstrap.register(partKey(IronsJewelry.id("gem_amulet_of_protection")), PartDefinition.simpleGemPart(IronsJewelry.MODID, "gem_amulet_of_protection", gems));
+        GEM_BAND_BARBED = bootstrap.register(partKey(IronsJewelry.id("gem_band_barbed")), PartDefinition.simpleGemPart(IronsJewelry.MODID, "gem_band_barbed", gems));
+        GEM_POINTY = bootstrap.register(partKey(IronsJewelry.id("gem_pointy")), PartDefinition.simpleGemPart(IronsJewelry.MODID, "gem_pointy", gems));
+        GEM_SIMPLE_AMULET = bootstrap.register(partKey(IronsJewelry.id("gem_simple_amulet")), PartDefinition.simpleGemPart(IronsJewelry.MODID, "gem_simple_amulet", gems));
+        GEM_TEARSTONE = bootstrap.register(partKey(IronsJewelry.id("gem_tearstone")), PartDefinition.simpleGemPart(IronsJewelry.MODID, "gem_tearstone", gems));
+        GEMS_SIDE = bootstrap.register(partKey(IronsJewelry.id("gems_side")), PartDefinition.simpleGemPart(IronsJewelry.MODID, "gems_side", gems));
         PIGLIN_SIGNET = bootstrap.register(partKey(IronsJewelry.id("piglin_signet")), new PartDefinition(
                 "part.irons_jewelry.piglin_signet",
                 IronsJewelry.id("palettes/gold"),
-                List.of("gold"),
+                Optional.of(golds),
                 IronsJewelry.id("item/base/piglin_signet")
         ));
         HAGGLER_STONE = bootstrap.register(partKey(IronsJewelry.id("haggler_stone")), new PartDefinition(
                 "part.irons_jewelry.haggler_stone",
                 IronsJewelry.id("palettes/diamond"),
-                List.of("emerald"),
+                Optional.of(emeralds),
                 IronsJewelry.id("item/base/gem_round_large")
         ));
-        BAND_BANE_RING = bootstrap.register(partKey(IronsJewelry.id("band_bane_ring")), PartDefinition.simpleMetalPart(IronsJewelry.MODID, "band_bane_ring"));
+        BAND_BANE_RING = bootstrap.register(partKey(IronsJewelry.id("band_bane_ring")), PartDefinition.simpleMetalPart(IronsJewelry.MODID, "band_bane_ring", metals));
         SKULL_BANE_RING = bootstrap.register(partKey(IronsJewelry.id("skull_bane_ring")), new PartDefinition(
                 "part.irons_jewelry.skull_bane_ring",
                 IronsJewelry.id("palettes/gold"),
-                List.of("metal", "gem"),
+                Optional.of(HolderSet.direct(
+                        materialGetter.getOrThrow(materialKey(IronsJewelry.id("allthemodium"))),
+                        materialGetter.getOrThrow(materialKey(IronsJewelry.id("amethyst"))),
+                        materialGetter.getOrThrow(materialKey(IronsJewelry.id("brass"))),
+                        materialGetter.getOrThrow(materialKey(IronsJewelry.id("bronze"))),
+                        materialGetter.getOrThrow(materialKey(IronsJewelry.id("copper"))),
+                        materialGetter.getOrThrow(materialKey(IronsJewelry.id("diamond"))),
+                        materialGetter.getOrThrow(materialKey(IronsJewelry.id("emerald"))),
+                        materialGetter.getOrThrow(materialKey(IronsJewelry.id("garnet"))),
+                        materialGetter.getOrThrow(materialKey(IronsJewelry.id("gold"))),
+                        materialGetter.getOrThrow(materialKey(IronsJewelry.id("iron"))),
+                        materialGetter.getOrThrow(materialKey(IronsJewelry.id("lapis"))),
+                        materialGetter.getOrThrow(materialKey(IronsJewelry.id("moonstone"))),
+                        materialGetter.getOrThrow(materialKey(IronsJewelry.id("netherite"))),
+                        materialGetter.getOrThrow(materialKey(IronsJewelry.id("onyx"))),
+                        materialGetter.getOrThrow(materialKey(IronsJewelry.id("peridot"))),
+                        materialGetter.getOrThrow(materialKey(IronsJewelry.id("platinum"))),
+                        materialGetter.getOrThrow(materialKey(IronsJewelry.id("ruby"))),
+                        materialGetter.getOrThrow(materialKey(IronsJewelry.id("sapphire"))),
+                        materialGetter.getOrThrow(materialKey(IronsJewelry.id("silver"))),
+                        materialGetter.getOrThrow(materialKey(IronsJewelry.id("topaz"))),
+                        materialGetter.getOrThrow(materialKey(IronsJewelry.id("unobtainium"))),
+                        materialGetter.getOrThrow(materialKey(IronsJewelry.id("vibranium")))
+                )),
                 IronsJewelry.id("item/base/skull_bane_ring")
         ));
-        CHAIN_RHINESTONE = bootstrap.register(partKey(IronsJewelry.id("chain_rhinestone")), PartDefinition.simpleMetalPart(IronsJewelry.MODID, "chain_rhinestone"));
-        GEM_RHINESTONE_A = bootstrap.register(partKey(IronsJewelry.id("gem_rhinestone_a")), PartDefinition.simpleGemPart(IronsJewelry.MODID, "gem_rhinestone_a"));
-        GEM_RHINESTONE_B = bootstrap.register(partKey(IronsJewelry.id("gem_rhinestone_b")), PartDefinition.simpleGemPart(IronsJewelry.MODID, "gem_rhinestone_b"));
-        GEM_RHINESTONE_C = bootstrap.register(partKey(IronsJewelry.id("gem_rhinestone_c")), PartDefinition.simpleGemPart(IronsJewelry.MODID, "gem_rhinestone_c"));
+        CHAIN_RHINESTONE = bootstrap.register(partKey(IronsJewelry.id("chain_rhinestone")), PartDefinition.simpleMetalPart(IronsJewelry.MODID, "chain_rhinestone", metals));
+        GEM_RHINESTONE_A = bootstrap.register(partKey(IronsJewelry.id("gem_rhinestone_a")), PartDefinition.simpleGemPart(IronsJewelry.MODID, "gem_rhinestone_a", gems));
+        GEM_RHINESTONE_B = bootstrap.register(partKey(IronsJewelry.id("gem_rhinestone_b")), PartDefinition.simpleGemPart(IronsJewelry.MODID, "gem_rhinestone_b", gems));
+        GEM_RHINESTONE_C = bootstrap.register(partKey(IronsJewelry.id("gem_rhinestone_c")), PartDefinition.simpleGemPart(IronsJewelry.MODID, "gem_rhinestone_c", gems));
 
     }
 
@@ -392,7 +422,6 @@ public class JewelryDataRegistryGenerator {
         ALLTHEMODIUM = bootstrap.register(materialKey(IronsJewelry.id("allthemodium")), new MaterialDefinition(
                 "material.irons_jewelry.allthemodium",
                 Ingredient.of(itemTag("c:ingots/allthemodium")),
-                List.of("metal"),
                 IronsJewelry.id("palettes/allthemodium"),
                 Map.of(
                         ParameterTypeRegistry.ATTRIBUTE_PARAMETER.get(), new AttributeInstance(Attributes.ARMOR_TOUGHNESS, 2, AttributeModifier.Operation.ADD_VALUE),
@@ -406,7 +435,6 @@ public class JewelryDataRegistryGenerator {
         AMETHYST = bootstrap.register(materialKey(IronsJewelry.id("amethyst")), new MaterialDefinition(
                 "material.irons_jewelry.amethyst",
                 Ingredient.of(itemTag("c:gems/amethyst")),
-                List.of("gem"),
                 IronsJewelry.id("palettes/amethyst"),
                 Map.of(
                         ParameterTypeRegistry.ATTRIBUTE_PARAMETER.get(), new AttributeInstance(attr("apothic_attributes:armor_pierce"), 1, AttributeModifier.Operation.ADD_VALUE),
@@ -420,7 +448,6 @@ public class JewelryDataRegistryGenerator {
         BRASS = bootstrap.register(materialKey(IronsJewelry.id("brass")), new MaterialDefinition(
                 "material.irons_jewelry.brass",
                 Ingredient.of(itemTag("c:ingots/brass")),
-                List.of("metal"),
                 IronsJewelry.id("palettes/brass"),
                 Map.of(
                         ParameterTypeRegistry.ATTRIBUTE_PARAMETER.get(), new AttributeInstance(Attributes.KNOCKBACK_RESISTANCE, 0.1, AttributeModifier.Operation.ADD_VALUE)
@@ -430,7 +457,6 @@ public class JewelryDataRegistryGenerator {
         BRONZE = bootstrap.register(materialKey(IronsJewelry.id("bronze")), new MaterialDefinition(
                 "material.irons_jewelry.bronze",
                 Ingredient.of(itemTag("c:ingots/bronze")),
-                List.of("metal"),
                 IronsJewelry.id("palettes/bronze"),
                 Map.of(
                         ParameterTypeRegistry.ATTRIBUTE_PARAMETER.get(), new AttributeInstance(attr("neoforge:swim_speed"), 0.10, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL)
@@ -440,7 +466,6 @@ public class JewelryDataRegistryGenerator {
         COPPER = bootstrap.register(materialKey(IronsJewelry.id("copper")), new MaterialDefinition(
                 "material.irons_jewelry.copper",
                 Ingredient.of(itemTag("c:ingots/copper")),
-                List.of("metal"),
                 IronsJewelry.id("palettes/copper"),
                 Map.of(
                         ParameterTypeRegistry.ATTRIBUTE_PARAMETER.get(), new AttributeInstance(Attributes.ATTACK_SPEED, 0.10, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL),
@@ -454,7 +479,6 @@ public class JewelryDataRegistryGenerator {
         DIAMOND = bootstrap.register(materialKey(IronsJewelry.id("diamond")), new MaterialDefinition(
                 "material.irons_jewelry.diamond",
                 Ingredient.of(itemTag("c:gems/diamond")),
-                List.of("gem"),
                 IronsJewelry.id("palettes/diamond"),
                 Map.of(
                         ParameterTypeRegistry.ATTRIBUTE_PARAMETER.get(), new AttributeInstance(Attributes.ARMOR, 2, AttributeModifier.Operation.ADD_VALUE),
@@ -468,7 +492,6 @@ public class JewelryDataRegistryGenerator {
         EMERALD = bootstrap.register(materialKey(IronsJewelry.id("emerald")), new MaterialDefinition(
                 "material.irons_jewelry.emerald",
                 Ingredient.of(itemTag("c:gems/emerald")),
-                List.of("emerald", "gem"),
                 IronsJewelry.id("palettes/emerald"),
                 Map.of(
                         ParameterTypeRegistry.ATTRIBUTE_PARAMETER.get(), new AttributeInstance(Attributes.MOVEMENT_SPEED, 0.05, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL),
@@ -488,7 +511,6 @@ public class JewelryDataRegistryGenerator {
         EXAMPLE = bootstrap.register(materialKey(IronsJewelry.id("example")), new MaterialDefinition(
                 "material.irons_jewelry.example",
                 Ingredient.EMPTY,
-                List.of(),
                 IronsJewelry.id("palettes/silver"),
                 Map.of(),
                 1.0
@@ -496,7 +518,6 @@ public class JewelryDataRegistryGenerator {
         GARNET = bootstrap.register(materialKey(IronsJewelry.id("garnet")), new MaterialDefinition(
                 "material.irons_jewelry.garnet",
                 Ingredient.of(itemTag("c:gems/garnet")),
-                List.of("gem"),
                 IronsJewelry.id("palettes/garnet"),
                 Map.of(
                         ParameterTypeRegistry.ATTRIBUTE_PARAMETER.get(), new AttributeInstance(Attributes.ATTACK_DAMAGE, 0.04, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL),
@@ -509,7 +530,6 @@ public class JewelryDataRegistryGenerator {
         GOLD = bootstrap.register(materialKey(IronsJewelry.id("gold")), new MaterialDefinition(
                 "material.irons_jewelry.gold",
                 Ingredient.of(itemTag("c:ingots/gold")),
-                List.of("metal", "gold"),
                 IronsJewelry.id("palettes/gold"),
                 Map.of(
                         ParameterTypeRegistry.ATTRIBUTE_PARAMETER.get(), new AttributeInstance(attr("apothic_attributes:mining_speed"), 0.10, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL),
@@ -523,7 +543,6 @@ public class JewelryDataRegistryGenerator {
         IRON = bootstrap.register(materialKey(IronsJewelry.id("iron")), new MaterialDefinition(
                 "material.irons_jewelry.iron",
                 Ingredient.of(itemTag("c:ingots/iron")),
-                List.of("metal"),
                 IronsJewelry.id("palettes/iron"),
                 Map.of(
                         ParameterTypeRegistry.ATTRIBUTE_PARAMETER.get(), new AttributeInstance(Attributes.ARMOR, 2, AttributeModifier.Operation.ADD_VALUE),
@@ -537,7 +556,6 @@ public class JewelryDataRegistryGenerator {
         LAPIS = bootstrap.register(materialKey(IronsJewelry.id("lapis")), new MaterialDefinition(
                 "material.irons_jewelry.lapis",
                 Ingredient.of(itemTag("c:gems/lapis")),
-                List.of("gem"),
                 IronsJewelry.id("palettes/lapis"),
                 Map.of(
                         ParameterTypeRegistry.ATTRIBUTE_PARAMETER.get(), new AttributeInstance(attr("apothic_attributes:experience_gained"), 0.10, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL),
@@ -550,7 +568,6 @@ public class JewelryDataRegistryGenerator {
         MOONSTONE = bootstrap.register(materialKey(IronsJewelry.id("moonstone")), new MaterialDefinition(
                 "material.irons_jewelry.moonstone",
                 Ingredient.of(itemTag("c:gems/moonstone")),
-                List.of("gem"),
                 IronsJewelry.id("palettes/moonstone"),
                 Map.of(
                         ParameterTypeRegistry.ATTRIBUTE_PARAMETER.get(), new AttributeInstance(attr("apothic_attributes:arrow_damage"), 0.1, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL),
@@ -567,7 +584,6 @@ public class JewelryDataRegistryGenerator {
         NETHERITE = bootstrap.register(materialKey(IronsJewelry.id("netherite")), new MaterialDefinition(
                 "material.irons_jewelry.netherite",
                 Ingredient.of(itemTag("c:ingots/netherite")),
-                List.of("metal"),
                 IronsJewelry.id("palettes/netherite"),
                 Map.of(
                         ParameterTypeRegistry.ATTRIBUTE_PARAMETER.get(), new AttributeInstance(Attributes.ATTACK_DAMAGE, 0.05, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL),
@@ -581,7 +597,6 @@ public class JewelryDataRegistryGenerator {
         ONYX = bootstrap.register(materialKey(IronsJewelry.id("onyx")), new MaterialDefinition(
                 "material.irons_jewelry.onyx",
                 Ingredient.of(itemTag("c:gems/onyx")),
-                List.of("gem"),
                 IronsJewelry.id("palettes/onyx"),
                 Map.of(
                         ParameterTypeRegistry.ATTRIBUTE_PARAMETER.get(), new AttributeInstance(attr("apothic_attributes:crit_damage"), 0.15, AttributeModifier.Operation.ADD_VALUE),
@@ -594,7 +609,6 @@ public class JewelryDataRegistryGenerator {
         PERIDOT = bootstrap.register(materialKey(IronsJewelry.id("peridot")), new MaterialDefinition(
                 "material.irons_jewelry.peridot",
                 Ingredient.of(itemTag("c:gems/peridot")),
-                List.of("gem"),
                 IronsJewelry.id("palettes/peridot"),
                 Map.of(
                         ParameterTypeRegistry.ATTRIBUTE_PARAMETER.get(), new AttributeInstance(attr("apothic_attributes:mining_speed"), 0.10, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL),
@@ -608,7 +622,6 @@ public class JewelryDataRegistryGenerator {
         PLATINUM = bootstrap.register(materialKey(IronsJewelry.id("platinum")), new MaterialDefinition(
                 "material.irons_jewelry.platinum",
                 Ingredient.of(itemTag("c:ingots/platinum")),
-                List.of("metal"),
                 IronsJewelry.id("palettes/platinum"),
                 Map.of(
                         ParameterTypeRegistry.ATTRIBUTE_PARAMETER.get(), new AttributeInstance(attr("apothic_attributes:armor_pierce"), 1, AttributeModifier.Operation.ADD_VALUE),
@@ -622,7 +635,6 @@ public class JewelryDataRegistryGenerator {
         RUBY = bootstrap.register(materialKey(IronsJewelry.id("ruby")), new MaterialDefinition(
                 "material.irons_jewelry.ruby",
                 Ingredient.of(itemTag("c:gems/ruby")),
-                List.of("gem"),
                 IronsJewelry.id("palettes/ruby"),
                 Map.of(
                         ParameterTypeRegistry.ATTRIBUTE_PARAMETER.get(), new AttributeInstance(Attributes.MAX_HEALTH, 2, AttributeModifier.Operation.ADD_VALUE),
@@ -635,7 +647,6 @@ public class JewelryDataRegistryGenerator {
         SAPPHIRE = bootstrap.register(materialKey(IronsJewelry.id("sapphire")), new MaterialDefinition(
                 "material.irons_jewelry.sapphire",
                 Ingredient.of(itemTag("c:gems/sapphire")),
-                List.of("gem"),
                 IronsJewelry.id("palettes/sapphire"),
                 Map.of(
                         ParameterTypeRegistry.ATTRIBUTE_PARAMETER.get(), new AttributeInstance(attr("apothic_attributes:dodge_chance"), 0.03, AttributeModifier.Operation.ADD_VALUE),
@@ -648,7 +659,6 @@ public class JewelryDataRegistryGenerator {
         SILVER = bootstrap.register(materialKey(IronsJewelry.id("silver")), new MaterialDefinition(
                 "material.irons_jewelry.silver",
                 Ingredient.of(itemTag("c:ingots/silver")),
-                List.of("metal"),
                 IronsJewelry.id("palettes/silver"),
                 Map.of(
                         ParameterTypeRegistry.ATTRIBUTE_PARAMETER.get(), new AttributeInstance(Attributes.MOVEMENT_SPEED, 0.05, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL),
@@ -665,7 +675,6 @@ public class JewelryDataRegistryGenerator {
         TOPAZ = bootstrap.register(materialKey(IronsJewelry.id("topaz")), new MaterialDefinition(
                 "material.irons_jewelry.topaz",
                 Ingredient.of(itemTag("c:gems/topaz")),
-                List.of("gem"),
                 IronsJewelry.id("palettes/topaz"),
                 Map.of(
                         ParameterTypeRegistry.ATTRIBUTE_PARAMETER.get(), new AttributeInstance(Attributes.ARMOR_TOUGHNESS, 2, AttributeModifier.Operation.ADD_VALUE),
@@ -678,7 +687,6 @@ public class JewelryDataRegistryGenerator {
         UNOBTAINIUM = bootstrap.register(materialKey(IronsJewelry.id("unobtainium")), new MaterialDefinition(
                 "material.irons_jewelry.unobtainium",
                 Ingredient.of(itemTag("c:ingots/unobtainium")),
-                List.of("metal"),
                 IronsJewelry.id("palettes/unobtainium"),
                 Map.of(
                         ParameterTypeRegistry.ATTRIBUTE_PARAMETER.get(), new AttributeInstance(Attributes.ARMOR_TOUGHNESS, 2, AttributeModifier.Operation.ADD_VALUE),
@@ -692,7 +700,6 @@ public class JewelryDataRegistryGenerator {
         VIBRANIUM = bootstrap.register(materialKey(IronsJewelry.id("vibranium")), new MaterialDefinition(
                 "material.irons_jewelry.vibranium",
                 Ingredient.of(itemTag("c:ingots/vibranium")),
-                List.of("metal"),
                 IronsJewelry.id("palettes/vibranium"),
                 Map.of(
                         ParameterTypeRegistry.ATTRIBUTE_PARAMETER.get(), new AttributeInstance(Attributes.ARMOR_TOUGHNESS, 2, AttributeModifier.Operation.ADD_VALUE),

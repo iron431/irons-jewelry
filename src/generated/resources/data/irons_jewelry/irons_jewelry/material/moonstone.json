@@ -40,9 +40,6 @@
   "ingredient": {
     "tag": "c:gems/moonstone"
   },
-  "materialType": [
-    "gem"
-  ],
   "paletteLocation": "irons_jewelry:palettes/moonstone",
   "quality": 2.0
 }
