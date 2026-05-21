@@ -1,4 +1,4 @@
-// 1.21.1	2026-05-21T07:52:18.6231639	Registries
+// 1.21.1	2026-05-21T08:06:11.2232601	Registries
 135e3d560816a90ad642e54861905881a35da02b data/irons_jewelry/irons_jewelry/material/allthemodium.json
 946b05336c9ff93548b76e2716d4ce1ec4757b08 data/irons_jewelry/irons_jewelry/material/amethyst.json
 bf7c02d943e9b22ff888eb16d5da2da19509d85d data/irons_jewelry/irons_jewelry/material/brass.json
@@ -46,7 +46,7 @@ ee592bb24d3faf60179d264559899567fd509428 data/irons_jewelry/irons_jewelry/part/g
 38cda8d8be668c816bd1c3806bbbe9aa768a80cb data/irons_jewelry/irons_jewelry/part/gem_tearstone.json
 a12f2476a751a8eb940d1789aee8838bb9d743dc data/irons_jewelry/irons_jewelry/part/haggler_stone.json
 d1f8cc562a34a3f2aade102fec930d709a1f47da data/irons_jewelry/irons_jewelry/part/piglin_signet.json
-a5432d1171fc7831dc4c4b7f1c43b1bd69a8d1e0 data/irons_jewelry/irons_jewelry/part/skull_bane_ring.json
+bd24095cadb22690bdff2c34a41d290525306409 data/irons_jewelry/irons_jewelry/part/skull_bane_ring.json
 20b60e9574f7b0e23fe7797b87ca3f0af636c995 data/irons_jewelry/irons_jewelry/pattern/amulet_of_protection.json
 6a905563700ae12717270f752acf595b92182baa data/irons_jewelry/irons_jewelry/pattern/bane_ring.json
 6bd9e0ca2ba67fadef19d4079ae1d51c467e6bda data/irons_jewelry/irons_jewelry/pattern/barbed_band.json

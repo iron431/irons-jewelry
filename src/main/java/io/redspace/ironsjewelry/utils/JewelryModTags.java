@@ -28,6 +28,8 @@ public class JewelryModTags {
             = TagKey.create(IronsJewelryRegistries.Keys.MATERIAL_REGISTRY_KEY, IronsJewelry.id("gold"));
     public static final TagKey<MaterialDefinition> EMERALD
             = TagKey.create(IronsJewelryRegistries.Keys.MATERIAL_REGISTRY_KEY, IronsJewelry.id("emerald"));
+    public static final TagKey<MaterialDefinition> METAL_OR_GEM
+            = TagKey.create(IronsJewelryRegistries.Keys.MATERIAL_REGISTRY_KEY, IronsJewelry.id("metal_or_gem"));
 
     public static final TagKey<PatternDefinition> GENERIC_LOOTABLE
             = TagKey.create(IronsJewelryRegistries.Keys.PATTERN_REGISTRY_KEY, IronsJewelry.id("generic_lootable"));

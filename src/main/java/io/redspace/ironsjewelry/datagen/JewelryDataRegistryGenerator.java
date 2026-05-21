@@ -126,6 +126,7 @@ public class JewelryDataRegistryGenerator {
         HolderSet.Named<MaterialDefinition> gems = materialGetter.getOrThrow(JewelryModTags.GEM);
         HolderSet.Named<MaterialDefinition> golds = materialGetter.getOrThrow(JewelryModTags.GOLD);
         HolderSet.Named<MaterialDefinition> emeralds = materialGetter.getOrThrow(JewelryModTags.EMERALD);
+        HolderSet.Named<MaterialDefinition> metalsOrGems = materialGetter.getOrThrow(JewelryModTags.METAL_OR_GEM);
         BAND_SIMPLE = bootstrap.register(partKey(IronsJewelry.id("band_simple")), new PartDefinition(
                 "part.irons_jewelry.band_simple",
                 IronsJewelry.id("palettes/gold"),
@@ -174,30 +175,7 @@ public class JewelryDataRegistryGenerator {
         SKULL_BANE_RING = bootstrap.register(partKey(IronsJewelry.id("skull_bane_ring")), new PartDefinition(
                 "part.irons_jewelry.skull_bane_ring",
                 IronsJewelry.id("palettes/gold"),
-                Optional.of(HolderSet.direct(
-                        materialGetter.getOrThrow(materialKey(IronsJewelry.id("allthemodium"))),
-                        materialGetter.getOrThrow(materialKey(IronsJewelry.id("amethyst"))),
-                        materialGetter.getOrThrow(materialKey(IronsJewelry.id("brass"))),
-                        materialGetter.getOrThrow(materialKey(IronsJewelry.id("bronze"))),
-                        materialGetter.getOrThrow(materialKey(IronsJewelry.id("copper"))),
-                        materialGetter.getOrThrow(materialKey(IronsJewelry.id("diamond"))),
-                        materialGetter.getOrThrow(materialKey(IronsJewelry.id("emerald"))),
-                        materialGetter.getOrThrow(materialKey(IronsJewelry.id("garnet"))),
-                        materialGetter.getOrThrow(materialKey(IronsJewelry.id("gold"))),
-                        materialGetter.getOrThrow(materialKey(IronsJewelry.id("iron"))),
-                        materialGetter.getOrThrow(materialKey(IronsJewelry.id("lapis"))),
-                        materialGetter.getOrThrow(materialKey(IronsJewelry.id("moonstone"))),
-                        materialGetter.getOrThrow(materialKey(IronsJewelry.id("netherite"))),
-                        materialGetter.getOrThrow(materialKey(IronsJewelry.id("onyx"))),
-                        materialGetter.getOrThrow(materialKey(IronsJewelry.id("peridot"))),
-                        materialGetter.getOrThrow(materialKey(IronsJewelry.id("platinum"))),
-                        materialGetter.getOrThrow(materialKey(IronsJewelry.id("ruby"))),
-                        materialGetter.getOrThrow(materialKey(IronsJewelry.id("sapphire"))),
-                        materialGetter.getOrThrow(materialKey(IronsJewelry.id("silver"))),
-                        materialGetter.getOrThrow(materialKey(IronsJewelry.id("topaz"))),
-                        materialGetter.getOrThrow(materialKey(IronsJewelry.id("unobtainium"))),
-                        materialGetter.getOrThrow(materialKey(IronsJewelry.id("vibranium")))
-                )),
+                Optional.of(metalsOrGems),
                 IronsJewelry.id("item/base/skull_bane_ring")
         ));
         CHAIN_RHINESTONE = bootstrap.register(partKey(IronsJewelry.id("chain_rhinestone")), PartDefinition.simpleMetalPart(IronsJewelry.MODID, "chain_rhinestone", metals));
