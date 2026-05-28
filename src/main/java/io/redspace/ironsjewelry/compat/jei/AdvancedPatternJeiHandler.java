@@ -1,7 +1,7 @@
 package io.redspace.ironsjewelry.compat.jei;
 
 import io.redspace.ironsjewelry.core.data.PatternDefinition;
-import io.redspace.ironsjewelry.registry.ComponentRegistry;
+import io.redspace.ironsjewelry.core.data.StoredPatternData;
 import io.redspace.ironsjewelry.registry.ItemRegistry;
 import mezz.jei.api.ingredients.ITypedIngredient;
 import mezz.jei.api.recipe.advanced.ISimpleRecipeManagerPlugin;
@@ -24,7 +24,7 @@ public class AdvancedPatternJeiHandler implements ISimpleRecipeManagerPlugin<Pat
     @Override
     public List<PatternDefinition> getRecipesForInput(ITypedIngredient<?> input) {
         return input.getItemStack()
-                .flatMap(stack -> Optional.ofNullable(stack.get(ComponentRegistry.STORED_PATTERN))
+                .flatMap(stack -> Optional.ofNullable(StoredPatternData.get(stack))
                         .map(pattern -> List.of(pattern.value())))
                 .orElse(List.of());
     }

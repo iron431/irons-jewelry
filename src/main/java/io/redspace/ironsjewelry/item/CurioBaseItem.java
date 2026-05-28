@@ -12,7 +12,6 @@ import io.redspace.ironsjewelry.core.data.PartDefinition;
 import io.redspace.ironsjewelry.core.data.PatternDefinition;
 import io.redspace.ironsjewelry.core.parameters.IBonusParameterType;
 import io.redspace.ironsjewelry.registry.BonusTypeRegistry;
-import io.redspace.ironsjewelry.registry.ComponentRegistry;
 import io.redspace.ironsjewelry.utils.Utils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
@@ -95,10 +94,8 @@ public class CurioBaseItem extends Item implements ICurioItem {
     @Override
     public void verifyComponentsAfterLoad(@NotNull ItemStack stack) {
         super.verifyComponentsAfterLoad(stack);
-        if (stack.has(ComponentRegistry.JEWELRY_COMPONENT)) {
-            if (!stack.get(ComponentRegistry.JEWELRY_COMPONENT).isValid()) {
-                stack.remove(DataComponents.ITEM_NAME);
-            }
+        if (JewelryData.has(stack) && !JewelryData.get(stack).isValid()) {
+            stack.remove(DataComponents.ITEM_NAME);
         }
     }
 
@@ -164,7 +161,7 @@ public class CurioBaseItem extends Item implements ICurioItem {
 
     @Override
     public Multimap<Holder<Attribute>, AttributeModifier> getAttributeModifiers(SlotContext slotContext, ResourceLocation id, ItemStack stack) {
-        JewelryData data = stack.get(ComponentRegistry.JEWELRY_COMPONENT);
+        JewelryData data = JewelryData.getNullable(stack);
         //TODO: cache these in the stack's attribute component for as long as index hasn't changed?
         if (data != null && slotContext.identifier().equals(this.slotIdentifier)) {
             var bonuses = data.getBonuses();

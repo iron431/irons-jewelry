@@ -1,7 +1,8 @@
 package io.redspace.ironsjewelry.utils;
 
+import io.redspace.ironsjewelry.core.data.JewelryData;
 import io.redspace.ironsjewelry.core.data.MaterialDefinition;
-import io.redspace.ironsjewelry.registry.ComponentRegistry;
+import io.redspace.ironsjewelry.core.data.StoredPatternData;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
@@ -25,7 +26,7 @@ import java.util.function.BiFunction;
 public class Trades {
 
     public static int calculatePatternPrice(ItemStack stack, RandomSource randomSource) {
-        var heldPattern = stack.get(ComponentRegistry.STORED_PATTERN);
+        var heldPattern = StoredPatternData.get(stack);
         if (heldPattern != null) {
             var pattern = heldPattern.value();
             return (int) ((randomSource.nextIntBetweenInclusive(15, 20) + pattern.partTemplate().size() * 2) * pattern.qualityMultiplier());
@@ -34,7 +35,7 @@ public class Trades {
     }
 
     public static int calculateJewelryPrice(ItemStack stack, RandomSource randomSource) {
-        var jewelryData = stack.get(ComponentRegistry.JEWELRY_COMPONENT);
+        var jewelryData = JewelryData.getNullable(stack);
         if (jewelryData != null && jewelryData.isValid()) {
             int cost = (int) (12 * jewelryData.pattern().value().qualityMultiplier());
             for (Holder<MaterialDefinition> part : jewelryData.parts().values()) {

@@ -14,7 +14,6 @@ import io.redspace.ironsjewelry.item.CurioBaseItem;
 import io.redspace.ironsjewelry.network.packets.SetJewelcraftingStationPattern;
 import io.redspace.ironsjewelry.network.packets.SyncJewelcraftingSlotStates;
 import io.redspace.ironsjewelry.registry.AssetHandlerRegistry;
-import io.redspace.ironsjewelry.registry.ComponentRegistry;
 import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
 import io.redspace.ironsjewelry.utils.MinecraftInstanceHelper;
 import io.redspace.ironsjewelry.utils.Utils;
@@ -240,7 +239,7 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
             if (!parts.isEmpty()) {
                 JewelryData jewelryData = JewelryData.renderable(holder, parts);
                 ItemStack stack = new ItemStack(pattern.jewelryType().item());
-                stack.set(ComponentRegistry.JEWELRY_COMPONENT, jewelryData);
+                JewelryData.set(stack, jewelryData);
                 //Event posting
                 var event = new SetupJewelcraftingResultEvent(holder, MinecraftInstanceHelper.getPlayer(), stack);
                 if (NeoForge.EVENT_BUS.post(event).isCanceled()) {

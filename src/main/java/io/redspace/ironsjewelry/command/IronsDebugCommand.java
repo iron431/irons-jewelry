@@ -13,9 +13,9 @@ import io.redspace.ironsjewelry.core.data.JewelryData;
 import io.redspace.ironsjewelry.core.data.MaterialDefinition;
 import io.redspace.ironsjewelry.core.data.PartIngredient;
 import io.redspace.ironsjewelry.core.data.PatternDefinition;
+import io.redspace.ironsjewelry.core.data.StoredPatternData;
 import io.redspace.ironsjewelry.loot.LootInjectionHandler;
 import io.redspace.ironsjewelry.registry.AssetHandlerRegistry;
-import io.redspace.ironsjewelry.registry.ComponentRegistry;
 import io.redspace.ironsjewelry.registry.DataAttachmentRegistry;
 import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
 import io.redspace.ironsjewelry.registry.ItemRegistry;
@@ -113,7 +113,7 @@ public class IronsDebugCommand {
         if (pattern.isPresent()) {
             var serverPlayer = source.getPlayer();
             ItemStack stack = new ItemStack(ItemRegistry.RECIPE.get());
-            stack.set(ComponentRegistry.STORED_PATTERN, pattern.get());
+            StoredPatternData.set(stack, pattern.get());
             serverPlayer.getInventory().add(stack);
             return 1;
         }

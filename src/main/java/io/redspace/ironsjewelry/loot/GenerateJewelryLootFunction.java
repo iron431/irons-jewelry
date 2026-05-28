@@ -8,7 +8,6 @@ import io.redspace.ironsjewelry.core.data.MaterialDefinition;
 import io.redspace.ironsjewelry.core.data.PartDefinition;
 import io.redspace.ironsjewelry.core.data.PartIngredient;
 import io.redspace.ironsjewelry.core.data.PatternDefinition;
-import io.redspace.ironsjewelry.registry.ComponentRegistry;
 import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
 import io.redspace.ironsjewelry.registry.LootRegistry;
 import io.redspace.ironsjewelry.utils.JewelryModTags;
@@ -87,7 +86,7 @@ public record GenerateJewelryLootFunction(
             }
             var jewelryData = new JewelryData(pattern, materials);
             if (jewelryData.isValid()) {
-                stack.set(ComponentRegistry.JEWELRY_COMPONENT, jewelryData);
+                JewelryData.set(stack, jewelryData);
                 return stack;
             }
         }

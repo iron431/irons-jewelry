@@ -10,7 +10,6 @@ import io.redspace.ironsjewelry.core.data.JewelryData;
 import io.redspace.ironsjewelry.core.data.MaterialDefinition;
 import io.redspace.ironsjewelry.core.data.PartIngredient;
 import io.redspace.ironsjewelry.core.data.PatternDefinition;
-import io.redspace.ironsjewelry.registry.ComponentRegistry;
 import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -68,11 +67,11 @@ public class Utils {
     }
 
     public static List<BonusInstance> getEquippedBonuses(Player player) {
-        return CuriosApi.getCuriosInventory(player).map(inv -> inv.findCurios(stack -> stack.has(ComponentRegistry.JEWELRY_COMPONENT)).stream().flatMap(slot -> JewelryData.get(slot.stack()).getBonuses().stream()).toList()).orElse(List.of());
+        return CuriosApi.getCuriosInventory(player).map(inv -> inv.findCurios(JewelryData::has).stream().flatMap(slot -> JewelryData.get(slot.stack()).getBonuses().stream()).toList()).orElse(List.of());
     }
 
     public static List<ItemStack> getEquippedJewelry(Player player) {
-        return CuriosApi.getCuriosInventory(player).map(inv -> inv.findCurios(stack -> stack.has(ComponentRegistry.JEWELRY_COMPONENT)).stream().map(SlotResult::stack).toList()).orElse(List.of());
+        return CuriosApi.getCuriosInventory(player).map(inv -> inv.findCurios(JewelryData::has).stream().map(SlotResult::stack).toList()).orElse(List.of());
     }
 
     public static List<FormattedCharSequence> rasterizeComponentList(List<? extends Component> components) {
@@ -143,7 +142,7 @@ public class Utils {
         var parts = pattern.partTemplate().stream().map(PartIngredient::part).collect(Collectors.toMap(Function.identity(),
                 (p) -> iron));
         JewelryData jewelryData = JewelryData.renderable(IronsJewelryRegistries.patternRegistry(Minecraft.getInstance().level.registryAccess()).wrapAsHolder(pattern), parts);
-        output.set(ComponentRegistry.JEWELRY_COMPONENT, jewelryData);
+        JewelryData.set(output, jewelryData);
         var bonuses = pattern.getPatternBonusesTooltip();
         if (!bonuses.isEmpty()) {
             bonuses.set(0, Component.translatable("tooltip.irons_jewelry.bonus_crafted_header").withStyle(ChatFormatting.YELLOW, ChatFormatting.UNDERLINE)); // replace header

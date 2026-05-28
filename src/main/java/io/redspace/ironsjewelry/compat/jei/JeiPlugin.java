@@ -4,8 +4,8 @@ import io.redspace.ironsjewelry.IronsJewelry;
 import io.redspace.ironsjewelry.block.jewelcrafting_station.JewelcraftingStationScreen;
 import io.redspace.ironsjewelry.core.data.JewelryData;
 import io.redspace.ironsjewelry.core.data.PatternDefinition;
+import io.redspace.ironsjewelry.core.data.StoredPatternData;
 import io.redspace.ironsjewelry.registry.BlockRegistry;
-import io.redspace.ironsjewelry.registry.ComponentRegistry;
 import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
 import io.redspace.ironsjewelry.registry.ItemRegistry;
 import io.redspace.ironsjewelry.utils.Utils;
@@ -100,7 +100,7 @@ public class JeiPlugin implements IModPlugin {
     public static final ISubtypeInterpreter<ItemStack> PATTERN_INTERPRETER = new ISubtypeInterpreter<ItemStack>() {
         @Override
         public @Nullable String getSubtypeData(ItemStack ingredient, UidContext context) {
-            var pattern = ingredient.get(ComponentRegistry.STORED_PATTERN);
+            var pattern = StoredPatternData.get(ingredient);
             if (pattern != null && pattern.getKey() != null) {
                 return pattern.getKey().location().toString();
             }

@@ -8,7 +8,6 @@ import io.redspace.ironsjewelry.core.data.PlayerData;
 import io.redspace.ironsjewelry.event.SetupJewelcraftingResultEvent;
 import io.redspace.ironsjewelry.network.packets.SyncJewelcraftingSlotStates;
 import io.redspace.ironsjewelry.registry.BlockRegistry;
-import io.redspace.ironsjewelry.registry.ComponentRegistry;
 import io.redspace.ironsjewelry.registry.MenuRegistry;
 import io.redspace.ironsjewelry.utils.Utils;
 import net.minecraft.core.Holder;
@@ -149,7 +148,7 @@ public class JewelcraftingStationMenu extends AbstractContainerMenu {
             var jewelryData = new JewelryData(this.currentPattern, parts);
             if (jewelryData.isValid()) {
                 result = new ItemStack(currentPattern.jewelryType().item());
-                result.set(ComponentRegistry.JEWELRY_COMPONENT, jewelryData);
+                JewelryData.set(result, jewelryData);
             }
             //Event posting
             var event = new SetupJewelcraftingResultEvent(this.currentPattern, this.player, result);
