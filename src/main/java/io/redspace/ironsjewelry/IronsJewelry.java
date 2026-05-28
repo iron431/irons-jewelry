@@ -38,6 +38,7 @@ public class IronsJewelry {
         VillagerRegistry.register(modEventBus);
         SoundRegistry.register(modEventBus);
         AssetHandlerRegistry.register(modEventBus);
+        AttributeRegistry.register(modEventBus);
 
         modContainer.registerConfig(ModConfig.Type.SERVER, ServerConfig.SPEC);
     }

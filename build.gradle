@@ -110,8 +110,8 @@ dependencies {
     compileOnly "io.redspace:atlas_api:${atlas_api_version}"
     localRuntime "io.redspace:atlas_api:${atlas_api_version}"
 
-    implementation "dev.shadowsoffire:ApothicAttributes:${minecraft_version}-${attribute_lib_version}"
-    localRuntime "dev.shadowsoffire:Placebo:${minecraft_version}-${placebo_version}"
+    compileOnly "dev.shadowsoffire:ApothicAttributes:${minecraft_version}-${attribute_lib_version}"
+//    localRuntime "dev.shadowsoffire:ApothicAttributes:${minecraft_version}-${attribute_lib_version}"
 
     compileOnly "io.redspace:irons_spellbooks:${minecraft_version}-${spellbooks_version}:api"
 //    localRuntime "io.redspace:irons_spellbooks:${minecraft_version}-${spellbooks_version}"
@@ -137,7 +137,6 @@ tasks.withType(ProcessResources).configureEach {
             mod_authors            : mod_authors,
             mod_description        : mod_description,
             attribute_lib_version  : attribute_lib_version,
-            placebo_version        : placebo_version,
             spellbooks_version     : spellbooks_version,
             atlas_api_version      : atlas_api_version,
             jei_version            : jei_version,

@@ -13,7 +13,7 @@
     },
     "irons_jewelry:attribute": {
       "amount": 1.0,
-      "attribute": "apothic_attributes:armor_pierce",
+      "attribute": "irons_jewelry:armor_pierce",
       "operation": "add_value"
     },
     "irons_jewelry:negative_effect": {

@@ -146,6 +146,14 @@
   "bonus_parameter.irons_jewelry.attribute": "Attribute",
   "bonus_parameter.irons_jewelry.empty": "Empty",
 
+  "attribute.name.irons_jewelry.armor_pierce": "Armor Pierce",
+  "attribute.name.irons_jewelry.mining_speed": "Mining Speed",
+  "attribute.name.irons_jewelry.experience_gained": "Experience Gained",
+  "attribute.name.irons_jewelry.arrow_damage": "Arrow Damage",
+  "attribute.name.irons_jewelry.crit_damage": "Critical Damage",
+  "attribute.name.irons_jewelry.dodge_chance": "Dodge Chance",
+  "attribute.name.irons_jewelry.healing_received": "Healing Received",
+
   "action.irons_jewelry.apply_effect.name": "Apply Effect",
   "action.irons_jewelry.apply_effect.self": "Gain %s%s",
   "action.irons_jewelry.apply_effect.entity": "Inflict %s%s",
