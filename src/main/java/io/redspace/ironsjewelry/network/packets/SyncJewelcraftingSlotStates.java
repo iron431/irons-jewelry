@@ -43,7 +43,7 @@ public record SyncJewelcraftingSlotStates(List<SlotState> slotStates) implements
 
     public static void handle(SyncJewelcraftingSlotStates packet, IPayloadContext context) {
         context.enqueueWork(() -> {
-            if(Minecraft.getInstance().screen instanceof JewelcraftingStationScreen jewelScreen){
+            if (Minecraft.getInstance().screen instanceof JewelcraftingStationScreen jewelScreen) {
                 jewelScreen.handleSlotSync(packet);
             }
         });

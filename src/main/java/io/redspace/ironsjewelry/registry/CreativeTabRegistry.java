@@ -29,8 +29,8 @@ public class CreativeTabRegistry {
             event.accept(ItemRegistry.GARNET.get());
             event.accept(ItemRegistry.JEWELCRAFTING_GUIDE.get());
 
-            event.getParameters().holders().lookup(IronsJewelryRegistries.Keys.PATTERN_REGISTRY_KEY).ifPresent(patternRegistry->{
-                patternRegistry.listElements().filter(pattern->pattern.isBound() && !pattern.value().unlockedByDefault()).forEach(pattern->event.accept(PatternRecipeItem.of(pattern)));
+            event.getParameters().holders().lookup(IronsJewelryRegistries.Keys.PATTERN_REGISTRY_KEY).ifPresent(patternRegistry -> {
+                patternRegistry.listElements().filter(pattern -> pattern.isBound() && !pattern.value().unlockedByDefault()).forEach(pattern -> event.accept(PatternRecipeItem.of(pattern)));
             });
         }
     }

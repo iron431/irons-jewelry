@@ -16,7 +16,8 @@ public class OpenGuidebookScreenPacket implements CustomPacketPayload {
     public OpenGuidebookScreenPacket(RegistryFriendlyByteBuf buf) {
     }
 
-    public OpenGuidebookScreenPacket(){}
+    public OpenGuidebookScreenPacket() {
+    }
 
     private void write(RegistryFriendlyByteBuf buf) {
     }

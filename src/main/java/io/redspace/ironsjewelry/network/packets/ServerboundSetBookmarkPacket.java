@@ -2,8 +2,6 @@ package io.redspace.ironsjewelry.network.packets;
 
 import io.redspace.ironsjewelry.IronsJewelry;
 import io.redspace.ironsjewelry.core.data.PlayerData;
-import io.redspace.ironsjewelry.registry.DataAttachmentRegistry;
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;

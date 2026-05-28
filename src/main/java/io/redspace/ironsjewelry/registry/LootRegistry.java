@@ -2,7 +2,11 @@ package io.redspace.ironsjewelry.registry;
 
 import com.mojang.serialization.MapCodec;
 import io.redspace.ironsjewelry.IronsJewelry;
-import io.redspace.ironsjewelry.loot.*;
+import io.redspace.ironsjewelry.loot.AppendLootModifier;
+import io.redspace.ironsjewelry.loot.GenerateJewelryLootFunction;
+import io.redspace.ironsjewelry.loot.InjectJewelryLootModifier;
+import io.redspace.ironsjewelry.loot.ReplaceLootModifier;
+import io.redspace.ironsjewelry.loot.SetHeldPatternLootFunction;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
 import net.neoforged.bus.api.IEventBus;

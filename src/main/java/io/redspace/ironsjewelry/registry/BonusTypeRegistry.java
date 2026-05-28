@@ -1,7 +1,17 @@
 package io.redspace.ironsjewelry.registry;
 
 import io.redspace.ironsjewelry.IronsJewelry;
-import io.redspace.ironsjewelry.core.bonuses.*;
+import io.redspace.ironsjewelry.core.bonuses.AttributeBonusType;
+import io.redspace.ironsjewelry.core.bonuses.BonusType;
+import io.redspace.ironsjewelry.core.bonuses.EffectImmunityBonusType;
+import io.redspace.ironsjewelry.core.bonuses.EffectOnHitBonusType;
+import io.redspace.ironsjewelry.core.bonuses.EmptyBonusType;
+import io.redspace.ironsjewelry.core.bonuses.OnAttackBonusType;
+import io.redspace.ironsjewelry.core.bonuses.OnProjectileHitBonusType;
+import io.redspace.ironsjewelry.core.bonuses.OnShieldBlockBonusType;
+import io.redspace.ironsjewelry.core.bonuses.OnTakeDamageBonusType;
+import io.redspace.ironsjewelry.core.bonuses.PiglinNeutralBonusType;
+import io.redspace.ironsjewelry.core.bonuses.TradeDiscountBonusType;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
@@ -21,7 +31,7 @@ public class BonusTypeRegistry {
     public static final Supplier<OnTakeDamageBonusType> ON_TAKE_DAMAGE_BONUS = BONUSES.register("on_take_damage_bonus", OnTakeDamageBonusType::new);
     public static final Supplier<TradeDiscountBonusType> TRADE_DISCOUNT_BONUS = BONUSES.register("trade_discount_bonus", TradeDiscountBonusType::new);
 
-    public static void register(IEventBus eventBus){
+    public static void register(IEventBus eventBus) {
         BONUSES.register(eventBus);
     }
 }

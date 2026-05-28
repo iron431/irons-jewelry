@@ -5,7 +5,11 @@ import com.google.common.collect.Multimap;
 import io.redspace.ironsjewelry.client.ClientEvents;
 import io.redspace.ironsjewelry.core.bonuses.AttributeBonusType;
 import io.redspace.ironsjewelry.core.bonuses.PiglinNeutralBonusType;
-import io.redspace.ironsjewelry.core.data.*;
+import io.redspace.ironsjewelry.core.data.BonusInstance;
+import io.redspace.ironsjewelry.core.data.JewelryData;
+import io.redspace.ironsjewelry.core.data.MaterialDefinition;
+import io.redspace.ironsjewelry.core.data.PartDefinition;
+import io.redspace.ironsjewelry.core.data.PatternDefinition;
 import io.redspace.ironsjewelry.core.parameters.IBonusParameterType;
 import io.redspace.ironsjewelry.registry.BonusTypeRegistry;
 import io.redspace.ironsjewelry.registry.ComponentRegistry;
@@ -30,7 +34,11 @@ import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.api.type.capability.ICurioItem;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 public class CurioBaseItem extends Item implements ICurioItem {
     String slotIdentifier;
