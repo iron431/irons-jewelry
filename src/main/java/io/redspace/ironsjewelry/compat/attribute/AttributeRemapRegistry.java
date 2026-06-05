@@ -6,17 +6,16 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 
 public final class AttributeRemapRegistry {
     private static final Map<Holder<Attribute>, Holder<Attribute>> REMAPS = new HashMap<>();
 
-    private AttributeRemapRegistry() {
-    }
-
     public static void register(Holder<Attribute> from, Holder<Attribute> to) {
         REMAPS.put(from, to);
+        relax();
     }
 
     public static void register(ResourceLocation from, ResourceLocation to) {
@@ -46,5 +45,23 @@ public final class AttributeRemapRegistry {
 
     public static Optional<Holder<Attribute>> findTarget(Holder<Attribute> source) {
         return Optional.ofNullable(REMAPS.get(source));
+    }
+
+    private static void relax() {
+        if (REMAPS.isEmpty()) {
+            return;
+        }
+        HashSet<Map.Entry<Holder<Attribute>, Holder<Attribute>>> toCollapse = new HashSet<>();
+        for (var entry : REMAPS.entrySet()) {
+            if (REMAPS.containsKey(entry.getValue())) {
+                toCollapse.add(entry);
+            }
+        }
+        for (var entry : toCollapse) {
+            var relaxed = REMAPS.remove(entry.getValue());
+            if (relaxed != null) {
+                REMAPS.put(entry.getKey(), relaxed);
+            }
+        }
     }
 }

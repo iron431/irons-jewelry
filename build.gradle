@@ -120,8 +120,8 @@ dependencies {
     //    localRuntime "io.redspace:irons_spellbooks:${minecraft_version}-${spellbooks_version}"
     //    localRuntime "curse.maven:playeranimator-658587:6024462"
 
-//        localRuntime "curse.maven:apothic-attributes-898963:6021370"
-//        localRuntime "curse.maven:placebo-283644:6105436"
+        localRuntime "curse.maven:apothic-attributes-898963:6021370"
+        localRuntime "curse.maven:placebo-283644:6105436"
 }
 
 tasks.withType(ProcessResources).configureEach {
