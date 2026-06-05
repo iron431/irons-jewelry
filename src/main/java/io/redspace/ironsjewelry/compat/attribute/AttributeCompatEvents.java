@@ -1,7 +1,5 @@
-package io.redspace.ironsjewelry.event;
+package io.redspace.ironsjewelry.compat.attribute;
 
-import io.redspace.ironsjewelry.IronsJewelry;
-import io.redspace.ironsjewelry.compat.CompatHandler;
 import net.minecraft.core.Holder;
 import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -16,12 +14,12 @@ import top.theillusivec4.curios.api.event.CurioAttributeModifierEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-@EventBusSubscriber(modid = IronsJewelry.MODID)
+@EventBusSubscriber(modid = "irons_jewelry")
 public class AttributeCompatEvents {
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void onItemAttributeModifiers(ItemAttributeModifierEvent event) {
         List<ItemAttributeModifiers.Entry> modifiers = new ArrayList<>(event.getModifiers());
-        CompatHandler.APOTH_PROXY.handleAttributeEvent(modifiers,
+        AttributeCompatHandler.handleAttributeEvent(modifiers,
                 (attribute, modifier) -> event.removeModifier(attribute, modifier.id()),
                 (attribute, modifier) -> event.addModifier(attribute, modifier, slotFor(modifiers, attribute, modifier)));
     }
@@ -31,7 +29,7 @@ public class AttributeCompatEvents {
         var modifiers = event.getModifiers().entries().stream()
                 .map(entry -> new ItemAttributeModifiers.Entry(entry.getKey(), entry.getValue(), EquipmentSlotGroup.ANY))
                 .toList();
-        CompatHandler.APOTH_PROXY.handleAttributeEvent(modifiers, event::removeModifier, event::addModifier);
+        AttributeCompatHandler.handleAttributeEvent(modifiers, event::removeModifier, event::addModifier);
     }
 
     private static EquipmentSlotGroup slotFor(List<ItemAttributeModifiers.Entry> modifiers, Holder<Attribute> attribute, AttributeModifier modifier) {
