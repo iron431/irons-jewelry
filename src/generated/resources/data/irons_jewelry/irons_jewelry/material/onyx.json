@@ -12,7 +12,7 @@
     },
     "irons_jewelry:attribute": {
       "amount": 0.15,
-      "attribute": "irons_jewelry:crit_damage",
+      "attribute": "irons_lib:crit_damage",
       "operation": "add_value"
     },
     "irons_jewelry:negative_effect": {

@@ -4,7 +4,6 @@ import com.mojang.logging.LogUtils;
 import io.redspace.ironsjewelry.core.MaterialModifierDataHandler;
 import io.redspace.ironsjewelry.registry.ActionRegistry;
 import io.redspace.ironsjewelry.registry.AssetHandlerRegistry;
-import io.redspace.ironsjewelry.registry.AttributeRegistry;
 import io.redspace.ironsjewelry.registry.BlockRegistry;
 import io.redspace.ironsjewelry.registry.BonusTypeRegistry;
 import io.redspace.ironsjewelry.registry.CommandArgumentRegistry;
@@ -54,7 +53,6 @@ public class IronsJewelry {
         VillagerRegistry.register(modEventBus);
         SoundRegistry.register(modEventBus);
         AssetHandlerRegistry.register(modEventBus);
-        AttributeRegistry.register(modEventBus);
 
         modContainer.registerConfig(ModConfig.Type.SERVER, ServerConfig.SPEC);
     }

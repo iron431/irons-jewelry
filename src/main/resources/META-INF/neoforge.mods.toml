@@ -108,6 +108,6 @@ file="META-INF/accesstransformer.cfg"
 [[dependencies.${mod_id}]]
     modId="irons_lib"
     type="required"
-    versionRange="[1.21.1-1,1.21.1-2)"
+    versionRange="[1.21.1-1.1,1.21.1-2)"
     ordering="NONE"
     side="BOTH"

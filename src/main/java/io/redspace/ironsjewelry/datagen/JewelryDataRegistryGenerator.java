@@ -17,13 +17,13 @@ import io.redspace.ironsjewelry.core.data.PartIngredient;
 import io.redspace.ironsjewelry.core.data.PatternDefinition;
 import io.redspace.ironsjewelry.core.data.QualityScalar;
 import io.redspace.ironsjewelry.core.parameters.ActionParameter;
-import io.redspace.ironsjewelry.registry.AttributeRegistry;
 import io.redspace.ironsjewelry.registry.BonusTypeRegistry;
 import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
 import io.redspace.ironsjewelry.registry.JewelryTypeRegistry;
 import io.redspace.ironsjewelry.registry.ParameterTypeRegistry;
 import io.redspace.ironsjewelry.registry.SoundRegistry;
 import io.redspace.ironsjewelry.utils.JewelryModTags;
+import io.redspace.ironslib.registry.IronsLibRegistries;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.core.HolderSet;
@@ -39,7 +39,6 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.Item;
@@ -415,7 +414,7 @@ public class JewelryDataRegistryGenerator {
                 Ingredient.of(itemTag("c:gems/amethyst")),
                 IronsJewelry.id("palettes/amethyst"),
                 Map.of(
-                        ParameterTypeRegistry.ATTRIBUTE_PARAMETER.get(), new AttributeInstance(AttributeRegistry.ARMOR_PIERCE, 1, AttributeModifier.Operation.ADD_VALUE),
+                        ParameterTypeRegistry.ATTRIBUTE_PARAMETER.get(), new AttributeInstance(IronsLibRegistries.AttributeRegistry.ARMOR_PIERCE, 1, AttributeModifier.Operation.ADD_VALUE),
                         ParameterTypeRegistry.POSITIVE_EFFECT_PARAMETER.get(), MobEffects.REGENERATION,
                         ParameterTypeRegistry.NEGATIVE_EFFECT_PARAMETER.get(), MobEffects.POISON,
                         ParameterTypeRegistry.ACTION_PARAMETER.get(), new ActionParameter.ActionRunnable(
@@ -510,7 +509,7 @@ public class JewelryDataRegistryGenerator {
                 Ingredient.of(itemTag("c:ingots/gold")),
                 IronsJewelry.id("palettes/gold"),
                 Map.of(
-                        ParameterTypeRegistry.ATTRIBUTE_PARAMETER.get(), new AttributeInstance(AttributeRegistry.MINING_SPEED, 0.10, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL),
+                        ParameterTypeRegistry.ATTRIBUTE_PARAMETER.get(), new AttributeInstance(IronsLibRegistries.AttributeRegistry.MINING_SPEED, 0.10, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL),
                         ParameterTypeRegistry.POSITIVE_EFFECT_PARAMETER.get(), MobEffects.FIRE_RESISTANCE,
                         ParameterTypeRegistry.NEGATIVE_EFFECT_PARAMETER.get(), MobEffects.POISON,
                         ParameterTypeRegistry.ACTION_PARAMETER.get(), new ActionParameter.ActionRunnable(
@@ -536,7 +535,7 @@ public class JewelryDataRegistryGenerator {
                 Ingredient.of(itemTag("c:gems/lapis")),
                 IronsJewelry.id("palettes/lapis"),
                 Map.of(
-                        ParameterTypeRegistry.ATTRIBUTE_PARAMETER.get(), new AttributeInstance(AttributeRegistry.EXPERIENCE_GAINED, 0.10, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL),
+                        ParameterTypeRegistry.ATTRIBUTE_PARAMETER.get(), new AttributeInstance(IronsLibRegistries.AttributeRegistry.EXPERIENCE_GAINED, 0.10, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL),
                         ParameterTypeRegistry.NEGATIVE_EFFECT_PARAMETER.get(), MobEffects.GLOWING,
                         ParameterTypeRegistry.ACTION_PARAMETER.get(), new ActionParameter.ActionRunnable(
                                 new ApplyEffectAction(new QualityScalar(80), new QualityScalar(0, 1, 0, Optional.of(2.0)), MobEffects.MOVEMENT_SLOWDOWN), false)
@@ -548,7 +547,7 @@ public class JewelryDataRegistryGenerator {
                 Ingredient.of(itemTag("c:gems/moonstone")),
                 IronsJewelry.id("palettes/moonstone"),
                 Map.of(
-                        ParameterTypeRegistry.ATTRIBUTE_PARAMETER.get(), new AttributeInstance(AttributeRegistry.ARROW_DAMAGE, 0.1, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL),
+                        ParameterTypeRegistry.ATTRIBUTE_PARAMETER.get(), new AttributeInstance(IronsLibRegistries.AttributeRegistry.ARROW_DAMAGE, 0.1, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL),
                         ParameterTypeRegistry.NEGATIVE_EFFECT_PARAMETER.get(), MobEffects.WEAVING,
                         ParameterTypeRegistry.POSITIVE_EFFECT_PARAMETER.get(), MobEffects.INVISIBILITY,
                         ParameterTypeRegistry.ACTION_PARAMETER.get(), new ActionParameter.ActionRunnable(
@@ -577,7 +576,7 @@ public class JewelryDataRegistryGenerator {
                 Ingredient.of(itemTag("c:gems/onyx")),
                 IronsJewelry.id("palettes/onyx"),
                 Map.of(
-                        ParameterTypeRegistry.ATTRIBUTE_PARAMETER.get(), new AttributeInstance(AttributeRegistry.CRIT_DAMAGE, 0.15, AttributeModifier.Operation.ADD_VALUE),
+                        ParameterTypeRegistry.ATTRIBUTE_PARAMETER.get(), new AttributeInstance(IronsLibRegistries.AttributeRegistry.CRIT_DAMAGE, 0.15, AttributeModifier.Operation.ADD_VALUE),
                         ParameterTypeRegistry.NEGATIVE_EFFECT_PARAMETER.get(), MobEffects.BLINDNESS,
                         ParameterTypeRegistry.ACTION_PARAMETER.get(), new ActionParameter.ActionRunnable(
                                 new HealAction(new QualityScalar(4.0, 2.0)), true)
@@ -589,7 +588,7 @@ public class JewelryDataRegistryGenerator {
                 Ingredient.of(itemTag("c:gems/peridot")),
                 IronsJewelry.id("palettes/peridot"),
                 Map.of(
-                        ParameterTypeRegistry.ATTRIBUTE_PARAMETER.get(), new AttributeInstance(AttributeRegistry.MINING_SPEED, 0.10, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL),
+                        ParameterTypeRegistry.ATTRIBUTE_PARAMETER.get(), new AttributeInstance(IronsLibRegistries.AttributeRegistry.MINING_SPEED, 0.10, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL),
                         ParameterTypeRegistry.NEGATIVE_EFFECT_PARAMETER.get(), MobEffects.POISON,
                         ParameterTypeRegistry.POSITIVE_EFFECT_PARAMETER.get(), MobEffects.DIG_SPEED,
                         ParameterTypeRegistry.ACTION_PARAMETER.get(), new ActionParameter.ActionRunnable(
@@ -602,7 +601,7 @@ public class JewelryDataRegistryGenerator {
                 Ingredient.of(itemTag("c:ingots/platinum")),
                 IronsJewelry.id("palettes/platinum"),
                 Map.of(
-                        ParameterTypeRegistry.ATTRIBUTE_PARAMETER.get(), new AttributeInstance(AttributeRegistry.ARMOR_PIERCE, 1, AttributeModifier.Operation.ADD_VALUE),
+                        ParameterTypeRegistry.ATTRIBUTE_PARAMETER.get(), new AttributeInstance(IronsLibRegistries.AttributeRegistry.ARMOR_PIERCE, 1, AttributeModifier.Operation.ADD_VALUE),
                         ParameterTypeRegistry.POSITIVE_EFFECT_PARAMETER.get(), MobEffects.DAMAGE_RESISTANCE,
                         ParameterTypeRegistry.NEGATIVE_EFFECT_PARAMETER.get(), MobEffects.WEAKNESS,
                         ParameterTypeRegistry.ACTION_PARAMETER.get(), new ActionParameter.ActionRunnable(
@@ -627,7 +626,7 @@ public class JewelryDataRegistryGenerator {
                 Ingredient.of(itemTag("c:gems/sapphire")),
                 IronsJewelry.id("palettes/sapphire"),
                 Map.of(
-                        ParameterTypeRegistry.ATTRIBUTE_PARAMETER.get(), new AttributeInstance(AttributeRegistry.DODGE_CHANCE, 0.03, AttributeModifier.Operation.ADD_VALUE),
+                        ParameterTypeRegistry.ATTRIBUTE_PARAMETER.get(), new AttributeInstance(IronsLibRegistries.AttributeRegistry.DODGE_CHANCE, 0.03, AttributeModifier.Operation.ADD_VALUE),
                         ParameterTypeRegistry.NEGATIVE_EFFECT_PARAMETER.get(), MobEffects.MOVEMENT_SLOWDOWN,
                         ParameterTypeRegistry.ACTION_PARAMETER.get(), new ActionParameter.ActionRunnable(
                                 new ApplyFreezeAction(new QualityScalar(40.0), false), false)
