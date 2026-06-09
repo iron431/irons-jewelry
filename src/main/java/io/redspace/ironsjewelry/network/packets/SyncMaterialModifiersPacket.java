@@ -27,7 +27,7 @@
 //                buf.writeInt(entries);
 //                for (int i = 0; i < entries; i++) {
 //                    var entry = entryList.get(i);
-//                    buf.writeResourceLocation(Objects.requireNonNull(entry.getKey().getKey()).location());
+//                    buf.writeIdentifier(Objects.requireNonNull(entry.getKey().getKey()).location());
 //                    var modifiers = data.map.get(entry.getKey());
 //                    int modifierCount = modifiers.size();
 //                    buf.writeInt(modifierCount);

@@ -28,7 +28,7 @@ import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.fml.loading.FMLLoader;
 
@@ -109,7 +109,7 @@ public class IronsDebugCommand {
         }
 
         var registry = IronsJewelryRegistries.patternRegistry(source.registryAccess());
-        var pattern = registry.getHolder(ResourceLocation.parse(patternId));
+        var pattern = registry.getHolder(Identifier.parse(patternId));
         if (pattern.isPresent()) {
             var serverPlayer = source.getPlayer();
             ItemStack stack = new ItemStack(ItemRegistry.RECIPE.get());
@@ -127,7 +127,7 @@ public class IronsDebugCommand {
         }
 
         var registry = IronsJewelryRegistries.patternRegistry(source.registryAccess());
-        var pattern = registry.get(ResourceLocation.parse(patternId));
+        var pattern = registry.get(Identifier.parse(patternId));
         if (pattern != null) {
             var serverPlayer = source.getPlayer();
             if (serverPlayer != null) {
@@ -212,7 +212,7 @@ public class IronsDebugCommand {
                         }
                     });
 
-                    var fileName = serverPlayer.getMainHandItem().getHoverName().getString().toLowerCase(Locale.ENGLISH).chars().mapToObj(i -> ResourceLocation.isAllowedInResourceLocation((char) i) ? String.valueOf((char) i) : "_").collect(Collectors.joining()) + ".png";
+                    var fileName = serverPlayer.getMainHandItem().getHoverName().getString().toLowerCase(Locale.ENGLISH).chars().mapToObj(i -> Identifier.isAllowedInIdentifier((char) i) ? String.valueOf((char) i) : "_").collect(Collectors.joining()) + ".png";
                     Path dirPath = Path.of("screenshots/irons_jewelry");
                     Path filePath = dirPath.resolve(fileName);
                     if (Files.notExists(dirPath)) {

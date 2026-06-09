@@ -18,7 +18,7 @@ import io.redspace.ironsjewelry.registry.MenuRegistry;
 import io.redspace.ironsjewelry.registry.ParameterTypeRegistry;
 import io.redspace.ironsjewelry.registry.SoundRegistry;
 import io.redspace.ironsjewelry.registry.VillagerRegistry;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
@@ -61,8 +61,8 @@ public class IronsJewelry {
         event.addListener(new MaterialModifierDataHandler());
     }
 
-    public static ResourceLocation id(String path) {
-        return ResourceLocation.fromNamespaceAndPath(IronsJewelry.MODID, path);
+    public static Identifier id(String path) {
+        return Identifier.fromNamespaceAndPath(IronsJewelry.MODID, path);
     }
 
 }

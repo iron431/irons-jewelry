@@ -3,7 +3,7 @@ package io.redspace.ironsjewelry.command;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.Collection;
 import java.util.List;
@@ -17,7 +17,7 @@ public class PatternCommandArgument implements ArgumentType<String> {
     public String parse(final StringReader reader) throws CommandSyntaxException {
         int i = reader.getCursor();
 
-        while (reader.canRead() && ResourceLocation.isAllowedInResourceLocation(reader.peek())) {
+        while (reader.canRead() && Identifier.isAllowedInIdentifier(reader.peek())) {
             reader.skip();
         }
 

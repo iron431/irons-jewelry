@@ -12,14 +12,14 @@ import io.redspace.ironsjewelry.core.data.PartDefinition;
 import io.redspace.ironsjewelry.core.data.PartIngredient;
 import io.redspace.ironsjewelry.core.data.PatternDefinition;
 import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
-import net.minecraft.ResourceLocationException;
+import net.minecraft.IdentifierException;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.texture.atlas.SpriteSource;
 import net.minecraft.client.renderer.texture.atlas.sources.PalettedPermutations;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -50,7 +50,7 @@ public class JewelryAssetHandler extends AssetHandler {
             var parts = jewelryData.parts().entrySet();
             if (!parts.isEmpty()) {
                 List<ModelLayer> layers = parts.stream().map(part -> {
-                    ResourceLocation sprite = getSpriteLocation(part.getKey(), part.getValue());
+                    Identifier sprite = getSpriteLocation(part.getKey(), part.getValue());
                     return new ModelLayer(sprite, extractDrawOrder(part.getKey(), jewelryData.pattern().value().partTemplate()), Optional.empty());
                 }).toList();
 
@@ -67,7 +67,7 @@ public class JewelryAssetHandler extends AssetHandler {
                 var patternValue = pattern.value();
                 List<ModelLayer> layers = patternValue.partTemplate().stream().map(
                         part -> {
-                            ResourceLocation sprite = getMenuSpriteLocation(part.part(), true);
+                            Identifier sprite = getMenuSpriteLocation(part.part(), true);
                             return new ModelLayer(sprite, extractDrawOrder(part.part(), patternValue.partTemplate()), Optional.empty());
                         }
                 ).toList();
@@ -83,34 +83,34 @@ public class JewelryAssetHandler extends AssetHandler {
         return String.format("%s_%s", materialKey.getNamespace(), materialName);
     }
 
-    public ResourceLocation getSpriteLocation(Holder<PartDefinition> part, Holder<MaterialDefinition> material) {
+    public Identifier getSpriteLocation(Holder<PartDefinition> part, Holder<MaterialDefinition> material) {
         try {
             String base = part.value().baseTextureLocation().toString();
             var permutationName = getPermutationName(material);
-            return ResourceLocation.parse(String.format("%s_%s", base, permutationName));
-        } catch (ResourceLocationException exception) {
+            return Identifier.parse(String.format("%s_%s", base, permutationName));
+        } catch (IdentifierException exception) {
             IronsJewelry.LOGGER.error("Error parsing atlas sprite location: {}", exception.getMessage());
         } catch (Exception ignored) {
         }
-        return ResourceLocation.withDefaultNamespace("missingno");
+        return Identifier.withDefaultNamespace("missingno");
     }
 
-    public ResourceLocation getMenuSpriteLocation(Holder<PartDefinition> partDefinition, boolean bright) {
-        return ResourceLocation.parse(String.format("%s_%s", partDefinition.value().baseTextureLocation().toString(), bright ? "menu_bright" : "menu"));
+    public Identifier getMenuSpriteLocation(Holder<PartDefinition> partDefinition, boolean bright) {
+        return Identifier.parse(String.format("%s_%s", partDefinition.value().baseTextureLocation().toString(), bright ? "menu_bright" : "menu"));
     }
 
     @Override
     public List<SpriteSource> buildSpriteSources() {
         var resourceManager = Minecraft.getInstance().getResourceManager();
         List<SpriteSource> sources = new ArrayList<>();
-        Multimap<ResourceLocation, ResourceLocation> byPaletteKey = LinkedListMultimap.create();
-        Map<String, ResourceLocation> permutations = new HashMap<>(Map.of(
+        Multimap<Identifier, Identifier> byPaletteKey = LinkedListMultimap.create();
+        Map<String, Identifier> permutations = new HashMap<>(Map.of(
                 "menu", IronsJewelry.id("palettes/menu"),
                 "menu_bright", IronsJewelry.id("palettes/menu_bright")
         ));
         IronsJewelryRegistries.materialRegistry(Minecraft.getInstance().level.registryAccess()).holders().forEach(
                 material -> {
-                    ResourceLocation palette = material.value().paletteLocation();
+                    Identifier palette = material.value().paletteLocation();
                     if (resourceManager.getResource(palette.withPrefix("textures/").withSuffix(".png")).isEmpty()) {
                         IronsJewelry.LOGGER.warn("Invalid palette: \"{}\" in material: {}", palette, material.key().location());
                     } else {
@@ -131,7 +131,7 @@ public class JewelryAssetHandler extends AssetHandler {
                 }
         );
 
-        for (ResourceLocation paletteKey : byPaletteKey.keySet()) {
+        for (Identifier paletteKey : byPaletteKey.keySet()) {
             var entries = byPaletteKey.get(paletteKey).stream().toList();
             sources.add(new PalettedPermutations(entries, paletteKey, permutations));
         }

@@ -2,7 +2,7 @@ package io.redspace.ironsjewelry.datagen;
 
 import io.redspace.ironsjewelry.IronsJewelry;
 import net.minecraft.data.PackOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.neoforged.neoforge.client.model.generators.ItemModelBuilder;
 import net.neoforged.neoforge.client.model.generators.ItemModelProvider;
@@ -28,7 +28,7 @@ public class ItemModelDataGenerator extends ItemModelProvider {
 
     public ItemModelBuilder simpleItem(DeferredHolder<Item, ? extends Item> item) {
         return withExistingParent(item.getId().getPath(),
-                ResourceLocation.withDefaultNamespace("item/generated")).texture("layer0",
-                ResourceLocation.fromNamespaceAndPath(IronsJewelry.MODID, "item/" + item.getId().getPath()));
+                Identifier.withDefaultNamespace("item/generated")).texture("layer0",
+                Identifier.fromNamespaceAndPath(IronsJewelry.MODID, "item/" + item.getId().getPath()));
     }
 }

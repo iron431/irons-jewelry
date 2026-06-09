@@ -14,7 +14,7 @@ import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.attachment.IAttachmentHolder;
@@ -32,7 +32,7 @@ public class PlayerData {
 
 
     private final Set<Holder<PatternDefinition>> learnedPatterns = new HashSet<>();
-    private final Map<ResourceLocation, CooldownInstance> cooldowns = new HashMap<>();
+    private final Map<Identifier, CooldownInstance> cooldowns = new HashMap<>();
     private int bookmarkIndex = -1;
 
     public int getBookmarkIndex() {
@@ -71,8 +71,8 @@ public class PlayerData {
         return isOnCooldown(IronsJewelryRegistries.BONUS_TYPE_REGISTRY.getKey(bonusType));
     }
 
-    public boolean isOnCooldown(ResourceLocation resourceLocation) {
-        return cooldowns.containsKey(resourceLocation) && cooldowns.get(resourceLocation).firstTick;
+    public boolean isOnCooldown(Identifier Identifier) {
+        return cooldowns.containsKey(Identifier) && cooldowns.get(Identifier).firstTick;
     }
 
     public void addCooldown(BonusType bonusType, int ticks) {
@@ -128,7 +128,7 @@ public class PlayerData {
             for (Tag stringTag : learnedPatterns) {
                 try {
                     var string = stringTag.getAsString();
-                    var pattern = holderGetter.get(ResourceKey.create(IronsJewelryRegistries.Keys.PATTERN_REGISTRY_KEY, ResourceLocation.parse(string)));
+                    var pattern = holderGetter.get(ResourceKey.create(IronsJewelryRegistries.Keys.PATTERN_REGISTRY_KEY, Identifier.parse(string)));
                     pattern.ifPresent(data.learnedPatterns::add);
                 } catch (Exception e) {
                     continue;
@@ -138,7 +138,7 @@ public class PlayerData {
             for (Tag tag : cooldowns) {
                 try {
                     var cooldown = (CompoundTag) tag;
-                    var id = ResourceLocation.parse(cooldown.getString("id"));
+                    var id = Identifier.parse(cooldown.getString("id"));
                     var rt = cooldown.getInt("rt");
                     var tt = cooldown.getInt("tt");
                     data.cooldowns.put(id, new CooldownInstance(rt, tt));
@@ -179,9 +179,9 @@ public class PlayerData {
             buf.writeInt(playerData.learnedPatterns.size());
             for (Holder<PatternDefinition> pattern : playerData.learnedPatterns) {
                 try {
-                    buf.writeResourceLocation(Objects.requireNonNull(pattern.getKey()).location());
+                    buf.writeIdentifier(Objects.requireNonNull(pattern.getKey()).location());
                 } catch (Exception e) {
-                    buf.writeResourceLocation(IronsJewelry.id("empty"));
+                    buf.writeIdentifier(IronsJewelry.id("empty"));
                 }
             }
             buf.writeInt(playerData.getBookmarkIndex());
@@ -193,7 +193,7 @@ public class PlayerData {
             var registry = IronsJewelryRegistries.patternRegistry(buf.registryAccess());
             for (int j = 0; j < i; j++) {
                 try {
-                    playerData.learnedPatterns.add(registry.wrapAsHolder(Objects.requireNonNull(registry.get(buf.readResourceLocation()))));
+                    playerData.learnedPatterns.add(registry.wrapAsHolder(Objects.requireNonNull(registry.get(buf.readIdentifier()))));
                 } catch (Exception e) {
                     continue;
                 }

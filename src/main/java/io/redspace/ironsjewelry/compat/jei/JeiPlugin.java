@@ -20,7 +20,7 @@ import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
 import mezz.jei.api.registration.ISubtypeRegistration;
 import net.minecraft.client.Minecraft;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
@@ -29,10 +29,10 @@ import java.util.List;
 
 @mezz.jei.api.JeiPlugin
 public class JeiPlugin implements IModPlugin {
-    private static final ResourceLocation ID = IronsJewelry.id("jei_plugin");
+    private static final Identifier ID = IronsJewelry.id("jei_plugin");
 
     @Override
-    public ResourceLocation getPluginUid() {
+    public Identifier getPluginUid() {
         return ID;
     }
 

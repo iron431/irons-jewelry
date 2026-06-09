@@ -37,7 +37,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.contents.PlainTextContents;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -67,7 +67,7 @@ import java.util.stream.Stream;
 
 public class GuideBookScreen extends Screen {
 
-    public static final ResourceLocation BOOK_LOCATION = IronsJewelry.id("textures/gui/jewelcrafting_guide.png");
+    public static final Identifier BOOK_LOCATION = IronsJewelry.id("textures/gui/jewelcrafting_guide.png");
 
     private PageButton forwardButton;
     private PageButton backButton;
@@ -336,7 +336,7 @@ public class GuideBookScreen extends Screen {
         });
     }
 
-    private int generateTextColor(ResourceLocation palette) {
+    private int generateTextColor(Identifier palette) {
         try {
             Optional<Resource> resource = Minecraft.getInstance().getResourceManager().getResource(SpriteSource.TEXTURE_ID_CONVERTER.idToFile(palette));
             if (resource.isPresent()) {
@@ -564,7 +564,7 @@ public class GuideBookScreen extends Screen {
                         List<FormattedCharSequence> tooltip, MutableComponent name,
                         List<MutableComponent> expandedInfo, boolean primary,
                         PartSelectionButton button) implements GuideBookButton {
-            private static final ResourceLocation INPUT_SLOT = IronsJewelry.id("guidebook/guidebook_part_frame");
+            private static final Identifier INPUT_SLOT = IronsJewelry.id("guidebook/guidebook_part_frame");
 
             void render(GuiGraphics guiGraphics, int x, int y, int width, int mouseX, int mouseY, float partialTick) {
                 List<FormattedCharSequence> tooltipToRender = null;
@@ -918,10 +918,10 @@ public class GuideBookScreen extends Screen {
 
     class BookmarkButton implements GuideBookButton {
         final int x, y, width, height;
-        final ResourceLocation sprite, spriteActive;
+        final Identifier sprite, spriteActive;
         int bookmark;
 
-        public BookmarkButton(int x, int y, int width, int height, ResourceLocation sprite, ResourceLocation spriteActive) {
+        public BookmarkButton(int x, int y, int width, int height, Identifier sprite, Identifier spriteActive) {
             this.x = x;
             this.y = y;
             this.width = width;
@@ -939,7 +939,7 @@ public class GuideBookScreen extends Screen {
         @Override
         public void render(GuiGraphics guiGraphics, boolean selected, float partialTick) {
             boolean active = bookmark >= 0 && bookmark == bookState.getGlobalPageNumber() - 1;
-            ResourceLocation sprite = active ? this.spriteActive : this.sprite;
+            Identifier sprite = active ? this.spriteActive : this.sprite;
             guiGraphics.blitSprite(sprite, x, y, width, height);
         }
 

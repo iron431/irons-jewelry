@@ -30,7 +30,7 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -97,14 +97,14 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
         return AssetHandlerRegistry.JEWELRY_HANDLER.get().getSprite(AssetHandlerRegistry.JEWELRY_HANDLER.get().getMenuSpriteLocation(partDefinition, bright));
     }
 
-    public static final ResourceLocation BACKGROUND_TEXTURE = IronsJewelry.id("textures/gui/jewelcrafting_station.png");
-    private static final ResourceLocation SCROLLER_SPRITE = IronsJewelry.id("jewelcrafting_station/scroller");
-    private static final ResourceLocation SCROLLER_DISABLED_SPRITE = IronsJewelry.id("jewelcrafting_station/scroller_disabled");
-    private static final ResourceLocation RECIPE_SPRITE_SELECTED = IronsJewelry.id("jewelcrafting_station/recipe_selected");
-    private static final ResourceLocation RECIPE_SPRITE_HOVERING = IronsJewelry.id("jewelcrafting_station/recipe_highlighted");
-    private static final ResourceLocation RECIPE_SPRITE = IronsJewelry.id("jewelcrafting_station/recipe");
-    private static final ResourceLocation INPUT_SLOT = IronsJewelry.id("jewelcrafting_station/input_slot");
-    private static final ResourceLocation LORE_PAGE = IronsJewelry.id("jewelcrafting_station/lore_page");
+    public static final Identifier BACKGROUND_TEXTURE = IronsJewelry.id("textures/gui/jewelcrafting_station.png");
+    private static final Identifier SCROLLER_SPRITE = IronsJewelry.id("jewelcrafting_station/scroller");
+    private static final Identifier SCROLLER_DISABLED_SPRITE = IronsJewelry.id("jewelcrafting_station/scroller_disabled");
+    private static final Identifier RECIPE_SPRITE_SELECTED = IronsJewelry.id("jewelcrafting_station/recipe_selected");
+    private static final Identifier RECIPE_SPRITE_HOVERING = IronsJewelry.id("jewelcrafting_station/recipe_highlighted");
+    private static final Identifier RECIPE_SPRITE = IronsJewelry.id("jewelcrafting_station/recipe");
+    private static final Identifier INPUT_SLOT = IronsJewelry.id("jewelcrafting_station/input_slot");
+    private static final Identifier LORE_PAGE = IronsJewelry.id("jewelcrafting_station/lore_page");
     private static final int MAX_PATTERNS = 8;
 
     public int scrollOff;

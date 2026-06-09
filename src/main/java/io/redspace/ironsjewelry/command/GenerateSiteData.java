@@ -24,7 +24,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.TagKey;
@@ -196,7 +196,7 @@ public class GenerateSiteData {
     private static String handleGenericItemGrouping(Item item) {
         if (item instanceof BlockItem) {
             return "Blocks";
-        } else if (new ItemStack(item).is(TagKey.create(Registries.ITEM, ResourceLocation.parse("c:gems")))) {
+        } else if (new ItemStack(item).is(TagKey.create(Registries.ITEM, Identifier.parse("c:gems")))) {
             return "Gems";
         } else {
             return "All";
@@ -205,12 +205,12 @@ public class GenerateSiteData {
 
     @NotNull
     private static ArrayList<RecipeIngredientData> getRecipeData(Recipe<?> recipe) {
-        var resultItemResourceLocation = BuiltInRegistries.ITEM.getKey(recipe.getResultItem(level.registryAccess()).getItem());
+        var resultItemIdentifier = BuiltInRegistries.ITEM.getKey(recipe.getResultItem(level.registryAccess()).getItem());
         var recipeData = new ArrayList<RecipeIngredientData>(10);
         recipeData.add(new RecipeIngredientData(
-                resultItemResourceLocation.toString(),
+                resultItemIdentifier.toString(),
                 recipe.getResultItem(level.registryAccess()).getItem().getName(ItemStack.EMPTY).getString(),
-                String.format("/img/items/%s.png", resultItemResourceLocation.getPath()),
+                String.format("/img/items/%s.png", resultItemIdentifier.getPath()),
                 recipe.getResultItem(level.registryAccess()).getItem())
         );
         if (recipe instanceof ShapedRecipe shapedRecipe && shapedRecipe.pattern.width() < 3) {
@@ -310,7 +310,7 @@ public class GenerateSiteData {
         ));
     }
 
-    private static void appendToBuilder2(StringBuilder sb, String name, ResourceLocation itemResource, String tooltip) {
+    private static void appendToBuilder2(StringBuilder sb, String name, Identifier itemResource, String tooltip) {
         sb.append(String.format(RECIPE_DATA_TEMPLATE,
                 itemResource.toString(),
                 name,
@@ -321,7 +321,7 @@ public class GenerateSiteData {
         ));
     }
 
-    private static void appendToBuilder3(StringBuilder sb, String name, ResourceLocation itemResource, String group, String tooltip) {
+    private static void appendToBuilder3(StringBuilder sb, String name, Identifier itemResource, String group, String tooltip) {
         sb.append(String.format(RECIPE_DATA_TEMPLATE,
                 itemResource.toString(),
                 name,
@@ -372,7 +372,7 @@ public class GenerateSiteData {
         return handleCapitalization(Component.translatable(descriptionId).getString());
     }
 
-    private static String parseAllowedMaterialsLabel(ResourceLocation partId) {
+    private static String parseAllowedMaterialsLabel(Identifier partId) {
         var rootOpt = loadRegistryDataJson(partId, "part");
         if (rootOpt.isEmpty()) {
             return "Any";
@@ -391,11 +391,11 @@ public class GenerateSiteData {
         }
     }
 
-    private static Optional<JsonObject> loadRegistryDataJson(ResourceLocation id, String registryPath) {
+    private static Optional<JsonObject> loadRegistryDataJson(Identifier id, String registryPath) {
         if (level == null || level.getServer() == null) {
             return Optional.empty();
         }
-        ResourceLocation dataPath = ResourceLocation.fromNamespaceAndPath(id.getNamespace(), "irons_jewelry/" + registryPath + "/" + id.getPath() + ".json");
+        Identifier dataPath = Identifier.fromNamespaceAndPath(id.getNamespace(), "irons_jewelry/" + registryPath + "/" + id.getPath() + ".json");
         var resourceOpt = level.getServer().getResourceManager().getResource(dataPath);
         if (resourceOpt.isEmpty()) {
             return Optional.empty();
@@ -434,10 +434,10 @@ public class GenerateSiteData {
 
     private static String holderSetEntryLabel(String entry) {
         if (entry.startsWith("#")) {
-            ResourceLocation tagId = ResourceLocation.parse(entry.substring(1));
+            Identifier tagId = Identifier.parse(entry.substring(1));
             return handleCapitalization(tagId.getPath().replace("_", " "));
         }
-        ResourceLocation id = ResourceLocation.parse(entry);
+        Identifier id = Identifier.parse(entry);
         return handleCapitalization(id.getPath().replace("_", " "));
     }
 

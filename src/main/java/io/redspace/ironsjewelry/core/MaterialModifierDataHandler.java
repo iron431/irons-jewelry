@@ -14,7 +14,7 @@ import io.redspace.ironsjewelry.core.parameters.IBonusParameterType;
 import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.RegistryOps;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
@@ -38,20 +38,20 @@ public class MaterialModifierDataHandler extends SimpleJsonResourceReloadListene
     }
 
     @Override
-    protected void apply(Map<ResourceLocation, JsonElement> pObject, ResourceManager pResourceManager, ProfilerFiller pProfiler) {
+    protected void apply(Map<Identifier, JsonElement> pObject, ResourceManager pResourceManager, ProfilerFiller pProfiler) {
         IronsJewelry.LOGGER.debug("MaterialDataHandler.apply");
         ImmutableMultimap.Builder<Holder<MaterialDefinition>, Modifier> builder = ImmutableMultimap.builder();
         RegistryOps<JsonElement> registryops = this.makeConditionalOps(); // Neo: add condition context
 
-        for (Map.Entry<ResourceLocation, JsonElement> entry : pObject.entrySet()) {
-            ResourceLocation resourcelocation = entry.getKey();
-            if (resourcelocation.getPath().startsWith("_"))
+        for (Map.Entry<Identifier, JsonElement> entry : pObject.entrySet()) {
+            Identifier Identifier = entry.getKey();
+            if (Identifier.getPath().startsWith("_"))
                 continue; //Forge: filter anything beginning with "_" as it's used for metadata.
             try {
                 var decoded = CODEC.parse(registryops, entry.getValue()).getOrThrow(JsonParseException::new);
                 builder.put(decoded.targetMaterial, decoded);
             } catch (IllegalArgumentException | JsonParseException jsonparseexception) {
-                IronsJewelry.LOGGER.error("Parsing error loading material {}: {}", resourcelocation, jsonparseexception);
+                IronsJewelry.LOGGER.error("Parsing error loading material {}: {}", Identifier, jsonparseexception);
             }
         }
 

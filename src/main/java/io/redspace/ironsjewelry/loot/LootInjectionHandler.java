@@ -5,7 +5,7 @@ import io.redspace.ironsjewelry.item.CurioBaseItem;
 import io.redspace.ironsjewelry.utils.JewelryModTags;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ArmorItem;
@@ -31,7 +31,7 @@ public class LootInjectionHandler {
      */
     private static final int GEARSCORE_THRESHOLD = 30;
     private static final Map<Predicate<Item>, Integer> ITEM_GEARSCORES = createGearscoreMap();
-    public static final HashMap<ResourceLocation, Float> TRACKED_LOOT_TABLES = new HashMap<>();
+    public static final HashMap<Identifier, Float> TRACKED_LOOT_TABLES = new HashMap<>();
     private static boolean built;
 
     private static Map<Predicate<Item>, Integer> createGearscoreMap() {
@@ -70,7 +70,7 @@ public class LootInjectionHandler {
         }
     }
 
-    private static void handleLootTable(ResourceLocation id, LootTable table) {
+    private static void handleLootTable(Identifier id, LootTable table) {
         try {
             // assume our loot tables do not need any edits
             if (id.getNamespace().equals(IronsJewelry.MODID)) {

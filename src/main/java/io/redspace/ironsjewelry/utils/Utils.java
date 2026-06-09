@@ -19,7 +19,7 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.entity.player.Player;
@@ -37,18 +37,18 @@ import java.util.stream.Collectors;
 
 public class Utils {
 
-    public static <T> Codec<T> byIdCodec(Function<ResourceLocation, Optional<T>> idToObj, Function<T, ResourceLocation> objToId) {
-        return ResourceLocation.CODEC
+    public static <T> Codec<T> byIdCodec(Function<Identifier, Optional<T>> idToObj, Function<T, Identifier> objToId) {
+        return Identifier.CODEC
                 .comapFlatMap(
-                        resourceLocation -> idToObj.apply(resourceLocation)
+                        Identifier -> idToObj.apply(Identifier)
                                 .map(DataResult::success)
-                                .orElseGet(() -> DataResult.error(() -> "Unknown registry key: " + resourceLocation)),
+                                .orElseGet(() -> DataResult.error(() -> "Unknown registry key: " + Identifier)),
                         objToId
                 );
     }
 
-    public static <T> StreamCodec<ByteBuf, T> idStreamCodec(Function<ResourceLocation, T> idToObj, Function<T, ResourceLocation> objToId) {
-        return ResourceLocation.STREAM_CODEC.map(idToObj, objToId);
+    public static <T> StreamCodec<ByteBuf, T> idStreamCodec(Function<Identifier, T> idToObj, Function<T, Identifier> objToId) {
+        return Identifier.STREAM_CODEC.map(idToObj, objToId);
     }
 
     public static <L, R, T> T mapEither(Either<L, R> either, Function<L, T> leftToValue, Function<R, T> rightToValue) {

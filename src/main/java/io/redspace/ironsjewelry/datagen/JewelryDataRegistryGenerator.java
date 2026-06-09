@@ -32,7 +32,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.TagKey;
@@ -694,19 +694,19 @@ public class JewelryDataRegistryGenerator {
             .add(IronsJewelryRegistries.Keys.PATTERN_REGISTRY_KEY, JewelryDataRegistryGenerator::bootstrapPatterns)
             .add(IronsJewelryRegistries.Keys.MATERIAL_REGISTRY_KEY, JewelryDataRegistryGenerator::bootstrapMaterials);
 
-    private static ResourceKey<PatternDefinition> patternKey(ResourceLocation location) {
+    private static ResourceKey<PatternDefinition> patternKey(Identifier location) {
         return ResourceKey.create(IronsJewelryRegistries.Keys.PATTERN_REGISTRY_KEY, location);
     }
 
-    private static ResourceKey<PartDefinition> partKey(ResourceLocation location) {
+    private static ResourceKey<PartDefinition> partKey(Identifier location) {
         return ResourceKey.create(IronsJewelryRegistries.Keys.PART_REGISTRY_KEY, location);
     }
 
-    private static ResourceKey<MaterialDefinition> materialKey(ResourceLocation location) {
+    private static ResourceKey<MaterialDefinition> materialKey(Identifier location) {
         return ResourceKey.create(IronsJewelryRegistries.Keys.MATERIAL_REGISTRY_KEY, location);
     }
 
     private static TagKey<Item> itemTag(String tag) {
-        return TagKey.create(Registries.ITEM, ResourceLocation.parse(tag));
+        return TagKey.create(Registries.ITEM, Identifier.parse(tag));
     }
 }

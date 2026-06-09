@@ -4,16 +4,16 @@ import io.redspace.ironsjewelry.item.book.GuideBookState;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.navigation.ScreenAxis;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.function.Function;
 
 public class PageButton implements GuideBookButton {
     final int x, y, width, height;
-    final ResourceLocation sprite, spriteHighlighted;
+    final Identifier sprite, spriteHighlighted;
     final Function<GuideBookState, Boolean> onClick;
 
-    public PageButton(int x, int y, int width, int height, ResourceLocation sprite, ResourceLocation spriteHighlighted, Function<GuideBookState, Boolean> onClick) {
+    public PageButton(int x, int y, int width, int height, Identifier sprite, Identifier spriteHighlighted, Function<GuideBookState, Boolean> onClick) {
         this.x = x;
         this.y = y;
         this.width = width;
@@ -30,7 +30,7 @@ public class PageButton implements GuideBookButton {
 
     @Override
     public void render(GuiGraphics guiGraphics, boolean selected, float partialTick) {
-        ResourceLocation sprite = selected ? this.spriteHighlighted : this.sprite;
+        Identifier sprite = selected ? this.spriteHighlighted : this.sprite;
         guiGraphics.blitSprite(sprite, x, y, width, height);
     }
 

@@ -8,7 +8,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.ProcessorLists;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.levelgen.structure.pools.SinglePoolElement;
 import net.minecraft.world.level.levelgen.structure.pools.StructurePoolElement;
 import net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool;
@@ -26,7 +26,7 @@ public class VillageAddition {
     private static void addBuildingToPool(Registry<StructureTemplatePool> templatePoolRegistry,
                                           Registry<StructureProcessorList> processorListRegistry,
                                           ResourceKey<StructureProcessorList> proccessor,
-                                          ResourceLocation poolRL,
+                                          Identifier poolRL,
                                           String nbtPieceRL,
                                           int weight) {
 
@@ -73,27 +73,27 @@ public class VillageAddition {
 
         addBuildingToPool(templatePoolRegistry, processorListRegistry,
                 ProcessorLists.MOSSIFY_70_PERCENT,
-                ResourceLocation.parse("minecraft:village/plains/houses"),
+                Identifier.parse("minecraft:village/plains/houses"),
                 "village/plains/house_jeweler",
                 weight);
         addBuildingToPool(templatePoolRegistry, processorListRegistry,
                 ProcessorLists.MOSSIFY_70_PERCENT,
-                ResourceLocation.parse("minecraft:village/desert/houses"),
+                Identifier.parse("minecraft:village/desert/houses"),
                 "village/desert/house_jeweler", weight);
 
         addBuildingToPool(templatePoolRegistry, processorListRegistry,
                 ProcessorLists.MOSSIFY_70_PERCENT,
-                ResourceLocation.parse("minecraft:village/taiga/houses"),
+                Identifier.parse("minecraft:village/taiga/houses"),
                 "village/taiga/house_jeweler", weight);
 
         addBuildingToPool(templatePoolRegistry, processorListRegistry,
                 ProcessorLists.MOSSIFY_70_PERCENT,
-                ResourceLocation.parse("minecraft:village/savanna/houses"),
+                Identifier.parse("minecraft:village/savanna/houses"),
                 "village/savanna/house_jeweler", weight);
 
         addBuildingToPool(templatePoolRegistry, processorListRegistry,
                 ProcessorLists.MOSSIFY_70_PERCENT,
-                ResourceLocation.parse("minecraft:village/snowy/houses"),
+                Identifier.parse("minecraft:village/snowy/houses"),
                 "village/snowy/house_jeweler", weight);
 
 

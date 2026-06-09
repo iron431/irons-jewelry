@@ -4,8 +4,8 @@ import com.mojang.serialization.Codec;
 import io.redspace.ironsjewelry.core.data.BonusInstance;
 import io.redspace.ironsjewelry.core.parameters.IBonusParameterType;
 import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
-import net.minecraft.Util;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.Util;
 
 import java.util.List;
 
