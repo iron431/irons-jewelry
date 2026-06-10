@@ -1,0 +1,659 @@
+﻿Downloading https://services.gradle.org/distributions/gradle-9.2.1-bin.zip
+............10%.............20%.............30%.............40%.............50%.............60%.............70%.............80%.............90%.............100%
+
+Welcome to Gradle 9.2.1!
+
+Here are the highlights of this release:
+ - Windows ARM support
+ - Improved publishing APIs
+ - Better guidance for dependency verification failures
+
+For more details see https://docs.gradle.org/9.2.1/release-notes.html
+
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/9.2.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+Calculating task graph as no cached configuration is available for tasks: compileJava
+
+> Task :createMinecraftArtifacts
+Loaded 141 artifacts from C:\Projects\26-irons-jewelry\build\tmp\createMinecraftArtifacts\nfrt_artifact_manifest.properties
+*** Started working on downloadManifest
+  DL    https://launchermeta.mojang.com/mc/game/version_manifest_v2.json
+ DONE  Completed downloadManifest in 0.29s
+*** Started working on downloadJson
+  DL    https://launchermeta.mojang.com/mc/game/version_manifest_v2.json
+  DL    https://piston-meta.mojang.com/v1/packages/ea40ed437b7b40d812843b576adf38d3c1ffb99c/26.1.2.json
+ DONE  Completed downloadJson in 0.20s
+*** Started working on downloadClient
+*** Started working on downloadServer
+  DL    https://piston-data.mojang.com/v1/objects/4e618f09a0c649dde3fdf829df443ce0b8831e65/client.jar
+  DL    https://piston-data.mojang.com/v1/objects/97ccd4c0ed3f81bbb7bfacddd1090b0c56f9bc51/server.jar
+ DONE  Completed downloadClient in 0.75s
+ DONE  Completed downloadServer in 1.39s
+*** Started working on preProcessJar
+ RUN   Running external tool net.neoforged.installertools:installertools:4.0.16:fatjar
+ DONE  Completed preProcessJar in 2.19s
+*** Started working on decompile
+ RUN   Running external tool org.jetbrains.java.decompiler.main.decompiler.ConsoleDecompiler
+ DONE  Completed decompile in 25.55s
+*** Started working on patch
+ RUN   Running external tool io.codechicken:DiffPatch:2.0.0.36:all
+ DONE  Completed patch in 4.33s
+*** Started working on applyNeoforgePatches
+ RUN   Running external tool io.codechicken:DiffPatch:2.0.0.36:all
+ DONE  Completed applyNeoforgePatches in 3.25s
+*** Started working on transformSources
+ RUN   Running external tool net.neoforged.jst:jst-cli-bundle:2.0.6
+ DONE  Completed transformSources in 7.39s
+*** Started working on recompile
+ 106 items on the compile classpath
+ 0 items on the sourcepath
+ Compiling 6882 source files
+Copied 18752 resource files
+ DONE  Completed recompile in 21.15s
+*** Started working on mergeWithSources
+ DONE  Completed mergeWithSources in 2.18s
+Total runtime: 68.57s
+
+
+> Task :compileJava
+.\gradlew.bat : C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\block\jewelcrafting_station\Jewelcr
+aftingStationScreen.java:23: error: cannot find symbol
+At C:\Users\cmb\AppData\Local\Temp\ps-script-c2726e39-b1ed-4220-a404-23f51dadd6cc.ps1:112 char:36
++ ... 26-irons-jewelry"; .\gradlew.bat compileJava --no-daemon 2>&1 | Out-F ...
++                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (C:\Projects\26-...not find symbol:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+import net.minecraft.client.gui.GuiGraphics;
+                               ^
+  symbol:   class GuiGraphics
+  location: package net.minecraft.client.gui
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\block\jewelcrafting_station\JewelcraftingStationScr
+een.java:28: error: cannot find symbol
+import net.minecraft.client.renderer.LightTexture;
+                                    ^
+  symbol:   class LightTexture
+  location: package net.minecraft.client.renderer
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\block\jewelcrafting_station\JewelcraftingStationScr
+een.java:158: error: cannot find symbol
+    protected void renderTooltip(GuiGraphics pGuiGraphics, int mouseX, int mouseY) {
+                                 ^
+  symbol:   class GuiGraphics
+  location: class JewelcraftingStationScreen
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\block\jewelcrafting_station\JewelcraftingStationScr
+een.java:190: error: cannot find symbol
+    protected void renderBg(GuiGraphics guiGraphics, float pPartialTick, int pMouseX, int pMouseY) {
+                            ^
+  symbol:   class GuiGraphics
+  location: class JewelcraftingStationScreen
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\block\jewelcrafting_station\JewelcraftingStationScr
+een.java:212: error: cannot find symbol
+    private void renderItemPreview(GuiGraphics guiGraphics, float pPartialTick, int pMouseX, int pMouseY) {
+                                   ^
+  symbol:   class GuiGraphics
+  location: class JewelcraftingStationScreen
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\block\jewelcrafting_station\JewelcraftingStationScr
+een.java:276: error: cannot find symbol
+    private void renderTooltipInternal(GuiGraphics guiGraphics, Font pFont, List<Component> components, int x, int y) {
+                                       ^
+  symbol:   class GuiGraphics
+  location: class JewelcraftingStationScreen
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\block\jewelcrafting_station\JewelcraftingStationScr
+een.java:316: error: cannot find symbol
+    public void render(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+                                ^
+  symbol:   class GuiGraphics
+  location: class JewelcraftingStationScreen
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\block\jewelcrafting_station\JewelcraftingStationScr
+een.java:346: error: cannot find symbol
+    private void renderSidebar(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+                               ^
+  symbol:   class GuiGraphics
+  location: class JewelcraftingStationScreen
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\block\jewelcrafting_station\JewelcraftingStationScr
+een.java:86: error: cannot find symbol
+        public void renderWidget(GuiGraphics guiGraphics, boolean isHovering, boolean selected) {
+                                 ^
+  symbol:   class GuiGraphics
+  location: class PatternButton
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\command\GenerateSiteData.java:17: error: package 
+io.redspace.ironsspellbooks.api.spells does not exist
+import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
+                                             ^
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\command\GenerateSiteData.java:31: error: cannot 
+find symbol
+import net.minecraft.util.FastColor;
+                         ^
+  symbol:   class FastColor
+  location: package net.minecraft.util
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\command\GenerateSiteData.java:648: error: cannot 
+find symbol
+    private static List<String> processUniqueInfo(AbstractSpell spell) {
+                                                  ^
+  symbol:   class AbstractSpell
+  location: class GenerateSiteData
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\compat\ISSCooldownHandler.java:5: error: package 
+io.redspace.ironsspellbooks.api.util does not exist
+import io.redspace.ironsspellbooks.api.util.Utils;
+                                           ^
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\compat\ISSCooldownHandler.java:8: error: package 
+io.redspace.ironsspellbooks.api.registry does not exist
+import static io.redspace.ironsspellbooks.api.registry.AttributeRegistry.COOLDOWN_REDUCTION;
+                                                      ^
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\compat\ISSCooldownHandler.java:8: error: static 
+import only from classes and interfaces
+import static io.redspace.ironsspellbooks.api.registry.AttributeRegistry.COOLDOWN_REDUCTION;
+^
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\compat\jei\AdvancedPatternJeiHandler.java:6: 
+error: package mezz.jei.api.ingredients does not exist
+import mezz.jei.api.ingredients.ITypedIngredient;
+                               ^
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\compat\jei\AdvancedPatternJeiHandler.java:7: 
+error: package mezz.jei.api.recipe.advanced does not exist
+import mezz.jei.api.recipe.advanced.ISimpleRecipeManagerPlugin;
+                                   ^
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\compat\jei\AdvancedPatternJeiHandler.java:13: 
+error: cannot find symbol
+public class AdvancedPatternJeiHandler implements ISimpleRecipeManagerPlugin<PatternDefinition> {
+                                                  ^
+  symbol: class ISimpleRecipeManagerPlugin
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\compat\jei\AdvancedPatternJeiHandler.java:15: 
+error: cannot find symbol
+    public boolean isHandledInput(ITypedIngredient<?> input) {
+                                  ^
+  symbol:   class ITypedIngredient
+  location: class AdvancedPatternJeiHandler
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\compat\jei\AdvancedPatternJeiHandler.java:20: 
+error: cannot find symbol
+    public boolean isHandledOutput(ITypedIngredient output) {
+                                   ^
+  symbol:   class ITypedIngredient
+  location: class AdvancedPatternJeiHandler
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\compat\jei\AdvancedPatternJeiHandler.java:25: 
+error: cannot find symbol
+    public List<PatternDefinition> getRecipesForInput(ITypedIngredient<?> input) {
+                                                      ^
+  symbol:   class ITypedIngredient
+  location: class AdvancedPatternJeiHandler
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\compat\jei\AdvancedPatternJeiHandler.java:33: 
+error: cannot find symbol
+    public List<PatternDefinition> getRecipesForOutput(ITypedIngredient<?> output) {
+                                                       ^
+  symbol:   class ITypedIngredient
+  location: class AdvancedPatternJeiHandler
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\compat\jei\JeiPlugin.java:12: error: package 
+mezz.jei.api does not exist
+import mezz.jei.api.IModPlugin;
+                   ^
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\compat\jei\JeiPlugin.java:13: error: package 
+mezz.jei.api.ingredients.subtypes does not exist
+import mezz.jei.api.ingredients.subtypes.ISubtypeInterpreter;
+                                        ^
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\compat\jei\JeiPlugin.java:14: error: package 
+mezz.jei.api.ingredients.subtypes does not exist
+import mezz.jei.api.ingredients.subtypes.UidContext;
+                                        ^
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\compat\jei\JeiPlugin.java:15: error: package 
+mezz.jei.api.registration does not exist
+import mezz.jei.api.registration.IAdvancedRegistration;
+                                ^
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\compat\jei\JeiPlugin.java:16: error: package 
+mezz.jei.api.registration does not exist
+import mezz.jei.api.registration.IExtraIngredientRegistration;
+                                ^
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\compat\jei\JeiPlugin.java:17: error: package 
+mezz.jei.api.registration does not exist
+import mezz.jei.api.registration.IGuiHandlerRegistration;
+                                ^
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\compat\jei\JeiPlugin.java:18: error: package 
+mezz.jei.api.registration does not exist
+import mezz.jei.api.registration.IRecipeCatalystRegistration;
+                                ^
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\compat\jei\JeiPlugin.java:19: error: package 
+mezz.jei.api.registration does not exist
+import mezz.jei.api.registration.IRecipeCategoryRegistration;
+                                ^
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\compat\jei\JeiPlugin.java:20: error: package 
+mezz.jei.api.registration does not exist
+import mezz.jei.api.registration.IRecipeRegistration;
+                                ^
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\compat\jei\JeiPlugin.java:21: error: package 
+mezz.jei.api.registration does not exist
+import mezz.jei.api.registration.ISubtypeRegistration;
+                                ^
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\compat\jei\JeiPlugin.java:31: error: cannot find 
+symbol
+public class JeiPlugin implements IModPlugin {
+                                  ^
+  symbol: class IModPlugin
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\compat\jei\JeiPlugin.java:30: error: package 
+mezz.jei.api does not exist
+@mezz.jei.api.JeiPlugin
+             ^
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\compat\jei\JeiPlugin.java:40: error: cannot find 
+symbol
+    public void registerGuiHandlers(IGuiHandlerRegistration registration) {
+                                    ^
+  symbol:   class IGuiHandlerRegistration
+  location: class JeiPlugin
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\compat\jei\JeiPlugin.java:45: error: cannot find 
+symbol
+    public void registerCategories(IRecipeCategoryRegistration registration) {
+                                   ^
+  symbol:   class IRecipeCategoryRegistration
+  location: class JeiPlugin
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\compat\jei\JeiPlugin.java:50: error: cannot find 
+symbol
+    public void registerRecipes(IRecipeRegistration registration) {
+                                ^
+  symbol:   class IRecipeRegistration
+  location: class JeiPlugin
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\compat\jei\JeiPlugin.java:55: error: cannot find 
+symbol
+    public void registerExtraIngredients(IExtraIngredientRegistration registration) {
+                                         ^
+  symbol:   class IExtraIngredientRegistration
+  location: class JeiPlugin
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\compat\jei\JeiPlugin.java:66: error: cannot find 
+symbol
+    public void registerItemSubtypes(ISubtypeRegistration registration) {
+                                     ^
+  symbol:   class ISubtypeRegistration
+  location: class JeiPlugin
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\compat\jei\JeiPlugin.java:73: error: cannot find 
+symbol
+    public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
+                                        ^
+  symbol:   class IRecipeCatalystRegistration
+  location: class JeiPlugin
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\compat\jei\JeiPlugin.java:78: error: cannot find 
+symbol
+    public void registerAdvanced(IAdvancedRegistration registration) {
+                                 ^
+  symbol:   class IAdvancedRegistration
+  location: class JeiPlugin
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\compat\jei\JeiPlugin.java:82: error: cannot find 
+symbol
+    public static final ISubtypeInterpreter<ItemStack> JEWELRY_INTERPRETER = new ISubtypeInterpreter<ItemStack>() {
+                        ^
+  symbol:   class ISubtypeInterpreter
+  location: class JeiPlugin
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\compat\jei\JeiPlugin.java:100: error: cannot find 
+symbol
+    public static final ISubtypeInterpreter<ItemStack> PATTERN_INTERPRETER = new ISubtypeInterpreter<ItemStack>() {
+                        ^
+  symbol:   class ISubtypeInterpreter
+  location: class JeiPlugin
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\compat\jei\JewelcraftingJeiGuiHandler.java:4: 
+error: package mezz.jei.api.gui.handlers does not exist
+import mezz.jei.api.gui.handlers.IGuiContainerHandler;
+                                ^
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\compat\jei\JewelcraftingJeiGuiHandler.java:10: 
+error: cannot find symbol
+public class JewelcraftingJeiGuiHandler implements IGuiContainerHandler<JewelcraftingStationScreen> {
+                                                   ^
+  symbol: class IGuiContainerHandler
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\compat\jei\JewelcraftingJeiRecipeCategory.java:9: 
+error: package mezz.jei.api.gui.builder does not exist
+import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
+                               ^
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\compat\jei\JewelcraftingJeiRecipeCategory.java:10: 
+error: package mezz.jei.api.gui.builder does not exist
+import mezz.jei.api.gui.builder.IRecipeSlotBuilder;
+                               ^
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\compat\jei\JewelcraftingJeiRecipeCategory.java:11: 
+error: package mezz.jei.api.gui.drawable does not exist
+import mezz.jei.api.gui.drawable.IDrawable;
+                                ^
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\compat\jei\JewelcraftingJeiRecipeCategory.java:12: 
+error: package mezz.jei.api.gui.ingredient does not exist
+import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
+                                  ^
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\compat\jei\JewelcraftingJeiRecipeCategory.java:13: 
+error: package mezz.jei.api.helpers does not exist
+import mezz.jei.api.helpers.IGuiHelper;
+                           ^
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\compat\jei\JewelcraftingJeiRecipeCategory.java:14: 
+error: package mezz.jei.api.recipe does not exist
+import mezz.jei.api.recipe.IFocusGroup;
+                          ^
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\compat\jei\JewelcraftingJeiRecipeCategory.java:15: 
+error: package mezz.jei.api.recipe does not exist
+import mezz.jei.api.recipe.RecipeIngredientRole;
+                          ^
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\compat\jei\JewelcraftingJeiRecipeCategory.java:16: 
+error: package mezz.jei.api.recipe does not exist
+import mezz.jei.api.recipe.RecipeType;
+                          ^
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\compat\jei\JewelcraftingJeiRecipeCategory.java:17: 
+error: package mezz.jei.api.recipe.category does not exist
+import mezz.jei.api.recipe.category.IRecipeCategory;
+                                   ^
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\compat\jei\JewelcraftingJeiRecipeCategory.java:20: 
+error: cannot find symbol
+import net.minecraft.client.gui.GuiGraphics;
+                               ^
+  symbol:   class GuiGraphics
+  location: package net.minecraft.client.gui
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\compat\jei\JewelcraftingJeiRecipeCategory.java:30: 
+error: cannot find symbol
+public class JewelcraftingJeiRecipeCategory implements IRecipeCategory<PatternDefinition> {
+                                                       ^
+  symbol: class IRecipeCategory
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\compat\jei\JewelcraftingJeiRecipeCategory.java:31: 
+error: cannot find symbol
+    public static final RecipeType<PatternDefinition> RECIPE_TYPE = RecipeType.create(IronsJewelry.MODID, 
+"jewelcrafting", PatternDefinition.class);
+                        ^
+  symbol:   class RecipeType
+  location: class JewelcraftingJeiRecipeCategory
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\compat\jei\JewelcraftingJeiRecipeCategory.java:33: 
+error: cannot find symbol
+    private final IDrawable background;
+                  ^
+  symbol:   class IDrawable
+  location: class JewelcraftingJeiRecipeCategory
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\compat\jei\JewelcraftingJeiRecipeCategory.java:34: 
+error: cannot find symbol
+    private final IDrawable icon;
+                  ^
+  symbol:   class IDrawable
+  location: class JewelcraftingJeiRecipeCategory
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\compat\jei\JewelcraftingJeiRecipeCategory.java:39: 
+error: cannot find symbol
+    public JewelcraftingJeiRecipeCategory(IGuiHelper guiHelper) {
+                                          ^
+  symbol:   class IGuiHelper
+  location: class JewelcraftingJeiRecipeCategory
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\compat\jei\JewelcraftingJeiRecipeCategory.java:48: 
+error: cannot find symbol
+    public RecipeType<PatternDefinition> getRecipeType() {
+           ^
+  symbol:   class RecipeType
+  location: class JewelcraftingJeiRecipeCategory
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\compat\jei\JewelcraftingJeiRecipeCategory.java:58: 
+error: cannot find symbol
+    public IDrawable getBackground() {
+           ^
+  symbol:   class IDrawable
+  location: class JewelcraftingJeiRecipeCategory
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\compat\jei\JewelcraftingJeiRecipeCategory.java:63: 
+error: cannot find symbol
+    public @Nullable IDrawable getIcon() {
+                     ^
+  symbol:   class IDrawable
+  location: class JewelcraftingJeiRecipeCategory
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\compat\jei\JewelcraftingJeiRecipeCategory.java:68: 
+error: cannot find symbol
+    public void setRecipe(IRecipeLayoutBuilder builder, PatternDefinition recipe, IFocusGroup focuses) {
+                          ^
+  symbol:   class IRecipeLayoutBuilder
+  location: class JewelcraftingJeiRecipeCategory
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\compat\jei\JewelcraftingJeiRecipeCategory.java:68: 
+error: cannot find symbol
+    public void setRecipe(IRecipeLayoutBuilder builder, PatternDefinition recipe, IFocusGroup focuses) {
+                                                                                  ^
+  symbol:   class IFocusGroup
+  location: class JewelcraftingJeiRecipeCategory
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\compat\jei\JewelcraftingJeiRecipeCategory.java:92: 
+error: cannot find symbol
+    public void draw(PatternDefinition recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double 
+mouseX, double mouseY) {
+                                               ^
+  symbol:   class IRecipeSlotsView
+  location: class JewelcraftingJeiRecipeCategory
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\compat\jei\JewelcraftingJeiRecipeCategory.java:92: 
+error: cannot find symbol
+    public void draw(PatternDefinition recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double 
+mouseX, double mouseY) {
+                                                                                 ^
+  symbol:   class GuiGraphics
+  location: class JewelcraftingJeiRecipeCategory
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\core\actions\IgnorableExplosion.java:15: error: no 
+interface expected here
+public class IgnorableExplosion extends Explosion {
+                                        ^
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\core\data\PlayerData.java:119: error: wrong number 
+of type arguments; required 1
+    public static class Serializer implements IAttachmentSerializer<CompoundTag, PlayerData> {
+                                                                   ^
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\datagen\DataGenerators.java:10: error: cannot find 
+symbol
+import net.neoforged.neoforge.common.data.ExistingFileHelper;
+                                         ^
+  symbol:   class ExistingFileHelper
+  location: package net.neoforged.neoforge.common.data
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\datagen\ItemModelDataGenerator.java:7: error: 
+package net.neoforged.neoforge.client.model.generators does not exist
+import net.neoforged.neoforge.client.model.generators.ItemModelBuilder;
+                                                     ^
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\datagen\ItemModelDataGenerator.java:8: error: 
+package net.neoforged.neoforge.client.model.generators does not exist
+import net.neoforged.neoforge.client.model.generators.ItemModelProvider;
+                                                     ^
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\datagen\ItemModelDataGenerator.java:9: error: 
+cannot find symbol
+import net.neoforged.neoforge.common.data.ExistingFileHelper;
+                                         ^
+  symbol:   class ExistingFileHelper
+  location: package net.neoforged.neoforge.common.data
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\datagen\ItemModelDataGenerator.java:16: error: 
+cannot find symbol
+public class ItemModelDataGenerator extends ItemModelProvider {
+                                            ^
+  symbol: class ItemModelProvider
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\datagen\ItemModelDataGenerator.java:20: error: 
+cannot find symbol
+    public ItemModelDataGenerator(PackOutput output, ExistingFileHelper exFileHelper) {
+                                                     ^
+  symbol:   class ExistingFileHelper
+  location: class ItemModelDataGenerator
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\datagen\ItemModelDataGenerator.java:29: error: 
+cannot find symbol
+    public ItemModelBuilder simpleItem(DeferredHolder<Item, ? extends Item> item) {
+           ^
+  symbol:   class ItemModelBuilder
+  location: class ItemModelDataGenerator
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\event\SetupEvents.java:12: error: cannot find 
+symbol
+import net.neoforged.neoforge.event.village.VillagerTradesEvent;
+                                           ^
+  symbol:   class VillagerTradesEvent
+  location: package net.neoforged.neoforge.event.village
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\event\SetupEvents.java:13: error: cannot find 
+symbol
+import net.neoforged.neoforge.event.village.WandererTradesEvent;
+                                           ^
+  symbol:   class WandererTradesEvent
+  location: package net.neoforged.neoforge.event.village
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\event\SetupEvents.java:18: error: cannot find 
+symbol
+    public static void setupProfessionTrades(VillagerTradesEvent event) {
+                                             ^
+  symbol:   class VillagerTradesEvent
+  location: class SetupEvents
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\event\SetupEvents.java:57: error: cannot find 
+symbol
+    public static void addWanderingTrades(WandererTradesEvent event) {
+                                          ^
+  symbol:   class WandererTradesEvent
+  location: class SetupEvents
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\IronsJewelry.java:27: error: cannot find symbol
+import net.neoforged.neoforge.event.AddReloadListenerEvent;
+                                   ^
+  symbol:   class AddReloadListenerEvent
+  location: package net.neoforged.neoforge.event
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\IronsJewelry.java:60: error: cannot find symbol
+    public static void registerReloadListeners(AddReloadListenerEvent event) {
+                                               ^
+  symbol:   class AddReloadListenerEvent
+  location: class IronsJewelry
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\item\book\buttons\GuideBookButton.java:4: error: 
+cannot find symbol
+import net.minecraft.client.gui.GuiGraphics;
+                               ^
+  symbol:   class GuiGraphics
+  location: package net.minecraft.client.gui
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\item\book\buttons\GuideBookButton.java:18: error: 
+cannot find symbol
+    void render(GuiGraphics guiGraphics, boolean selected, float partialTick);
+                ^
+  symbol:   class GuiGraphics
+  location: interface GuideBookButton
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\item\book\GuideBookScreen.java:26: error: cannot 
+find symbol
+import net.minecraft.client.gui.GuiGraphics;
+                               ^
+  symbol:   class GuiGraphics
+  location: package net.minecraft.client.gui
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\item\book\GuideBookScreen.java:31: error: cannot 
+find symbol
+import net.minecraft.client.renderer.RenderType;
+                                    ^
+  symbol:   class RenderType
+  location: package net.minecraft.client.renderer
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\item\book\GuideBookScreen.java:372: error: cannot 
+find symbol
+        abstract void render(GuiGraphics guiGraphics, int titleX, int titleBottomY, int mouseX, int mouseY, float 
+partialTick);
+                             ^
+  symbol:   class GuiGraphics
+  location: class GuideBookScreen.Page
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\item\book\GuideBookScreen.java:374: error: cannot 
+find symbol
+        void drawTitle(GuiGraphics guiGraphics, Component text, int titleX, int titleBottomY, int color, boolean 
+dropshadow, @Nullable CyclicItemRenderer itemRenderer) {
+                       ^
+  symbol:   class GuiGraphics
+  location: class GuideBookScreen.Page
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\item\book\CyclicItemRenderer.java:3: error: cannot 
+find symbol
+import net.minecraft.client.gui.GuiGraphics;
+                               ^
+  symbol:   class GuiGraphics
+  location: package net.minecraft.client.gui
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\item\book\CyclicItemRenderer.java:26: error: 
+cannot find symbol
+    public void renderBottomLeft(GuiGraphics guiGraphics, int x, int y, float scale) {
+                                 ^
+  symbol:   class GuiGraphics
+  location: class CyclicItemRenderer
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\item\book\buttons\PageButton.java:4: error: cannot 
+find symbol
+import net.minecraft.client.gui.GuiGraphics;
+                               ^
+  symbol:   class GuiGraphics
+  location: package net.minecraft.client.gui
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\item\book\GuideBookScreen.java:145: error: cannot 
+find symbol
+    public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+                                 ^
+  symbol:   class GuiGraphics
+  location: class GuideBookScreen
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\item\book\GuideBookScreen.java:157: error: cannot 
+find symbol
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+                       ^
+  symbol:   class GuiGraphics
+  location: class GuideBookScreen
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\item\book\GuideBookScreen.java:322: error: cannot 
+find symbol
+    private void drawLine(GuiGraphics graphics, int thickness, int startX, int startY, int endX, int endY, int 
+startColor, int endColor) {
+                          ^
+  symbol:   class GuiGraphics
+  location: class GuideBookScreen
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\item\book\GuideBookScreen.java:424: error: cannot 
+find symbol
+        public void render(GuiGraphics guiGraphics, int titleX, int titleBottomY, int mouseX, int mouseY, float 
+partialTick) {
+                           ^
+  symbol:   class GuiGraphics
+  location: class GuideBookScreen.TableOfContentsPage
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\item\book\GuideBookScreen.java:940: error: cannot 
+find symbol
+        public void render(GuiGraphics guiGraphics, boolean selected, float partialTick) {
+                           ^
+  symbol:   class GuiGraphics
+  location: class GuideBookScreen.BookmarkButton
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\item\book\buttons\PageButton.java:32: error: 
+cannot find symbol
+    public void render(GuiGraphics guiGraphics, boolean selected, float partialTick) {
+                       ^
+  symbol:   class GuiGraphics
+  location: class PageButton
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\item\book\buttons\TextButton.java:6: error: cannot 
+find symbol
+import net.minecraft.client.gui.GuiGraphics;
+                               ^
+  symbol:   class GuiGraphics
+  location: package net.minecraft.client.gui
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\item\book\buttons\TextButton.java:46: error: 
+cannot find symbol
+    public void render(GuiGraphics guiGraphics, boolean selected, float partialTick) {
+                       ^
+  symbol:   class GuiGraphics
+  location: class TextButton
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\item\book\GuideBookItem.java:9: error: cannot find 
+symbol
+import net.minecraft.world.InteractionResultHolder;
+                          ^
+  symbol:   class InteractionResultHolder
+  location: package net.minecraft.world
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\compat\jei\JewelcraftingJeiGuiHandler.java:23: 
+warning: [removal] getGuiLeft() in AbstractContainerScreen has been deprecated and marked for removal
+        int x = containerScreen.getGuiLeft() + containerScreen.getXSize();
+                               ^
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\compat\jei\JewelcraftingJeiGuiHandler.java:23: 
+warning: [removal] getXSize() in AbstractContainerScreen has been deprecated and marked for removal
+        int x = containerScreen.getGuiLeft() + containerScreen.getXSize();
+                                                              ^
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\compat\jei\JewelcraftingJeiGuiHandler.java:24: 
+warning: [removal] getGuiTop() in AbstractContainerScreen has been deprecated and marked for removal
+        int y = containerScreen.getGuiTop();
+                               ^
+C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\core\data\JewelryData.java:220: warning: 
+non-varargs call of varargs method with inexact argument type for last parameter;
+        MutableComponent directTranslation = Component.translatable(descriptionId + ".item", ids);
+                                                                                             ^
+  cast to Object for a varargs call
+  cast to Object[] for a non-varargs call and to suppress this warning
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+Note: Some input files use unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+Note: Some messages have been simplified; recompile with -Xdiags:verbose to get full output
+100 errors
+4 warnings
+
+> Task :compileJava FAILED
+
+[Incubating] Problems report is available at: file:///C:/Projects/26-irons-jewelry/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':compileJava'.
+> Compilation failed; see the compiler output below.
+  C:\Projects\26-irons-jewelry\src\main\java\io\redspace\ironsjewelry\block\jewelcrafting_station\JewelcraftingStationS
+creen.java:23: error: cannot find symbol
+  import net.minecraft.client.gui.GuiGraphics;
+                                 ^
+    symbol:   class GuiGraphics
+    location: package net.minecraft.client.gui
+  100 errors
+  4 warnings
+
+* Try:
+> Check your code and dependencies to fix the compilation error(s)
+> Run with --scan to generate a Build Scan (powered by Develocity).
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 10.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/9.2.1/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD FAILED in 2m 57s
+2 actionable tasks: 2 executed
+Configuration cache entry stored.

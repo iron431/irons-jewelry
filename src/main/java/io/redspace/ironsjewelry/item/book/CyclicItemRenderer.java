@@ -1,6 +1,6 @@
 package io.redspace.ironsjewelry.item.book;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
@@ -23,10 +23,10 @@ public class CyclicItemRenderer {
         return items.get(index);
     }
 
-    public void renderBottomLeft(GuiGraphics guiGraphics, int x, int y, float scale) {
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().scale(scale, scale, scale);
-        guiGraphics.renderItem(get(), (int) (x / scale), (int) (y / scale - 16));
-        guiGraphics.pose().popPose();
+    public void renderBottomLeft(GuiGraphicsExtractor guiGraphics, int x, int y, float scale) {
+        guiGraphics.pose().pushMatrix();
+        guiGraphics.pose().scale(scale, scale);
+        guiGraphics.item(get(), (int) (x / scale), (int) (y / scale - 16));
+        guiGraphics.pose().popMatrix();
     }
 }

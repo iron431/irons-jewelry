@@ -1,7 +1,5 @@
 package io.redspace.ironsjewelry.block.jewelcrafting_station;
 
-import com.mojang.blaze3d.platform.Lighting;
-import com.mojang.math.Axis;
 import io.redspace.ironsjewelry.IronsJewelry;
 import io.redspace.ironsjewelry.core.data.JewelryData;
 import io.redspace.ironsjewelry.core.data.MaterialDefinition;
@@ -20,13 +18,11 @@ import io.redspace.ironsjewelry.utils.Utils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
-import net.minecraft.client.gui.screens.inventory.tooltip.TooltipRenderUtil;
-import net.minecraft.client.renderer.LightTexture;
-import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
@@ -35,10 +31,9 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerListener;
-import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -83,12 +78,16 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
             this.patternDefinition = patternDefinition;
         }
 
-        public void renderWidget(GuiGraphics guiGraphics, boolean isHovering, boolean selected) {
+        @Override
+        protected void extractContents(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+        }
+
+        public void renderWidget(GuiGraphicsExtractor guiGraphics, boolean isHovering, boolean selected) {
             var sprite = isHovering ? RECIPE_SPRITE_HOVERING : selected ? RECIPE_SPRITE_SELECTED : RECIPE_SPRITE;
-            guiGraphics.blitSprite(sprite, this.getX(), this.getY(), this.width, this.height);
+            guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, sprite, this.getX(), this.getY(), this.width, this.height);
             var parts = patternDefinition.value().partTemplate();
             for (PartIngredient part : parts) {
-                guiGraphics.blit(this.getX() + 1, this.getY() + 1, 0, 16, 16, getMenuSprite(part.part(), selected || isHovering));
+                guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, getMenuSprite(part.part(), selected || isHovering), this.getX() + 1, this.getY() + 1, 16, 16);
             }
         }
     }
@@ -113,8 +112,7 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
     private List<PatternButton> patternButtons;
 
     public JewelcraftingStationScreen(JewelcraftingStationMenu pMenu, Inventory pPlayerInventory, Component pTitle) {
-        super(pMenu, pPlayerInventory, pTitle);
-        this.imageWidth = 206;
+        super(pMenu, pPlayerInventory, pTitle, 206, 166);
         this.inventoryLabelX += menu.SCROLL_AREA_OFFSET;
         this.inventoryLabelY += 2;
         this.titleLabelY -= 2;
@@ -147,7 +145,7 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
             int index = i;
             patternButtons.add(this.addWidget(new PatternButton(availablePatterns.get(i), 0, 0, 18, 18, (button) -> {
                 selectedPattern = index;
-                PacketDistributor.sendToServer(new SetJewelcraftingStationPattern(this.menu.containerId, availablePatterns.get(selectedPattern)));
+                ClientPacketDistributor.sendToServer(new SetJewelcraftingStationPattern(this.menu.containerId, availablePatterns.get(selectedPattern)));
             })));
         }
         positionPatternButtons();
@@ -155,13 +153,13 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
     }
 
     @Override
-    protected void renderTooltip(GuiGraphics pGuiGraphics, int mouseX, int mouseY) {
-        super.renderTooltip(pGuiGraphics, mouseX, mouseY);
+    protected void extractTooltip(GuiGraphicsExtractor pGuiGraphics, int mouseX, int mouseY) {
+        super.extractTooltip(pGuiGraphics, mouseX, mouseY);
         if (this.menu.getCarried().isEmpty()) {
             if (this.hoveredSlot == null) {
                 for (PatternButton button : this.patternButtons) {
                     if (button.active && isHovering(mouseX, mouseY, button.getX(), button.getY(), button.getWidth(), button.getHeight())) {
-                        pGuiGraphics.renderTooltip(this.font, Utils.rasterizeComponentList(button.patternDefinition.value().getFullPatternTooltip()), mouseX, mouseY);
+                        pGuiGraphics.setTooltipForNextFrame(Utils.rasterizeComponentList(button.patternDefinition.value().getFullPatternTooltip()), mouseX, mouseY);
                         break;
                     }
                 }
@@ -176,9 +174,9 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
                             tooltip.add(Component.translatable(part.part().value().descriptionId()).withStyle(ChatFormatting.YELLOW, ChatFormatting.UNDERLINE));
                             tooltip.add(Component.literal(String.format(" (0/%s)", part.materialCost())).withStyle(ChatFormatting.RED));
                             tooltip.add(Component.translatable("tooltip.irons_jewelry.applicable_materials").withStyle(ChatFormatting.YELLOW, ChatFormatting.UNDERLINE));
-                            IronsJewelryRegistries.materialRegistry(Minecraft.getInstance().level.registryAccess()).holders().filter(material -> !material.value().ingredient().hasNoItems() && part.part().value().canUseMaterial(material))
+                            IronsJewelryRegistries.materialRegistry(Minecraft.getInstance().level.registryAccess()).listElements().filter(material -> !material.value().ingredient().isEmpty() && part.part().value().canUseMaterial(material))
                                     .forEach(material -> tooltip.add(Component.literal(" ").append(Component.translatable(material.value().descriptionId())).withStyle(ChatFormatting.GRAY)));
-                            pGuiGraphics.renderTooltip(this.font, Utils.rasterizeComponentList(tooltip), mouseX, mouseY);
+                            pGuiGraphics.setTooltipForNextFrame(Utils.rasterizeComponentList(tooltip), mouseX, mouseY);
                         }
                     }
                 }
@@ -187,29 +185,33 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
     }
 
     @Override
-    protected void renderBg(GuiGraphics guiGraphics, float pPartialTick, int pMouseX, int pMouseY) {
-        guiGraphics.blit(BACKGROUND_TEXTURE, leftPos, topPos, 0, 0, this.imageWidth, this.imageHeight);
-        renderItemPreview(guiGraphics, pPartialTick, pMouseX, pMouseY);
+    public void extractContents(@NotNull GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
+        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, BACKGROUND_TEXTURE, leftPos, topPos, 0f, 0f, this.imageWidth, this.imageHeight, 256, 256);
+        renderItemPreview(guiGraphics, partialTick, mouseX, mouseY);
         for (int i = 0; i < menu.workspaceSlots.size(); i++) {
             var slot = menu.workspaceSlots.get(i);
             if (!slot.isActive()) {
                 break;
             }
-            guiGraphics.blitSprite(INPUT_SLOT, leftPos + slot.x - 3, topPos + slot.y - 3, 200, 22, 22);
+            guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, INPUT_SLOT, leftPos + slot.x - 3, topPos + slot.y - 3, 22, 22);
             if (!slot.hasItem()) {
                 if (selectedPattern >= 0) {
                     var pattern = availablePatterns.get(selectedPattern).value();
                     var parts = pattern.partTemplate();
                     if (i < parts.size()) {
-                        guiGraphics.blit(leftPos + slot.x, topPos + slot.y, 200, 16, 16, getMenuSprite(parts.get(i).part(), false));
+                        guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, getMenuSprite(parts.get(i).part(), false), leftPos + slot.x, topPos + slot.y, 16, 16);
                     }
                 }
             }
         }
+
+        super.extractContents(guiGraphics, mouseX, mouseY, partialTick);
+        renderSidebar(guiGraphics, mouseX, mouseY);
+        this.extractTooltip(guiGraphics, mouseX, mouseY);
     }
 
 
-    private void renderItemPreview(GuiGraphics guiGraphics, float pPartialTick, int pMouseX, int pMouseY) {
+    private void renderItemPreview(GuiGraphicsExtractor guiGraphics, float pPartialTick, int pMouseX, int pMouseY) {
         List<Component> tooltip = new ArrayList<>();
         if (selectedPattern >= 0) {
             var holder = availablePatterns.get(selectedPattern);
@@ -222,7 +224,6 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
                 var material = Utils.getMaterialForIngredient(Minecraft.getInstance().player.level.registryAccess(), input);
                 if (material.isPresent() && ingredient.part().value().canUseMaterial(material.get())) {
                     parts.put(ingredient.part(), material.get());
-                    //var texture = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(DynamicModel.atlasResourceLocaction(ingredient.part(), material.get().value().paletteLocation().getPath()));
                 }
             }
 
@@ -240,14 +241,12 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
                 JewelryData jewelryData = JewelryData.renderable(holder, parts);
                 ItemStack stack = new ItemStack(pattern.jewelryType().item());
                 JewelryData.set(stack, jewelryData);
-                //Event posting
                 var event = new SetupJewelcraftingResultEvent(holder, MinecraftInstanceHelper.getPlayer(), stack);
                 if (NeoForge.EVENT_BUS.post(event).isCanceled()) {
                     stack = ItemStack.EMPTY;
                 } else {
                     stack = event.getResult();
                 }
-                var pose = guiGraphics.pose();
                 int width = 0;
                 for (Component component : tooltip) {
                     int i = font.width(component.getString());
@@ -255,15 +254,14 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
                         width = i;
                     }
                 }
-                pose.pushPose();
-                //pose.translate(leftPos + 61 + 95 / 2f, topPos + 13 + 60 / 2f, 100);
-                pose.translate(leftPos + imageWidth + width / 2f/* + 9 * scale + 16*/, topPos + 8 * scale + (baseLines + 1) * font.lineHeight + topBuffer + 4, 100);
-                pose.scale(16 * scale, -16 * scale, 16 * scale);
-                pose.mulPose(Axis.YP.rotationDegrees((Minecraft.getInstance().player.tickCount + pPartialTick) * 1.25f));
-                Lighting.setupForFlatItems();
-                Minecraft.getInstance().getItemRenderer().renderStatic(stack, ItemDisplayContext.GUI, LightTexture.FULL_BLOCK, OverlayTexture.NO_OVERLAY, pose, guiGraphics.bufferSource(), null, 0);
-                guiGraphics.flush();
-                pose.popPose();
+                var pose = guiGraphics.pose();
+                pose.pushMatrix();
+                float renderX = leftPos + imageWidth + width / 2f;
+                float renderY = topPos + (baseLines + 1) * font.lineHeight + topBuffer + 4;
+                pose.translate(renderX, renderY);
+                pose.scale(scale, scale);
+                guiGraphics.item(stack, -8, -8);
+                pose.popMatrix();
             }
         }
         if (tooltipDirty) {
@@ -273,51 +271,37 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
         }
     }
 
-    private void renderTooltipInternal(GuiGraphics guiGraphics, Font pFont, List<Component> components, int x, int y) {
+    private void renderTooltipInternal(GuiGraphicsExtractor guiGraphics, Font pFont, List<Component> components, int x, int y) {
         if (!components.isEmpty()) {
-            int i = 0;
-            int j = components.size() == 1 ? -2 : 0;
-            var pComponents = components.stream().map(c -> ClientTooltipComponent.create(c.getVisualOrderText())).toList();
-            for (ClientTooltipComponent clienttooltipcomponent : pComponents) {
-                int k = clienttooltipcomponent.getWidth(pFont);
-                if (k > i) {
-                    i = k;
+            int maxWidth = 0;
+            for (Component component : components) {
+                int w = pFont.width(component);
+                if (w > maxWidth) {
+                    maxWidth = w;
                 }
-                j += clienttooltipcomponent.getHeight();
             }
-            int i2 = i;
-            int j2 = j;
-            var poseStack = guiGraphics.pose();
-            poseStack.pushPose();
-            var bgstart = 0xb4260f0c;//0xf0511d17;//0xf0100010;
-            var bgend = bgstart;//0xf0361d17;//bgstart;
-            var borderstart = 0x50e0ca9f;//0x505000FF;
-            var borderend = 0x50a09172;//0x5028007f;
-            guiGraphics.drawManaged(() -> TooltipRenderUtil.renderTooltipBackground(guiGraphics, x, y, i2, j2, 0, bgstart, bgend, borderstart, borderend));
-            int k1 = y;
+            int totalHeight = 0;
+            for (int i = 0; i < components.size(); i++) {
+                totalHeight += pFont.lineHeight + (i == 0 && components.size() > 1 ? 2 : 0);
+            }
 
-            for (int l1 = 0; l1 < pComponents.size(); l1++) {
-                ClientTooltipComponent clienttooltipcomponent1 = pComponents.get(l1);
-                clienttooltipcomponent1.renderText(font, x, k1, poseStack.last().pose(), guiGraphics.bufferSource());
-                k1 += clienttooltipcomponent1.getHeight() + (l1 == 0 ? 2 : 0);
+            int bgColor = 0xb4260f0c;
+            int borderColor = 0x50e0ca9f;
+
+            guiGraphics.fill(x - 3, y - 4, x + maxWidth + 3, y + totalHeight + 4, bgColor);
+            guiGraphics.fill(x - 3, y - 4, x + maxWidth + 3, y - 3, borderColor);
+            guiGraphics.fill(x - 3, y + totalHeight + 3, x + maxWidth + 3, y + totalHeight + 4, borderColor);
+            guiGraphics.fill(x - 4, y - 3, x - 3, y + totalHeight + 3, borderColor);
+            guiGraphics.fill(x + maxWidth + 3, y - 3, x + maxWidth + 4, y + totalHeight + 3, borderColor);
+
+            int currentY = y;
+            for (int i = 0; i < components.size(); i++) {
+                guiGraphics.text(pFont, components.get(i), x, currentY, -1, true);
+                currentY += pFont.lineHeight + (i == 0 ? 2 : 0);
             }
-            k1 = y;
-            for (int k2 = 0; k2 < pComponents.size(); k2++) {
-                ClientTooltipComponent clienttooltipcomponent2 = pComponents.get(k2);
-                clienttooltipcomponent2.renderImage(font, x, k1, guiGraphics);
-                k1 += clienttooltipcomponent2.getHeight() + (k2 == 0 ? 2 : 0);
-            }
-            poseStack.popPose();
         }
     }
 
-
-    @Override
-    public void render(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        super.render(guiGraphics, mouseX, mouseY, partialTick);
-        renderSidebar(guiGraphics, mouseX, mouseY);
-        this.renderTooltip(guiGraphics, mouseX, mouseY);
-    }
 
     private boolean isHovering(int mouseX, int mouseY, int xmin, int ymin, int width, int height) {
         return mouseX > xmin && mouseX < xmin + width && mouseY > ymin && mouseY < ymin + height;
@@ -343,7 +327,7 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
     private static final int SCROLL_BAR_HEIGHT = 27;
     private static final int SCROLL_BAR_CHANNEL_LENGTH = 144;
 
-    private void renderSidebar(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+    private void renderSidebar(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY) {
         int barX = leftPos + SCROLL_BAR_X_OFFSET;
         int y = topPos + SCROLL_BAR_Y_OFFSET;
         for (int i = scrollOff; i < patternButtons.size() && i < MAX_PATTERNS + scrollOff; i++) {
@@ -354,9 +338,9 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
         int i = availablePatterns.size() + 1 - MAX_PATTERNS;
         if (i > 1) {
             var i1 = getCurrentScrollBarYOffset(i);
-            guiGraphics.blitSprite(SCROLLER_SPRITE, barX, y + i1, 0, 6, 27);
+            guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, SCROLLER_SPRITE, barX, y + i1, 6, 27);
         } else {
-            guiGraphics.blitSprite(SCROLLER_DISABLED_SPRITE, barX, y, 0, 6, 27);
+            guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, SCROLLER_DISABLED_SPRITE, barX, y, 6, 27);
         }
     }
 
@@ -389,19 +373,9 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
         return true;
     }
 
-    /**
-     * Called when the mouse is dragged within the GUI element.
-     * <p>
-     *
-     * @param pMouseX the X coordinate of the mouse.
-     * @param pMouseY the Y coordinate of the mouse.
-     * @param pButton the button that is being dragged.
-     * @param pDragX  the X distance of the drag.
-     * @param pDragY  the Y distance of the drag.
-     * @return {@code true} if the event is consumed, {@code false} otherwise.
-     */
     @Override
-    public boolean mouseDragged(double pMouseX, double pMouseY, int pButton, double pDragX, double pDragY) {
+    public boolean mouseDragged(MouseButtonEvent event, double dx, double dy) {
+        double pMouseY = event.y();
         int i = this.availablePatterns.size();
         if (this.isDragging) {
             int j = this.topPos + 18;
@@ -413,21 +387,14 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
             positionPatternButtons();
             return true;
         } else {
-            return super.mouseDragged(pMouseX, pMouseY, pButton, pDragX, pDragY);
+            return super.mouseDragged(event, dx, dy);
         }
     }
 
-    /**
-     * Called when a mouse button is clicked within the GUI element.
-     * <p>
-     *
-     * @param pMouseX the X coordinate of the mouse.
-     * @param pMouseY the Y coordinate of the mouse.
-     * @param pButton the button that was clicked.
-     * @return {@code true} if the event is consumed, {@code false} otherwise.
-     */
     @Override
-    public boolean mouseClicked(double pMouseX, double pMouseY, int pButton) {
+    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+        double pMouseX = event.x();
+        double pMouseY = event.y();
         this.isDragging = this.canScroll(this.availablePatterns.size())
                 && isHovering((int) pMouseX, (int) pMouseY,
                 leftPos + SCROLL_BAR_X_OFFSET,
@@ -436,7 +403,7 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
                 SCROLL_BAR_HEIGHT
         );
 
-        return super.mouseClicked(pMouseX, pMouseY, pButton);
+        return super.mouseClicked(event, doubleClick);
     }
 
     @Override

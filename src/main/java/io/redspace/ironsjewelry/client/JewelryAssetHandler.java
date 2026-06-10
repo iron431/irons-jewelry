@@ -60,7 +60,7 @@ public class JewelryAssetHandler extends AssetHandler {
             Holder<PatternDefinition> pattern = jewelryData.pattern();
             if (pattern == null && clientLevel != null) {
                 // replace invalid pattern with simple band so something always renders
-                pattern = IronsJewelryRegistries.patternRegistry(clientLevel.registryAccess()).getHolderOrThrow(ResourceKey.create(IronsJewelryRegistries.Keys.PATTERN_REGISTRY_KEY, IronsJewelry.id("simple_band")));
+                pattern = IronsJewelryRegistries.patternRegistry(clientLevel.registryAccess()).get(ResourceKey.create(IronsJewelryRegistries.Keys.PATTERN_REGISTRY_KEY, IronsJewelry.id("simple_band"))).orElse(null);
             }
             if (pattern != null) {
                 // iterate over the part template and grab sad menu sprite
@@ -78,7 +78,7 @@ public class JewelryAssetHandler extends AssetHandler {
     }
 
     public String getPermutationName(Holder<MaterialDefinition> material) {
-        var materialKey = material.getKey().location();
+        var materialKey = material.getKey().identifier();
         var materialName = splitEnd(materialKey.getPath());
         return String.format("%s_%s", materialKey.getNamespace(), materialName);
     }
@@ -108,23 +108,23 @@ public class JewelryAssetHandler extends AssetHandler {
                 "menu", IronsJewelry.id("palettes/menu"),
                 "menu_bright", IronsJewelry.id("palettes/menu_bright")
         ));
-        IronsJewelryRegistries.materialRegistry(Minecraft.getInstance().level.registryAccess()).holders().forEach(
+        IronsJewelryRegistries.materialRegistry(Minecraft.getInstance().level.registryAccess()).listElements().forEach(
                 material -> {
                     Identifier palette = material.value().paletteLocation();
                     if (resourceManager.getResource(palette.withPrefix("textures/").withSuffix(".png")).isEmpty()) {
-                        IronsJewelry.LOGGER.warn("Invalid palette: \"{}\" in material: {}", palette, material.key().location());
+                        IronsJewelry.LOGGER.warn("Invalid palette: \"{}\" in material: {}", palette, material.key().identifier());
                     } else {
                         permutations.put(getPermutationName(material), palette);
                     }
                 }
         );
-        IronsJewelryRegistries.partRegistry(Minecraft.getInstance().level.registryAccess()).holders().forEach(part -> {
+        IronsJewelryRegistries.partRegistry(Minecraft.getInstance().level.registryAccess()).listElements().forEach(part -> {
                     var paletteKey = part.value().paletteKey();
                     var texture = part.value().baseTextureLocation();
                     if (resourceManager.getResource(paletteKey.withPrefix("textures/").withSuffix(".png")).isEmpty()) {
-                        IronsJewelry.LOGGER.warn("Invalid palette key: \"{}\" in part: {}", paletteKey, part.key().location());
+                        IronsJewelry.LOGGER.warn("Invalid palette key: \"{}\" in part: {}", paletteKey, part.key().identifier());
                     } else if (resourceManager.getResource(texture.withPrefix("textures/").withSuffix(".png")).isEmpty()) {
-                        IronsJewelry.LOGGER.warn("Invalid texture location: \"{}\" in part: {}", texture, part.key().location());
+                        IronsJewelry.LOGGER.warn("Invalid texture location: \"{}\" in part: {}", texture, part.key().identifier());
                     } else {
                         byPaletteKey.put(paletteKey, texture);
                     }

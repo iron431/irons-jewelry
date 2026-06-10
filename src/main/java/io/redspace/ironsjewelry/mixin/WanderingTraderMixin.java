@@ -4,7 +4,7 @@ import io.redspace.ironsjewelry.IronsJewelry;
 import io.redspace.ironsjewelry.utils.Trades;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.tags.TagKey;
-import net.minecraft.world.entity.npc.WanderingTrader;
+import net.minecraft.world.entity.npc.wanderingtrader.WanderingTrader;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;

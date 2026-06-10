@@ -26,7 +26,7 @@
     },
     "irons_jewelry:attribute": {
       "amount": 0.05,
-      "attribute": "minecraft:generic.movement_speed",
+      "attribute": "minecraft:movement_speed",
       "operation": "add_multiplied_total"
     },
     "irons_jewelry:negative_effect": {
@@ -37,9 +37,7 @@
     }
   },
   "descriptionId": "material.irons_jewelry.silver",
-  "ingredient": {
-    "tag": "c:ingots/silver"
-  },
+  "ingredient": "#c:ingots/silver",
   "paletteLocation": "irons_jewelry:palettes/silver",
   "quality": 1.0
 }

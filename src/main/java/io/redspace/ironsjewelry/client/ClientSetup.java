@@ -14,7 +14,7 @@ import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import org.jetbrains.annotations.Nullable;
 
-@EventBusSubscriber(modid = IronsJewelry.MODID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+@EventBusSubscriber(modid = IronsJewelry.MODID, value = Dist.CLIENT)
 public class ClientSetup {
     @SubscribeEvent
     public static void registerMenuScreens(RegisterMenuScreensEvent event) {

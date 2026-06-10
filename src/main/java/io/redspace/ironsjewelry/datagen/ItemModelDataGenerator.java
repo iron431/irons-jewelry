@@ -1,34 +1,60 @@
 package io.redspace.ironsjewelry.datagen;
 
 import io.redspace.ironsjewelry.IronsJewelry;
+import net.minecraft.client.data.models.BlockModelGenerators;
+import net.minecraft.client.data.models.ItemModelGenerators;
+import net.minecraft.client.data.models.ModelProvider;
+import net.minecraft.client.data.models.model.ModelTemplates;
+import net.minecraft.core.Holder;
+import net.minecraft.data.CachedOutput;
 import net.minecraft.data.PackOutput;
-import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
-import net.neoforged.neoforge.client.model.generators.ItemModelBuilder;
-import net.neoforged.neoforge.client.model.generators.ItemModelProvider;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
+import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.registries.DeferredHolder;
+import org.jspecify.annotations.NonNull;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
-public class ItemModelDataGenerator extends ItemModelProvider {
+public class ItemModelDataGenerator extends ModelProvider {
+    public static Map<DeferredHolder<Item, ? extends Item>, Consumer<ItemModelGenerators>> items = new HashMap<>();
+    // todo: implement blocks eventually ig
+    public static Map<DeferredHolder<Block, ? extends Block>, Consumer<ItemModelGenerators>> blocks = new HashMap<>();
 
-    public static List<Consumer<ItemModelDataGenerator>> toRegister = new ArrayList<>();
-
-    public ItemModelDataGenerator(PackOutput output, ExistingFileHelper exFileHelper) {
-        super(output, IronsJewelry.MODID, exFileHelper);
+    public ItemModelDataGenerator(PackOutput output) {
+        super(output, IronsJewelry.MODID);
     }
 
     @Override
-    protected void registerModels() {
-        toRegister.forEach(c -> c.accept(this));
+    public @NonNull CompletableFuture<?> run(@NonNull CachedOutput cache) {
+        return super.run(cache);
     }
 
-    public ItemModelBuilder simpleItem(DeferredHolder<Item, ? extends Item> item) {
-        return withExistingParent(item.getId().getPath(),
-                Identifier.withDefaultNamespace("item/generated")).texture("layer0",
-                Identifier.fromNamespaceAndPath(IronsJewelry.MODID, "item/" + item.getId().getPath()));
+    @Override
+    protected Stream<? extends Holder<Block>> getKnownBlocks() {
+        return blocks.keySet().stream();
     }
+
+    @Override
+    protected Stream<? extends Holder<Item>> getKnownItems() {
+        return items.keySet().stream();
+    }
+
+    @Override
+    protected void registerModels(@NonNull BlockModelGenerators blockModels, @NonNull ItemModelGenerators itemModels) {
+        try {
+            items.values().forEach(c -> c.accept(itemModels));
+        } catch (Exception e) {
+            IronsJewelry.LOGGER.debug("erjgnhorenhoj: {}", e.getMessage());
+        }
+    }
+
+    public static void simpleItem(DeferredHolder<Item, ? extends Item> item) {
+        items.put(item, itemModels -> itemModels.generateFlatItem(item.get(), ModelTemplates.FLAT_ITEM));
+    }
+
+
 }

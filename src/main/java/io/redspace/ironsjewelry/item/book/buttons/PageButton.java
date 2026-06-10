@@ -1,9 +1,10 @@
 package io.redspace.ironsjewelry.item.book.buttons;
 
 import io.redspace.ironsjewelry.item.book.GuideBookState;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.navigation.ScreenAxis;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.resources.Identifier;
 
 import java.util.function.Function;
@@ -29,9 +30,9 @@ public class PageButton implements GuideBookButton {
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, boolean selected, float partialTick) {
+    public void render(GuiGraphicsExtractor guiGraphics, boolean selected, float partialTick) {
         Identifier sprite = selected ? this.spriteHighlighted : this.sprite;
-        guiGraphics.blitSprite(sprite, x, y, width, height);
+        guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, sprite, x, y, width, height);
     }
 
     @Override

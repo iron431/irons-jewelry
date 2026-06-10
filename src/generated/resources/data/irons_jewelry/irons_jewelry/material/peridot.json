@@ -23,9 +23,7 @@
     }
   },
   "descriptionId": "material.irons_jewelry.peridot",
-  "ingredient": {
-    "tag": "c:gems/peridot"
-  },
+  "ingredient": "#c:gems/peridot",
   "paletteLocation": "irons_jewelry:palettes/peridot",
   "quality": 2.0
 }

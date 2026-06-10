@@ -10,7 +10,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.npc.VillagerTrades;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -49,8 +48,13 @@ public class Trades {
         return 0;
     }
 
+    @FunctionalInterface
+    public interface ItemListing {
+        MerchantOffer getOffer(Entity trader, RandomSource random);
+    }
+
     public record BuyItem(Item toBuy, int toBuyCount, int emeraldCost, int maxUses, int villagerXp,
-                          float priceMultiplier) implements VillagerTrades.ItemListing {
+                          float priceMultiplier) implements ItemListing {
         @Override
         public MerchantOffer getOffer(Entity pTrader, RandomSource pRandom) {
             return new MerchantOffer(new ItemCost(toBuy, toBuyCount), new ItemStack(Items.EMERALD, this.emeraldCost), this.maxUses, this.villagerXp, this.priceMultiplier);
@@ -59,7 +63,7 @@ public class Trades {
 
     public record SellLootTable(ResourceKey<LootTable> lootTable, int maxUses, int villagerXp,
                                 float priceMultiplier,
-                                BiFunction<ItemStack, RandomSource, Integer> itemCostFunction) implements VillagerTrades.ItemListing {
+                                BiFunction<ItemStack, RandomSource, Integer> itemCostFunction) implements ItemListing {
         @Override
         public MerchantOffer getOffer(Entity pTrader, RandomSource pRandom) {
             if (pTrader.level() instanceof ServerLevel serverLevel) {
@@ -102,11 +106,11 @@ public class Trades {
     }
 
     public record BuyItemTag(TagKey<Item> itemTag, int buyCount, int emeraldCost, int maxUses, int villagerXp,
-                             float priceMultiplier) implements VillagerTrades.ItemListing {
+                             float priceMultiplier) implements ItemListing {
         @Override
         public MerchantOffer getOffer(Entity pTrader, RandomSource pRandom) {
             if (pTrader.level() instanceof ServerLevel serverLevel) {
-                var options = BuiltInRegistries.ITEM.getTag(this.itemTag);
+                var options = BuiltInRegistries.ITEM.get(this.itemTag);
                 if (options.isPresent()) {
                     var set = options.get();
                     var item = set.getRandomElement(pRandom);
@@ -121,11 +125,11 @@ public class Trades {
 
     public record SellItemTag(TagKey<Item> itemTag, int maxUses, int villagerXp,
                               float priceMultiplier,
-                              int emeraldValue) implements VillagerTrades.ItemListing {
+                              int emeraldValue) implements ItemListing {
         @Override
         public MerchantOffer getOffer(Entity pTrader, RandomSource pRandom) {
             if (pTrader.level() instanceof ServerLevel serverLevel) {
-                var options = BuiltInRegistries.ITEM.getTag(this.itemTag);
+                var options = BuiltInRegistries.ITEM.get(this.itemTag);
                 if (options.isPresent()) {
                     var set = options.get();
                     var item = set.getRandomElement(pRandom);

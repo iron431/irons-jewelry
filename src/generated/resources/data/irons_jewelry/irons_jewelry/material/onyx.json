@@ -20,9 +20,7 @@
     }
   },
   "descriptionId": "material.irons_jewelry.onyx",
-  "ingredient": {
-    "tag": "c:gems/onyx"
-  },
+  "ingredient": "#c:gems/onyx",
   "paletteLocation": "irons_jewelry:palettes/onyx",
   "quality": 2.0
 }

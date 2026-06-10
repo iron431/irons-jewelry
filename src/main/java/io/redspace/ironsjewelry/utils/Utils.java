@@ -138,7 +138,7 @@ public class Utils {
     public static ItemStack createExampleJewelryItem(RegistryAccess registryAccess, Holder<PatternDefinition> patternHolder) {
         var pattern = patternHolder.value();
         ItemStack output = new ItemStack(pattern.jewelryType().item());
-        Holder<MaterialDefinition> iron = IronsJewelryRegistries.materialRegistry(registryAccess).getHolder(IronsJewelry.id("example")).get();
+        Holder<MaterialDefinition> iron = IronsJewelryRegistries.materialRegistry(registryAccess).get(IronsJewelry.id("example")).orElseThrow();
         var parts = pattern.partTemplate().stream().map(PartIngredient::part).collect(Collectors.toMap(Function.identity(),
                 (p) -> iron));
         JewelryData jewelryData = JewelryData.renderable(IronsJewelryRegistries.patternRegistry(Minecraft.getInstance().level.registryAccess()).wrapAsHolder(pattern), parts);
@@ -153,6 +153,6 @@ public class Utils {
     }
 
     public static void spawnParticles(Level level, ParticleOptions particle, double x, double y, double z, int count, double deltaX, double deltaY, double deltaZ, double speed, boolean force) {
-        level.getServer().getPlayerList().getPlayers().forEach(player -> ((ServerLevel) level).sendParticles(player, particle, force, x, y, z, count, deltaX, deltaY, deltaZ, speed));
+        level.getServer().getPlayerList().getPlayers().forEach(player -> ((ServerLevel) level).sendParticles(player, particle, force, false, x, y, z, count, deltaX, deltaY, deltaZ, speed));
     }
 }

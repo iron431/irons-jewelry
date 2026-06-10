@@ -23,9 +23,7 @@
     }
   },
   "descriptionId": "material.irons_jewelry.platinum",
-  "ingredient": {
-    "tag": "c:ingots/platinum"
-  },
+  "ingredient": "#c:ingots/platinum",
   "paletteLocation": "irons_jewelry:palettes/platinum",
   "quality": 2.0
 }

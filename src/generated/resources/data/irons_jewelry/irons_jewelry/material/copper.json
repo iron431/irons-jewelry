@@ -13,7 +13,7 @@
     },
     "irons_jewelry:attribute": {
       "amount": 0.1,
-      "attribute": "minecraft:generic.attack_speed",
+      "attribute": "minecraft:attack_speed",
       "operation": "add_multiplied_total"
     },
     "irons_jewelry:negative_effect": {
@@ -24,9 +24,7 @@
     }
   },
   "descriptionId": "material.irons_jewelry.copper",
-  "ingredient": {
-    "tag": "c:ingots/copper"
-  },
+  "ingredient": "#c:ingots/copper",
   "paletteLocation": "irons_jewelry:palettes/copper",
   "quality": 0.5
 }

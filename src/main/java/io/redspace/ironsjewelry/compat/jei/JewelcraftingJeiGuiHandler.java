@@ -20,8 +20,8 @@ public class JewelcraftingJeiGuiHandler implements IGuiContainerHandler<Jewelcra
                 ).findFirst().get()
         ) + 4;
         int height = font.lineHeight * (tooltip.size() + 1);
-        int x = containerScreen.getGuiLeft() + containerScreen.getXSize();
-        int y = containerScreen.getGuiTop();
+        int x = containerScreen.getLeftPos() + containerScreen.getImageWidth();
+        int y = containerScreen.getTopPos();
         return List.of(new Rect2i(x, y, width, height));
     }
 }

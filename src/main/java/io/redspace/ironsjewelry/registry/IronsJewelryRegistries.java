@@ -27,7 +27,7 @@ public class IronsJewelryRegistries {
     public static final Registry<MapCodec<? extends IAction>> ACTION_REGISTRY = new RegistryBuilder<>(Keys.ACTION_REGISTRY_KEY).defaultKey(IronsJewelry.id("empty")).create();
 
     public static <T> Registry<T> get(RegistryAccess registryAccess, ResourceKey<Registry<T>> key) {
-        return registryAccess.registryOrThrow(key);
+        return registryAccess.lookupOrThrow(key);
     }
 
     public static Registry<PatternDefinition> patternRegistry(RegistryAccess registryAccess) {

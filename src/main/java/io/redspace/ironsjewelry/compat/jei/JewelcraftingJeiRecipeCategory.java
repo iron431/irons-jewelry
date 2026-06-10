@@ -13,55 +13,38 @@ import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
-import mezz.jei.api.recipe.RecipeType;
-import mezz.jei.api.recipe.category.IRecipeCategory;
+import mezz.jei.api.recipe.category.AbstractRecipeCategory;
+import mezz.jei.api.recipe.types.IRecipeType;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.inventory.tooltip.TooltipRenderUtil;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.List;
 
-public class JewelcraftingJeiRecipeCategory implements IRecipeCategory<PatternDefinition> {
-    public static final RecipeType<PatternDefinition> RECIPE_TYPE = RecipeType.create(IronsJewelry.MODID, "jewelcrafting", PatternDefinition.class);
+public class JewelcraftingJeiRecipeCategory extends AbstractRecipeCategory<PatternDefinition> {
+    public static final IRecipeType<PatternDefinition> RECIPE_TYPE = IRecipeType.create(IronsJewelry.MODID, "jewelcrafting", PatternDefinition.class);
 
     private final IDrawable background;
-    private final IDrawable icon;
     private static final int buffer = 32;
-    private static final int width = 127;
-    private static final int height = 60;
+    private static final int WIDTH = 127;
+    private static final int HEIGHT = 60;
 
     public JewelcraftingJeiRecipeCategory(IGuiHelper guiHelper) {
-        background = guiHelper.drawableBuilder(IronsJewelry.id("textures/gui/sprites/jewelcrafting_station/jei_bg.png"), 0, 0, width, height)
+        super(
+                RECIPE_TYPE,
+                Component.translatable("container.irons_jewelry.jewelcrafting_station"),
+                guiHelper.createDrawableItemStack(new ItemStack(BlockRegistry.JEWELCRAFTING_STATION_BLOCK.get())),
+                WIDTH + buffer,
+                HEIGHT
+        );
+        background = guiHelper.drawableBuilder(IronsJewelry.id("textures/gui/sprites/jewelcrafting_station/jei_bg.png"), 0, 0, WIDTH, HEIGHT)
                 .addPadding(0, 0, buffer, 0)
-                .setTextureSize(width, height)
+                .setTextureSize(WIDTH, HEIGHT)
                 .build();
-        icon = guiHelper.createDrawableItemStack(new ItemStack(BlockRegistry.JEWELCRAFTING_STATION_BLOCK.get()));
-    }
-
-    @Override
-    public RecipeType<PatternDefinition> getRecipeType() {
-        return RECIPE_TYPE;
-    }
-
-    @Override
-    public Component getTitle() {
-        return Component.translatable("container.irons_jewelry.jewelcrafting_station");
-    }
-
-    @Override
-    public IDrawable getBackground() {
-        return background;
-    }
-
-    @Override
-    public @Nullable IDrawable getIcon() {
-        return icon;
     }
 
     @Override
@@ -80,7 +63,7 @@ public class JewelcraftingJeiRecipeCategory implements IRecipeCategory<PatternDe
         for (int i = 0; i < template.size(); i++) {
             var partIngredient = template.get(i);
             var part = partIngredient.part().value();
-            var stacks = materialRegistry.holders().filter(part::canUseMaterial).map(Holder::value).map(MaterialDefinition::ingredient).filter(ingr -> !ingr.hasNoItems()).flatMap(ingredient -> Arrays.stream(ingredient.getItems())).map(ItemStack::copy).toList();
+            var stacks = materialRegistry.listElements().filter(part::canUseMaterial).map(Holder::value).map(MaterialDefinition::ingredient).filter(ingr -> !ingr.isEmpty()).flatMap(ingredient -> ingredient.items().map(ItemStack::new)).toList();
             stacks.forEach(stack -> stack.setCount(partIngredient.materialCost()));
             builder.addSlot(RecipeIngredientRole.INPUT, buffer + leftPos + i * widthPer, 9 + 5 + 6)
                     .addItemStacks(stacks)
@@ -89,17 +72,19 @@ public class JewelcraftingJeiRecipeCategory implements IRecipeCategory<PatternDe
     }
 
     @Override
-    public void draw(PatternDefinition recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
-        IRecipeCategory.super.draw(recipe, recipeSlotsView, guiGraphics, mouseX, mouseY);
+    public void draw(PatternDefinition recipe, IRecipeSlotsView recipeSlotsView, GuiGraphicsExtractor guiGraphics, double mouseX, double mouseY) {
+        background.draw(guiGraphics);
         Component title = Component.translatable(recipe.descriptionId()).withStyle(ChatFormatting.UNDERLINE);
-        int width = Minecraft.getInstance().font.width(title);
-        int x = buffer + 47 - width / 2;
+        int titleWidth = Minecraft.getInstance().font.width(title);
+        int x = buffer + 47 - titleWidth / 2;
         int y = 4;
-        var bgstart = 0xb4260f0c;//0xf0511d17;//0xf0100010;
-        var bgend = bgstart;//0xf0361d17;//bgstart;
-        var borderstart = 0x50e0ca9f;//0x505000FF;
-        var borderend = 0x50a09172;//0x5028007f;
-        guiGraphics.drawManaged(() -> TooltipRenderUtil.renderTooltipBackground(guiGraphics, x, y, width, 9, 0, bgstart, bgend, borderstart, borderend));
-        guiGraphics.drawString(Minecraft.getInstance().font, title, x, y, 0xFFFFFF, true);
+        int bgColor = 0xb4260f0c;
+        int borderColor = 0x50e0ca9f;
+        guiGraphics.fill(x - 2, y - 1, x + titleWidth + 2, y + 10, bgColor);
+        guiGraphics.fill(x - 3, y - 1, x - 2, y + 10, borderColor);
+        guiGraphics.fill(x + titleWidth + 2, y - 1, x + titleWidth + 3, y + 10, borderColor);
+        guiGraphics.fill(x - 2, y - 2, x + titleWidth + 2, y - 1, borderColor);
+        guiGraphics.fill(x - 2, y + 10, x + titleWidth + 2, y + 11, borderColor);
+        guiGraphics.text(Minecraft.getInstance().font, title, x, y, 0xFFFFFF, true);
     }
 }

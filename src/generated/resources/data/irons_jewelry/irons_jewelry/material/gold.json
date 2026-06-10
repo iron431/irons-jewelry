@@ -23,9 +23,7 @@
     }
   },
   "descriptionId": "material.irons_jewelry.gold",
-  "ingredient": {
-    "tag": "c:ingots/gold"
-  },
+  "ingredient": "#c:ingots/gold",
   "paletteLocation": "irons_jewelry:palettes/gold",
   "quality": 1.5
 }

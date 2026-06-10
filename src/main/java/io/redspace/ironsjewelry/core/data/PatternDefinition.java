@@ -44,7 +44,7 @@ public record PatternDefinition(String descriptionId,
             var part = pattern.partForQuality().get();
             if (pattern.partTemplate().stream()
                     .noneMatch(ingredient -> ingredient.part().equals(part))) {
-                return DataResult.error(() -> "partForQuality \"" + part.getKey().location() + "\" is not found in the parts list");
+                return DataResult.error(() -> "partForQuality \"" + part.getKey().identifier() + "\" is not found in the parts list");
             }
         }
         return DataResult.success(pattern);

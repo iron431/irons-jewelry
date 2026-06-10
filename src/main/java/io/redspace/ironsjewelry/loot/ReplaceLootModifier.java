@@ -29,8 +29,8 @@ public class ReplaceLootModifier extends LootModifier {
     private final String IdentifierKey;
     private final double chanceToReplace;
 
-    protected ReplaceLootModifier(LootItemCondition[] conditionsIn, String IdentifierKey, double chanceToReplace) {
-        super(conditionsIn);
+    protected ReplaceLootModifier(LootItemCondition[] conditionsIn, int priority, String IdentifierKey, double chanceToReplace) {
+        super(conditionsIn, priority);
         this.IdentifierKey = IdentifierKey;
         this.chanceToReplace = Mth.clamp(chanceToReplace, 0, 1.0);
     }

@@ -11,11 +11,11 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 public class BlockRegistry {
-    private static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(Registries.BLOCK, IronsJewelry.MODID);
+    private static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(IronsJewelry.MODID);
 
     public static void register(IEventBus eventBus) {
         BLOCKS.register(eventBus);
     }
 
-    public static final DeferredHolder<Block, JewelcraftingStationBlock> JEWELCRAFTING_STATION_BLOCK = BLOCKS.register("jewelcrafting_station", () -> new JewelcraftingStationBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.SMITHING_TABLE)));
+    public static final DeferredHolder<Block, JewelcraftingStationBlock> JEWELCRAFTING_STATION_BLOCK = BLOCKS.registerBlock("jewelcrafting_station", (properties) -> new JewelcraftingStationBlock(properties), () -> BlockBehaviour.Properties.ofFullCopy(Blocks.SMITHING_TABLE));
 }

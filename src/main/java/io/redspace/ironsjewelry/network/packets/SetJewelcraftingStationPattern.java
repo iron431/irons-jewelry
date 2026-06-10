@@ -21,7 +21,7 @@ public record SetJewelcraftingStationPattern(int containerId,
                 buf.writeResourceKey(Objects.requireNonNull(data.patternDefinition.getKey()));
             },
             (buf) -> new SetJewelcraftingStationPattern(buf.readInt(),
-                    IronsJewelryRegistries.patternRegistry(buf.registryAccess()).getHolderOrThrow(buf.readResourceKey(IronsJewelryRegistries.Keys.PATTERN_REGISTRY_KEY))));
+                    IronsJewelryRegistries.patternRegistry(buf.registryAccess()).get(buf.readResourceKey(IronsJewelryRegistries.Keys.PATTERN_REGISTRY_KEY)).orElseThrow()));
 
     @Override
     public Type<? extends CustomPacketPayload> type() {

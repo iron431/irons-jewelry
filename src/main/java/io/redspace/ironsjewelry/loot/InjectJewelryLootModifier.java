@@ -21,8 +21,8 @@ public class InjectJewelryLootModifier extends LootModifier {
     public static final Supplier<MapCodec<InjectJewelryLootModifier>> CODEC = Suppliers.memoize(()
             -> RecordCodecBuilder.mapCodec(builder -> codecStart(builder).apply(builder, InjectJewelryLootModifier::new)));
 
-    protected InjectJewelryLootModifier(LootItemCondition[] conditionsIn) {
-        super(conditionsIn);
+    protected InjectJewelryLootModifier(LootItemCondition[] conditionsIn, int priority) {
+        super(conditionsIn, priority);
     }
 
     @Override

@@ -1,7 +1,7 @@
 {
   "bonusParameters": {},
   "descriptionId": "material.irons_jewelry.example",
-  "ingredient": [],
+  "ingredient": "minecraft:barrier",
   "paletteLocation": "irons_jewelry:palettes/silver",
   "quality": 1.0
 }

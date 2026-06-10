@@ -2,7 +2,6 @@ package io.redspace.ironsjewelry.item.book;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.NativeImage;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import io.redspace.ironsjewelry.IronsJewelry;
 import io.redspace.ironsjewelry.core.data.JewelryData;
 import io.redspace.ironsjewelry.core.data.MaterialDefinition;
@@ -23,12 +22,13 @@ import io.redspace.ironsjewelry.utils.Utils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.navigation.ScreenAxis;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.inventory.tooltip.TooltipRenderUtil;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.atlas.SpriteSource;
 import net.minecraft.client.resources.language.I18n;
@@ -44,13 +44,10 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.Tags;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Matrix4f;
-
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -91,8 +88,6 @@ public class GuideBookScreen extends Screen {
 
     public GuideBookScreen() {
         super(Component.empty());
-        this.minecraft = Minecraft.getInstance();
-        this.font = minecraft.font;
         initPageButtons();
     }
 
@@ -134,7 +129,7 @@ public class GuideBookScreen extends Screen {
 
     public void setBookmark(int index) {
         PlayerData.get(minecraft.player).setBookmarkIndex(index);
-        PacketDistributor.sendToServer(new ServerboundSetBookmarkPacket(index));
+        ClientPacketDistributor.sendToServer(new ServerboundSetBookmarkPacket(index));
     }
 
     protected void chooseMaterial(Holder<MaterialDefinition> materialDefinitionHolder) {
@@ -142,9 +137,9 @@ public class GuideBookScreen extends Screen {
     }
 
     @Override
-    public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        super.renderBackground(guiGraphics, mouseX, mouseY, partialTick);
-        guiGraphics.blit(BOOK_LOCATION, leftPos, topPos, 0, 0, IMAGE_WIDTH, IMAGE_HEIGHT, 512, 256);
+    public void extractBackground(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
+        super.extractBackground(guiGraphics, mouseX, mouseY, partialTick);
+        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, BOOK_LOCATION, leftPos, topPos, 0f, 0f, IMAGE_WIDTH, IMAGE_HEIGHT, 512, 256);
     }
 
     private int getMaxTitleWidth() {
@@ -154,8 +149,8 @@ public class GuideBookScreen extends Screen {
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        super.render(guiGraphics, mouseX, mouseY, partialTick);
+    public void extractRenderState(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
+        super.extractRenderState(guiGraphics, mouseX, mouseY, partialTick);
         int currentPageNumber = bookState.getGlobalPageNumber();
         if (lastPageNumber != currentPageNumber) {
             lastPageNumber = currentPageNumber;
@@ -164,22 +159,24 @@ public class GuideBookScreen extends Screen {
         int titleX = leftPos + XM - 2;
         int titleBottomY = topPos + YM / 2 + (int) (16 * itemScale);
         cachedPage.render(guiGraphics, titleX, titleBottomY, mouseX, mouseY, partialTick);
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(leftPos, topPos, 0);
+        guiGraphics.pose().pushMatrix();
+        guiGraphics.pose().translate(leftPos, topPos);
         for (GuideBookButton button : nativeButtons) {
             button.render(guiGraphics, button.boundingBox(leftPos, topPos).containsPoint(mouseX, mouseY), partialTick);
         }
         for (GuideBookButton button : cachedPage.extraButtons()) {
             button.render(guiGraphics, button.boundingBox(leftPos, topPos).containsPoint(mouseX, mouseY), partialTick);
         }
-        guiGraphics.pose().popPose();
+        guiGraphics.pose().popMatrix();
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int mouseAction) {
+    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+        int mouseX = (int) event.x();
+        int mouseY = (int) event.y();
         for (GuideBookButton button : nativeButtons) {
             int prevPage = bookState.getGlobalPageNumber() - 1;
-            if (button.boundingBox(leftPos, topPos).containsPoint((int) mouseX, (int) mouseY) && button.onClick(this.bookState)) {
+            if (button.boundingBox(leftPos, topPos).containsPoint(mouseX, mouseY) && button.onClick(this.bookState)) {
                 Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(button.getSound(), 1f));
                 bookState.getGlobalPage(prevPage).onDepart();
                 bookState.getCurrentPage().onArrive();
@@ -187,12 +184,12 @@ public class GuideBookScreen extends Screen {
             }
         }
         for (GuideBookButton button : cachedPage.extraButtons()) {
-            if (button.boundingBox(leftPos, topPos).containsPoint((int) mouseX, (int) mouseY) && button.onClick(this.bookState)) {
+            if (button.boundingBox(leftPos, topPos).containsPoint(mouseX, mouseY) && button.onClick(this.bookState)) {
                 Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(button.getSound(), 1f));
                 return true;
             }
         }
-        return super.mouseClicked(mouseX, mouseY, mouseAction);
+        return super.mouseClicked(event, doubleClick);
     }
 
     @Override
@@ -214,9 +211,9 @@ public class GuideBookScreen extends Screen {
     }
 
     @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        InputConstants.Key mouseKey = InputConstants.getKey(keyCode, scanCode);
-        if (super.keyPressed(keyCode, scanCode, modifiers)) {
+    public boolean keyPressed(KeyEvent event) {
+        InputConstants.Key mouseKey = InputConstants.getKey(event);
+        if (super.keyPressed(event)) {
             return true;
         } else if (this.minecraft.options.keyInventory.isActiveAndMatches(mouseKey)) {
             this.onClose();
@@ -234,7 +231,7 @@ public class GuideBookScreen extends Screen {
         var patternRegistry = IronsJewelryRegistries.patternRegistry(Minecraft.getInstance().level.registryAccess());
         List<Page> materialPages = new ArrayList<>();
         // Construct a material page if the material exists and has valid items to be crafted from
-        materialRegistry.holders().filter(holder -> !holder.value().ingredient().hasNoItems()).forEach(holder -> materialPages.add(new MaterialPage(holder)));
+        materialRegistry.listElements().filter(holder -> !holder.value().ingredient().isEmpty()).forEach(holder -> materialPages.add(new MaterialPage(holder)));
         // Effectively curry buttons by using preparation structure. Allows all information to be created now, and the button can be positioned and fit onto the screen later, because it is difficult to position all elements without knowing how many there are
         List<Function<TableOfContentsPage.EntryPreparation, GuideBookButton>> materialTableOfContentsEntries = new ArrayList<>();
         for (int i = 0; i < materialPages.size(); i++) {
@@ -242,13 +239,13 @@ public class GuideBookScreen extends Screen {
             var material = materialPage.material;
             materialTableOfContentsEntries.add(preparation ->
                     new TextButton(preparation.x(), preparation.y(), preparation.width(), preparation.height(), Component.translatable(material.value().descriptionId()), 0xFF000000, ChatFormatting.YELLOW.getColor(),
-                            List.of(material.value().ingredient().getItems()), guidebook -> guidebook.navigateToPage(materialPage)));
+                            material.value().ingredient().items().map(ItemStack::new).toList(), guidebook -> guidebook.navigateToPage(materialPage)));
         }
         materialPages.addAll(0, createTableOfContentsPages(Component.translatable("ui.irons_jewelry.guide_book.table_of_contents_materials"), materialTableOfContentsEntries, 75));
 
         List<Page> patternPages = new ArrayList<>();
         // Construct a pattern page for all patterns that exist
-        patternRegistry.holders().forEach(holder -> patternPages.add(new PatternPage(holder)));
+        patternRegistry.listElements().forEach(holder -> patternPages.add(new PatternPage(holder)));
         List<Function<TableOfContentsPage.EntryPreparation, GuideBookButton>> patternTableOfContentsEntries = new ArrayList<>();
         for (int i = 0; i < patternPages.size(); i++) {
             var patternPage = ((PatternPage) patternPages.get(i));
@@ -319,21 +316,9 @@ public class GuideBookScreen extends Screen {
         return (r << 16) | (g << 8) | b;
     }
 
-    private void drawLine(GuiGraphics graphics, int thickness, int startX, int startY, int endX, int endY, int startColor, int endColor) {
-        graphics.drawManaged(() -> {
-            VertexConsumer consumer = graphics.bufferSource().getBuffer(RenderType.gui());
-            Vec3 startV = new Vec3(startX, startY, 0);
-            Vec3 endV = new Vec3(endX, endY, 0);
-            Vec3 line = endV.subtract(startV);
-            Vec3 volume = line.normalize().cross(new Vec3(0, 0, 1)).scale(thickness / 2.0);
-
-            Vec3[] corners = {startV.add(volume), startV.subtract(volume), endV.subtract(volume), endV.add(volume)};
-            Matrix4f matrix4f = graphics.pose().last().pose();
-            consumer.addVertex(matrix4f, (float) corners[0].x, (float) corners[0].y, 0).setColor(startColor);
-            consumer.addVertex(matrix4f, (float) corners[1].x, (float) corners[1].y, 0).setColor(startColor);
-            consumer.addVertex(matrix4f, (float) corners[2].x, (float) corners[2].y, 0).setColor(endColor);
-            consumer.addVertex(matrix4f, (float) corners[3].x, (float) corners[3].y, 0).setColor(endColor);
-        });
+    private void drawLine(GuiGraphicsExtractor graphics, int thickness, int startX, int startY, int endX, int endY, int startColor, int endColor) {
+        int halfThickness = thickness / 2;
+        graphics.fill(startX, startY - halfThickness, endX, startY - halfThickness + Math.max(thickness, 1), startColor);
     }
 
     private int generateTextColor(Identifier palette) {
@@ -345,7 +330,7 @@ public class GuideBookScreen extends Screen {
                         InputStream inputstream = resource.get().open();
                         NativeImage nativeimage = NativeImage.read(inputstream);
                 ) {
-                    aint = nativeimage.getPixelsRGBA();
+                    aint = nativeimage.getPixels();
                 }
                 aint = Arrays.copyOf(aint, 5); // exclude brightest two pixels, which often contain pure white
                 // for some reason, these ints are AGBR
@@ -369,11 +354,11 @@ public class GuideBookScreen extends Screen {
     }
 
     abstract class Page {
-        abstract void render(GuiGraphics guiGraphics, int titleX, int titleBottomY, int mouseX, int mouseY, float partialTick);
+        abstract void render(GuiGraphicsExtractor guiGraphics, int titleX, int titleBottomY, int mouseX, int mouseY, float partialTick);
 
-        void drawTitle(GuiGraphics guiGraphics, Component text, int titleX, int titleBottomY, int color, boolean dropshadow, @Nullable CyclicItemRenderer itemRenderer) {
+        void drawTitle(GuiGraphicsExtractor guiGraphics, Component text, int titleX, int titleBottomY, int color, boolean dropshadow, @Nullable CyclicItemRenderer itemRenderer) {
             var poseStack = guiGraphics.pose();
-            poseStack.pushPose();
+            poseStack.pushMatrix();
             float textScale = titleScale;
             int xOffset;
             if (itemRenderer == null) {
@@ -383,9 +368,9 @@ public class GuideBookScreen extends Screen {
                 itemRenderer.renderBottomLeft(guiGraphics, titleX, titleBottomY, itemScale);
             }
             textScale *= Math.clamp(getMaxTitleWidth() / (float) font.width(text), 0, 1);
-            poseStack.scale(textScale, textScale, textScale);
-            guiGraphics.drawString(font, text, (int) ((titleX + xOffset) / textScale), (int) ((titleBottomY - (2 * itemScale)) / textScale) - font.lineHeight, color, dropshadow);
-            poseStack.popPose();
+            poseStack.scale(textScale, textScale);
+            guiGraphics.text(font, text, (int) ((titleX + xOffset) / textScale), (int) ((titleBottomY - (2 * itemScale)) / textScale) - font.lineHeight, color, dropshadow);
+            poseStack.popMatrix();
             int lineLength = Math.min((int) (xOffset + (font.width(text) + 24) * textScale), IMAGE_WIDTH - XM * 2);
             int lineThickness = 2;
             int split = 15;
@@ -421,7 +406,7 @@ public class GuideBookScreen extends Screen {
         }
 
         @Override
-        public void render(GuiGraphics guiGraphics, int titleX, int titleBottomY, int mouseX, int mouseY, float partialTick) {
+        public void render(GuiGraphicsExtractor guiGraphics, int titleX, int titleBottomY, int mouseX, int mouseY, float partialTick) {
             // 0xFF8f756b - paper themed color
             // 0xFF923d34 - book leather themed color
             drawTitle(guiGraphics, title, titleX, titleBottomY, 0xFF8f756b, true, null);
@@ -445,7 +430,7 @@ public class GuideBookScreen extends Screen {
         public MaterialPage(Holder<MaterialDefinition> material) {
             this.material = material;
             this.cachedTextColor = generateTextColor(material.value().paletteLocation());
-            this.itemRenderer = new CyclicItemRenderer(List.of(material.value().ingredient().getItems()));
+            this.itemRenderer = new CyclicItemRenderer(material.value().ingredient().items().map(ItemStack::new).toList());
             this.bonusTable = new ArrayList<>();
             bonusTable.add(new TableEntry(
                     Component.translatable("ui.irons_jewelry.quality"),
@@ -473,7 +458,7 @@ public class GuideBookScreen extends Screen {
         }
 
         @Override
-        public void render(GuiGraphics guiGraphics, int titleX, int titleBottomY, int mouseX, int mouseY, float partialTick) {
+        public void render(GuiGraphicsExtractor guiGraphics, int titleX, int titleBottomY, int mouseX, int mouseY, float partialTick) {
             MaterialDefinition material = this.material.value();
             Component name = Component.translatable(material.descriptionId());
             var poseStack = guiGraphics.pose();
@@ -497,16 +482,16 @@ public class GuideBookScreen extends Screen {
                 int xpos = leftPos + XM;
                 for (int x = -1; x <= 1; x++) {
                     for (int y = -1; y <= 1; y++) {
-                        guiGraphics.drawString(font, type, xpos + x, ypos + y, darkColor, false);
+                        guiGraphics.text(font, type, xpos + x, ypos + y, darkColor, false);
                     }
                 }
-                guiGraphics.drawString(font, type, xpos, ypos, lightColor, false);
+                guiGraphics.text(font, type, xpos, ypos, lightColor, false);
                 if (mouseY >= ypos && mouseY <= ypos + font.lineHeight && mouseX >= xpos && mouseX <= xpos + font.width(type)) {
                     tooltipIndex = i;
                 }
                 int availableInfoWidth = IMAGE_WIDTH - XM * 2 - valueColumMargin;
                 for (var line : font.split(value, availableInfoWidth)) {
-                    guiGraphics.drawString(font, line, xpos + valueColumMargin, ypos, 0x0, false);
+                    guiGraphics.text(font, line, xpos + valueColumMargin, ypos, 0x0, false);
                     if (mouseY >= ypos && mouseY <= ypos + font.lineHeight &&
                             mouseX >= xpos + valueColumMargin && mouseX <= xpos + valueColumMargin + font.width(line)) {
                         tooltipIndex = i;
@@ -524,7 +509,7 @@ public class GuideBookScreen extends Screen {
                 }
             }
             if (tooltipIndex >= 0) {
-                guiGraphics.renderTooltip(font, font.split(bonusTable.get(tooltipIndex).tooltip, 250), mouseX, mouseY);
+                guiGraphics.setTooltipForNextFrame(font.split(bonusTable.get(tooltipIndex).tooltip, 250), mouseX, mouseY);
             }
         }
     }
@@ -545,7 +530,7 @@ public class GuideBookScreen extends Screen {
             }
 
             @Override
-            public void render(GuiGraphics guiGraphics, boolean selected, float partialTick) {
+            public void render(GuiGraphicsExtractor guiGraphics, boolean selected, float partialTick) {
                 return;
             }
 
@@ -566,12 +551,12 @@ public class GuideBookScreen extends Screen {
                         PartSelectionButton button) implements GuideBookButton {
             private static final Identifier INPUT_SLOT = IronsJewelry.id("guidebook/guidebook_part_frame");
 
-            void render(GuiGraphics guiGraphics, int x, int y, int width, int mouseX, int mouseY, float partialTick) {
+            void render(GuiGraphicsExtractor guiGraphics, int x, int y, int width, int mouseX, int mouseY, float partialTick) {
                 List<FormattedCharSequence> tooltipToRender = null;
                 int slotMargin = 4;
                 int size = 24;
-                guiGraphics.blitSprite(INPUT_SLOT, x, y, 200, size, size);
-                guiGraphics.blit(x + slotMargin, y + slotMargin, 200, 16, 16, sprite);
+                guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, INPUT_SLOT, x, y, size, size);
+                guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, sprite, x + slotMargin, y + slotMargin, 16, 16);
                 if (mouseX >= x && mouseX <= x + size && mouseY >= y && mouseY <= y + size) {
                     tooltipToRender = tooltip;
                 }
@@ -582,18 +567,18 @@ public class GuideBookScreen extends Screen {
                 // Name
                 int textWidth = width - size - textMargin;
                 for (var line : font.split(name, textWidth)) {
-                    guiGraphics.drawString(font, line, x, ypos, 0x0, true);
+                    guiGraphics.text(font, line, x, ypos, 0x0, true);
                     ypos += font.lineHeight;
                 }
                 if (primary) {
                     ypos += 1;
                     for (var line : font.split(Component.translatable("ui.irons_jewelry.primary_part").withStyle(ChatFormatting.ITALIC).withColor(0xFF222233), textWidth)) {
-                        guiGraphics.drawString(font, line, x, ypos, 0x0, false);
+                        guiGraphics.text(font, line, x, ypos, 0x0, false);
                         ypos += font.lineHeight;
                     }
                 }
                 if (tooltipToRender != null) {
-                    guiGraphics.renderTooltip(Minecraft.getInstance().font, tooltipToRender, mouseX, mouseY);
+                    guiGraphics.setTooltipForNextFrame(tooltipToRender, mouseX, mouseY);
                 }
             }
 
@@ -603,7 +588,7 @@ public class GuideBookScreen extends Screen {
             }
 
             @Override
-            public void render(GuiGraphics guiGraphics, boolean selected, float partialTick) {
+            public void render(GuiGraphicsExtractor guiGraphics, boolean selected, float partialTick) {
                 button.render(guiGraphics, selected, partialTick);
             }
 
@@ -671,7 +656,7 @@ public class GuideBookScreen extends Screen {
                 tooltip.add(name);
                 tooltip.add(Component.literal(" ").append(Component.translatable("tooltip.irons_jewelry.material_cost", Component.literal(String.valueOf(partIngredient.materialCost())).withStyle(ChatFormatting.WHITE))).withStyle(ChatFormatting.GRAY));
                 tooltip.add(Component.translatable("tooltip.irons_jewelry.applicable_materials").withStyle(ChatFormatting.YELLOW, ChatFormatting.UNDERLINE));
-                IronsJewelryRegistries.materialRegistry(Minecraft.getInstance().level.registryAccess()).holders().filter(candidate -> !candidate.value().ingredient().hasNoItems() && part.value().canUseMaterial(candidate))
+                IronsJewelryRegistries.materialRegistry(Minecraft.getInstance().level.registryAccess()).listElements().filter(candidate -> !candidate.value().ingredient().isEmpty() && part.value().canUseMaterial(candidate))
                         .forEach(m -> tooltip.add(Component.literal(" ").append(Component.translatable(m.value().descriptionId())).withStyle(ChatFormatting.GRAY)));
                 List<MutableComponent> partExpandedInfo = new ArrayList<>();
                 partExpandedInfo.add(name);
@@ -738,7 +723,7 @@ public class GuideBookScreen extends Screen {
         }
 
         @Override
-        public void render(GuiGraphics guiGraphics, int titleX, int titleBottomY, int mouseX, int mouseY, float partialTick) {
+        public void render(GuiGraphicsExtractor guiGraphics, int titleX, int titleBottomY, int mouseX, int mouseY, float partialTick) {
             PatternDefinition pattern = this.pattern.value();
             Component name = Component.translatable(pattern.descriptionId());
             /*
@@ -752,7 +737,7 @@ public class GuideBookScreen extends Screen {
             int partSectionY = titleBottomY + 4;
             int partSectionWidth = 100;
             int titleSpacer = font.lineHeight * 3 / 2;
-            guiGraphics.drawString(font, Component.translatable("tooltip.irons_jewelry.parts_header").withStyle(ChatFormatting.UNDERLINE), partSectionX, partSectionY, 0x0, false);
+            guiGraphics.text(font, Component.translatable("tooltip.irons_jewelry.parts_header").withStyle(ChatFormatting.UNDERLINE), partSectionX, partSectionY, 0x0, false);
             int yoff = 0;
             for (int i = 0; i < partInfo.size(); i++) {
                 //fixme: this has no y bounding condition
@@ -761,11 +746,14 @@ public class GuideBookScreen extends Screen {
                 var info = partInfo.get(i);
                 info.button.rectangle = ScreenRectangle.of(ScreenAxis.HORIZONTAL, x - leftPos, y - topPos, partSectionWidth, 24);
                 if (i == selectedPartIndex) {
-                    var bgstart = 0xBB260f0c;
-                    var bgend = bgstart;
-                    var borderstart = 0xDDe0ca9f;
-                    var borderend = 0xEEa09172;
-                    guiGraphics.drawManaged(() -> TooltipRenderUtil.renderTooltipBackground(guiGraphics, x, y, partSectionWidth - 5, 24, 0, bgstart, bgend, borderstart, borderend));
+                    int bgColor = 0xBB260f0c;
+                    int borderStart = 0xDDe0ca9f;
+                    int borderEnd = 0xEEa09172;
+                    guiGraphics.fill(x, y, x + partSectionWidth - 5, y + 24, bgColor);
+                    guiGraphics.fill(x, y, x + partSectionWidth - 5, y + 1, borderStart);
+                    guiGraphics.fill(x, y + 23, x + partSectionWidth - 5, y + 24, borderEnd);
+                    guiGraphics.fill(x - 1, y, x, y + 24, borderStart);
+                    guiGraphics.fill(x + partSectionWidth - 5, y, x + partSectionWidth - 4, y + 24, borderEnd);
                 }
                 info.render(guiGraphics, x, y, partSectionWidth, mouseX, mouseY, partialTick);
                 yoff += 32;
@@ -777,11 +765,14 @@ public class GuideBookScreen extends Screen {
             int infoSectionY = partSectionY + 3;
             int infoSectionWidth = IMAGE_WIDTH - 11 - (infoSectionX - leftPos);
             int infoSectionHeight = IMAGE_HEIGHT - YM * 2 - (infoSectionY - topPos);
-            var bgstart = 0xDD260f0c;
-            var bgend = bgstart;
-            var borderstart = 0xFFe0ca9f;
-            var borderend = 0xFFa09172;
-            guiGraphics.drawManaged(() -> TooltipRenderUtil.renderTooltipBackground(guiGraphics, infoSectionX, infoSectionY + 1, infoSectionWidth - 2, infoSectionHeight - 2, 0, bgstart, bgend, borderstart, borderend));
+            int bgColor = 0xDD260f0c;
+            int borderStart = 0xFFe0ca9f;
+            int borderEnd = 0xFFa09172;
+            guiGraphics.fill(infoSectionX, infoSectionY + 1, infoSectionX + infoSectionWidth - 2, infoSectionY + infoSectionHeight - 1, bgColor);
+            guiGraphics.fill(infoSectionX, infoSectionY + 1, infoSectionX + infoSectionWidth - 2, infoSectionY + 2, borderStart);
+            guiGraphics.fill(infoSectionX, infoSectionY + infoSectionHeight - 2, infoSectionX + infoSectionWidth - 2, infoSectionY + infoSectionHeight - 1, borderEnd);
+            guiGraphics.fill(infoSectionX - 1, infoSectionY + 1, infoSectionX, infoSectionY + infoSectionHeight - 1, borderStart);
+            guiGraphics.fill(infoSectionX + infoSectionWidth - 2, infoSectionY + 1, infoSectionX + infoSectionWidth - 1, infoSectionY + infoSectionHeight - 1, borderEnd);
             List<MutableComponent> infoPage = overviewInfo;
             if (selectedPartIndex >= 0 && selectedPartIndex < partInfo.size()) {
                 infoPage = partInfo.get(selectedPartIndex).expandedInfo;
@@ -793,35 +784,33 @@ public class GuideBookScreen extends Screen {
                 textScale -= .1f;
             }
             var poseStack = guiGraphics.pose();
-            poseStack.pushPose();
-            poseStack.translate(infoSectionX, infoSectionY, 0);
-            poseStack.scale(textScale, textScale, textScale);
+            poseStack.pushMatrix();
+            poseStack.translate(infoSectionX, infoSectionY);
+            poseStack.scale(textScale, textScale);
             int y = 0;
             for (var component : infoPage) {
                 if (component.getContents() == PlainTextContents.EMPTY) {
                     y += emptyMargin;
                 } else {
                     for (var line : font.split(component, (int) (infoSectionWidth / textScale))) {
-                        guiGraphics.drawString(font, line, 0, y, -1, true);
+                        guiGraphics.text(font, line, 0, y, -1, true);
                         y += font.lineHeight + 1;
                     }
                 }
             }
-            poseStack.popPose();
+            poseStack.popMatrix();
             /*
             Artisan Scroll Helper
              */
-            poseStack.pushPose();
+            poseStack.pushMatrix();
             float scale = itemScale * 0.75f;
             int itemX = (int) (leftPos + IMAGE_WIDTH - XM - 16 * scale);
-            poseStack.translate(0, 0, -2000);
             SCROLL_RENDERER.renderBottomLeft(guiGraphics, itemX, titleBottomY, scale);
-            poseStack.translate(0, 0, 1000);
-            poseStack.scale(scale, scale, scale);
-            guiGraphics.drawString(font, "?", (itemX + 22) / scale, (titleBottomY - font.lineHeight * scale) / scale, 0x0, false);
-            poseStack.popPose();
+            poseStack.scale(scale, scale);
+            guiGraphics.text(font, "?", (int) ((itemX + 22) / scale), (int) ((titleBottomY - font.lineHeight * scale) / scale), 0x0, false);
+            poseStack.popMatrix();
             if (mouseX >= itemX && mouseX <= itemX + 22 * scale && mouseY >= titleBottomY - 16 * scale && mouseY <= titleBottomY) {
-                guiGraphics.renderTooltip(font, patternTooltip, mouseX, mouseY);
+                guiGraphics.setTooltipForNextFrame(patternTooltip, mouseX, mouseY);
             }
         }
 
@@ -881,8 +870,8 @@ public class GuideBookScreen extends Screen {
                 ItemStack item = new ItemStack(pattern.value().jewelryType().item());
                 Holder<MaterialDefinition> renderMaterial = null;
                 var materialRegistry = IronsJewelryRegistries.materialRegistry(Minecraft.getInstance().level.registryAccess());
-                var metal = materialRegistry.getHolder(IronsJewelry.id("gold")).get();
-                var gem = materialRegistry.getHolder(IronsJewelry.id("diamond")).get();
+                var metal = materialRegistry.get(IronsJewelry.id("gold")).get();
+                var gem = materialRegistry.get(IronsJewelry.id("diamond")).get();
                 Map<Holder<PartDefinition>, Holder<MaterialDefinition>> parts = new HashMap<>();
                 for (var partIngredient : pattern.value().partTemplate()) {
                     var part = partIngredient.part();
@@ -891,7 +880,7 @@ public class GuideBookScreen extends Screen {
                     } else if (part.value().canUseMaterial(gem)) {
                         renderMaterial = gem;
                     } else {
-                        for (Holder.Reference<MaterialDefinition> materialDefinition : materialRegistry.holders().toList()) {
+                        for (Holder.Reference<MaterialDefinition> materialDefinition : materialRegistry.listElements().toList()) {
                             if (part.value().canUseMaterial(materialDefinition)) {
                                 renderMaterial = materialDefinition;
                                 break;
@@ -937,10 +926,10 @@ public class GuideBookScreen extends Screen {
         }
 
         @Override
-        public void render(GuiGraphics guiGraphics, boolean selected, float partialTick) {
+        public void render(GuiGraphicsExtractor guiGraphics, boolean selected, float partialTick) {
             boolean active = bookmark >= 0 && bookmark == bookState.getGlobalPageNumber() - 1;
             Identifier sprite = active ? this.spriteActive : this.sprite;
-            guiGraphics.blitSprite(sprite, x, y, width, height);
+            guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, sprite, x, y, width, height);
         }
 
         @Override

@@ -3,7 +3,7 @@ package io.redspace.ironsjewelry.mixin;
 import io.redspace.ironsjewelry.core.bonuses.TradeDiscountBonusType;
 import io.redspace.ironsjewelry.registry.BonusTypeRegistry;
 import io.redspace.ironsjewelry.utils.Utils;
-import net.minecraft.world.entity.npc.Villager;
+import net.minecraft.world.entity.npc.villager.Villager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.trading.MerchantOffer;
 import org.spongepowered.asm.mixin.Mixin;

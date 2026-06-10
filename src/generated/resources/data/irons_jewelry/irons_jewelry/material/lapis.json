@@ -26,9 +26,7 @@
     }
   },
   "descriptionId": "material.irons_jewelry.lapis",
-  "ingredient": {
-    "tag": "c:gems/lapis"
-  },
+  "ingredient": "#c:gems/lapis",
   "paletteLocation": "irons_jewelry:palettes/lapis",
   "quality": 1.0
 }

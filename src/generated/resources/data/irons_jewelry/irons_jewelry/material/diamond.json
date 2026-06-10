@@ -13,7 +13,7 @@
     },
     "irons_jewelry:attribute": {
       "amount": 2.0,
-      "attribute": "minecraft:generic.armor",
+      "attribute": "minecraft:armor",
       "operation": "add_value"
     },
     "irons_jewelry:negative_effect": {
@@ -24,9 +24,7 @@
     }
   },
   "descriptionId": "material.irons_jewelry.diamond",
-  "ingredient": {
-    "tag": "c:gems/diamond"
-  },
+  "ingredient": "#c:gems/diamond",
   "paletteLocation": "irons_jewelry:palettes/diamond",
   "quality": 2.0
 }

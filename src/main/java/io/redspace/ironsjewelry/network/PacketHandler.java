@@ -11,7 +11,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
-@EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD, modid = IronsJewelry.MODID)
+@EventBusSubscriber(modid = IronsJewelry.MODID)
 public class PacketHandler {
     @SubscribeEvent
     public static void register(final RegisterPayloadHandlersEvent event) {

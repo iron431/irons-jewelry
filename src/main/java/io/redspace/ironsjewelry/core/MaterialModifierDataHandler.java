@@ -3,9 +3,6 @@ package io.redspace.ironsjewelry.core;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParseException;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.redspace.ironsjewelry.IronsJewelry;
@@ -13,15 +10,15 @@ import io.redspace.ironsjewelry.core.data.MaterialDefinition;
 import io.redspace.ironsjewelry.core.parameters.IBonusParameterType;
 import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
 import net.minecraft.core.Holder;
-import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.FileToIdConverter;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
 
 import java.util.Map;
 
-public class MaterialModifierDataHandler extends SimpleJsonResourceReloadListener {
+public class MaterialModifierDataHandler extends SimpleJsonResourceReloadListener<MaterialModifierDataHandler.Modifier> {
     public record Modifier(Holder<MaterialDefinition> targetMaterial,
                            Map<IBonusParameterType<?>, Object> parameterOverrides) {
     }
@@ -34,30 +31,27 @@ public class MaterialModifierDataHandler extends SimpleJsonResourceReloadListene
     private static Multimap<Holder<MaterialDefinition>, Modifier> INSTANCE;
 
     public MaterialModifierDataHandler() {
-        super(new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create(), "irons_jewelry/material_modifier");
+        super(CODEC, FileToIdConverter.json("irons_jewelry/material_modifier"));
     }
 
     @Override
-    protected void apply(Map<Identifier, JsonElement> pObject, ResourceManager pResourceManager, ProfilerFiller pProfiler) {
+    protected void apply(Map<Identifier, Modifier> pObject, ResourceManager pResourceManager, ProfilerFiller pProfiler) {
         IronsJewelry.LOGGER.debug("MaterialDataHandler.apply");
         ImmutableMultimap.Builder<Holder<MaterialDefinition>, Modifier> builder = ImmutableMultimap.builder();
-        RegistryOps<JsonElement> registryops = this.makeConditionalOps(); // Neo: add condition context
 
-        for (Map.Entry<Identifier, JsonElement> entry : pObject.entrySet()) {
+        for (Map.Entry<Identifier, Modifier> entry : pObject.entrySet()) {
             Identifier Identifier = entry.getKey();
             if (Identifier.getPath().startsWith("_"))
-                continue; //Forge: filter anything beginning with "_" as it's used for metadata.
+                continue;
             try {
-                var decoded = CODEC.parse(registryops, entry.getValue()).getOrThrow(JsonParseException::new);
-                builder.put(decoded.targetMaterial, decoded);
-            } catch (IllegalArgumentException | JsonParseException jsonparseexception) {
-                IronsJewelry.LOGGER.error("Parsing error loading material {}: {}", Identifier, jsonparseexception);
+                builder.put(entry.getValue().targetMaterial, entry.getValue());
+            } catch (IllegalArgumentException e) {
+                IronsJewelry.LOGGER.error("Parsing error loading material {}: {}", Identifier, e);
             }
         }
 
         INSTANCE = builder.build();
         IronsJewelry.LOGGER.debug("MaterialDataHandler Finished Loading: {}", INSTANCE);
-
     }
 
     public static Map<IBonusParameterType<?>, Object> getParametersWithOverrides(Holder<MaterialDefinition> material) {

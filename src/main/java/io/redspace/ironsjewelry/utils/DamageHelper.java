@@ -13,8 +13,8 @@ public class DamageHelper {
     private static final HashMap<UUID, Integer> knockbackImmunes = new HashMap<>();
 
     public static void ignoreNextKnockback(LivingEntity livingEntity) {
-        if (livingEntity.getServer() != null) {
-            var tickCount = livingEntity.getServer().getTickCount();
+        if (livingEntity.level().getServer() != null) {
+            var tickCount = livingEntity.level().getServer().getTickCount();
             //garbage collect
             knockbackImmunes.entrySet().stream().filter(entry -> tickCount - entry.getValue() >= 10).toList().forEach(entry -> knockbackImmunes.remove(entry.getKey()));
             //enter entity
@@ -26,8 +26,8 @@ public class DamageHelper {
     public static void cancelKnockback(LivingKnockBackEvent event) {
         //IronsSpellbooks.LOGGER.debug("DamageSources.cancelKnockback {}", event.getEntity().getName().getString());
         var entity = event.getEntity();
-        if (entity.getServer() != null && knockbackImmunes.containsKey(event.getEntity().getUUID())) {
-            if (entity.getServer().getTickCount() - knockbackImmunes.get(entity.getUUID()) <= 1) {
+        if (entity.level().getServer() != null && knockbackImmunes.containsKey(event.getEntity().getUUID())) {
+            if (entity.level().getServer().getTickCount() - knockbackImmunes.get(entity.getUUID()) <= 1) {
                 event.setCanceled(true);
             }
             knockbackImmunes.remove(entity.getUUID());

@@ -99,15 +99,15 @@ file="META-INF/accesstransformer.cfg"
     ordering="NONE"
     side="BOTH"
 
-[[dependencies.${mod_id}]]
-    modId="atlas_api"
-    type="required"
-    versionRange="[26.1.2-1.1.0,26.1.2-2.0.0)"
-    ordering="NONE"
-    side="BOTH"
-[[dependencies.${mod_id}]]
-    modId="irons_lib"
-    type="required"
-    versionRange="[26.1.2-2.0.0,26.1.2-3.0.0)"
-    ordering="NONE"
-    side="BOTH"
+#[[dependencies.${mod_id}]]
+#    modId="atlas_api"
+#    type="required"
+#    versionRange="[26.1.2-1.1.0,26.1.2-2.0.0)"
+#    ordering="NONE"
+#    side="BOTH"
+#[[dependencies.${mod_id}]]
+#    modId="irons_lib"
+#    type="required"
+#    versionRange="[26.1.2-2.0.0,26.1.2-3.0.0)"
+#    ordering="NONE"
+#    side="BOTH"

@@ -17,7 +17,7 @@ public class AdvancedPatternJeiHandler implements ISimpleRecipeManagerPlugin<Pat
     }
 
     @Override
-    public boolean isHandledOutput(ITypedIngredient output) {
+    public boolean isHandledOutput(ITypedIngredient<?> output) {
         return false;
     }
 

@@ -20,9 +20,7 @@
     }
   },
   "descriptionId": "material.irons_jewelry.sapphire",
-  "ingredient": {
-    "tag": "c:gems/sapphire"
-  },
+  "ingredient": "#c:gems/sapphire",
   "paletteLocation": "irons_jewelry:palettes/sapphire",
   "quality": 2.0
 }

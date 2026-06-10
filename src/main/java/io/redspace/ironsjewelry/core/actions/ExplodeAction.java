@@ -10,6 +10,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.RegistryCodecs;
+import net.minecraft.core.particles.ExplosionParticleInfo;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
@@ -19,6 +20,7 @@ import net.minecraft.network.protocol.game.ClientboundExplodePacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.util.random.WeightedList;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.Entity;
@@ -62,12 +64,17 @@ public record ExplodeAction(
             SoundEvent.CODEC.fieldOf("sound").forGetter(ExplodeAction::sound)
     ).apply(builder, ExplodeAction::new));
 
+    private static final WeightedList<ExplosionParticleInfo> DEFAULT_BLOCK_PARTICLES = WeightedList.<ExplosionParticleInfo>builder()
+            .add(new ExplosionParticleInfo(ParticleTypes.POOF, 0.5F, 1.0F))
+            .add(new ExplosionParticleInfo(ParticleTypes.SMOKE, 1.0F, 1.0F))
+            .build();
+
     @Override
     public void apply(ServerLevel serverLevel, double quality, boolean applyToSelf, ServerPlayer wearer, Entity entity) {
-        Vec3 origin = (applyToSelf ? wearer : entity).position().add(serverLevel.random.nextDouble() * .1 - .05, serverLevel.random.nextDouble() * .2 + .2, serverLevel.random.nextDouble() * .1 - .05);
+        Vec3 origin = (applyToSelf ? wearer : entity).position().add(serverLevel.getRandom().nextDouble() * .1 - .05, serverLevel.getRandom().nextDouble() * .2 + .2, serverLevel.getRandom().nextDouble() * .1 - .05);
         Vec3 vec3 = origin.add(this.offset);
         var exRadius = Math.max((float) this.radius.sample(quality), 0.0F);
-        Explosion explosion = new IgnorableExplosion(
+        IgnorableExplosion explosion = new IgnorableExplosion(
                 serverLevel,
                 affectSelf,
                 wearer,
@@ -79,39 +86,28 @@ public record ExplodeAction(
                         this.knockbackMultiplier.map(p_345018_ -> (float) p_345018_.sample(quality)),
                         this.immuneBlocks
                 ),
-                vec3.x(),
-                vec3.y(),
-                vec3.z(),
+                vec3,
                 exRadius,
                 this.createFire,
-                Explosion.BlockInteraction.KEEP,//explosion$blockinteraction,
-                smallParticle,
-                largeParticle,
-                sound
+                Explosion.BlockInteraction.KEEP
         );
         if (net.neoforged.neoforge.event.EventHooks.onExplosionStart(serverLevel, explosion)) {
             return;
         }
-        explosion.explode();
-        explosion.finalizeExplosion(true);
-        if (!explosion.interactsWithBlocks()) {
-            explosion.clearToBlow();
-        }
+        int blockCount = explosion.explode();
+        ParticleOptions explosionParticle = explosion.isSmall() ? smallParticle : largeParticle;
 
         for (ServerPlayer serverplayer : serverLevel.getPlayers(serverplayer -> serverplayer.distanceToSqr(vec3) < 4096.0)) {
             serverplayer.connection
                     .send(
                             new ClientboundExplodePacket(
-                                    vec3.x,
-                                    vec3.y,
-                                    vec3.z,
+                                    vec3,
                                     exRadius,
-                                    explosion.getToBlow(),
-                                    explosion.getHitPlayers().get(serverplayer),
-                                    explosion.getBlockInteraction(),
-                                    explosion.getSmallExplosionParticles(),
-                                    explosion.getLargeExplosionParticles(),
-                                    explosion.getExplosionSound()
+                                    blockCount,
+                                    Optional.ofNullable(explosion.getHitPlayers().get(serverplayer)),
+                                    explosionParticle,
+                                    sound,
+                                    DEFAULT_BLOCK_PARTICLES
                             )
                     );
         }

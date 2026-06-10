@@ -8,9 +8,8 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
-import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.SwordItem;
+import net.minecraft.world.item.equipment.Equippable;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
@@ -40,7 +39,7 @@ public class LootInjectionHandler {
         map.put(is(JewelryModTags.LOOT_HANDLER_MEDIUM_GEARSCORE), 25);
         map.put(is(JewelryModTags.LOOT_HANDLER_HIGH_GEARSCORE), 50);
         map.put(is(JewelryModTags.LOOT_HANDLER_VERY_HIGH_GEARSCORE), 75);
-        map.put(item -> item instanceof ArmorItem || item instanceof SwordItem, 25);
+        map.put(item -> item.components().has(net.minecraft.core.component.DataComponents.EQUIPPABLE) || item.components().has(net.minecraft.core.component.DataComponents.TOOL), 25);
         return map;
     }
 
@@ -61,10 +60,11 @@ public class LootInjectionHandler {
     public static void cacheTrackedLootTables(OnDatapackSyncEvent event) {
         // if never built, or the world data is reloading (player is null) then do work
         if (!built || event.getPlayer() == null) {
-            var lootTables = event.getPlayerList().getServer().reloadableRegistries().get().registryOrThrow(Registries.LOOT_TABLE);
+//            var lootTables = event.getPlayerList().getServer().reloadableRegistries().get().registryOrThrow(Registries.LOOT_TABLE);
+            var lootTables = event.getPlayerList().getServer().reloadableRegistries().lookup().lookupOrThrow(Registries.LOOT_TABLE).listElements().toList();
             TRACKED_LOOT_TABLES.clear();
-            for (Map.Entry<ResourceKey<LootTable>, LootTable> registryEntry : lootTables.entrySet()) {
-                handleLootTable(registryEntry.getKey().location(), registryEntry.getValue());
+            for (var registryEntry : lootTables) {
+                handleLootTable(registryEntry.getKey().identifier(), registryEntry.value());
             }
             built = true;
         }

@@ -76,41 +76,31 @@ public class JeiPlugin implements IModPlugin {
 
     @Override
     public void registerAdvanced(IAdvancedRegistration registration) {
-        registration.addTypedRecipeManagerPlugin(JewelcraftingJeiRecipeCategory.RECIPE_TYPE, new AdvancedPatternJeiHandler());
+        registration.addSimpleRecipeManagerPlugin(JewelcraftingJeiRecipeCategory.RECIPE_TYPE, new AdvancedPatternJeiHandler());
     }
 
     public static final ISubtypeInterpreter<ItemStack> JEWELRY_INTERPRETER = new ISubtypeInterpreter<ItemStack>() {
         @Override
-        public @Nullable String getSubtypeData(ItemStack ingredient, UidContext context) {
+        public @Nullable Object getSubtypeData(ItemStack ingredient, UidContext context) {
             var data = JewelryData.get(ingredient);
             if (data.isValid()) {
                 var pattern = data.pattern().getKey();
                 if (pattern != null) {
-                    return pattern.location().toString();
+                    return pattern.identifier().toString();
                 }
             }
             return null;
         }
-
-        @Override
-        public String getLegacyStringSubtypeInfo(ItemStack ingredient, UidContext context) {
-            return getSubtypeData(ingredient, context);
-        }
     };
     public static final ISubtypeInterpreter<ItemStack> PATTERN_INTERPRETER = new ISubtypeInterpreter<ItemStack>() {
         @Override
-        public @Nullable String getSubtypeData(ItemStack ingredient, UidContext context) {
+        public @Nullable Object getSubtypeData(ItemStack ingredient, UidContext context) {
             var pattern = StoredPatternData.get(ingredient);
             if (pattern != null && pattern.getKey() != null) {
-                return pattern.getKey().location().toString();
+                return pattern.getKey().identifier().toString();
             }
 
             return null;
-        }
-
-        @Override
-        public String getLegacyStringSubtypeInfo(ItemStack ingredient, UidContext context) {
-            return getSubtypeData(ingredient, context);
         }
     };
 }

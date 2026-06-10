@@ -54,7 +54,7 @@ public class IronsDebugCommand {
 
     public static void register(CommandDispatcher<CommandSourceStack> pDispatcher) {
 
-        var command = Commands.literal("ironsJewelry").requires((p_138819_) -> p_138819_.hasPermission(2)).
+        var command = Commands.literal("ironsJewelry").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS)).
                 then(Commands.literal("learnPattern")
                         .then(Commands.argument("pattern", PatternCommandArgument.patternArgument()).suggests(PATTERN_SUGGESTIONS).executes((commandContext) -> learnPattern(commandContext.getSource(), commandContext.getArgument("pattern", String.class)))).then(Commands.literal("all").executes(context -> learnAllPatterns(context.getSource())))
                         .then(Commands.literal("unlearnAll").executes(context -> unlearnAllPatterns(context.getSource()))))
@@ -63,7 +63,7 @@ public class IronsDebugCommand {
                         }))
                 );
 
-        if (!FMLLoader.isProduction()) {
+        if (!FMLLoader.getCurrent().isProduction()) {
             command.then(Commands.literal("debug")
                     .then(Commands.literal("countCombos").executes((commandContext) -> enumerateCombos(commandContext.getSource())))
                     .then(Commands.literal("generateSiteData").executes((commandContext) -> GenerateSiteData.generateSiteData(commandContext.getSource())))
@@ -109,7 +109,7 @@ public class IronsDebugCommand {
         }
 
         var registry = IronsJewelryRegistries.patternRegistry(source.registryAccess());
-        var pattern = registry.getHolder(Identifier.parse(patternId));
+        var pattern = registry.get(Identifier.parse(patternId));
         if (pattern.isPresent()) {
             var serverPlayer = source.getPlayer();
             ItemStack stack = new ItemStack(ItemRegistry.RECIPE.get());
@@ -128,10 +128,10 @@ public class IronsDebugCommand {
 
         var registry = IronsJewelryRegistries.patternRegistry(source.registryAccess());
         var pattern = registry.get(Identifier.parse(patternId));
-        if (pattern != null) {
+        if (pattern.isPresent()) {
             var serverPlayer = source.getPlayer();
             if (serverPlayer != null) {
-                return serverPlayer.getData(DataAttachmentRegistry.PLAYER_DATA).learnAndSync(serverPlayer, registry.wrapAsHolder(pattern)) ? 1 : 0;
+                return serverPlayer.getData(DataAttachmentRegistry.PLAYER_DATA).learnAndSync(serverPlayer, pattern.get()) ? 1 : 0;
             }
 
         }
@@ -199,14 +199,14 @@ public class IronsDebugCommand {
                         var material = jewelry.parts().get(part);
                         var sprite = AssetHandlerRegistry.JEWELRY_HANDLER.get().getSprite(AssetHandlerRegistry.JEWELRY_HANDLER.get().getSpriteLocation(part, material));
                         var layer = sprite.contents().getOriginalImage();
-                        var pixels = layer.getPixelsRGBA();
+                        var pixels = layer.getPixels();
                         for (int x = 0; x < 16; x++) {
                             for (int y = 0; y < 16; y++) {
                                 int i = y * 16 + x;
                                 int rgba = pixels[i];
                                 int alpha = (rgba >> 24) & 0xFF;
                                 if (alpha != 0) {
-                                    image.setPixelRGBA(x, y, rgba);
+                                    image.setPixel(x, y, rgba);
                                 }
                             }
                         }
@@ -224,7 +224,7 @@ public class IronsDebugCommand {
                     image.writeToFile(filePath);
                     Component component = Component.literal("Exported " + fileName)
                             .withStyle(ChatFormatting.UNDERLINE)
-                            .withStyle(p_168608_ -> p_168608_.withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, filePath.toString())));
+                            .withStyle(p_168608_ -> p_168608_.withClickEvent(new ClickEvent.OpenFile(filePath)));
                     serverPlayer.sendSystemMessage(component);
 
                 } catch (Exception e) {

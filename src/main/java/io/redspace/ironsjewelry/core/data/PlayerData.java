@@ -1,26 +1,22 @@
 package io.redspace.ironsjewelry.core.data;
 
+import com.mojang.serialization.Codec;
 import io.redspace.ironsjewelry.IronsJewelry;
 import io.redspace.ironsjewelry.core.bonuses.BonusType;
 import io.redspace.ironsjewelry.network.packets.SyncPlayerDataPacket;
 import io.redspace.ironsjewelry.registry.DataAttachmentRegistry;
 import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
 import net.minecraft.core.Holder;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.IntTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.StringTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.neoforge.attachment.IAttachmentHolder;
 import net.neoforged.neoforge.attachment.IAttachmentSerializer;
 import net.neoforged.neoforge.network.PacketDistributor;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -116,70 +112,64 @@ public class PlayerData {
     /**
      * Serializer
      */
-    public static class Serializer implements IAttachmentSerializer<CompoundTag, PlayerData> {
+    public static class Serializer implements IAttachmentSerializer<PlayerData> {
         private static final String LEARNED_PATTERNS = "learned_patterns";
         private static final String COOLDOWNS = "cooldowns";
 
         @Override
-        public PlayerData read(IAttachmentHolder holder, CompoundTag compoundTag, HolderLookup.Provider provider) {
+        public PlayerData read(IAttachmentHolder holder, ValueInput input) {
             var data = new PlayerData();
-            var learnedPatterns = compoundTag.getList(LEARNED_PATTERNS, StringTag.TAG_STRING);
-            var holderGetter = provider.asGetterLookup().lookupOrThrow(IronsJewelryRegistries.Keys.PATTERN_REGISTRY_KEY);
-            for (Tag stringTag : learnedPatterns) {
-                try {
-                    var string = stringTag.getAsString();
-                    var pattern = holderGetter.get(ResourceKey.create(IronsJewelryRegistries.Keys.PATTERN_REGISTRY_KEY, Identifier.parse(string)));
-                    pattern.ifPresent(data.learnedPatterns::add);
-                } catch (Exception e) {
-                    continue;
+            var learnedPatternsList = input.listOrEmpty(LEARNED_PATTERNS, Codec.STRING);
+            if (holder instanceof Player player) {
+                var holderGetter = player.registryAccess().lookupOrThrow(IronsJewelryRegistries.Keys.PATTERN_REGISTRY_KEY);
+                for (String string : learnedPatternsList) {
+                    try {
+                        var pattern = holderGetter.get(ResourceKey.create(IronsJewelryRegistries.Keys.PATTERN_REGISTRY_KEY, Identifier.parse(string)));
+                        pattern.ifPresent(data.learnedPatterns::add);
+                    } catch (Exception e) {
+                        continue;
+                    }
                 }
             }
-            var cooldowns = compoundTag.getList(COOLDOWNS, CompoundTag.TAG_COMPOUND);
-            for (Tag tag : cooldowns) {
+            var cooldownsList = input.childrenListOrEmpty(COOLDOWNS);
+            for (ValueInput child : cooldownsList) {
                 try {
-                    var cooldown = (CompoundTag) tag;
-                    var id = Identifier.parse(cooldown.getString("id"));
-                    var rt = cooldown.getInt("rt");
-                    var tt = cooldown.getInt("tt");
+                    var id = Identifier.parse(child.getStringOr("id", ""));
+                    var rt = child.getIntOr("rt", 0);
+                    var tt = child.getIntOr("tt", 0);
                     data.cooldowns.put(id, new CooldownInstance(rt, tt));
                 } catch (Exception e) {
                     continue;
                 }
             }
-            if (compoundTag.contains("bookmark")) {
-                data.bookmarkIndex = compoundTag.getInt("bookmark");
-            }
+            data.bookmarkIndex = input.getIntOr("bookmark", -1);
             return data;
         }
 
         @Override
-        public @Nullable CompoundTag write(PlayerData attachment, HolderLookup.Provider provider) {
-            CompoundTag tag = new CompoundTag();
+        public boolean write(PlayerData attachment, ValueOutput output) {
+            var patternsList = output.list(LEARNED_PATTERNS, Codec.STRING);
+            attachment.learnedPatterns.forEach(patternDefinition -> patternsList.add(patternDefinition.getKey().identifier().toString()));
 
-            var patterns = new ListTag();
-            attachment.learnedPatterns.forEach(patternDefinition -> patterns.add(StringTag.valueOf(patternDefinition.getKey().location().toString())));
-            tag.put(LEARNED_PATTERNS, patterns);
-
-            var cooldowns = new ListTag();
+            var cooldownsList = output.childrenList(COOLDOWNS);
             attachment.cooldowns.forEach((r, cd) -> {
-                var c = new CompoundTag();
-                c.put("id", StringTag.valueOf(r.toString()));
-                c.put("rt", IntTag.valueOf(cd.remainingTicks));
-                c.put("tt", IntTag.valueOf(cd.totalTicks));
-                cooldowns.add(c);
+                var child = cooldownsList.addChild();
+                child.putString("id", r.toString());
+                child.putInt("rt", cd.remainingTicks);
+                child.putInt("tt", cd.totalTicks);
             });
-            tag.put(COOLDOWNS, cooldowns);
+
             if (attachment.hasBookmark()) {
-                tag.putInt("bookmark", attachment.getBookmarkIndex());
+                output.putInt("bookmark", attachment.getBookmarkIndex());
             }
-            return tag;
+            return !output.isEmpty();
         }
 
         public static void networkWrite(RegistryFriendlyByteBuf buf, PlayerData playerData) {
             buf.writeInt(playerData.learnedPatterns.size());
             for (Holder<PatternDefinition> pattern : playerData.learnedPatterns) {
                 try {
-                    buf.writeIdentifier(Objects.requireNonNull(pattern.getKey()).location());
+                    buf.writeIdentifier(Objects.requireNonNull(pattern.getKey()).identifier());
                 } catch (Exception e) {
                     buf.writeIdentifier(IronsJewelry.id("empty"));
                 }
@@ -193,7 +183,7 @@ public class PlayerData {
             var registry = IronsJewelryRegistries.patternRegistry(buf.registryAccess());
             for (int j = 0; j < i; j++) {
                 try {
-                    playerData.learnedPatterns.add(registry.wrapAsHolder(Objects.requireNonNull(registry.get(buf.readIdentifier()))));
+                    registry.get(buf.readIdentifier()).ifPresent(playerData.learnedPatterns::add);
                 } catch (Exception e) {
                     continue;
                 }

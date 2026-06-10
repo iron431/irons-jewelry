@@ -33,11 +33,12 @@ public class VillageAddition {
         // Grabs the processor list we want to use along with our piece.
         // This is a requirement as using the ProcessorLists.EMPTY field will cause the game to throw errors.
         // The reason why is the empty processor list in the world's registry is not the same instance as in that field once the world is started up.
-        Holder<StructureProcessorList> processor = processorListRegistry.getHolderOrThrow(proccessor);
+        Holder<StructureProcessorList> processor = processorListRegistry.getOrThrow(proccessor);
 
         // Grab the pool we want to add to
-        StructureTemplatePool pool = templatePoolRegistry.get(poolRL);
-        if (pool == null) return;
+        var poolHolder = templatePoolRegistry.get(poolRL);
+        if (poolHolder.isEmpty()) return;
+        StructureTemplatePool pool = poolHolder.get().value();
 
         // Grabs the nbt piece and creates a SinglePoolElement of it that we can add to a structure's pool.
         // Use .legacy( for villages/outposts and .single( for everything else
@@ -66,8 +67,8 @@ public class VillageAddition {
      */
     @SubscribeEvent
     public static void addNewVillageBuilding(final ServerAboutToStartEvent event) {
-        Registry<StructureTemplatePool> templatePoolRegistry = event.getServer().registryAccess().registry(Registries.TEMPLATE_POOL).orElseThrow();
-        Registry<StructureProcessorList> processorListRegistry = event.getServer().registryAccess().registry(Registries.PROCESSOR_LIST).orElseThrow();
+        Registry<StructureTemplatePool> templatePoolRegistry = event.getServer().registryAccess().lookupOrThrow(Registries.TEMPLATE_POOL);
+        Registry<StructureProcessorList> processorListRegistry = event.getServer().registryAccess().lookupOrThrow(Registries.PROCESSOR_LIST);
 
         int weight = ServerConfig.JEWELER_HOUSE_WEIGHT.get();
 

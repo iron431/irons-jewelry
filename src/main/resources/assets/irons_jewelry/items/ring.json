@@ -1,0 +1,7 @@
+{
+  "model": {
+    "type": "atlas_api:simple_model",
+    "handler": "irons_jewelry:jewelry",
+    "model": "irons_jewelry:item/ring"
+  }
+}

@@ -24,15 +24,15 @@ public class AppendLootModifier extends LootModifier {
             Codec.list(Codec.STRING).fieldOf("keys").forGetter(m -> m.IdentifierKeys)).apply(builder, AppendLootModifier::new)));
     private final List<String> IdentifierKeys;
 
-    protected AppendLootModifier(LootItemCondition[] conditionsIn, List<String> IdentifierKey) {
-        super(conditionsIn);
+    protected AppendLootModifier(LootItemCondition[] conditionsIn, int priority, List<String> IdentifierKey) {
+        super(conditionsIn, priority);
         this.IdentifierKeys = IdentifierKey;
     }
 
     @Override
     protected @NotNull ObjectArrayList<ItemStack> doApply(ObjectArrayList<ItemStack> generatedLoot, LootContext context) {
-        for (String Identifier : IdentifierKeys) {
-            Identifier path = Identifier.parse(Identifier);
+        for (String idKey : IdentifierKeys) {
+            Identifier path = Identifier.parse(idKey);
             var lootTable = context.getLevel().getServer().reloadableRegistries().getLootTable(ResourceKey.create(Registries.LOOT_TABLE, path));
             ObjectArrayList<ItemStack> objectarraylist = new ObjectArrayList<>();
             //use raw to avoid recursively adding all global loot modifiers again

@@ -24,7 +24,7 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.AddReloadListenerEvent;
+import net.neoforged.neoforge.event.AddServerReloadListenersEvent;
 import org.slf4j.Logger;
 
 @Mod(IronsJewelry.MODID)
@@ -57,8 +57,8 @@ public class IronsJewelry {
         modContainer.registerConfig(ModConfig.Type.SERVER, ServerConfig.SPEC);
     }
 
-    public static void registerReloadListeners(AddReloadListenerEvent event) {
-        event.addListener(new MaterialModifierDataHandler());
+    public static void registerReloadListeners(AddServerReloadListenersEvent event) {
+        event.addListener(IronsJewelry.id("material_modifier_data"), new MaterialModifierDataHandler());
     }
 
     public static Identifier id(String path) {

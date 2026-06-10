@@ -9,7 +9,6 @@ import io.redspace.ironsjewelry.core.data.PartDefinition;
 import io.redspace.ironsjewelry.core.data.PartIngredient;
 import io.redspace.ironsjewelry.core.data.PatternDefinition;
 import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
-import io.redspace.ironsjewelry.registry.LootRegistry;
 import io.redspace.ironsjewelry.utils.JewelryModTags;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
@@ -19,7 +18,6 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunction;
-import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -34,15 +32,15 @@ public record GenerateJewelryLootFunction(
         Optional<Map<TagKey<MaterialDefinition>, HolderSet<MaterialDefinition>>> materialFilter
 
 ) implements LootItemFunction {
-    public static MapCodec<GenerateJewelryLootFunction> CODEC = RecordCodecBuilder.mapCodec(builder -> builder.group(
+    public static final MapCodec<GenerateJewelryLootFunction> MAP_CODEC = RecordCodecBuilder.mapCodec(builder -> builder.group(
             RegistryCodecs.homogeneousList(IronsJewelryRegistries.Keys.PATTERN_REGISTRY_KEY).fieldOf("patterns").forGetter(GenerateJewelryLootFunction::patternSource),
             Codec.unboundedMap(TagKey.codec(IronsJewelryRegistries.Keys.MATERIAL_REGISTRY_KEY), RegistryCodecs.homogeneousList(IronsJewelryRegistries.Keys.MATERIAL_REGISTRY_KEY)).optionalFieldOf("materials").forGetter(GenerateJewelryLootFunction::materialFilter)
 
     ).apply(builder, GenerateJewelryLootFunction::new));
 
     @Override
-    public @NotNull LootItemFunctionType<? extends LootItemFunction> getType() {
-        return LootRegistry.GENERATE_JEWELRY.get();
+    public @NotNull MapCodec<GenerateJewelryLootFunction> codec() {
+        return MAP_CODEC;
     }
 
     @Override
@@ -68,8 +66,8 @@ public record GenerateJewelryLootFunction(
             HashMap<Holder<PartDefinition>, Holder<MaterialDefinition>> materials = new HashMap<>();
             var registry = IronsJewelryRegistries.materialRegistry(lootContext.getLevel().registryAccess());
             // Precompute all potential materials by excluding all blacklisted materials, unless a material filter is set which will override the blacklist
-            List<Holder.Reference<MaterialDefinition>> allMaterials = registry.holders().filter(material ->
-                    !material.value().ingredient().hasNoItems() && (!material.is(JewelryModTags.JEWELRY_LOOT_MATERIAL_BLACKLIST) || !materialFilter.isEmpty())
+            List<Holder.Reference<MaterialDefinition>> allMaterials = registry.listElements().filter(material ->
+                    !material.value().ingredient().isEmpty() && (!material.is(JewelryModTags.JEWELRY_LOOT_MATERIAL_BLACKLIST) || !materialFilter.isEmpty())
             ).toList();
 
             for (PartIngredient part : pattern.value().partTemplate()) {

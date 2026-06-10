@@ -21,7 +21,7 @@ public class JewelcraftingStationBlock extends Block {
 
     @Override
     protected InteractionResult useWithoutItem(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, BlockHitResult pHitResult) {
-        if (pLevel.isClientSide) {
+        if (pLevel.isClientSide()) {
             return InteractionResult.SUCCESS;
         } else {
             pPlayer.openMenu(pState.getMenuProvider(pLevel, pPos));

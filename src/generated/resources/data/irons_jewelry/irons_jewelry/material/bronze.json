@@ -7,9 +7,7 @@
     }
   },
   "descriptionId": "material.irons_jewelry.bronze",
-  "ingredient": {
-    "tag": "c:ingots/bronze"
-  },
+  "ingredient": "#c:ingots/bronze",
   "paletteLocation": "irons_jewelry:palettes/bronze",
   "quality": 1.0
 }

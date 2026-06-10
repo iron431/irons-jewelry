@@ -12,7 +12,7 @@
     },
     "irons_jewelry:attribute": {
       "amount": 2.0,
-      "attribute": "minecraft:generic.max_health",
+      "attribute": "minecraft:max_health",
       "operation": "add_value"
     },
     "irons_jewelry:negative_effect": {
@@ -20,9 +20,7 @@
     }
   },
   "descriptionId": "material.irons_jewelry.ruby",
-  "ingredient": {
-    "tag": "c:gems/ruby"
-  },
+  "ingredient": "#c:gems/ruby",
   "paletteLocation": "irons_jewelry:palettes/ruby",
   "quality": 2.0
 }

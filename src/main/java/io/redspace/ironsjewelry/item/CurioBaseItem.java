@@ -2,7 +2,7 @@ package io.redspace.ironsjewelry.item;
 
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
-import io.redspace.ironsjewelry.client.ClientEvents;
+import io.redspace.ironslib.util.TooltipUtils;
 import io.redspace.ironsjewelry.core.bonuses.AttributeBonusType;
 import io.redspace.ironsjewelry.core.bonuses.PiglinNeutralBonusType;
 import io.redspace.ironsjewelry.core.data.BonusInstance;
@@ -26,8 +26,10 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.ItemAttributeModifiers;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import top.theillusivec4.curios.api.CurioAttributeModifiers;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.capability.ICurio;
@@ -64,12 +66,12 @@ public class CurioBaseItem extends Item implements ICurioItem {
             return List.of();
         }
         var shiftTooltip = new ArrayList<Component>();
-        if (ClientEvents.isIsShiftKeyDown()) {
-            shiftTooltip.add(Component.translatable("tooltip.irons_jewelry.hold_shift", Component.translatable("key.keyboard.left.shift").withStyle(ChatFormatting.WHITE)).withStyle(ChatFormatting.GRAY));
-            shiftTooltip.addAll(getShiftDescription(jewelryData.pattern().value(), jewelryData.parts(), Optional.empty()));
-        } else {
-            shiftTooltip.add(Component.translatable("tooltip.irons_jewelry.hold_shift", Component.translatable("key.keyboard.left.shift").withStyle(ChatFormatting.DARK_GRAY)).withStyle(ChatFormatting.GRAY));
-        }
+        TooltipUtils.addShiftTooltip(
+                shiftTooltip::add,
+                Component.translatable("tooltip.irons_jewelry.hold_shift", Component.translatable("key.keyboard.left.shift").withStyle(ChatFormatting.DARK_GRAY)).withStyle(ChatFormatting.GRAY),
+                Optional.of(Component.translatable("tooltip.irons_jewelry.hold_shift", Component.translatable("key.keyboard.left.shift").withStyle(ChatFormatting.WHITE)).withStyle(ChatFormatting.GRAY)),
+                getShiftDescription(jewelryData.pattern().value(), jewelryData.parts(), Optional.empty())
+        );
         var attrTooltip = ICurioItem.super.getAttributesTooltip(tooltips, tooltipContext, stack);
         boolean needHeader = attrTooltip.isEmpty();
         var bonuses = jewelryData.getBonuses();
@@ -89,14 +91,6 @@ public class CurioBaseItem extends Item implements ICurioItem {
             itemStack.set(DataComponents.ITEM_NAME, JewelryData.get(itemStack).getItemName());
         }
         return Optional.ofNullable(itemStack.get(DataComponents.ITEM_NAME)).orElse(super.getName(itemStack));
-    }
-
-    @Override
-    public void verifyComponentsAfterLoad(@NotNull ItemStack stack) {
-        super.verifyComponentsAfterLoad(stack);
-        if (JewelryData.has(stack) && !JewelryData.get(stack).isValid()) {
-            stack.remove(DataComponents.ITEM_NAME);
-        }
     }
 
     public static List<Component> getShiftDescription(PatternDefinition pattern, Map<Holder<PartDefinition>, Holder<MaterialDefinition>> parts, Optional<List<Integer>> materialCost) {
@@ -157,6 +151,11 @@ public class CurioBaseItem extends Item implements ICurioItem {
     public void onEquip(SlotContext slotContext, ItemStack prevStack, ItemStack stack) {
         ICurioItem.super.onEquip(slotContext, prevStack, stack);
         JewelryData.ifPresent(stack, data -> data.forBonuses(BonusTypeRegistry.EFFECT_IMMUNITY_BONUS.get(), Holder.class, (bonus, param) -> slotContext.entity().removeEffect(param)));
+    }
+
+    @Override
+    public CurioAttributeModifiers getDefaultCurioAttributeModifiers(ItemStack stack) {
+        return ICurioItem.super.getDefaultCurioAttributeModifiers(stack);
     }
 
     @Override

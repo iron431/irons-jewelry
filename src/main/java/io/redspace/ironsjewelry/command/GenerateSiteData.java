@@ -14,7 +14,8 @@ import io.redspace.ironsjewelry.registry.AssetHandlerRegistry;
 import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
 import io.redspace.ironsjewelry.registry.ItemRegistry;
 import io.redspace.ironsjewelry.utils.JewelryModTags;
-import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
+// ISS stub: commented until compileOnly dep is wired
+// import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import net.minecraft.client.Minecraft;
@@ -28,7 +29,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.TagKey;
-import net.minecraft.util.FastColor;
+import net.minecraft.util.ARGB;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
@@ -131,7 +132,8 @@ public class GenerateSiteData {
             """;
 
     protected static int generateSiteData(CommandSourceStack source) {
-        generateRecipeData(source);
+        // TODO: Recipe API changed in 26.1.2 (getResultItem, getIngredients, getRecipeManager removed). Re-implement when needed.
+        //generateRecipeData(source);
 
         generatePatternData(source);
 
@@ -146,6 +148,8 @@ public class GenerateSiteData {
         return BuiltInRegistries.ITEM.stream().filter(item -> CreativeModeTabs.allTabs().stream().anyMatch(tab -> tab.contains(new ItemStack(item)))).toList();
     }
 
+    // TODO: Recipe API changed in 26.1.2 - re-implement when recipe access is reworked
+    /*
     private static void generateRecipeData(CommandSourceStack source) {
         try {
             var itemBuilder = new StringBuilder();
@@ -184,14 +188,11 @@ public class GenerateSiteData {
             var file = new BufferedWriter(new FileWriter("site_data/item_data.yml"));
             file.write(postProcess(itemBuilder));
             file.close();
-
-//            file = new BufferedWriter(new FileWriter("site_data/block_data.yml"));
-//            file.write(postProcess(blockBuilder));
-//            file.close();
         } catch (Exception e) {
             IronsJewelry.LOGGER.debug(e.getMessage());
         }
     }
+    */
 
     private static String handleGenericItemGrouping(Item item) {
         if (item instanceof BlockItem) {
@@ -203,6 +204,8 @@ public class GenerateSiteData {
         }
     }
 
+    // TODO: Recipe API changed in 26.1.2 - getResultItem() and getIngredients() removed
+    /*
     @NotNull
     private static ArrayList<RecipeIngredientData> getRecipeData(Recipe<?> recipe) {
         var resultItemIdentifier = BuiltInRegistries.ITEM.getKey(recipe.getResultItem(level.registryAccess()).getItem());
@@ -217,7 +220,6 @@ public class GenerateSiteData {
             var ingredients = recipe.getIngredients();
             for (int i = 0; i < ingredients.size(); i++) {
                 handleIngredient(ingredients.get(i), recipeData, recipe);
-                //assume spaces are only on the right, never left or middle
                 if ((i + 1) % shapedRecipe.pattern.width() == 0) {
                     recipeData.add(RecipeIngredientData.EMPTY);
                 }
@@ -230,7 +232,10 @@ public class GenerateSiteData {
         }
         return recipeData;
     }
+    */
 
+    // TODO: Recipe API changed in 26.1.2 - getRecipeManager() moved, getResultItem() removed
+    /*
     private static @Nullable Recipe getRecipeFor(CommandSourceStack sourceStack, Item item) {
         for (RecipeHolder<?> recipe : sourceStack.getRecipeManager().getRecipes()) {
             if (recipe.value().getResultItem(level.registryAccess()).is(item)) {
@@ -239,6 +244,7 @@ public class GenerateSiteData {
         }
         return null;
     }
+    */
 
     private static void handleArtisanScrollEntry(StringBuilder curioBuilder, Set<Item> itemsTracked, CommandSourceStack source) {
         var item = ItemRegistry.RECIPE.get();
@@ -272,6 +278,8 @@ public class GenerateSiteData {
                 .replace(":", ":<br>");
     }
 
+    // TODO: Recipe API changed in 26.1.2 - recipe.getType() may need updating
+    /*
     private static void appendToBuilder(StringBuilder sb, Recipe recipe, List<RecipeIngredientData> recipeIngredientData, String group, String tooltip) {
         sb.append(String.format(RECIPE_DATA_TEMPLATE,
                 getRecipeDataAtIndex(recipeIngredientData, 0).id,
@@ -309,6 +317,7 @@ public class GenerateSiteData {
                 tooltip
         ));
     }
+    */
 
     private static void appendToBuilder2(StringBuilder sb, String name, Identifier itemResource, String tooltip) {
         sb.append(String.format(RECIPE_DATA_TEMPLATE,
@@ -332,8 +341,9 @@ public class GenerateSiteData {
         ));
     }
 
+    // TODO: Recipe API changed in 26.1.2 - ingredient.getItems() and recipe.getResultItem() removed
+    /*
     private static void handleIngredient(Ingredient ingredient, ArrayList<RecipeIngredientData> recipeData, Recipe recipe) {
-
         Arrays.stream(ingredient.getItems())
                 .findFirst()
                 .ifPresentOrElse(itemStack -> {
@@ -355,6 +365,7 @@ public class GenerateSiteData {
                     recipeData.add(RecipeIngredientData.EMPTY);
                 });
     }
+    */
 
     private static RecipeIngredientData getRecipeDataAtIndex(List<RecipeIngredientData> recipeIngredientData, int index) {
         if (index < recipeIngredientData.size()) {
@@ -463,15 +474,15 @@ public class GenerateSiteData {
 
             for (MaterialDefinition material : registry) {
                 var name = rasterizeTranslation(material.descriptionId());
-                var id = registry.wrapAsHolder(material).getKey().location();
+                var id = registry.wrapAsHolder(material).getKey().identifier();
                 if (id.equals(IronsJewelry.id("example"))) {
                     continue;
                 }
-                if (material.ingredient().hasNoItems()) {
+                if (material.ingredient().isEmpty()) {
                     IronsJewelry.LOGGER.error("Cannot generate material {}, no valid ingredients present!", id);
                     continue;
                 }
-                ItemStack representativeStack = Arrays.stream(material.ingredient().getItems()).sorted(GenerateSiteData::sortIngredientStack).findFirst().get();
+                ItemStack representativeStack = material.ingredient().items().map(ItemStack::new).sorted(GenerateSiteData::sortIngredientStack).findFirst().get();
                 var ingrId = BuiltInRegistries.ITEM.getKey(representativeStack.getItem());
                 var imgid = ingrId.getPath();
                 var sortOrder = (int) name.charAt(0);
@@ -542,14 +553,14 @@ public class GenerateSiteData {
 //                    .filter(st -> (st.isEnabled() && st != SpellRegistry.none()))
                     .forEach(pattern -> {
                         var name = rasterizeTranslation(pattern.descriptionId());
-                        var imgid = registry.wrapAsHolder(pattern).getKey().location().getPath();
+                        var imgid = registry.wrapAsHolder(pattern).getKey().identifier().getPath();
                         var locked = pattern.unlockedByDefault() ? "Yes" : "No";
                         var partForQuality = pattern.partForQuality().map(part -> rasterizeTranslation(part.value().descriptionId())).orElse("None");
                         var quality = pattern.qualityMultiplier();
                         var parts = pattern.partTemplate().stream().map(part -> String.format("%s (%s - %s)",
                                 rasterizeTranslation(part.part().value().descriptionId()),
                                 part.materialCost(),
-                                parseAllowedMaterialsLabel(part.part().getKey().location()))).toList();
+                                parseAllowedMaterialsLabel(part.part().getKey().identifier()))).toList();
                         var part1 = parts.size() >= 1 ? parts.get(0) : "";
                         var part2 = parts.size() >= 2 ? parts.get(1) : "";
                         var part3 = parts.size() >= 3 ? parts.get(2) : "";
@@ -593,8 +604,8 @@ public class GenerateSiteData {
     private static void tryGeneratePatternImage(CommandSourceStack source, PatternDefinition pattern, String imgid) {
         try {
             var materialRegistry = IronsJewelryRegistries.materialRegistry(source.registryAccess());
-            var metal = materialRegistry.getHolder(IronsJewelry.id("gold")).get();
-            var gem = materialRegistry.getHolder(IronsJewelry.id("ruby")).get();
+            var metal = materialRegistry.get(IronsJewelry.id("gold")).get();
+            var gem = materialRegistry.get(IronsJewelry.id("ruby")).get();
             NativeImage image = new NativeImage(16, 16, false);
             pattern.partTemplate().stream().map(PartIngredient::part).forEach(part -> {
                 Holder<MaterialDefinition> renderMaterial = null;
@@ -603,7 +614,7 @@ public class GenerateSiteData {
                 } else if (part.value().canUseMaterial(metal)) {
                     renderMaterial = metal;
                 } else {
-                    for (Holder.Reference<MaterialDefinition> materialDefinition : materialRegistry.holders().toList()) {
+                    for (Holder.Reference<MaterialDefinition> materialDefinition : materialRegistry.listElements().toList()) {
                         if (part.value().canUseMaterial(materialDefinition)) {
                             renderMaterial = materialDefinition;
                             break;
@@ -613,14 +624,14 @@ public class GenerateSiteData {
                 }
                 var sprite = AssetHandlerRegistry.JEWELRY_HANDLER.get().getSprite(AssetHandlerRegistry.JEWELRY_HANDLER.get().getSpriteLocation(part, renderMaterial));
                 var layer = sprite.contents().getOriginalImage();
-                var pixels = layer.getPixelsRGBA();
+                var pixels = layer.getPixels();
                 for (int x = 0; x < 16; x++) {
                     for (int y = 0; y < 16; y++) {
                         int i = y * 16 + x;
                         int rgba = pixels[i];
                         int alpha = (rgba >> 24) & 0xFF;
                         if (alpha != 0) {
-                            image.setPixelRGBA(x, y, rgba);
+                            image.setPixel(x, y, rgba);
                         }
                     }
                 }
@@ -645,28 +656,8 @@ public class GenerateSiteData {
         image.writeToFile(filePath);
     }
 
-    private static List<String> processUniqueInfo(AbstractSpell spell) {
-        List<String> text = new ArrayList<>();
-        var uniqueInfoMin = spell.getUniqueInfo(spell.getMinLevel(), null);
-        var uniqueInfoMax = spell.getUniqueInfo(spell.getMaxLevel(), null);
-        for (int i = 0; i < uniqueInfoMax.size(); i++) {
-            var splitMin = uniqueInfoMin.get(i).getString().split(" ");
-            var splitMax = uniqueInfoMax.get(i).getString().split(" ");
-            int k = -1;
-            for (int j = 0; j < splitMin.length; j++) {
-                if (splitMin[j].matches("\\d\\.?\\d*(s|m|%)*")) {
-                    k = j;
-                    break;
-                }
-            }
-            if (k >= 0 && !splitMin[k].equals(splitMax[k])) {
-                text.add(String.format(uniqueInfoMin.get(i).getString().replaceFirst(splitMin[k], "%s"), String.format("%s-%s", splitMin[k], splitMax[k])));
-            } else {
-                text.add(uniqueInfoMin.get(i).getString());
-            }
-        }
-        return text;
-    }
+    // ISS stub: commented until compileOnly dep is wired
+    // private static List<String> processUniqueInfo(AbstractSpell spell) { ... }
 
     public static String handleCapitalization(String input) {
         return Arrays.stream(input.split("[ |_]"))
@@ -691,20 +682,20 @@ public class GenerateSiteData {
 
             for (int i = 0; i < p_266839_.length; i++) {
                 int j = p_266839_[i];
-                if (FastColor.ABGR32.alpha(j) != 0) {
-                    int2intmap.put(FastColor.ABGR32.transparent(j), p_266776_[i]);
+                if (ARGB.alpha(j) != 0) {
+                    int2intmap.put(ARGB.transparent(j), p_266776_[i]);
                 }
             }
 
             return p_267899_ -> {
-                int k = FastColor.ABGR32.alpha(p_267899_);
+                int k = ARGB.alpha(p_267899_);
                 if (k == 0) {
                     return p_267899_;
                 } else {
-                    int l = FastColor.ABGR32.transparent(p_267899_);
-                    int i1 = int2intmap.getOrDefault(l, FastColor.ABGR32.opaque(l));
-                    int j1 = FastColor.ABGR32.alpha(i1);
-                    return FastColor.ABGR32.color(k * j1 / 255, i1);
+                    int l = ARGB.transparent(p_267899_);
+                    int i1 = int2intmap.getOrDefault(l, ARGB.opaque(l));
+                    int j1 = ARGB.alpha(i1);
+                    return ARGB.color(k * j1 / 255, i1);
                 }
             };
         }

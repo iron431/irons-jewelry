@@ -7,6 +7,9 @@
       "scale": [ 0.4, 0.4, 0.4 ]
     }
   },
-  "loader": "atlas_api:dynamic_model",
-  "handler": "irons_jewelry:jewelry"
+  "type": "atlas_api:simple_model",
+  "handler": "irons_jewelry:jewelry",
+  "textures": {
+    "layer0": "irons_jewelry:item/base/gold_ring_irons_jewelry_diamond"
+  }
 }

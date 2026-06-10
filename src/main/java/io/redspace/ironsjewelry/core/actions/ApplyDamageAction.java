@@ -56,7 +56,7 @@ public record ApplyDamageAction(Holder<DamageType> damageType, QualityScalar amo
         var key = this.damageType.getKey();
         Component typeComponent = Component.empty();
         if (key != null) {
-            var location = key.location();
+            var location = key.identifier();
             typeComponent = Component.translatable(String.format("damage_type.%s.%s", location.getNamespace(), location.getPath()));
         }
         return Component.translatable((applyToSelf ? "action.irons_jewelry.apply_damage.self" : "action.irons_jewelry.apply_damage.entity"), Component.literal(damage).withStyle(ChatFormatting.RED), typeComponent);
@@ -67,7 +67,7 @@ public record ApplyDamageAction(Holder<DamageType> damageType, QualityScalar amo
         if (damageType().getKey() == null) {
             return Component.empty();
         }
-        var location = damageType().getKey().location();
+        var location = damageType().getKey().identifier();
         var typeComponent = Component.translatable(String.format("damage_type.%s.%s", location.getNamespace(), location.getPath()));
         return actionName.append(" ").append(Component.translatable("action.irons_jewelry.apply_damage.description", getDamage(1), typeComponent));
     }

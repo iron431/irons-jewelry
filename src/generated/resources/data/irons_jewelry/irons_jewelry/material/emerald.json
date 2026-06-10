@@ -24,7 +24,7 @@
     },
     "irons_jewelry:attribute": {
       "amount": 0.05,
-      "attribute": "minecraft:generic.movement_speed",
+      "attribute": "minecraft:movement_speed",
       "operation": "add_multiplied_total"
     },
     "irons_jewelry:negative_effect": {
@@ -35,9 +35,7 @@
     }
   },
   "descriptionId": "material.irons_jewelry.emerald",
-  "ingredient": {
-    "tag": "c:gems/emerald"
-  },
+  "ingredient": "#c:gems/emerald",
   "paletteLocation": "irons_jewelry:palettes/emerald",
   "quality": 1.5
 }
