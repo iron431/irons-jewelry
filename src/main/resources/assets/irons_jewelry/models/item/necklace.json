@@ -1,5 +1,3 @@
 {
-  "parent": "minecraft:item/generated",
-  "type": "atlas_api:dynamic_model",
-  "handler": "irons_jewelry:jewelry"
+  "parent": "minecraft:item/generated"
 }

@@ -1,6 +1,6 @@
 {
   "model": {
-    "type": "atlas_api:simple_model",
+    "type": "atlas_api:dynamic_model",
     "handler": "irons_jewelry:jewelry",
     "model": "irons_jewelry:item/ring"
   }

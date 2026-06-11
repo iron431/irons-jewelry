@@ -25,6 +25,7 @@ import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.ItemLore;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotResult;
@@ -63,7 +64,12 @@ public class Utils {
 
     public static Optional<Holder<MaterialDefinition>> getMaterialForIngredient(RegistryAccess access, ItemStack ingredient) {
         var r = IronsJewelryRegistries.materialRegistry(access);
-        return r.stream().filter(material -> material.ingredient().test(ingredient)).map(r::wrapAsHolder).findFirst();
+        return r.stream().filter(material -> material.ingredient().map(ingr -> ingr.test(ingredient)).orElse(false)).map(r::wrapAsHolder).findFirst();
+    }
+
+    public static List<Holder<MaterialDefinition>> getEnabledMaterials(RegistryAccess access) {
+        var r = IronsJewelryRegistries.materialRegistry(access);
+        return r.stream().filter(material -> !material.isIngredientEmpty()).map(r::wrapAsHolder).toList();
     }
 
     public static List<BonusInstance> getEquippedBonuses(Player player) {

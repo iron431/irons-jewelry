@@ -1,7 +1,5 @@
 package io.redspace.ironsjewelry.item;
 
-import com.google.common.collect.ImmutableMultimap;
-import com.google.common.collect.Multimap;
 import io.redspace.ironslib.util.TooltipUtils;
 import io.redspace.ironsjewelry.core.bonuses.AttributeBonusType;
 import io.redspace.ironsjewelry.core.bonuses.PiglinNeutralBonusType;
@@ -15,10 +13,8 @@ import io.redspace.ironsjewelry.registry.BonusTypeRegistry;
 import io.redspace.ironsjewelry.utils.Utils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -26,7 +22,6 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.component.ItemAttributeModifiers;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import top.theillusivec4.curios.api.CurioAttributeModifiers;
@@ -87,10 +82,14 @@ public class CurioBaseItem extends Item implements ICurioItem {
 
     @Override
     public @NotNull Component getName(ItemStack itemStack) {
-        if (!itemStack.has(DataComponents.ITEM_NAME)) {
-            itemStack.set(DataComponents.ITEM_NAME, JewelryData.get(itemStack).getItemName());
+        if (JewelryData.has(itemStack)) {
+            var data = JewelryData.get(itemStack);
+            if (data.isValid()) {
+                return data.getItemName();
+            }
+            return Component.translatable("item.irons_jewelry.invalid_jewelry");
         }
-        return Optional.ofNullable(itemStack.get(DataComponents.ITEM_NAME)).orElse(super.getName(itemStack));
+        return super.getName(itemStack);
     }
 
     public static List<Component> getShiftDescription(PatternDefinition pattern, Map<Holder<PartDefinition>, Holder<MaterialDefinition>> parts, Optional<List<Integer>> materialCost) {
@@ -155,42 +154,38 @@ public class CurioBaseItem extends Item implements ICurioItem {
 
     @Override
     public CurioAttributeModifiers getDefaultCurioAttributeModifiers(ItemStack stack) {
-        return ICurioItem.super.getDefaultCurioAttributeModifiers(stack);
+        JewelryData data = JewelryData.getNullable(stack);
+        if (data == null || !data.isValid()) {
+            return CurioAttributeModifiers.EMPTY;
+        }
+
+        var builder = CurioAttributeModifiers.builder();
+        var slotContext = new SlotContext(this.slotIdentifier, null, -1, false, true);
+        for (Map.Entry<Holder<Attribute>, Map<AttributeModifier.Operation, AttributeModifier>> entry : buildCollapsedAttributeModifiers(data, slotContext).entrySet()) {
+            for (AttributeModifier modifier : entry.getValue().values()) {
+                builder.addModifier(entry.getKey(), modifier, this.slotIdentifier);
+            }
+        }
+        return builder.build();
     }
 
-    @Override
-    public Multimap<Holder<Attribute>, AttributeModifier> getAttributeModifiers(SlotContext slotContext, Identifier id, ItemStack stack) {
-        JewelryData data = JewelryData.getNullable(stack);
-        //TODO: cache these in the stack's attribute component for as long as index hasn't changed?
-        if (data != null && slotContext.identifier().equals(this.slotIdentifier)) {
-            var bonuses = data.getBonuses();
-            // We want to combine like modifiers by operation, so instead of two "+2 health"'s, we get one "+4 health"
-            Map<Holder<Attribute>, Map<AttributeModifier.Operation, AttributeModifier>> collapsedModifiers = new HashMap<>();
-            for (BonusInstance instance : bonuses) {
-                if (instance.bonusType() instanceof AttributeBonusType attributeBonus) {
-                    attributeBonus.getParameterType().resolve(instance.parameter()).ifPresent(
-                            attributeInstance -> {
-                                // If this is the first modifier of this attribute and operation, store it.
-                                // If it is not, get the previous modifier, and create a new modifier of previous value + additional value
-                                var byOperation = collapsedModifiers.computeIfAbsent(attributeInstance.attribute(), (x) -> new HashMap<>());
-                                var modifier = attributeBonus.modifier(attributeInstance, slotContext, instance.quality());
-                                var operation = modifier.operation();
-                                if (byOperation.containsKey(operation)) {
-                                    var oldModifier = byOperation.get(operation);
-                                    var jointModifier = new AttributeModifier(oldModifier.id(), oldModifier.amount() + modifier.amount(), operation);
-                                    byOperation.put(operation, jointModifier);
-                                } else {
-                                    byOperation.put(operation, modifier);
-                                }
-                            });
-                }
+    private static Map<Holder<Attribute>, Map<AttributeModifier.Operation, AttributeModifier>> buildCollapsedAttributeModifiers(JewelryData data, SlotContext slotContext) {
+        Map<Holder<Attribute>, Map<AttributeModifier.Operation, AttributeModifier>> collapsedModifiers = new HashMap<>();
+        for (BonusInstance instance : data.getBonuses()) {
+            if (instance.bonusType() instanceof AttributeBonusType attributeBonus) {
+                attributeBonus.getParameterType().resolve(instance.parameter()).ifPresent(attributeInstance -> {
+                    var byOperation = collapsedModifiers.computeIfAbsent(attributeInstance.attribute(), ignored -> new HashMap<>());
+                    var modifier = attributeBonus.modifier(attributeInstance, slotContext, instance.quality());
+                    var operation = modifier.operation();
+                    if (byOperation.containsKey(operation)) {
+                        var oldModifier = byOperation.get(operation);
+                        byOperation.put(operation, new AttributeModifier(oldModifier.id(), oldModifier.amount() + modifier.amount(), operation));
+                    } else {
+                        byOperation.put(operation, modifier);
+                    }
+                });
             }
-            ImmutableMultimap.Builder<Holder<Attribute>, AttributeModifier> builder = ImmutableMultimap.builder();
-            for (Map.Entry<Holder<Attribute>, Map<AttributeModifier.Operation, AttributeModifier>> entry : collapsedModifiers.entrySet()) {
-                builder.putAll(entry.getKey(), entry.getValue().values());
-            }
-            return builder.build();
         }
-        return ICurioItem.super.getAttributeModifiers(slotContext, id, stack);
+        return collapsedModifiers;
     }
 }

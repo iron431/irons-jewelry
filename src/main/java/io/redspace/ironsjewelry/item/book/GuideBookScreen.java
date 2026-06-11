@@ -3,6 +3,7 @@ package io.redspace.ironsjewelry.item.book;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.NativeImage;
 import io.redspace.ironsjewelry.IronsJewelry;
+import io.redspace.ironsjewelry.client.TooltipRenderUtil;
 import io.redspace.ironsjewelry.core.data.JewelryData;
 import io.redspace.ironsjewelry.core.data.MaterialDefinition;
 import io.redspace.ironsjewelry.core.data.PartDefinition;
@@ -231,7 +232,7 @@ public class GuideBookScreen extends Screen {
         var patternRegistry = IronsJewelryRegistries.patternRegistry(Minecraft.getInstance().level.registryAccess());
         List<Page> materialPages = new ArrayList<>();
         // Construct a material page if the material exists and has valid items to be crafted from
-        materialRegistry.listElements().filter(holder -> !holder.value().ingredient().isEmpty()).forEach(holder -> materialPages.add(new MaterialPage(holder)));
+        Utils.getEnabledMaterials(Minecraft.getInstance().level.registryAccess()).forEach(holder -> materialPages.add(new MaterialPage(holder)));
         // Effectively curry buttons by using preparation structure. Allows all information to be created now, and the button can be positioned and fit onto the screen later, because it is difficult to position all elements without knowing how many there are
         List<Function<TableOfContentsPage.EntryPreparation, GuideBookButton>> materialTableOfContentsEntries = new ArrayList<>();
         for (int i = 0; i < materialPages.size(); i++) {
@@ -239,7 +240,7 @@ public class GuideBookScreen extends Screen {
             var material = materialPage.material;
             materialTableOfContentsEntries.add(preparation ->
                     new TextButton(preparation.x(), preparation.y(), preparation.width(), preparation.height(), Component.translatable(material.value().descriptionId()), 0xFF000000, ChatFormatting.YELLOW.getColor(),
-                            material.value().ingredient().items().map(ItemStack::new).toList(), guidebook -> guidebook.navigateToPage(materialPage)));
+                            material.value().getIngredientItems().map(ItemStack::new).toList(), guidebook -> guidebook.navigateToPage(materialPage)));
         }
         materialPages.addAll(0, createTableOfContentsPages(Component.translatable("ui.irons_jewelry.guide_book.table_of_contents_materials"), materialTableOfContentsEntries, 75));
 
@@ -430,7 +431,7 @@ public class GuideBookScreen extends Screen {
         public MaterialPage(Holder<MaterialDefinition> material) {
             this.material = material;
             this.cachedTextColor = generateTextColor(material.value().paletteLocation());
-            this.itemRenderer = new CyclicItemRenderer(material.value().ingredient().items().map(ItemStack::new).toList());
+            this.itemRenderer = new CyclicItemRenderer(material.value().getIngredientItems().map(ItemStack::new).toList());
             this.bonusTable = new ArrayList<>();
             bonusTable.add(new TableEntry(
                     Component.translatable("ui.irons_jewelry.quality"),
@@ -656,7 +657,8 @@ public class GuideBookScreen extends Screen {
                 tooltip.add(name);
                 tooltip.add(Component.literal(" ").append(Component.translatable("tooltip.irons_jewelry.material_cost", Component.literal(String.valueOf(partIngredient.materialCost())).withStyle(ChatFormatting.WHITE))).withStyle(ChatFormatting.GRAY));
                 tooltip.add(Component.translatable("tooltip.irons_jewelry.applicable_materials").withStyle(ChatFormatting.YELLOW, ChatFormatting.UNDERLINE));
-                IronsJewelryRegistries.materialRegistry(Minecraft.getInstance().level.registryAccess()).listElements().filter(candidate -> !candidate.value().ingredient().isEmpty() && part.value().canUseMaterial(candidate))
+                Utils.getEnabledMaterials(Minecraft.getInstance().level.registryAccess()).stream()
+                        .filter(candidate -> part.value().canUseMaterial(candidate))
                         .forEach(m -> tooltip.add(Component.literal(" ").append(Component.translatable(m.value().descriptionId())).withStyle(ChatFormatting.GRAY)));
                 List<MutableComponent> partExpandedInfo = new ArrayList<>();
                 partExpandedInfo.add(name);
@@ -746,14 +748,7 @@ public class GuideBookScreen extends Screen {
                 var info = partInfo.get(i);
                 info.button.rectangle = ScreenRectangle.of(ScreenAxis.HORIZONTAL, x - leftPos, y - topPos, partSectionWidth, 24);
                 if (i == selectedPartIndex) {
-                    int bgColor = 0xBB260f0c;
-                    int borderStart = 0xDDe0ca9f;
-                    int borderEnd = 0xEEa09172;
-                    guiGraphics.fill(x, y, x + partSectionWidth - 5, y + 24, bgColor);
-                    guiGraphics.fill(x, y, x + partSectionWidth - 5, y + 1, borderStart);
-                    guiGraphics.fill(x, y + 23, x + partSectionWidth - 5, y + 24, borderEnd);
-                    guiGraphics.fill(x - 1, y, x, y + 24, borderStart);
-                    guiGraphics.fill(x + partSectionWidth - 5, y, x + partSectionWidth - 4, y + 24, borderEnd);
+                    TooltipRenderUtil.renderTooltipBackground(guiGraphics, x, y, partSectionWidth - 5, 24, 0xBB260f0c, 0xBB260f0c, 0xDDe0ca9f, 0xEEa09172);
                 }
                 info.render(guiGraphics, x, y, partSectionWidth, mouseX, mouseY, partialTick);
                 yoff += 32;
@@ -765,14 +760,7 @@ public class GuideBookScreen extends Screen {
             int infoSectionY = partSectionY + 3;
             int infoSectionWidth = IMAGE_WIDTH - 11 - (infoSectionX - leftPos);
             int infoSectionHeight = IMAGE_HEIGHT - YM * 2 - (infoSectionY - topPos);
-            int bgColor = 0xDD260f0c;
-            int borderStart = 0xFFe0ca9f;
-            int borderEnd = 0xFFa09172;
-            guiGraphics.fill(infoSectionX, infoSectionY + 1, infoSectionX + infoSectionWidth - 2, infoSectionY + infoSectionHeight - 1, bgColor);
-            guiGraphics.fill(infoSectionX, infoSectionY + 1, infoSectionX + infoSectionWidth - 2, infoSectionY + 2, borderStart);
-            guiGraphics.fill(infoSectionX, infoSectionY + infoSectionHeight - 2, infoSectionX + infoSectionWidth - 2, infoSectionY + infoSectionHeight - 1, borderEnd);
-            guiGraphics.fill(infoSectionX - 1, infoSectionY + 1, infoSectionX, infoSectionY + infoSectionHeight - 1, borderStart);
-            guiGraphics.fill(infoSectionX + infoSectionWidth - 2, infoSectionY + 1, infoSectionX + infoSectionWidth - 1, infoSectionY + infoSectionHeight - 1, borderEnd);
+            TooltipRenderUtil.renderTooltipBackground(guiGraphics, infoSectionX, infoSectionY, infoSectionWidth - 2, infoSectionHeight - 1, 0xDD260f0c, 0xDD260f0c, 0xFFe0ca9f, 0xFFa09172);
             List<MutableComponent> infoPage = overviewInfo;
             if (selectedPartIndex >= 0 && selectedPartIndex < partInfo.size()) {
                 infoPage = partInfo.get(selectedPartIndex).expandedInfo;

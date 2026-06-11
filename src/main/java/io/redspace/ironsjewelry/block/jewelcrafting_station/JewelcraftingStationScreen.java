@@ -1,6 +1,7 @@
 package io.redspace.ironsjewelry.block.jewelcrafting_station;
 
 import io.redspace.ironsjewelry.IronsJewelry;
+import io.redspace.ironsjewelry.client.TooltipRenderUtil;
 import io.redspace.ironsjewelry.core.data.JewelryData;
 import io.redspace.ironsjewelry.core.data.MaterialDefinition;
 import io.redspace.ironsjewelry.core.data.PartDefinition;
@@ -174,7 +175,7 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
                             tooltip.add(Component.translatable(part.part().value().descriptionId()).withStyle(ChatFormatting.YELLOW, ChatFormatting.UNDERLINE));
                             tooltip.add(Component.literal(String.format(" (0/%s)", part.materialCost())).withStyle(ChatFormatting.RED));
                             tooltip.add(Component.translatable("tooltip.irons_jewelry.applicable_materials").withStyle(ChatFormatting.YELLOW, ChatFormatting.UNDERLINE));
-                            IronsJewelryRegistries.materialRegistry(Minecraft.getInstance().level.registryAccess()).listElements().filter(material -> !material.value().ingredient().isEmpty() && part.part().value().canUseMaterial(material))
+                            Utils.getEnabledMaterials(Minecraft.getInstance().level.registryAccess()).stream().filter(material -> part.part().value().canUseMaterial(material))
                                     .forEach(material -> tooltip.add(Component.literal(" ").append(Component.translatable(material.value().descriptionId())).withStyle(ChatFormatting.GRAY)));
                             pGuiGraphics.setTooltipForNextFrame(Utils.rasterizeComponentList(tooltip), mouseX, mouseY);
                         }
@@ -221,6 +222,9 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
             for (int i = 0; i < requiredIngredients.size(); i++) {
                 var ingredient = requiredIngredients.get(i);
                 var input = menu.workspaceSlots.get(i).getItem();
+                if (input.isEmpty()) {
+                    continue;
+                }
                 var material = Utils.getMaterialForIngredient(Minecraft.getInstance().player.level.registryAccess(), input);
                 if (material.isPresent() && ingredient.part().value().canUseMaterial(material.get())) {
                     parts.put(ingredient.part(), material.get());
@@ -260,7 +264,8 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
                 float renderY = topPos + (baseLines + 1) * font.lineHeight + topBuffer + 4;
                 pose.translate(renderX, renderY);
                 pose.scale(scale, scale);
-                guiGraphics.item(stack, -8, -8);
+//                pose.rotateAbout(Minecraft.getInstance().player.tickCount + pPartialTick, 0, 0);
+                guiGraphics.item(stack, -8, -2);
                 pose.popMatrix();
             }
         }
@@ -284,15 +289,11 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
             for (int i = 0; i < components.size(); i++) {
                 totalHeight += pFont.lineHeight + (i == 0 && components.size() > 1 ? 2 : 0);
             }
-
-            int bgColor = 0xb4260f0c;
-            int borderColor = 0x50e0ca9f;
-
-            guiGraphics.fill(x - 3, y - 4, x + maxWidth + 3, y + totalHeight + 4, bgColor);
-            guiGraphics.fill(x - 3, y - 4, x + maxWidth + 3, y - 3, borderColor);
-            guiGraphics.fill(x - 3, y + totalHeight + 3, x + maxWidth + 3, y + totalHeight + 4, borderColor);
-            guiGraphics.fill(x - 4, y - 3, x - 3, y + totalHeight + 3, borderColor);
-            guiGraphics.fill(x + maxWidth + 3, y - 3, x + maxWidth + 4, y + totalHeight + 3, borderColor);
+            var bgstart = 0xb4260f0c;//0xf0511d17;//0xf0100010;
+            var bgend = bgstart;//0xf0361d17;//bgstart;
+            var borderstart = 0x50e0ca9f;//0x505000FF;
+            var borderend = 0x50a09172;//0x5028007f;
+            TooltipRenderUtil.renderTooltipBackground(guiGraphics, x, y, maxWidth, totalHeight, bgstart, bgend, borderstart, borderend);
 
             int currentY = y;
             for (int i = 0; i < components.size(); i++) {

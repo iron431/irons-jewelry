@@ -122,14 +122,12 @@ public class JewelryDataRegistryGenerator {
     public static Holder<MaterialDefinition> VIBRANIUM;
 
     private static void bootstrapParts(BootstrapContext<PartDefinition> bootstrap) {
-        IronsJewelry.LOGGER.debug("bootstrapParts");
         HolderGetter<MaterialDefinition> materialGetter = bootstrap.lookup(IronsJewelryRegistries.Keys.MATERIAL_REGISTRY_KEY);
         HolderSet.Named<MaterialDefinition> metals = materialGetter.getOrThrow(JewelryModTags.METAL);
         HolderSet.Named<MaterialDefinition> gems = materialGetter.getOrThrow(JewelryModTags.GEM);
         HolderSet.Named<MaterialDefinition> golds = materialGetter.getOrThrow(JewelryModTags.GOLD);
         HolderSet.Named<MaterialDefinition> emeralds = materialGetter.getOrThrow(JewelryModTags.EMERALD);
         HolderSet.Named<MaterialDefinition> metalsOrGems = materialGetter.getOrThrow(JewelryModTags.METAL_OR_GEM);
-        IronsJewelry.LOGGER.debug("bootstrapParts materials obtained");
 
         BAND_SIMPLE = bootstrap.register(partKey(IronsJewelry.id("band_simple")), new PartDefinition(
                 "part.irons_jewelry.band_simple",
@@ -186,8 +184,6 @@ public class JewelryDataRegistryGenerator {
         GEM_RHINESTONE_A = bootstrap.register(partKey(IronsJewelry.id("gem_rhinestone_a")), PartDefinition.simpleGemPart(IronsJewelry.MODID, "gem_rhinestone_a", gems));
         GEM_RHINESTONE_B = bootstrap.register(partKey(IronsJewelry.id("gem_rhinestone_b")), PartDefinition.simpleGemPart(IronsJewelry.MODID, "gem_rhinestone_b", gems));
         GEM_RHINESTONE_C = bootstrap.register(partKey(IronsJewelry.id("gem_rhinestone_c")), PartDefinition.simpleGemPart(IronsJewelry.MODID, "gem_rhinestone_c", gems));
-        IronsJewelry.LOGGER.debug("bootstrapParts done");
-
     }
 
     private static void bootstrapPatterns(BootstrapContext<PatternDefinition> bootstrap) {

@@ -66,16 +66,16 @@ public record GenerateJewelryLootFunction(
             HashMap<Holder<PartDefinition>, Holder<MaterialDefinition>> materials = new HashMap<>();
             var registry = IronsJewelryRegistries.materialRegistry(lootContext.getLevel().registryAccess());
             // Precompute all potential materials by excluding all blacklisted materials, unless a material filter is set which will override the blacklist
-            List<Holder.Reference<MaterialDefinition>> allMaterials = registry.listElements().filter(material ->
-                    !material.value().ingredient().isEmpty() && (!material.is(JewelryModTags.JEWELRY_LOOT_MATERIAL_BLACKLIST) || !materialFilter.isEmpty())
-            ).toList();
+            List<Holder<MaterialDefinition>> allMaterials = registry.listElements().filter(material ->
+                    !material.value().isIngredientEmpty() && (!material.is(JewelryModTags.JEWELRY_LOOT_MATERIAL_BLACKLIST) || !materialFilter.isEmpty())
+            ).map(holder -> (Holder<MaterialDefinition>) holder).toList();
 
             for (PartIngredient part : pattern.value().partTemplate()) {
                 // Find applicable materials by
                 // a): the material exists in this world (allMaterials)
                 // b): the material can be used for this part
                 // c): the material filter is empty, or this material passes each matching tag filter
-                List<Holder.Reference<MaterialDefinition>> applicableMaterials = allMaterials.stream().filter(
+                List<Holder<MaterialDefinition>> applicableMaterials = allMaterials.stream().filter(
                         (material) -> part.part().value().canUseMaterial(material) && matchesMaterialFilter(material)
                 ).toList();
                 if (!applicableMaterials.isEmpty()) {
