@@ -19,6 +19,7 @@ import mezz.jei.api.recipe.types.IRecipeType;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.util.ARGB;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
@@ -83,6 +84,6 @@ public class JewelcraftingJeiRecipeCategory extends AbstractRecipeCategory<Patte
         var borderstart = 0x50e0ca9f;//0x505000FF;
         var borderend = 0x50a09172;//0x5028007f;
         TooltipRenderUtil.renderTooltipBackground(guiGraphics, x, y, titleWidth, Minecraft.getInstance().font.lineHeight, bgstart, bgend, borderstart, borderend);
-        guiGraphics.text(Minecraft.getInstance().font, title, x, y, 0xFFFFFF, true);
+        guiGraphics.text(Minecraft.getInstance().font, title, x, y, -1, true);
     }
 }

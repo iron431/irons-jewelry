@@ -1,8 +1,6 @@
 package io.redspace.ironsjewelry.client;
 
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 
 /**
  * 1.21.1 bridge for rendering colored tooltip backgrounds the old fashioned way

@@ -42,6 +42,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.ARGB;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -49,6 +50,7 @@ import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import org.jetbrains.annotations.Nullable;
+
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -64,7 +66,6 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 public class GuideBookScreen extends Screen {
-
     public static final Identifier BOOK_LOCATION = IronsJewelry.id("textures/gui/jewelcrafting_guide.png");
 
     private PageButton forwardButton;
@@ -239,7 +240,7 @@ public class GuideBookScreen extends Screen {
             var materialPage = ((MaterialPage) materialPages.get(i));
             var material = materialPage.material;
             materialTableOfContentsEntries.add(preparation ->
-                    new TextButton(preparation.x(), preparation.y(), preparation.width(), preparation.height(), Component.translatable(material.value().descriptionId()), 0xFF000000, ChatFormatting.YELLOW.getColor(),
+                    new TextButton(preparation.x(), preparation.y(), preparation.width(), preparation.height(), Component.translatable(material.value().descriptionId()), ARGB.black(255), ARGB.opaque(ChatFormatting.YELLOW.getColor()),
                             material.value().getIngredientItems().map(ItemStack::new).toList(), guidebook -> guidebook.navigateToPage(materialPage)));
         }
         materialPages.addAll(0, createTableOfContentsPages(Component.translatable("ui.irons_jewelry.guide_book.table_of_contents_materials"), materialTableOfContentsEntries, 75));
@@ -252,7 +253,7 @@ public class GuideBookScreen extends Screen {
             var patternPage = ((PatternPage) patternPages.get(i));
             var pattern = patternPage.pattern;
             patternTableOfContentsEntries.add(preparation ->
-                    new TextButton(preparation.x(), preparation.y(), preparation.width(), preparation.height(), Component.translatable(pattern.value().descriptionId()), 0xFF000000, ChatFormatting.YELLOW.getColor(),
+                    new TextButton(preparation.x(), preparation.y(), preparation.width(), preparation.height(), Component.translatable(pattern.value().descriptionId()), ARGB.black(255), ARGB.opaque(ChatFormatting.YELLOW.getColor()),
                             List.of(patternPage.itemIcon), guidebook -> guidebook.navigateToPage(patternPage)));
         }
         patternPages.addAll(0, createTableOfContentsPages(Component.translatable("ui.irons_jewelry.guide_book.table_of_contents_patterns"), patternTableOfContentsEntries, 75));
@@ -263,11 +264,11 @@ public class GuideBookScreen extends Screen {
                 List.of(
                         // Materials
                         preparation -> new TextButton(preparation.x(), preparation.y(), preparation.width(), preparation.height(),
-                                Component.translatable("ui.irons_jewelry.guide_book.table_of_contents_materials"), 0xFF000000, ChatFormatting.YELLOW.getColor(),
+                                Component.translatable("ui.irons_jewelry.guide_book.table_of_contents_materials"), ARGB.black(255), ARGB.opaque(ChatFormatting.YELLOW.getColor()),
                                 ItemRegistry.items().stream().filter(holder -> holder.is(Tags.Items.GEMS)).map(DeferredHolder::get).map(Item::getDefaultInstance).toList(), guidebook -> guidebook.navigateToPage(materialPages.get(0))),
                         // Patterns
                         preparation -> new TextButton(preparation.x(), preparation.y(), preparation.width(), preparation.height(),
-                                Component.translatable("ui.irons_jewelry.guide_book.table_of_contents_patterns"), 0xFF000000, ChatFormatting.YELLOW.getColor(),
+                                Component.translatable("ui.irons_jewelry.guide_book.table_of_contents_patterns"), ARGB.black(255), ARGB.opaque(ChatFormatting.YELLOW.getColor()),
                                 List.of(ItemRegistry.RECIPE.get().getDefaultInstance()), guidebook -> guidebook.navigateToPage(patternPages.get(0)))
                 ), 75));
 
@@ -311,15 +312,21 @@ public class GuideBookScreen extends Screen {
     }
 
     private int scaleColor(int color, float scalar) {
-        var r = (int) Math.clamp((color >> 16 & 0xFF) * scalar, 0, 255);
-        var g = (int) Math.clamp((color >> 8 & 0xFF) * scalar, 0, 255);
-        var b = (int) Math.clamp((color & 0xFF) * scalar, 0, 255);
-        return (r << 16) | (g << 8) | b;
+        var r = (int) Math.clamp(ARGB.red(color) * scalar, 0, 255);
+        var g = (int) Math.clamp(ARGB.green(color) * scalar, 0, 255);
+        var b = (int) Math.clamp(ARGB.blue(color) * scalar, 0, 255);
+        return ARGB.color(255, r, g, b);
+    }
+
+    private static int fadedColor(int color) {
+        return ARGB.color(0, ARGB.red(color), ARGB.green(color), ARGB.blue(color));
     }
 
     private void drawLine(GuiGraphicsExtractor graphics, int thickness, int startX, int startY, int endX, int endY, int startColor, int endColor) {
         int halfThickness = thickness / 2;
-        graphics.fill(startX, startY - halfThickness, endX, startY - halfThickness + Math.max(thickness, 1), startColor);
+        int y0 = startY - halfThickness;
+        int y1 = startY - halfThickness + Math.max(thickness, 1);
+        fillHorizontalGradient(graphics, startX, y0, endX, y1, startColor, endColor);
     }
 
     private int generateTextColor(Identifier palette) {
@@ -334,10 +341,9 @@ public class GuideBookScreen extends Screen {
                     aint = nativeimage.getPixels();
                 }
                 aint = Arrays.copyOf(aint, 5); // exclude brightest two pixels, which often contain pure white
-                // for some reason, these ints are AGBR
-                int r = Arrays.stream(aint).map(i -> i & 0xFF).sum() / aint.length;
-                int g = Arrays.stream(aint).map(i -> i >> 8 & 0xFF).sum() / aint.length;
-                int b = Arrays.stream(aint).map(i -> i >> 16 & 0xFF).sum() / aint.length;
+                int r = Arrays.stream(aint).map(ARGB::red).sum() / aint.length;
+                int g = Arrays.stream(aint).map(ARGB::green).sum() / aint.length;
+                int b = Arrays.stream(aint).map(ARGB::blue).sum() / aint.length;
                 int max = Math.max(Math.max(r, g), b);
                 if (max < 128) {
                     // ensure darker palettes still create bright, legible text colors
@@ -346,12 +352,12 @@ public class GuideBookScreen extends Screen {
                     b *= factor;
                     g *= factor;
                 }
-                return 0xFF000000 + (r << 16) + (g << 8) + b;
+                return ARGB.color(255, r, g, b);
             }
         } catch (Exception exception) {
             IronsJewelry.LOGGER.error("Failed to generate guidebook coloration for material palette: \"{}\"", palette);
         }
-        return 0xFFFFFF;
+        return ARGB.white(255);
     }
 
     abstract class Page {
@@ -375,9 +381,9 @@ public class GuideBookScreen extends Screen {
             int lineLength = Math.min((int) (xOffset + (font.width(text) + 24) * textScale), IMAGE_WIDTH - XM * 2);
             int lineThickness = 2;
             int split = 15;
-            int color2 = color & 0x00FFFFFF;
-            drawLine(guiGraphics, lineThickness, titleX - 3, titleBottomY, titleX + split, titleBottomY, color2, color);
-            drawLine(guiGraphics, lineThickness, titleX + split, titleBottomY, titleX + lineLength, titleBottomY, color, color2);
+            int faded = fadedColor(color);
+            drawLine(guiGraphics, lineThickness, titleX - 3, titleBottomY, titleX + split + 1, titleBottomY, faded, color);
+            drawLine(guiGraphics, lineThickness, titleX + split, titleBottomY, titleX + lineLength, titleBottomY, color, faded);
         }
 
         void onArrive() {
@@ -492,7 +498,7 @@ public class GuideBookScreen extends Screen {
                 }
                 int availableInfoWidth = IMAGE_WIDTH - XM * 2 - valueColumMargin;
                 for (var line : font.split(value, availableInfoWidth)) {
-                    guiGraphics.text(font, line, xpos + valueColumMargin, ypos, 0x0, false);
+                    guiGraphics.text(font, line, xpos + valueColumMargin, ypos, ARGB.opaque(0), false);
                     if (mouseY >= ypos && mouseY <= ypos + font.lineHeight &&
                             mouseX >= xpos + valueColumMargin && mouseX <= xpos + valueColumMargin + font.width(line)) {
                         tooltipIndex = i;
@@ -502,10 +508,10 @@ public class GuideBookScreen extends Screen {
                 if (i != bonusTable.size() - 1) {
                     ypos += 1;
                     int color = cachedTextColor;
-                    int color2 = color & 0x00FFFFFF;
+                    int faded = fadedColor(color);
                     int split = (xpos + valueColumMargin + xpos) / 2;
-                    drawLine(guiGraphics, 1, xpos - 10, ypos, split, ypos, color2, color);
-                    drawLine(guiGraphics, 1, split, ypos, xpos + valueColumMargin + availableInfoWidth / 2, ypos, color, color2);
+                    drawLine(guiGraphics, 1, xpos - 10, ypos, split, ypos, faded, color);
+                    drawLine(guiGraphics, 1, split, ypos, xpos + valueColumMargin + availableInfoWidth / 2, ypos, color, faded);
                     ypos += 2;
                 }
             }
@@ -568,13 +574,13 @@ public class GuideBookScreen extends Screen {
                 // Name
                 int textWidth = width - size - textMargin;
                 for (var line : font.split(name, textWidth)) {
-                    guiGraphics.text(font, line, x, ypos, 0x0, true);
+                    guiGraphics.text(font, line, x, ypos, -1, true);
                     ypos += font.lineHeight;
                 }
                 if (primary) {
                     ypos += 1;
-                    for (var line : font.split(Component.translatable("ui.irons_jewelry.primary_part").withStyle(ChatFormatting.ITALIC).withColor(0xFF222233), textWidth)) {
-                        guiGraphics.text(font, line, x, ypos, 0x0, false);
+                    for (var line : font.split(Component.translatable("ui.irons_jewelry.primary_part").withStyle(ChatFormatting.ITALIC).withColor(0x222233), textWidth)) {
+                        guiGraphics.text(font, line, x, ypos, -1, false);
                         ypos += font.lineHeight;
                     }
                 }
@@ -739,7 +745,7 @@ public class GuideBookScreen extends Screen {
             int partSectionY = titleBottomY + 4;
             int partSectionWidth = 100;
             int titleSpacer = font.lineHeight * 3 / 2;
-            guiGraphics.text(font, Component.translatable("tooltip.irons_jewelry.parts_header").withStyle(ChatFormatting.UNDERLINE), partSectionX, partSectionY, 0x0, false);
+            guiGraphics.text(font, Component.translatable("tooltip.irons_jewelry.parts_header").withStyle(ChatFormatting.UNDERLINE), partSectionX, partSectionY, ARGB.opaque(0), false);
             int yoff = 0;
             for (int i = 0; i < partInfo.size(); i++) {
                 //fixme: this has no y bounding condition
@@ -795,7 +801,7 @@ public class GuideBookScreen extends Screen {
             int itemX = (int) (leftPos + IMAGE_WIDTH - XM - 16 * scale);
             SCROLL_RENDERER.renderBottomLeft(guiGraphics, itemX, titleBottomY, scale);
             poseStack.scale(scale, scale);
-            guiGraphics.text(font, "?", (int) ((itemX + 22) / scale), (int) ((titleBottomY - font.lineHeight * scale) / scale), 0x0, false);
+            guiGraphics.text(font, "?", (int) ((itemX + 22) / scale), (int) ((titleBottomY - font.lineHeight * scale) / scale), ARGB.opaque(0), false);
             poseStack.popMatrix();
             if (mouseX >= itemX && mouseX <= itemX + 22 * scale && mouseY >= titleBottomY - 16 * scale && mouseY <= titleBottomY) {
                 guiGraphics.setTooltipForNextFrame(patternTooltip, mouseX, mouseY);
@@ -936,4 +942,42 @@ public class GuideBookScreen extends Screen {
         }
     }
 
+    public static void fillHorizontalGradient(
+            GuiGraphicsExtractor graphics,
+            int x0,
+            int y0,
+            int x1,
+            int y1,
+            int leftColor,
+            int rightColor
+    ) {
+        int width = x1 - x0;
+        int height = y1 - y0;
+        if (width <= 0 || height <= 0) {
+            return;
+        }
+        if (width == 1) {
+            graphics.fill(x0, y0, x1, y1, leftColor);
+            return;
+        }
+
+        float centerX = (x0 + x1) / 2f;
+        float centerY = (y0 + y1) / 2f;
+        int halfWidth = width / 2;
+        int halfHeight = height / 2;
+
+        var pose = graphics.pose();
+        pose.pushMatrix();
+        pose.translate(centerX, centerY);
+        pose.rotate((float) (-Math.PI / 2));
+        graphics.fillGradient(
+                -halfHeight,
+                -halfWidth,
+                -halfHeight + height,
+                -halfWidth + width,
+                leftColor,
+                rightColor
+        );
+        pose.popMatrix();
+    }
 }

@@ -142,8 +142,8 @@ public class CurioBaseItem extends Item implements ICurioItem {
     }
 
     @Override
-    public boolean makesPiglinsNeutral(@NotNull ItemStack stack, @NotNull LivingEntity wearer) {
-        return wearer instanceof Player player && Utils.getEquippedBonuses(player).stream().map(BonusInstance::bonusType).anyMatch(bonus -> bonus instanceof PiglinNeutralBonusType);
+    public boolean makesPiglinsNeutral(SlotContext slotContext, ItemStack stack) {
+        return JewelryData.get(stack).getBonuses().stream().map(BonusInstance::bonusType).anyMatch(bonus -> bonus instanceof PiglinNeutralBonusType);
     }
 
     @Override

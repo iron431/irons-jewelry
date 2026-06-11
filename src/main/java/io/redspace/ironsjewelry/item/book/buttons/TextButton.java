@@ -7,6 +7,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.navigation.ScreenAxis;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.ARGB;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
@@ -58,7 +59,7 @@ public class TextButton implements GuideBookButton {
         guiGraphics.pose().pushMatrix();
         guiGraphics.pose().scale(textScale, textScale);
         float textYBottom = middleY + font.lineHeight / 2f + 2;
-        guiGraphics.text(font, text, (int) (textX / textScale), (int) ((textYBottom) / textScale - font.lineHeight), selected ? selectedColor : color, selected);
+        guiGraphics.text(font, text, (int) (textX / textScale), (int) ((textYBottom) / textScale - font.lineHeight), ARGB.opaque(selected ? selectedColor : color), selected);
         guiGraphics.pose().popMatrix();
     }
 
