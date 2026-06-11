@@ -1,0 +1,14 @@
+{
+  "amount": 2,
+  "random_sequence": "irons_jewelry:trade_set/jeweler/expert",
+  "trades": [
+    "irons_jewelry:jeweler/expert/emerald_jewelry",
+    "irons_jewelry:jeweler/expert/sell/emerald_moonstone",
+    "irons_jewelry:jeweler/expert/sell/emerald_onyx",
+    "irons_jewelry:jeweler/expert/sell/emerald_peridot",
+    "irons_jewelry:jeweler/expert/sell/emerald_ruby",
+    "irons_jewelry:jeweler/expert/sell/emerald_sapphire",
+    "irons_jewelry:jeweler/expert/sell/emerald_topaz",
+    "irons_jewelry:jeweler/expert/sell/emerald_garnet"
+  ]
+}

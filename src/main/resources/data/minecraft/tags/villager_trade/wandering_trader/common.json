@@ -1,0 +1,14 @@
+{
+  "replace": false,
+  "values": [
+    "irons_jewelry:jeweler/wandering/emerald_jewelry",
+    "irons_jewelry:jeweler/wandering/emerald_jewelry",
+    "irons_jewelry:jeweler/wandering/sell/emerald_moonstone",
+    "irons_jewelry:jeweler/wandering/sell/emerald_onyx",
+    "irons_jewelry:jeweler/wandering/sell/emerald_peridot",
+    "irons_jewelry:jeweler/wandering/sell/emerald_ruby",
+    "irons_jewelry:jeweler/wandering/sell/emerald_sapphire",
+    "irons_jewelry:jeweler/wandering/sell/emerald_topaz",
+    "irons_jewelry:jeweler/wandering/sell/emerald_garnet"
+  ]
+}

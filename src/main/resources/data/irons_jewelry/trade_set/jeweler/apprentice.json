@@ -1,0 +1,23 @@
+{
+  "amount": 2,
+  "random_sequence": "irons_jewelry:trade_set/jeweler/apprentice",
+  "trades": [
+    "irons_jewelry:jeweler/apprentice/buy/diamond_emerald",
+    "irons_jewelry:jeweler/apprentice/buy/lapis_lazuli_emerald",
+    "irons_jewelry:jeweler/apprentice/buy/amethyst_shard_emerald",
+    "irons_jewelry:jeweler/apprentice/buy/moonstone_emerald",
+    "irons_jewelry:jeweler/apprentice/buy/onyx_emerald",
+    "irons_jewelry:jeweler/apprentice/buy/peridot_emerald",
+    "irons_jewelry:jeweler/apprentice/buy/ruby_emerald",
+    "irons_jewelry:jeweler/apprentice/buy/sapphire_emerald",
+    "irons_jewelry:jeweler/apprentice/buy/topaz_emerald",
+    "irons_jewelry:jeweler/apprentice/buy/garnet_emerald",
+    "irons_jewelry:jeweler/apprentice/sell/emerald_moonstone",
+    "irons_jewelry:jeweler/apprentice/sell/emerald_onyx",
+    "irons_jewelry:jeweler/apprentice/sell/emerald_peridot",
+    "irons_jewelry:jeweler/apprentice/sell/emerald_ruby",
+    "irons_jewelry:jeweler/apprentice/sell/emerald_sapphire",
+    "irons_jewelry:jeweler/apprentice/sell/emerald_topaz",
+    "irons_jewelry:jeweler/apprentice/sell/emerald_garnet"
+  ]
+}

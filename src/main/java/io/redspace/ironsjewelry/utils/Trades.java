@@ -24,26 +24,30 @@ import java.util.function.BiFunction;
 
 public class Trades {
 
-    public static int calculatePatternPrice(ItemStack stack, RandomSource randomSource) {
-        var heldPattern = StoredPatternData.get(stack);
-        if (heldPattern != null) {
-            var pattern = heldPattern.value();
-            return (int) ((randomSource.nextIntBetweenInclusive(15, 20) + pattern.partTemplate().size() * 2) * pattern.qualityMultiplier());
+//    public static int calculatePatternPrice(ItemStack stack, RandomSource randomSource) {
+//        var heldPattern = StoredPatternData.get(stack);
+//        if (heldPattern != null) {
+//            var pattern = heldPattern.value();
+//            return (int) ((randomSource.nextIntBetweenInclusive(15, 20) + pattern.partTemplate().size() * 2) * pattern.qualityMultiplier());
+//        }
+//        return 0;
+//    }
+
+    public static int calculateJewelryPrice(JewelryData jewelryData) {
+        int cost = (int) (12 * jewelryData.pattern().value().qualityMultiplier());
+        for (Holder<MaterialDefinition> part : jewelryData.parts().values()) {
+            cost += (int) (4 * part.value().quality());
         }
-        return 0;
+        if (jewelryData.pattern().value().partForQuality().isPresent()) {
+            cost = (int) (cost * jewelryData.parts().get(jewelryData.pattern().value().partForQuality().get()).value().quality());
+        }
+        return cost;
     }
 
-    public static int calculateJewelryPrice(ItemStack stack, RandomSource randomSource) {
+    public static int calculateJewelryPrice(ItemStack stack) {
         var jewelryData = JewelryData.getNullable(stack);
         if (jewelryData != null && jewelryData.isValid()) {
-            int cost = (int) (12 * jewelryData.pattern().value().qualityMultiplier());
-            for (Holder<MaterialDefinition> part : jewelryData.parts().values()) {
-                cost += (int) (4 * part.value().quality());
-            }
-            if (jewelryData.pattern().value().partForQuality().isPresent()) {
-                cost = (int) (cost * jewelryData.parts().get(jewelryData.pattern().value().partForQuality().get()).value().quality());
-            }
-            return cost;
+            return calculateJewelryPrice(jewelryData);
         }
         return 0;
     }

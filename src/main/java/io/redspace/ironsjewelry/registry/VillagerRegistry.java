@@ -36,11 +36,11 @@ public class VillagerRegistry {
                 ImmutableSet.of(),
                 pWorkSound,
                 Int2ObjectMap.ofEntries(
-                        Int2ObjectMap.entry(1, ResourceKey.create(Registries.TRADE_SET, IronsJewelry.id(pName + "/level_1"))),
-                        Int2ObjectMap.entry(2, ResourceKey.create(Registries.TRADE_SET, IronsJewelry.id(pName + "/level_2"))),
-                        Int2ObjectMap.entry(3, ResourceKey.create(Registries.TRADE_SET, IronsJewelry.id(pName + "/level_3"))),
-                        Int2ObjectMap.entry(4, ResourceKey.create(Registries.TRADE_SET, IronsJewelry.id(pName + "/level_4"))),
-                        Int2ObjectMap.entry(5, ResourceKey.create(Registries.TRADE_SET, IronsJewelry.id(pName + "/level_5")))
+                        Int2ObjectMap.entry(1, ResourceKey.create(Registries.TRADE_SET, IronsJewelry.id(pName + "/novice"))),
+                        Int2ObjectMap.entry(2, ResourceKey.create(Registries.TRADE_SET, IronsJewelry.id(pName + "/apprentice"))),
+                        Int2ObjectMap.entry(3, ResourceKey.create(Registries.TRADE_SET, IronsJewelry.id(pName + "/journey"))),
+                        Int2ObjectMap.entry(4, ResourceKey.create(Registries.TRADE_SET, IronsJewelry.id(pName + "/expert"))),
+                        Int2ObjectMap.entry(5, ResourceKey.create(Registries.TRADE_SET, IronsJewelry.id(pName + "/master")))
                 )
         ));
     }

@@ -1,0 +1,12 @@
+{
+  "gives": {
+    "id": "irons_jewelry:garnet"
+  },
+  "max_uses": 4,
+  "reputation_discount": 0.05,
+  "wants": {
+    "count": 10,
+    "id": "minecraft:emerald"
+  },
+  "xp": 15
+}

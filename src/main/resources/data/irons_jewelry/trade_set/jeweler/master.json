@@ -1,0 +1,8 @@
+{
+  "amount": 2,
+  "random_sequence": "irons_jewelry:trade_set/jeweler/master",
+  "trades": [
+    "irons_jewelry:jeweler/master/emerald_jewelry",
+    "irons_jewelry:jeweler/master/emerald_advanced_pattern"
+  ]
+}

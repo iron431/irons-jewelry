@@ -1,0 +1,18 @@
+{
+  "gives": {
+    "id": "irons_jewelry:ring"
+  },
+  "given_item_modifiers": [
+    {
+      "function": "irons_jewelry:generate_jewelry",
+      "patterns": "#irons_jewelry:default_patterns"
+    }
+  ],
+  "max_uses": 2,
+  "reputation_discount": 0.05,
+  "wants": {
+    "count": 1,
+    "id": "minecraft:emerald"
+  },
+  "xp": 15
+}
