@@ -1,7 +1,6 @@
 {
   "bonusParameters": {},
   "descriptionId": "material.irons_jewelry.example",
-  "ingredient": [],
   "paletteLocation": "irons_jewelry:palettes/silver",
   "quality": 1.0
 }

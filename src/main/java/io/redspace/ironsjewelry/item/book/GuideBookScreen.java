@@ -234,7 +234,7 @@ public class GuideBookScreen extends Screen {
         var patternRegistry = IronsJewelryRegistries.patternRegistry(Minecraft.getInstance().level.registryAccess());
         List<Page> materialPages = new ArrayList<>();
         // Construct a material page if the material exists and has valid items to be crafted from
-        materialRegistry.holders().filter(holder -> !holder.value().ingredient().hasNoItems()).forEach(holder -> materialPages.add(new MaterialPage(holder)));
+        Utils.getEnabledMaterials(Minecraft.getInstance().level.registryAccess()).forEach(holder -> materialPages.add(new MaterialPage(holder)));
         // Effectively curry buttons by using preparation structure. Allows all information to be created now, and the button can be positioned and fit onto the screen later, because it is difficult to position all elements without knowing how many there are
         List<Function<TableOfContentsPage.EntryPreparation, GuideBookButton>> materialTableOfContentsEntries = new ArrayList<>();
         for (int i = 0; i < materialPages.size(); i++) {
@@ -242,7 +242,7 @@ public class GuideBookScreen extends Screen {
             var material = materialPage.material;
             materialTableOfContentsEntries.add(preparation ->
                     new TextButton(preparation.x(), preparation.y(), preparation.width(), preparation.height(), Component.translatable(material.value().descriptionId()), 0xFF000000, ChatFormatting.YELLOW.getColor(),
-                            List.of(material.value().ingredient().getItems()), guidebook -> guidebook.navigateToPage(materialPage)));
+                            material.value().getIngredientItems().map(ItemStack::new).toList(), guidebook -> guidebook.navigateToPage(materialPage)));
         }
         materialPages.addAll(0, createTableOfContentsPages(Component.translatable("ui.irons_jewelry.guide_book.table_of_contents_materials"), materialTableOfContentsEntries, 75));
 
@@ -445,7 +445,7 @@ public class GuideBookScreen extends Screen {
         public MaterialPage(Holder<MaterialDefinition> material) {
             this.material = material;
             this.cachedTextColor = generateTextColor(material.value().paletteLocation());
-            this.itemRenderer = new CyclicItemRenderer(List.of(material.value().ingredient().getItems()));
+            this.itemRenderer = new CyclicItemRenderer(material.value().getIngredientItems().map(ItemStack::new).toList());
             this.bonusTable = new ArrayList<>();
             bonusTable.add(new TableEntry(
                     Component.translatable("ui.irons_jewelry.quality"),
@@ -671,7 +671,8 @@ public class GuideBookScreen extends Screen {
                 tooltip.add(name);
                 tooltip.add(Component.literal(" ").append(Component.translatable("tooltip.irons_jewelry.material_cost", Component.literal(String.valueOf(partIngredient.materialCost())).withStyle(ChatFormatting.WHITE))).withStyle(ChatFormatting.GRAY));
                 tooltip.add(Component.translatable("tooltip.irons_jewelry.applicable_materials").withStyle(ChatFormatting.YELLOW, ChatFormatting.UNDERLINE));
-                IronsJewelryRegistries.materialRegistry(Minecraft.getInstance().level.registryAccess()).holders().filter(candidate -> !candidate.value().ingredient().hasNoItems() && part.value().canUseMaterial(candidate))
+                Utils.getEnabledMaterials(Minecraft.getInstance().level.registryAccess()).stream()
+                        .filter(candidate -> part.value().canUseMaterial(candidate))
                         .forEach(m -> tooltip.add(Component.literal(" ").append(Component.translatable(m.value().descriptionId())).withStyle(ChatFormatting.GRAY)));
                 List<MutableComponent> partExpandedInfo = new ArrayList<>();
                 partExpandedInfo.add(name);

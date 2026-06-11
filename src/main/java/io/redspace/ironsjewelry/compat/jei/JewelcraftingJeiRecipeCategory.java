@@ -80,7 +80,7 @@ public class JewelcraftingJeiRecipeCategory implements IRecipeCategory<PatternDe
         for (int i = 0; i < template.size(); i++) {
             var partIngredient = template.get(i);
             var part = partIngredient.part().value();
-            var stacks = materialRegistry.holders().filter(part::canUseMaterial).map(Holder::value).map(MaterialDefinition::ingredient).filter(ingr -> !ingr.hasNoItems()).flatMap(ingredient -> Arrays.stream(ingredient.getItems())).map(ItemStack::copy).toList();
+            var stacks = Utils.getEnabledMaterials(Minecraft.getInstance().level.registryAccess()).stream().filter(part::canUseMaterial).flatMap(mat -> mat.value().getIngredientItems()).map(ItemStack::new).toList();
             stacks.forEach(stack -> stack.setCount(partIngredient.materialCost()));
             builder.addSlot(RecipeIngredientRole.INPUT, buffer + leftPos + i * widthPer, 9 + 5 + 6)
                     .addItemStacks(stacks)

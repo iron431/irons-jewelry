@@ -84,14 +84,6 @@ file="META-INF/accesstransformer.cfg"
     versionRange="${minecraft_version_range}"
     ordering="NONE"
     side="BOTH"
-
-[[dependencies.${mod_id}]]
-    modId="apothic_attributes"
-    type="optional"
-    versionRange="[${attribute_lib_version},)"
-    ordering="NONE"
-    side="BOTH"
-
 [[dependencies.${mod_id}]]
     modId="curios"
     type="required"

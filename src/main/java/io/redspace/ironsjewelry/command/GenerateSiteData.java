@@ -467,11 +467,11 @@ public class GenerateSiteData {
                 if (id.equals(IronsJewelry.id("example"))) {
                     continue;
                 }
-                if (material.ingredient().hasNoItems()) {
+                if (material.isIngredientEmpty()) {
                     IronsJewelry.LOGGER.error("Cannot generate material {}, no valid ingredients present!", id);
                     continue;
                 }
-                ItemStack representativeStack = Arrays.stream(material.ingredient().getItems()).sorted(GenerateSiteData::sortIngredientStack).findFirst().get();
+                ItemStack representativeStack = material.getIngredientItems().map(ItemStack::new).sorted(GenerateSiteData::sortIngredientStack).findFirst().get();
                 var ingrId = BuiltInRegistries.ITEM.getKey(representativeStack.getItem());
                 var imgid = ingrId.getPath();
                 var sortOrder = (int) name.charAt(0);

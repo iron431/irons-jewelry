@@ -487,7 +487,7 @@ public class JewelryDataRegistryGenerator {
         ));
         EXAMPLE = bootstrap.register(materialKey(IronsJewelry.id("example")), new MaterialDefinition(
                 "material.irons_jewelry.example",
-                Ingredient.EMPTY,
+                Optional.empty(),
                 IronsJewelry.id("palettes/silver"),
                 Map.of(),
                 1.0

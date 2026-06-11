@@ -69,7 +69,7 @@ public record GenerateJewelryLootFunction(
             var registry = IronsJewelryRegistries.materialRegistry(lootContext.getLevel().registryAccess());
             // Precompute all potential materials by excluding all blacklisted materials, unless a material filter is set which will override the blacklist
             List<Holder.Reference<MaterialDefinition>> allMaterials = registry.holders().filter(material ->
-                    !material.value().ingredient().hasNoItems() && (!material.is(JewelryModTags.JEWELRY_LOOT_MATERIAL_BLACKLIST) || !materialFilter.isEmpty())
+                    !material.value().isIngredientEmpty() && (!material.is(JewelryModTags.JEWELRY_LOOT_MATERIAL_BLACKLIST) || !materialFilter.isEmpty())
             ).toList();
 
             for (PartIngredient part : pattern.value().partTemplate()) {
