@@ -1,9 +1,10 @@
-// 1.21.1	2025-11-28T18:56:37.0278066	Item Models: irons_jewelry
+// 1.21.1	2026-06-12T07:54:15.5026153	Item Models: irons_jewelry
 c8bdbf158e2d154a1b83ea4091254a830250683a assets/irons_jewelry/models/item/garnet.json
 003fa8558a13faa555d914de41c7b95066419a02 assets/irons_jewelry/models/item/jewelcrafting_guide.json
 06e60134ff9c921c7e9e1c3b2ede5e2e51d143f7 assets/irons_jewelry/models/item/moonstone.json
 439d669287e09183fe6ec3a5de0401ef184e2417 assets/irons_jewelry/models/item/onyx.json
 65ca5d3fce6550482dcf485627cee3d2fd485ae6 assets/irons_jewelry/models/item/peridot.json
+740fc3661c87ee4949ff15ba69d5cb19ea962a1d assets/irons_jewelry/models/item/recipe.json
 52959ca163a17b6f9e8ae15a54a4f2d8cb58bd81 assets/irons_jewelry/models/item/ruby.json
 de9493f3a443a1555bdda0a8a75b47aa4ca17072 assets/irons_jewelry/models/item/sapphire.json
 a869bfcb64d236113edbf4fe3af587e57bab75e4 assets/irons_jewelry/models/item/topaz.json
