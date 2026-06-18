@@ -131,7 +131,7 @@ dependencies {
     implementation "io.redspace:irons_lib:${irons_lib_version}"
 
     compileOnly "io.redspace:atlas_api:${atlas_api_version}:api"
-    localRuntime "io.redspace:atlas_api:${atlas_api_version}"
+//    localRuntime "io.redspace:atlas_api:${atlas_api_version}"
     localRuntime "com.geckolib:geckolib-neoforge-${minecraft_version}:${geckolib_version}"
 
     // QOL          /////////////////////////////////////////////////////////////////

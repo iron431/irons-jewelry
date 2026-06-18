@@ -53,7 +53,6 @@ public class JeiPlugin implements IModPlugin {
 
     @Override
     public void registerExtraIngredients(IExtraIngredientRegistration registration) {
-        var materialRegistry = IronsJewelryRegistries.materialRegistry(Minecraft.getInstance().level.registryAccess());
         var patternRegistry = IronsJewelryRegistries.patternRegistry(Minecraft.getInstance().level.registryAccess());
         List<ItemStack> exampleJewelryItems = new ArrayList<>();
         for (PatternDefinition pattern : patternRegistry) {

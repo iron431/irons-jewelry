@@ -17,5 +17,5 @@ public class BlockRegistry {
         BLOCKS.register(eventBus);
     }
 
-    public static final DeferredHolder<Block, JewelcraftingStationBlock> JEWELCRAFTING_STATION_BLOCK = BLOCKS.registerBlock("jewelcrafting_station", (properties) -> new JewelcraftingStationBlock(properties), () -> BlockBehaviour.Properties.ofFullCopy(Blocks.SMITHING_TABLE));
+    public static final DeferredHolder<Block, JewelcraftingStationBlock> JEWELCRAFTING_STATION_BLOCK = BLOCKS.registerBlock("jewelcrafting_station", JewelcraftingStationBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.SMITHING_TABLE));
 }
