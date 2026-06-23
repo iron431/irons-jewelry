@@ -1,7 +1,6 @@
 package io.redspace.ironsjewelry.mixin;
 
-import io.redspace.ironsjewelry.core.data.JewelryData;
-import io.redspace.ironsjewelry.utils.Trades;
+import io.redspace.ironsjewelry.utils.TradeHelper;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.trading.ItemCost;
 import net.minecraft.world.item.trading.MerchantOffer;
@@ -25,13 +24,12 @@ public class VillagerTradeMixin {
         if (!offer.getCostA().is(Items.EMERALD)) {
             return;
         }
-        JewelryData data = JewelryData.getNullable(offer.getResult());
-        if (data == null || !data.isValid()) {
+        int emeraldPrice = TradeHelper.getSpecialItemPrice(offer.getResult());
+        if (emeraldPrice == 0) {
             return;
         }
         ItemCost primaryCost;
         Optional<ItemCost> secondaryCost = Optional.empty();
-        int emeraldPrice = Trades.calculateJewelryPrice(data);
         if (emeraldPrice > 64 * 9) {
             // price is greater than one stack of blocks, therefore the inputs are in units of blocks
             emeraldPrice = emeraldPrice - 64 * 9;

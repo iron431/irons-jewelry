@@ -32,7 +32,6 @@ public record SetHeldPatternLootFunction(
         if (patternOpt.isPresent()) {
             var pattern = patternOpt.get();
             StoredPatternData.set(stack, pattern);
-            stack.set(DataComponents.ADDITIONAL_TRADE_COST, (int) Math.min(64, (18 + pattern.value().partTemplate().size() * 2) * pattern.value().qualityMultiplier()));
         }
         return stack;
     }
