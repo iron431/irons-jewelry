@@ -2,6 +2,7 @@ package io.redspace.ironsjewelry.registry;
 
 import io.redspace.ironsjewelry.IronsJewelry;
 import io.redspace.ironsjewelry.datagen.ItemModelDataGenerator;
+import io.redspace.ironsjewelry.datagen.ItemModelHelper;
 import io.redspace.ironsjewelry.item.CurioBaseItem;
 import io.redspace.ironsjewelry.item.PatternRecipeItem;
 import io.redspace.ironsjewelry.item.book.GuideBookItem;
@@ -39,7 +40,7 @@ public class ItemRegistry {
 
     private static <T extends Item> DeferredHolder<Item, T> registerSimpleItem(String name, Function<Item.Properties, T> supplier) {
         var s = ITEMS.registerItem(name, supplier);
-        ItemModelDataGenerator.simpleItem(s);
+        ItemModelHelper.simpleItem(s);
         return s;
     }
 
