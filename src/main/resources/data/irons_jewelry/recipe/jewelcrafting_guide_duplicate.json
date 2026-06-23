@@ -2,12 +2,8 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    {
-      "item": "minecraft:book"
-    },
-    {
-      "item": "irons_jewelry:jewelcrafting_guide"
-    }
+    "minecraft:book",
+    "irons_jewelry:jewelcrafting_guide"
   ],
   "result": {
     "count": 2,

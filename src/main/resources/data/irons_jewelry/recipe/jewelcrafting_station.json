@@ -2,20 +2,13 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "W": {
-      "tag": "minecraft:planks"
-    },
-    "C": {
-      "tag": "c:ingots/copper"
-    }
+    "W": "#minecraft:planks",
+    "C": "#c:ingots/copper"
   },
   "pattern": [
     "CC",
     "WW",
     "WW"
   ],
-  "result": {
-    "count": 1,
-    "id": "irons_jewelry:jewelcrafting_station"
-  }
+  "result": "irons_jewelry:jewelcrafting_station"
 }
