@@ -3,6 +3,7 @@ package io.redspace.ironsjewelry.core.data;
 public class CooldownInstance {
     int remainingTicks, totalTicks;
     boolean firstTick;
+
     public CooldownInstance(int ticks) {
         this.remainingTicks = ticks;
         this.totalTicks = ticks;
@@ -18,7 +19,7 @@ public class CooldownInstance {
         remainingTicks -= amount;
     }
 
-    public int getRemainingTicks(){
+    public int getRemainingTicks() {
         return remainingTicks;
     }
 }

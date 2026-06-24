@@ -14,32 +14,33 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 import java.util.Collection;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class ItemRegistry {
-    private static final DeferredRegister<Item> ITEMS = DeferredRegister.create(Registries.ITEM, IronsJewelry.MODID);
+    private static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(IronsJewelry.MODID);
 
     public static void register(IEventBus eventBus) {
         ITEMS.register(eventBus);
     }
 
-    public static final DeferredHolder<Item, CurioBaseItem> RING = ITEMS.register("ring", () -> new CurioBaseItem(new Item.Properties().stacksTo(1), "ring"));
-    public static final DeferredHolder<Item, CurioBaseItem> NECKLACE = ITEMS.register("necklace", () -> new CurioBaseItem(new Item.Properties().stacksTo(1), "necklace"));
-    public static final DeferredHolder<Item, PatternRecipeItem> RECIPE = ITEMS.register("recipe", () -> new PatternRecipeItem(new Item.Properties().stacksTo(1).rarity(Rarity.UNCOMMON)));
-    public static final DeferredHolder<Item, GuideBookItem> JEWELCRAFTING_GUIDE = registerSimpleItem("jewelcrafting_guide", () -> new GuideBookItem(new Item.Properties().rarity(Rarity.UNCOMMON)));
+    public static final DeferredHolder<Item, CurioBaseItem> RING = ITEMS.registerItem("ring", (properties) -> new CurioBaseItem(properties.stacksTo(1), "ring"));
+    public static final DeferredHolder<Item, CurioBaseItem> NECKLACE = ITEMS.registerItem("necklace", (properties) -> new CurioBaseItem(properties.stacksTo(1), "necklace"));
+    public static final DeferredHolder<Item, PatternRecipeItem> RECIPE = registerSimpleItem("recipe", (properties) -> new PatternRecipeItem(properties.stacksTo(1).rarity(Rarity.UNCOMMON)));
+    public static final DeferredHolder<Item, GuideBookItem> JEWELCRAFTING_GUIDE = registerSimpleItem("jewelcrafting_guide", (properties) -> new GuideBookItem(properties.rarity(Rarity.UNCOMMON)));
 
-    public static final DeferredHolder<Item, Item> RUBY = registerSimpleItem("ruby", () -> new Item(new Item.Properties()));
-    public static final DeferredHolder<Item, Item> SAPPHIRE = registerSimpleItem("sapphire", () -> new Item(new Item.Properties()));
-    public static final DeferredHolder<Item, Item> TOPAZ = registerSimpleItem("topaz", () -> new Item(new Item.Properties()));
-    public static final DeferredHolder<Item, Item> MOONSTONE = registerSimpleItem("moonstone", () -> new Item(new Item.Properties()));
-    public static final DeferredHolder<Item, Item> PERIDOT = registerSimpleItem("peridot", () -> new Item(new Item.Properties()));
-    public static final DeferredHolder<Item, Item> ONYX = registerSimpleItem("onyx", () -> new Item(new Item.Properties()));
-    public static final DeferredHolder<Item, Item> GARNET = registerSimpleItem("garnet", () -> new Item(new Item.Properties()));
+    public static final DeferredHolder<Item, Item> RUBY = registerSimpleItem("ruby", Item::new);
+    public static final DeferredHolder<Item, Item> SAPPHIRE = registerSimpleItem("sapphire", Item::new);
+    public static final DeferredHolder<Item, Item> TOPAZ = registerSimpleItem("topaz", Item::new);
+    public static final DeferredHolder<Item, Item> MOONSTONE = registerSimpleItem("moonstone", Item::new);
+    public static final DeferredHolder<Item, Item> PERIDOT = registerSimpleItem("peridot", Item::new);
+    public static final DeferredHolder<Item, Item> ONYX = registerSimpleItem("onyx", Item::new);
+    public static final DeferredHolder<Item, Item> GARNET = registerSimpleItem("garnet", Item::new);
 
     public static final DeferredHolder<Item, BlockItem> JEWELCRAFTING_STATION_BLOCK_ITEM = ITEMS.register("jewelcrafting_station", () -> new BlockItem(BlockRegistry.JEWELCRAFTING_STATION_BLOCK.get(), new Item.Properties()));
 
-    private static <T extends Item> DeferredHolder<Item, T> registerSimpleItem(String name, Supplier<T> supplier) {
-        var s = ITEMS.register(name, supplier);
+    private static <T extends Item> DeferredHolder<Item, T> registerSimpleItem(String name, Function<Item.Properties, T> supplier) {
+        var s = ITEMS.registerItem(name, supplier);
         ItemModelDataGenerator.toRegister.add(generator -> generator.simpleItem(s));
         return s;
     }

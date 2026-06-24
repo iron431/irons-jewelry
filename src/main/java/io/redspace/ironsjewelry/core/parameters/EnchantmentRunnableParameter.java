@@ -8,7 +8,8 @@ import net.minecraft.world.item.enchantment.effects.EnchantmentEntityEffect;
 import java.util.Optional;
 
 public class EnchantmentRunnableParameter implements IBonusParameterType<EnchantmentRunnableParameter.EnchantmentRunnable> {
-    public record EnchantmentRunnable(EnchantmentEntityEffect enchantment, boolean targetSelf, int effectiveLevel, String verbTranslation) {
+    public record EnchantmentRunnable(EnchantmentEntityEffect enchantment, boolean targetSelf, int effectiveLevel,
+                                      String verbTranslation) {
     }
 
     public static final Codec<EnchantmentRunnableParameter.EnchantmentRunnable> CODEC = RecordCodecBuilder.create(builder -> builder.group(

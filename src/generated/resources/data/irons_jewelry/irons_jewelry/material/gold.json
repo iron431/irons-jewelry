@@ -12,7 +12,7 @@
     },
     "irons_jewelry:attribute": {
       "amount": 0.1,
-      "attribute": "apothic_attributes:mining_speed",
+      "attribute": "irons_lib:mining_speed",
       "operation": "add_multiplied_total"
     },
     "irons_jewelry:negative_effect": {
@@ -26,10 +26,6 @@
   "ingredient": {
     "tag": "c:ingots/gold"
   },
-  "materialType": [
-    "metal",
-    "gold"
-  ],
   "paletteLocation": "irons_jewelry:palettes/gold",
   "quality": 1.5
 }

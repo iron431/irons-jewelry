@@ -40,9 +40,6 @@
   "ingredient": {
     "tag": "c:ingots/silver"
   },
-  "materialType": [
-    "metal"
-  ],
   "paletteLocation": "irons_jewelry:palettes/silver",
   "quality": 1.0
 }

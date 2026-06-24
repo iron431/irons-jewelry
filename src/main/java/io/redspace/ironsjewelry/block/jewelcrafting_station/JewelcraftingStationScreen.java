@@ -3,13 +3,17 @@ package io.redspace.ironsjewelry.block.jewelcrafting_station;
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.math.Axis;
 import io.redspace.ironsjewelry.IronsJewelry;
-import io.redspace.ironsjewelry.core.data.*;
+import io.redspace.ironsjewelry.core.data.JewelryData;
+import io.redspace.ironsjewelry.core.data.MaterialDefinition;
+import io.redspace.ironsjewelry.core.data.PartDefinition;
+import io.redspace.ironsjewelry.core.data.PartIngredient;
+import io.redspace.ironsjewelry.core.data.PatternDefinition;
+import io.redspace.ironsjewelry.core.data.PlayerData;
 import io.redspace.ironsjewelry.event.SetupJewelcraftingResultEvent;
 import io.redspace.ironsjewelry.item.CurioBaseItem;
 import io.redspace.ironsjewelry.network.packets.SetJewelcraftingStationPattern;
 import io.redspace.ironsjewelry.network.packets.SyncJewelcraftingSlotStates;
 import io.redspace.ironsjewelry.registry.AssetHandlerRegistry;
-import io.redspace.ironsjewelry.registry.ComponentRegistry;
 import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
 import io.redspace.ironsjewelry.utils.MinecraftInstanceHelper;
 import io.redspace.ironsjewelry.utils.Utils;
@@ -37,7 +41,11 @@ import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 public class JewelcraftingStationScreen extends AbstractContainerScreen<JewelcraftingStationMenu> implements ContainerListener {
@@ -168,8 +176,8 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
                             tooltip.add(Component.translatable(part.part().value().descriptionId()).withStyle(ChatFormatting.YELLOW, ChatFormatting.UNDERLINE));
                             tooltip.add(Component.literal(String.format(" (0/%s)", part.materialCost())).withStyle(ChatFormatting.RED));
                             tooltip.add(Component.translatable("tooltip.irons_jewelry.applicable_materials").withStyle(ChatFormatting.YELLOW, ChatFormatting.UNDERLINE));
-                            IronsJewelryRegistries.materialRegistry(Minecraft.getInstance().level.registryAccess()).stream().filter(materialDefinition -> !materialDefinition.ingredient().hasNoItems() && part.part().value().canUseMaterial(materialDefinition.materialType()))
-                                    .forEach(material -> tooltip.add(Component.literal(" ").append(Component.translatable(material.descriptionId())).withStyle(ChatFormatting.GRAY)));
+                            Utils.getEnabledMaterials(Minecraft.getInstance().level.registryAccess()).stream().filter(material -> part.part().value().canUseMaterial(material))
+                                    .forEach(material -> tooltip.add(Component.literal(" ").append(Component.translatable(material.value().descriptionId())).withStyle(ChatFormatting.GRAY)));
                             pGuiGraphics.renderTooltip(this.font, Utils.rasterizeComponentList(tooltip), mouseX, mouseY);
                         }
                     }
@@ -212,7 +220,7 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
                 var ingredient = requiredIngredients.get(i);
                 var input = menu.workspaceSlots.get(i).getItem();
                 var material = Utils.getMaterialForIngredient(Minecraft.getInstance().player.level.registryAccess(), input);
-                if (material.isPresent() && ingredient.part().value().canUseMaterial(material.get().value().materialType())) {
+                if (material.isPresent() && ingredient.part().value().canUseMaterial(material.get())) {
                     parts.put(ingredient.part(), material.get());
                     //var texture = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(DynamicModel.atlasResourceLocaction(ingredient.part(), material.get().value().paletteLocation().getPath()));
                 }
@@ -231,7 +239,7 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
             if (!parts.isEmpty()) {
                 JewelryData jewelryData = JewelryData.renderable(holder, parts);
                 ItemStack stack = new ItemStack(pattern.jewelryType().item());
-                stack.set(ComponentRegistry.JEWELRY_COMPONENT, jewelryData);
+                JewelryData.set(stack, jewelryData);
                 //Event posting
                 var event = new SetupJewelcraftingResultEvent(holder, MinecraftInstanceHelper.getPlayer(), stack);
                 if (NeoForge.EVENT_BUS.post(event).isCanceled()) {
@@ -321,7 +329,7 @@ public class JewelcraftingStationScreen extends AbstractContainerScreen<Jewelcra
             if (slot.isActive()) {
                 var stack = slot.getItem();
                 var material = Utils.getMaterialForIngredient(Minecraft.getInstance().level.registryAccess(), stack);
-                if (material.isPresent() && forPart.value().canUseMaterial(material.get().value().materialType())) {
+                if (material.isPresent() && forPart.value().canUseMaterial(material.get())) {
                     return stack.getCount();
                 }
             }

@@ -1,7 +1,5 @@
 {
-  "allowedMaterialTypes": [
-    "gem"
-  ],
+  "allowedMaterials": "#irons_jewelry:gem",
   "baseTextureLocation": "irons_jewelry:item/base/gem_rhinestone_b",
   "descriptionId": "part.irons_jewelry.gem_rhinestone_b",
   "paletteKey": "irons_jewelry:palettes/diamond"

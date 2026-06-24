@@ -1,7 +1,5 @@
 {
-  "allowedMaterialTypes": [
-    "emerald"
-  ],
+  "allowedMaterials": "#irons_jewelry:emerald",
   "baseTextureLocation": "irons_jewelry:item/base/gem_round_large",
   "descriptionId": "part.irons_jewelry.haggler_stone",
   "paletteKey": "irons_jewelry:palettes/diamond"

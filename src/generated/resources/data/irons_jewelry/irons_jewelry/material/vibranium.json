@@ -32,9 +32,6 @@
   "ingredient": {
     "tag": "c:ingots/vibranium"
   },
-  "materialType": [
-    "metal"
-  ],
   "paletteLocation": "irons_jewelry:palettes/vibranium",
   "quality": 3.5
 }

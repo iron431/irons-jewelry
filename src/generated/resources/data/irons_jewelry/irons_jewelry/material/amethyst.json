@@ -13,7 +13,7 @@
     },
     "irons_jewelry:attribute": {
       "amount": 1.0,
-      "attribute": "apothic_attributes:armor_pierce",
+      "attribute": "irons_lib:armor_pierce",
       "operation": "add_value"
     },
     "irons_jewelry:negative_effect": {
@@ -27,9 +27,6 @@
   "ingredient": {
     "tag": "c:gems/amethyst"
   },
-  "materialType": [
-    "gem"
-  ],
   "paletteLocation": "irons_jewelry:palettes/amethyst",
   "quality": 1.0
 }

@@ -2,7 +2,7 @@ package io.redspace.ironsjewelry.item;
 
 import io.redspace.ironsjewelry.core.data.PatternDefinition;
 import io.redspace.ironsjewelry.core.data.PlayerData;
-import io.redspace.ironsjewelry.registry.ComponentRegistry;
+import io.redspace.ironsjewelry.core.data.StoredPatternData;
 import io.redspace.ironsjewelry.registry.DataAttachmentRegistry;
 import io.redspace.ironsjewelry.registry.ItemRegistry;
 import io.redspace.ironsjewelry.utils.MinecraftInstanceHelper;
@@ -31,8 +31,8 @@ public class PatternRecipeItem extends Item {
     @Override
     public InteractionResultHolder<ItemStack> use(Level pLevel, Player pPlayer, InteractionHand pUsedHand) {
         var stack = pPlayer.getItemInHand(pUsedHand);
-        if (stack.has(ComponentRegistry.STORED_PATTERN)) {
-            var pattern = stack.get(ComponentRegistry.STORED_PATTERN);
+        if (StoredPatternData.has(stack)) {
+            var pattern = StoredPatternData.get(stack);
             var playerData = pPlayer.getData(DataAttachmentRegistry.PLAYER_DATA);
             if (!playerData.isLearned(pattern)) {
                 if (pPlayer instanceof ServerPlayer serverPlayer) {
@@ -61,8 +61,8 @@ public class PatternRecipeItem extends Item {
     @ParametersAreNonnullByDefault
     public void appendHoverText(ItemStack stack, TooltipContext pContext, List<Component> pTooltipComponents, TooltipFlag pTooltipFlag) {
         super.appendHoverText(stack, pContext, pTooltipComponents, pTooltipFlag);
-        if (stack.has(ComponentRegistry.STORED_PATTERN)) {
-            var pattern = stack.get(ComponentRegistry.STORED_PATTERN);
+        if (StoredPatternData.has(stack)) {
+            var pattern = StoredPatternData.get(stack);
             pTooltipComponents.add(Component.translatable("tooltip.irons_jewelry.stored_pattern", Component.translatable(pattern.value().descriptionId()).withStyle(ChatFormatting.GOLD)).withStyle(ChatFormatting.GRAY));
             var player = MinecraftInstanceHelper.getPlayer();
             if (player != null) {
@@ -78,7 +78,7 @@ public class PatternRecipeItem extends Item {
 
     public static ItemStack of(Holder<PatternDefinition> patternDefinitionHolder) {
         ItemStack stack = new ItemStack(ItemRegistry.RECIPE);
-        stack.set(ComponentRegistry.STORED_PATTERN, patternDefinitionHolder);
+        StoredPatternData.set(stack, patternDefinitionHolder);
         return stack;
     }
 }

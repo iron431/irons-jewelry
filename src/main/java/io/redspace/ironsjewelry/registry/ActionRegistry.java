@@ -2,7 +2,15 @@ package io.redspace.ironsjewelry.registry;
 
 import com.mojang.serialization.MapCodec;
 import io.redspace.ironsjewelry.IronsJewelry;
-import io.redspace.ironsjewelry.core.actions.*;
+import io.redspace.ironsjewelry.core.actions.ApplyDamageAction;
+import io.redspace.ironsjewelry.core.actions.ApplyEffectAction;
+import io.redspace.ironsjewelry.core.actions.ApplyFreezeAction;
+import io.redspace.ironsjewelry.core.actions.CreateItemsAction;
+import io.redspace.ironsjewelry.core.actions.ExplodeAction;
+import io.redspace.ironsjewelry.core.actions.HealAction;
+import io.redspace.ironsjewelry.core.actions.IAction;
+import io.redspace.ironsjewelry.core.actions.IgniteAction;
+import io.redspace.ironsjewelry.core.actions.KnockbackAction;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredRegister;
 

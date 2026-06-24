@@ -146,6 +146,7 @@
   "bonus_parameter.irons_jewelry.attribute": "Attribute",
   "bonus_parameter.irons_jewelry.empty": "Empty",
 
+
   "action.irons_jewelry.apply_effect.name": "Apply Effect",
   "action.irons_jewelry.apply_effect.self": "Gain %s%s",
   "action.irons_jewelry.apply_effect.entity": "Inflict %s%s",

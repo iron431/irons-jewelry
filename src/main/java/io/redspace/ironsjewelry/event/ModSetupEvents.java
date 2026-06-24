@@ -5,7 +5,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 
-@EventBusSubscriber(bus= EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber
 public class ModSetupEvents {
 
     @SubscribeEvent

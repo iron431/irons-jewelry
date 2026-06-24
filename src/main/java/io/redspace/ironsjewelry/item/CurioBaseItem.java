@@ -5,10 +5,13 @@ import com.google.common.collect.Multimap;
 import io.redspace.ironsjewelry.client.ClientEvents;
 import io.redspace.ironsjewelry.core.bonuses.AttributeBonusType;
 import io.redspace.ironsjewelry.core.bonuses.PiglinNeutralBonusType;
-import io.redspace.ironsjewelry.core.data.*;
+import io.redspace.ironsjewelry.core.data.BonusInstance;
+import io.redspace.ironsjewelry.core.data.JewelryData;
+import io.redspace.ironsjewelry.core.data.MaterialDefinition;
+import io.redspace.ironsjewelry.core.data.PartDefinition;
+import io.redspace.ironsjewelry.core.data.PatternDefinition;
 import io.redspace.ironsjewelry.core.parameters.IBonusParameterType;
 import io.redspace.ironsjewelry.registry.BonusTypeRegistry;
-import io.redspace.ironsjewelry.registry.ComponentRegistry;
 import io.redspace.ironsjewelry.utils.Utils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
@@ -30,7 +33,11 @@ import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.api.type.capability.ICurioItem;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 public class CurioBaseItem extends Item implements ICurioItem {
     String slotIdentifier;
@@ -87,10 +94,8 @@ public class CurioBaseItem extends Item implements ICurioItem {
     @Override
     public void verifyComponentsAfterLoad(@NotNull ItemStack stack) {
         super.verifyComponentsAfterLoad(stack);
-        if (stack.has(ComponentRegistry.JEWELRY_COMPONENT)) {
-            if (!stack.get(ComponentRegistry.JEWELRY_COMPONENT).isValid()) {
-                stack.remove(DataComponents.ITEM_NAME);
-            }
+        if (JewelryData.has(stack) && !JewelryData.get(stack).isValid()) {
+            stack.remove(DataComponents.ITEM_NAME);
         }
     }
 
@@ -105,7 +110,7 @@ public class CurioBaseItem extends Item implements ICurioItem {
             Optional<Component> qualityComponent = Optional.empty();
             int i2 = i;
             Optional<MutableComponent> costComponent = materialCost.map(list -> {
-                var count = list.size() > i2 && parts.containsKey(currentPart) && currentPart.value().canUseMaterial(parts.get(currentPart).value().materialType()) ? list.get(i2) : 0;
+                var count = list.size() > i2 && parts.containsKey(currentPart) && currentPart.value().canUseMaterial(parts.get(currentPart)) ? list.get(i2) : 0;
                 String cost = String.format("(%s/%s)", count, partIngredient.materialCost());
                 return Optional.of(Component.literal("  * ").append(Component.literal(cost).withStyle(count >= partIngredient.materialCost() ? ChatFormatting.GREEN : ChatFormatting.RED)).withStyle(ChatFormatting.DARK_GRAY));
             }).orElse(Optional.empty());
@@ -156,7 +161,7 @@ public class CurioBaseItem extends Item implements ICurioItem {
 
     @Override
     public Multimap<Holder<Attribute>, AttributeModifier> getAttributeModifiers(SlotContext slotContext, ResourceLocation id, ItemStack stack) {
-        JewelryData data = stack.get(ComponentRegistry.JEWELRY_COMPONENT);
+        JewelryData data = JewelryData.getNullable(stack);
         //TODO: cache these in the stack's attribute component for as long as index hasn't changed?
         if (data != null && slotContext.identifier().equals(this.slotIdentifier)) {
             var bonuses = data.getBonuses();

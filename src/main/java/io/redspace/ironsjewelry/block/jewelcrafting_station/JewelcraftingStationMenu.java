@@ -1,10 +1,13 @@
 package io.redspace.ironsjewelry.block.jewelcrafting_station;
 
-import io.redspace.ironsjewelry.core.data.*;
+import io.redspace.ironsjewelry.core.data.JewelryData;
+import io.redspace.ironsjewelry.core.data.MaterialDefinition;
+import io.redspace.ironsjewelry.core.data.PartDefinition;
+import io.redspace.ironsjewelry.core.data.PatternDefinition;
+import io.redspace.ironsjewelry.core.data.PlayerData;
 import io.redspace.ironsjewelry.event.SetupJewelcraftingResultEvent;
 import io.redspace.ironsjewelry.network.packets.SyncJewelcraftingSlotStates;
 import io.redspace.ironsjewelry.registry.BlockRegistry;
-import io.redspace.ironsjewelry.registry.ComponentRegistry;
 import io.redspace.ironsjewelry.registry.MenuRegistry;
 import io.redspace.ironsjewelry.utils.Utils;
 import net.minecraft.core.Holder;
@@ -137,7 +140,7 @@ public class JewelcraftingStationMenu extends AbstractContainerMenu {
                 var ingredient = requiredIngredients.get(i);
                 var input = workspaceSlots.get(i).getItem();
                 var material = Utils.getMaterialForIngredient(this.player.registryAccess(), input);
-                if (material.isPresent() && input.getCount() >= ingredient.materialCost() && ingredient.part().value().canUseMaterial(material.get().value().materialType())) {
+                if (material.isPresent() && input.getCount() >= ingredient.materialCost() && ingredient.part().value().canUseMaterial(material.get())) {
                     parts.put(ingredient.part(), material.get());
                     workspaceSlots.get(i).currentCost = ingredient.materialCost();
                 }
@@ -145,7 +148,7 @@ public class JewelcraftingStationMenu extends AbstractContainerMenu {
             var jewelryData = new JewelryData(this.currentPattern, parts);
             if (jewelryData.isValid()) {
                 result = new ItemStack(currentPattern.jewelryType().item());
-                result.set(ComponentRegistry.JEWELRY_COMPONENT, jewelryData);
+                JewelryData.set(result, jewelryData);
             }
             //Event posting
             var event = new SetupJewelcraftingResultEvent(this.currentPattern, this.player, result);

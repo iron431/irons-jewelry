@@ -4,13 +4,21 @@ import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import io.redspace.ironsjewelry.IronsJewelry;
-import io.redspace.ironsjewelry.core.data.*;
+import io.redspace.ironsjewelry.core.data.JewelryData;
+import io.redspace.ironsjewelry.core.data.MaterialDefinition;
+import io.redspace.ironsjewelry.core.data.PartDefinition;
+import io.redspace.ironsjewelry.core.data.PartIngredient;
+import io.redspace.ironsjewelry.core.data.PatternDefinition;
+import io.redspace.ironsjewelry.core.data.PlayerData;
 import io.redspace.ironsjewelry.core.parameters.IBonusParameterType;
 import io.redspace.ironsjewelry.item.book.buttons.GuideBookButton;
 import io.redspace.ironsjewelry.item.book.buttons.PageButton;
 import io.redspace.ironsjewelry.item.book.buttons.TextButton;
 import io.redspace.ironsjewelry.network.packets.ServerboundSetBookmarkPacket;
-import io.redspace.ironsjewelry.registry.*;
+import io.redspace.ironsjewelry.registry.AssetHandlerRegistry;
+import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
+import io.redspace.ironsjewelry.registry.ItemRegistry;
+import io.redspace.ironsjewelry.registry.ParameterTypeRegistry;
 import io.redspace.ironsjewelry.utils.Utils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -44,7 +52,16 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Queue;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -217,7 +234,7 @@ public class GuideBookScreen extends Screen {
         var patternRegistry = IronsJewelryRegistries.patternRegistry(Minecraft.getInstance().level.registryAccess());
         List<Page> materialPages = new ArrayList<>();
         // Construct a material page if the material exists and has valid items to be crafted from
-        materialRegistry.holders().filter(holder -> !holder.value().ingredient().hasNoItems()).forEach(holder -> materialPages.add(new MaterialPage(holder)));
+        Utils.getEnabledMaterials(Minecraft.getInstance().level.registryAccess()).forEach(holder -> materialPages.add(new MaterialPage(holder)));
         // Effectively curry buttons by using preparation structure. Allows all information to be created now, and the button can be positioned and fit onto the screen later, because it is difficult to position all elements without knowing how many there are
         List<Function<TableOfContentsPage.EntryPreparation, GuideBookButton>> materialTableOfContentsEntries = new ArrayList<>();
         for (int i = 0; i < materialPages.size(); i++) {
@@ -225,7 +242,7 @@ public class GuideBookScreen extends Screen {
             var material = materialPage.material;
             materialTableOfContentsEntries.add(preparation ->
                     new TextButton(preparation.x(), preparation.y(), preparation.width(), preparation.height(), Component.translatable(material.value().descriptionId()), 0xFF000000, ChatFormatting.YELLOW.getColor(),
-                            List.of(material.value().ingredient().getItems()), guidebook -> guidebook.navigateToPage(materialPage)));
+                            material.value().getIngredientItems().map(ItemStack::new).toList(), guidebook -> guidebook.navigateToPage(materialPage)));
         }
         materialPages.addAll(0, createTableOfContentsPages(Component.translatable("ui.irons_jewelry.guide_book.table_of_contents_materials"), materialTableOfContentsEntries, 75));
 
@@ -428,7 +445,7 @@ public class GuideBookScreen extends Screen {
         public MaterialPage(Holder<MaterialDefinition> material) {
             this.material = material;
             this.cachedTextColor = generateTextColor(material.value().paletteLocation());
-            this.itemRenderer = new CyclicItemRenderer(List.of(material.value().ingredient().getItems()));
+            this.itemRenderer = new CyclicItemRenderer(material.value().getIngredientItems().map(ItemStack::new).toList());
             this.bonusTable = new ArrayList<>();
             bonusTable.add(new TableEntry(
                     Component.translatable("ui.irons_jewelry.quality"),
@@ -654,8 +671,9 @@ public class GuideBookScreen extends Screen {
                 tooltip.add(name);
                 tooltip.add(Component.literal(" ").append(Component.translatable("tooltip.irons_jewelry.material_cost", Component.literal(String.valueOf(partIngredient.materialCost())).withStyle(ChatFormatting.WHITE))).withStyle(ChatFormatting.GRAY));
                 tooltip.add(Component.translatable("tooltip.irons_jewelry.applicable_materials").withStyle(ChatFormatting.YELLOW, ChatFormatting.UNDERLINE));
-                IronsJewelryRegistries.materialRegistry(Minecraft.getInstance().level.registryAccess()).stream().filter(materialDefinition -> !materialDefinition.ingredient().hasNoItems() && part.value().canUseMaterial(materialDefinition.materialType()))
-                        .forEach(m -> tooltip.add(Component.literal(" ").append(Component.translatable(m.descriptionId())).withStyle(ChatFormatting.GRAY)));
+                Utils.getEnabledMaterials(Minecraft.getInstance().level.registryAccess()).stream()
+                        .filter(candidate -> part.value().canUseMaterial(candidate))
+                        .forEach(m -> tooltip.add(Component.literal(" ").append(Component.translatable(m.value().descriptionId())).withStyle(ChatFormatting.GRAY)));
                 List<MutableComponent> partExpandedInfo = new ArrayList<>();
                 partExpandedInfo.add(name);
                 if (isPrimaryPart) {
@@ -869,14 +887,14 @@ public class GuideBookScreen extends Screen {
                 Map<Holder<PartDefinition>, Holder<MaterialDefinition>> parts = new HashMap<>();
                 for (var partIngredient : pattern.value().partTemplate()) {
                     var part = partIngredient.part();
-                    if (part.value().canUseMaterial("metal")) {
+                    if (part.value().canUseMaterial(metal)) {
                         renderMaterial = metal;
-                    } else if (part.value().canUseMaterial("gem")) {
+                    } else if (part.value().canUseMaterial(gem)) {
                         renderMaterial = gem;
                     } else {
-                        for (MaterialDefinition materialDefinition : materialRegistry) {
-                            if (part.value().canUseMaterial(materialDefinition.materialType())) {
-                                renderMaterial = materialRegistry.wrapAsHolder(materialDefinition);
+                        for (Holder.Reference<MaterialDefinition> materialDefinition : materialRegistry.holders().toList()) {
+                            if (part.value().canUseMaterial(materialDefinition)) {
+                                renderMaterial = materialDefinition;
                                 break;
                             }
                         }

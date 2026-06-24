@@ -84,14 +84,6 @@ file="META-INF/accesstransformer.cfg"
     versionRange="${minecraft_version_range}"
     ordering="NONE"
     side="BOTH"
-
-[[dependencies.${mod_id}]]
-    modId="apothic_attributes"
-    type="required"
-    versionRange="[${attribute_lib_version},)"
-    ordering="NONE"
-    side="BOTH"
-
 [[dependencies.${mod_id}]]
     modId="curios"
     type="required"
@@ -108,6 +100,6 @@ file="META-INF/accesstransformer.cfg"
 [[dependencies.${mod_id}]]
     modId="irons_lib"
     type="required"
-    versionRange="[1.21.1-1,1.21.1-2)"
+    versionRange="[1.21.1-1.1,1.21.1-2)"
     ordering="NONE"
     side="BOTH"

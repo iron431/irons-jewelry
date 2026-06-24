@@ -3,7 +3,7 @@ package io.redspace.ironsjewelry.loot;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.redspace.ironsjewelry.core.data.PatternDefinition;
-import io.redspace.ironsjewelry.registry.ComponentRegistry;
+import io.redspace.ironsjewelry.core.data.StoredPatternData;
 import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
 import io.redspace.ironsjewelry.registry.LootRegistry;
 import net.minecraft.core.HolderSet;
@@ -26,7 +26,7 @@ public record SetHeldPatternLootFunction(
 
     @Override
     public ItemStack apply(ItemStack stack, LootContext lootContext) {
-        this.patternSource.getRandomElement(lootContext.getRandom()).ifPresent(pattern -> stack.set(ComponentRegistry.STORED_PATTERN, pattern));
+        this.patternSource.getRandomElement(lootContext.getRandom()).ifPresent(pattern -> StoredPatternData.set(stack, pattern));
         return stack;
     }
 }

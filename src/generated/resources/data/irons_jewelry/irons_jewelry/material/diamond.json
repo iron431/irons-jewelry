@@ -27,9 +27,6 @@
   "ingredient": {
     "tag": "c:gems/diamond"
   },
-  "materialType": [
-    "gem"
-  ],
   "paletteLocation": "irons_jewelry:palettes/diamond",
   "quality": 2.0
 }

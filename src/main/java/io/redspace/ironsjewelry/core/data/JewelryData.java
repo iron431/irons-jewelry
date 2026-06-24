@@ -17,9 +17,13 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -90,17 +94,30 @@ public class JewelryData {
 
     public static JewelryData NONE = new JewelryData();
 
+    public static boolean has(ItemStack itemStack) {
+        return itemStack.has(ComponentRegistry.JEWELRY_COMPONENT);
+    }
+
     @NotNull
     public static JewelryData get(ItemStack itemStack) {
         return itemStack.getOrDefault(ComponentRegistry.JEWELRY_COMPONENT, NONE);
+    }
+
+    @Nullable
+    public static JewelryData getNullable(ItemStack itemStack) {
+        return itemStack.get(ComponentRegistry.JEWELRY_COMPONENT);
     }
 
     public static void set(ItemStack itemStack, JewelryData data) {
         itemStack.set(ComponentRegistry.JEWELRY_COMPONENT, data);
     }
 
+    public static void remove(ItemStack itemStack) {
+        itemStack.remove(ComponentRegistry.JEWELRY_COMPONENT);
+    }
+
     public static void ifPresent(ItemStack itemStack, Consumer<JewelryData> consumer) {
-        var data = itemStack.get(ComponentRegistry.JEWELRY_COMPONENT);
+        var data = getNullable(itemStack);
         if (data != null) {
             consumer.accept(data);
         }

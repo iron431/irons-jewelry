@@ -11,10 +11,11 @@ import java.util.Optional;
 
 /**
  * The template bonus that a {@link PartIngredient} holds as a member of a pattern's part template
- * @param bonusType Type of bonus granted
+ *
+ * @param bonusType         Type of bonus granted
  * @param qualityMultiplier Inherent quality factor from this part
  * @param cooldown
- * @param parameterValue Optional predefined and fixed bonus parameter
+ * @param parameterValue    Optional predefined and fixed bonus parameter
  */
 public record Bonus(BonusType bonusType,
                     double qualityMultiplier,
@@ -28,7 +29,7 @@ public record Bonus(BonusType bonusType,
     ).apply(builder, Bonus::new));
 
     public Bonus(BonusType bonusType, double qualityMultiplier) {
-       this(bonusType, qualityMultiplier, Optional.empty(), Map.of());
+        this(bonusType, qualityMultiplier, Optional.empty(), Map.of());
     }
 }
 

@@ -5,21 +5,27 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import io.netty.buffer.ByteBuf;
 import io.redspace.ironsjewelry.IronsJewelry;
-import io.redspace.ironsjewelry.core.data.*;
-import io.redspace.ironsjewelry.registry.ComponentRegistry;
+import io.redspace.ironsjewelry.core.data.BonusInstance;
+import io.redspace.ironsjewelry.core.data.JewelryData;
+import io.redspace.ironsjewelry.core.data.MaterialDefinition;
+import io.redspace.ironsjewelry.core.data.PartIngredient;
+import io.redspace.ironsjewelry.core.data.PatternDefinition;
 import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.ItemLore;
+import net.minecraft.world.level.Level;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotResult;
 
@@ -57,15 +63,20 @@ public class Utils {
 
     public static Optional<Holder<MaterialDefinition>> getMaterialForIngredient(RegistryAccess access, ItemStack ingredient) {
         var r = IronsJewelryRegistries.materialRegistry(access);
-        return r.stream().filter(material -> material.ingredient().test(ingredient)).map(r::wrapAsHolder).findFirst();
+        return r.stream().filter(material -> material.ingredient().map(ingr -> ingr.test(ingredient)).orElse(false)).map(r::wrapAsHolder).findFirst();
+    }
+
+    public static List<Holder<MaterialDefinition>> getEnabledMaterials(RegistryAccess access) {
+        var r = IronsJewelryRegistries.materialRegistry(access);
+        return r.stream().filter(material -> !material.isIngredientEmpty()).map(r::wrapAsHolder).toList();
     }
 
     public static List<BonusInstance> getEquippedBonuses(Player player) {
-        return CuriosApi.getCuriosInventory(player).map(inv -> inv.findCurios(stack -> stack.has(ComponentRegistry.JEWELRY_COMPONENT)).stream().flatMap(slot -> JewelryData.get(slot.stack()).getBonuses().stream()).toList()).orElse(List.of());
+        return CuriosApi.getCuriosInventory(player).map(inv -> inv.findCurios(JewelryData::has).stream().flatMap(slot -> JewelryData.get(slot.stack()).getBonuses().stream()).toList()).orElse(List.of());
     }
 
     public static List<ItemStack> getEquippedJewelry(Player player) {
-        return CuriosApi.getCuriosInventory(player).map(inv -> inv.findCurios(stack -> stack.has(ComponentRegistry.JEWELRY_COMPONENT)).stream().map(SlotResult::stack).toList()).orElse(List.of());
+        return CuriosApi.getCuriosInventory(player).map(inv -> inv.findCurios(JewelryData::has).stream().map(SlotResult::stack).toList()).orElse(List.of());
     }
 
     public static List<FormattedCharSequence> rasterizeComponentList(List<? extends Component> components) {
@@ -136,7 +147,7 @@ public class Utils {
         var parts = pattern.partTemplate().stream().map(PartIngredient::part).collect(Collectors.toMap(Function.identity(),
                 (p) -> iron));
         JewelryData jewelryData = JewelryData.renderable(IronsJewelryRegistries.patternRegistry(Minecraft.getInstance().level.registryAccess()).wrapAsHolder(pattern), parts);
-        output.set(ComponentRegistry.JEWELRY_COMPONENT, jewelryData);
+        JewelryData.set(output, jewelryData);
         var bonuses = pattern.getPatternBonusesTooltip();
         if (!bonuses.isEmpty()) {
             bonuses.set(0, Component.translatable("tooltip.irons_jewelry.bonus_crafted_header").withStyle(ChatFormatting.YELLOW, ChatFormatting.UNDERLINE)); // replace header
@@ -144,5 +155,9 @@ public class Utils {
             output.set(DataComponents.LORE, new ItemLore(bonuses.stream().map(component -> (Component) component.withStyle(component.getStyle().withItalic(false))).toList()));
         }
         return output;
+    }
+
+    public static void spawnParticles(Level level, ParticleOptions particle, double x, double y, double z, int count, double deltaX, double deltaY, double deltaZ, double speed, boolean force) {
+        level.getServer().getPlayerList().getPlayers().forEach(player -> ((ServerLevel) level).sendParticles(player, particle, force, x, y, z, count, deltaX, deltaY, deltaZ, speed));
     }
 }

@@ -26,7 +26,7 @@
     },
     "irons_jewelry:attribute": {
       "amount": 0.1,
-      "attribute": "apothic_attributes:arrow_damage",
+      "attribute": "irons_lib:arrow_damage",
       "operation": "add_multiplied_total"
     },
     "irons_jewelry:negative_effect": {
@@ -40,9 +40,6 @@
   "ingredient": {
     "tag": "c:gems/moonstone"
   },
-  "materialType": [
-    "gem"
-  ],
   "paletteLocation": "irons_jewelry:palettes/moonstone",
   "quality": 2.0
 }

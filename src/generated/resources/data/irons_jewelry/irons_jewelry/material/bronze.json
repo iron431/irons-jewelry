@@ -10,9 +10,6 @@
   "ingredient": {
     "tag": "c:ingots/bronze"
   },
-  "materialType": [
-    "metal"
-  ],
   "paletteLocation": "irons_jewelry:palettes/bronze",
   "quality": 1.0
 }

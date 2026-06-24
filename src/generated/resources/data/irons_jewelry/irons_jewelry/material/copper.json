@@ -27,9 +27,6 @@
   "ingredient": {
     "tag": "c:ingots/copper"
   },
-  "materialType": [
-    "metal"
-  ],
   "paletteLocation": "irons_jewelry:palettes/copper",
   "quality": 0.5
 }

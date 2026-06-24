@@ -29,9 +29,6 @@
   "ingredient": {
     "tag": "c:gems/garnet"
   },
-  "materialType": [
-    "gem"
-  ],
   "paletteLocation": "irons_jewelry:palettes/garnet",
   "quality": 2.0
 }

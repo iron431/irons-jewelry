@@ -1,12 +1,9 @@
 package io.redspace.ironsjewelry.compat.jei;
 
 import io.redspace.ironsjewelry.IronsJewelry;
-import io.redspace.ironsjewelry.core.data.JewelryData;
 import io.redspace.ironsjewelry.core.data.MaterialDefinition;
-import io.redspace.ironsjewelry.core.data.PartIngredient;
 import io.redspace.ironsjewelry.core.data.PatternDefinition;
 import io.redspace.ironsjewelry.registry.BlockRegistry;
-import io.redspace.ironsjewelry.registry.ComponentRegistry;
 import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
 import io.redspace.ironsjewelry.utils.Utils;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
@@ -23,16 +20,12 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.TooltipRenderUtil;
 import net.minecraft.core.Holder;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.component.ItemLore;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class JewelcraftingJeiRecipeCategory implements IRecipeCategory<PatternDefinition> {
     public static final RecipeType<PatternDefinition> RECIPE_TYPE = RecipeType.create(IronsJewelry.MODID, "jewelcrafting", PatternDefinition.class);
@@ -87,7 +80,7 @@ public class JewelcraftingJeiRecipeCategory implements IRecipeCategory<PatternDe
         for (int i = 0; i < template.size(); i++) {
             var partIngredient = template.get(i);
             var part = partIngredient.part().value();
-            var stacks = materialRegistry.stream().filter(material -> part.canUseMaterial(material.materialType())).map(MaterialDefinition::ingredient).filter(ingr -> !ingr.hasNoItems()).flatMap(ingredient -> Arrays.stream(ingredient.getItems())).map(ItemStack::copy).toList();
+            var stacks = Utils.getEnabledMaterials(Minecraft.getInstance().level.registryAccess()).stream().filter(part::canUseMaterial).flatMap(mat -> mat.value().getIngredientItems()).map(ItemStack::new).toList();
             stacks.forEach(stack -> stack.setCount(partIngredient.materialCost()));
             builder.addSlot(RecipeIngredientRole.INPUT, buffer + leftPos + i * widthPer, 9 + 5 + 6)
                     .addItemStacks(stacks)

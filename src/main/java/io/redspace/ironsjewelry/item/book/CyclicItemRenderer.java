@@ -15,7 +15,7 @@ public class CyclicItemRenderer {
         this.items = items;
     }
 
-    public ItemStack get(){
+    public ItemStack get() {
         if (System.currentTimeMillis() > lastItemDisplayMilis + MILIS_PER_ITEM) {
             index = (index + 1) % items.size();
             lastItemDisplayMilis = System.currentTimeMillis();
@@ -23,7 +23,7 @@ public class CyclicItemRenderer {
         return items.get(index);
     }
 
-    public void renderBottomLeft(GuiGraphics guiGraphics, int x, int y, float scale){
+    public void renderBottomLeft(GuiGraphics guiGraphics, int x, int y, float scale) {
         guiGraphics.pose().pushPose();
         guiGraphics.pose().scale(scale, scale, scale);
         guiGraphics.renderItem(get(), (int) (x / scale), (int) (y / scale - 16));

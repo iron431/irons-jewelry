@@ -48,17 +48,17 @@ public class AttributeParameter implements IBonusParameterType<AttributeInstance
         }
         if (d0 >= 0.0) {
             return Optional.of(Component.translatable(
-                            "attribute.modifier.plus." + value.operation().id(),
-                            ItemAttributeModifiers.ATTRIBUTE_MODIFIER_FORMAT.format(d1),
-                            Component.translatable(attribute.value().getDescriptionId())
-                    ));
+                    "attribute.modifier.plus." + value.operation().id(),
+                    ItemAttributeModifiers.ATTRIBUTE_MODIFIER_FORMAT.format(d1),
+                    Component.translatable(attribute.value().getDescriptionId())
+            ));
         } else {
             return Optional.of(
                     Component.translatable(
-                                    "attribute.modifier.take." + value.operation().id(),
-                                    ItemAttributeModifiers.ATTRIBUTE_MODIFIER_FORMAT.format(-d1),
-                                    Component.translatable(attribute.value().getDescriptionId())
-                            ));
+                            "attribute.modifier.take." + value.operation().id(),
+                            ItemAttributeModifiers.ATTRIBUTE_MODIFIER_FORMAT.format(-d1),
+                            Component.translatable(attribute.value().getDescriptionId())
+                    ));
         }
     }
 }

@@ -15,4 +15,6 @@
 - 
 
 ### API
-- 
+- Removed `materialType` from material definitions; material classification is now driven by material registry tags.
+- Part material filters now use `allowedMaterials` holder sets instead of `allowedMaterialTypes` string lists.
+- `irons_jewelry:generate_jewelry` loot `materials` filter keys now use material tags (for example `#irons_jewelry:metal`) instead of free-form strings.

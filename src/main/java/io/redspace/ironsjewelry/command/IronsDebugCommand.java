@@ -13,8 +13,12 @@ import io.redspace.ironsjewelry.core.data.JewelryData;
 import io.redspace.ironsjewelry.core.data.MaterialDefinition;
 import io.redspace.ironsjewelry.core.data.PartIngredient;
 import io.redspace.ironsjewelry.core.data.PatternDefinition;
+import io.redspace.ironsjewelry.core.data.StoredPatternData;
 import io.redspace.ironsjewelry.loot.LootInjectionHandler;
-import io.redspace.ironsjewelry.registry.*;
+import io.redspace.ironsjewelry.registry.AssetHandlerRegistry;
+import io.redspace.ironsjewelry.registry.DataAttachmentRegistry;
+import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
+import io.redspace.ironsjewelry.registry.ItemRegistry;
 import joptsimple.internal.Strings;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
@@ -31,7 +35,11 @@ import net.neoforged.fml.loading.FMLLoader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 public class IronsDebugCommand {
@@ -78,7 +86,7 @@ public class IronsDebugCommand {
             for (PartIngredient part : patternDefinition.partTemplate()) {
                 int option = 0;
                 for (MaterialDefinition materialDefinition : materials) {
-                    if (part.part().value().canUseMaterial(materialDefinition.materialType())) {
+                    if (part.part().value().canUseMaterial(materials.wrapAsHolder(materialDefinition))) {
                         option++;
                     }
                 }
@@ -105,7 +113,7 @@ public class IronsDebugCommand {
         if (pattern.isPresent()) {
             var serverPlayer = source.getPlayer();
             ItemStack stack = new ItemStack(ItemRegistry.RECIPE.get());
-            stack.set(ComponentRegistry.STORED_PATTERN, pattern.get());
+            StoredPatternData.set(stack, pattern.get());
             serverPlayer.getInventory().add(stack);
             return 1;
         }
