@@ -5,6 +5,7 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.redspace.ironsjewelry.core.data.BonusInstance;
 import io.redspace.ironsjewelry.core.data.QualityScalar;
+import io.redspace.ironsjewelry.mixin.LivingEntityAccessor;
 import io.redspace.ironsjewelry.utils.DamageHelper;
 import io.redspace.ironsjewelry.utils.Utils;
 import net.minecraft.ChatFormatting;
@@ -17,6 +18,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 
 import java.util.Optional;
 
@@ -35,14 +37,18 @@ public record ApplyDamageAction(Holder<DamageType> damageType, QualityScalar amo
         var damageSource = new DamageSource(this.damageType, null, wearer, wearer.position());
         var damage = getDamage(quality);
         var target = applyToSelf ? wearer : entity;
-
         if (applyToSelf) {
             DamageHelper.ignoreNextKnockback(wearer);
         } else if (wearer.getUUID().equals(target.getUUID())) {
             // prevent self-inflicted damage if not explicitly allowed
             return;
         }
+        if (target instanceof LivingEntity living && (living.isDeadOrDying() || ((LivingEntityAccessor) living).isDead())) {
+            // prevent edge case crash with creepers and neoforge damage event pipeline, where the pipeline can start but not finish due to timing when a creeper explodes
+            return;
+        }
         target.hurt(damageSource, damage);
+        target.invulnerableTime = 0;
         this.soundEvent.ifPresent(sound -> target.playSound(sound.value()));
     }
 
