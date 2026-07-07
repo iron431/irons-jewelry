@@ -7,6 +7,7 @@ import io.redspace.ironsjewelry.core.data.BonusInstance;
 import io.redspace.ironsjewelry.core.data.PlayerData;
 import io.redspace.ironsjewelry.core.data.QualityScalar;
 import io.redspace.ironsjewelry.registry.IronsJewelryRegistries;
+import io.redspace.ironsjewelry.utils.DamageHelper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerLevel;
@@ -27,7 +28,7 @@ public interface IAction {
         var playerData = PlayerData.get(wearer);
         int cooldownTicks = cooldown.map(scalar -> CooldownHandler.INSTANCE.getCooldown(wearer, scalar, bonusInstance.quality())).orElse(0);
         if (cooldownTicks <= 0 || !playerData.isOnCooldown(bonusInstance.bonusType())) {
-            apply(serverLevel, bonusInstance.quality(), applyToSelf, wearer, entity);
+            DamageHelper.runWithoutRecursiveBonusTriggers(() -> apply(serverLevel, bonusInstance.quality(), applyToSelf, wearer, entity));
 //            wearer.level.playSound(null, wearer.blockPosition(), SoundRegistry.GENERIC_ACTION.get(), SoundSource.PLAYERS);
             if (cooldownTicks > 0) {
                 playerData.addCooldown(bonusInstance.bonusType(), cooldownTicks);

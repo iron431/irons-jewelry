@@ -5,6 +5,7 @@ import io.redspace.ironsjewelry.core.data.BonusInstance;
 import io.redspace.ironsjewelry.core.data.JewelryData;
 import io.redspace.ironsjewelry.core.parameters.ActionParameter;
 import io.redspace.ironsjewelry.registry.BonusTypeRegistry;
+import io.redspace.ironsjewelry.utils.DamageHelper;
 import io.redspace.ironsjewelry.utils.Utils;
 import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerPlayer;
@@ -39,6 +40,10 @@ public class JewelryBonusEvents {
 
     @SubscribeEvent
     public static void onLivingDamaged(LivingIncomingDamageEvent event) {
+        // Ignore nested damage caused by jewelry actions to prevent retaliation loops between players.
+        if (DamageHelper.isHandlingJewelryAction()) {
+            return;
+        }
         var damageSource = event.getSource();
         @Nullable var attacker = event.getSource().getEntity();
         var victim = event.getEntity();
