@@ -9,7 +9,7 @@
           "functions": [
             {
               "function": "irons_jewelry:set_held_pattern",
-              "patterns": "#irons_jewelry:nether_findable"
+              "patterns": "#irons_jewelry:nether_lootable"
             }
           ],
           "name": "irons_jewelry:recipe"
