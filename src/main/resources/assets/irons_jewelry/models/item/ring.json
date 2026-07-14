@@ -1,5 +1,5 @@
 {
-  "parent": "minecraft:item/generated",
+  "parent": "irons_jewelry:item/builtin",
   "display": {
     "thirdperson_righthand": {
       "rotation": [ 0, 0, 0 ],
