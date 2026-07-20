@@ -244,15 +244,43 @@ public class JewelryData {
         return this.pattern;
     }
 
+    private static net.minecraft.resources.ResourceLocation getHolderId(net.minecraft.core.Holder<?> holder) {
+        return holder.unwrapKey()
+                .map(net.minecraft.resources.ResourceKey::location)
+                .orElse(net.minecraft.resources.ResourceLocation.parse("irons_jewelry:unknown"));
+    }
+
     @Override
     public int hashCode() {
-        return hashCode;
+        int result = Objects.hashCode(getHolderId(this.pattern));
+        for (Map.Entry<net.minecraft.core.Holder<PartDefinition>, net.minecraft.core.Holder<MaterialDefinition>> entry : this.parts.entrySet()) {
+            result += Objects.hashCode(getHolderId(entry.getKey())) ^ Objects.hashCode(getHolderId(entry.getValue()));
+        }
+        return result;
     }
 
     @Override
     public boolean equals(Object obj) {
-        return obj == this || (obj instanceof JewelryData other
-                && this.pattern.equals(other.pattern)
-                && this.parts.equals(other.parts));
+        if (this == obj) return true;
+        if (!(obj instanceof JewelryData other)) return false;
+
+        if (!Objects.equals(getHolderId(this.pattern), getHolderId(other.pattern))) return false;
+
+        if (this.parts.size() != other.parts.size()) return false;
+
+        for (Map.Entry<net.minecraft.core.Holder<PartDefinition>, net.minecraft.core.Holder<MaterialDefinition>> entry : this.parts.entrySet()) {
+            net.minecraft.resources.ResourceLocation thisPartId = getHolderId(entry.getKey());
+            net.minecraft.resources.ResourceLocation thisMaterialId = getHolderId(entry.getValue());
+
+            net.minecraft.resources.ResourceLocation otherMaterialId = other.parts.entrySet().stream()
+                    .filter(e -> getHolderId(e.getKey()).equals(thisPartId))
+                    .map(e -> getHolderId(e.getValue()))
+                    .findFirst()
+                    .orElse(null);
+
+            if (otherMaterialId == null || !thisMaterialId.equals(otherMaterialId)) return false;
+        }
+
+        return true;
     }
 }
