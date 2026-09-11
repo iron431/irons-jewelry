@@ -65,7 +65,7 @@ public class Trades {
             if (pTrader.level() instanceof ServerLevel serverLevel) {
                 LootTable loottable = serverLevel.getServer().reloadableRegistries().getLootTable(this.lootTable);
                 var context = new LootParams.Builder(serverLevel).create(LootContextParamSets.EMPTY);
-                var items = loottable.getRandomItems(context);
+                var items = loottable.getRandomItems(context, pRandom);
                 if (items.isEmpty()) {
                     return null;
                 }
